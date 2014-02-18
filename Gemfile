@@ -58,6 +58,8 @@ gem 'rb-readline', '~> 0.4.2'
 
 group :development, :test do
 	gem 'nokogiri'
+	gem 'mechanize'
+	#gem 'bubble-wrap'
 	gem 'better_errors'								# Improve error page
   	gem 'binding_of_caller'
   	gem 'fuubar'									# テスト進行状況可視化
