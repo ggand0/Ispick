@@ -24,7 +24,8 @@ class TargetImagesController < ApplicationController
   # POST /target_images
   # POST /target_images.json
   def create
-    @target_image = TargetImage.new(target_image_params)
+    #target_image_params # titleのみのhash
+    @target_image = TargetImage.new(title: params[:target_image][:title], data: params[:target_image][:data])
 
     respond_to do |format|
       if @target_image.save
