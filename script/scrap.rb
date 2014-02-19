@@ -7,8 +7,9 @@ module Scrap
     Scrap::Nico.scrap()
     Scrap::Piapro.scrap()
     Scrap::Pixiv.scrap()
+    puts 'DONE!!'
   end
 end
 
 # 抽出開始
-Scrap.scrap_all()
+#Scrap.scrap_all()
