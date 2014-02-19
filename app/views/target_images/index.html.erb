@@ -1,0 +1,27 @@
+<h1>Listing target_images</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @target_images.each do |target_image| %>
+      <tr>
+        <td><%= target_image.title %></td>
+        <td><%= link_to 'Show', target_image %></td>
+        <td><%= link_to 'Edit', edit_target_image_path(target_image) %></td>
+        <td><%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Target image', new_target_image_path %>
