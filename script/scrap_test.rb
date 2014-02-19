@@ -1,4 +1,3 @@
-
 # coding: utf-8
 require 'open-uri'
 
@@ -6,15 +5,20 @@ page_url = 'http://dic.nicovideo.jp'
 
 # ニコ百「鹿目まどか」
 url = 'http://dic.nicovideo.jp/a/%E9%B9%BF%E7%9B%AE%E3%81%BE%E3%81%A9%E3%81%8B'
-b = Nokogiri::HTML(open(url))
+html = Nokogiri::HTML(open(url))
 puts url
 
-b.css('img').each do |item|
+# imgタグを全て選択/抽出する
+html.css('img').each do |item|
+  # srcフィールドにあるurlを抽出
   img_url = item['src'].split('?')[0]
   root_img_url = URI.join(page_url,img_url).to_s
   puts item['title']
 
+  # 抽出情報からImageモデルを生成
   image = Image.new(title: item['title'])
   image.image_from_url root_img_url
+
+  # DBに保存
   image.save!
 end

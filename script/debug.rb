@@ -2,8 +2,9 @@
 require 'open-uri'
 
 
-# Use official api
-ROOT_URL = 'http://backend.deviantart.com/rss.xml?type=deviation&q=boost%3Apopular+max_age%3A24h+in%3Amanga%2Fdigital+anime'
+# モジュール化する前の実験用として使用している
+#ROOT_URL = 'http://backend.deviantart.com/rss.xml?type=deviation&q=boost%3Apopular+max_age%3A24h+in%3Amanga%2Fdigital+anime'
+ROOT_URL = ''
 
 xml = Nokogiri::XML(open(ROOT_URL))
 puts 'Extracting : ' + ROOT_URL
