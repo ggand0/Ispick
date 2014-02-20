@@ -18,6 +18,10 @@ gem 'coffee-rails', '~> 4.0.0', :git => 'https://github.com/rails/coffee-rails.g
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 #gem 'therubyracer', platforms: :ruby
+gem 'libv8', '~> 3.11.8.13'
+gem 'therubyracer'#, '0.11.0beta8'
+#gem 'therubyracer', '0.10.2'
+#gem 'libv8', '3.11.8.3'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -59,6 +63,7 @@ gem 'rb-readline', '~> 0.4.2'
 group :development, :test do
 	gem 'nokogiri'
 	gem 'mechanize'
+
 	#gem 'bubble-wrap'
 	gem 'better_errors'								# Improve error page
   	gem 'binding_of_caller'
