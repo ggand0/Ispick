@@ -81,6 +81,46 @@ class TargetImagesController < ApplicationController
   end
 
 
+  def RGB2HSV(r, g, b, cone_model)
+    h = 0
+    s = 0
+    v = 0
+    max = [[r, g].max, b].max
+    min = [[r, g].min, b].min
+
+    # hue
+    if max == min
+      h = 0
+    elsif max == r
+      h = (60 * (g - b) * 1.0 / (max - min)*1.0) + 0
+    elsif max == g
+      h = (60 * (b - r) * 1.0 / (max - min)*1.0) + 120
+    else
+      h = (60 * (r - g) * 1.0 / (max - min)*1.0) + 240
+    end
+
+    while h < 0 do
+      h += 360
+    end
+
+    # saturation
+    if cone_model
+      s = max - min
+    else
+      #s = 0 if max==0 else (max-min)*1.0/max*255*1.0
+      if max==0
+        s = 0
+      else
+        s = (max-min)*1.0/max*255*1.0
+      end
+    end
+
+    # value
+    v = max
+
+    [h, s, v]
+  end
+
   # 顔の特徴量を抽出して、処理時間とともにJSON形式で表示する
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
@@ -95,6 +135,8 @@ class TargetImagesController < ApplicationController
     target_r = face_feature[0]['hair_color']['red'].to_i
     target_g = face_feature[0]['hair_color']['green'].to_i
     target_b = face_feature[0]['hair_color']['blue'].to_i
+    @target_rgb = [target_r, target_g, target_b]
+    @target_hsv = self.RGB2HSV(target_r, target_g, target_b, false)
 
     Image.all.each do |image|
       if image.face_feature == '[]'
@@ -105,15 +147,15 @@ class TargetImagesController < ApplicationController
       r = image_face[0]['hair_color']['red'].to_i
       g = image_face[0]['hair_color']['green'].to_i
       b = image_face[0]['hair_color']['blue'].to_i
+      hsv = self.RGB2HSV(r, g, b, false)
 
-      if (target_r - r).abs < 30 and (target_g - g).abs < 30 and (target_b - b).abs < 30
-      #if (target_r - r).abs < 100 and (target_g - g).abs < 100 and (target_b - b).abs < 100
-        @preferred.push(image)
+      #if (target_r - r).abs < 30 and (target_g - g).abs < 30 and (target_b - b).abs < 30
+      if (@target_hsv[0] - hsv[0]).abs < 20
+        @preferred.push({image: image, hsv: hsv})
       end
     end
 
     #render text: @preferred
-
   end
 
   private

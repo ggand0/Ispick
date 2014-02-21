@@ -1,4 +1,12 @@
 <h1>Listing preferred images</h1>
+<p>
+  <strong>Target RGB:</strong>
+  <%= @target_rgb %>
+</p>
+<p>
+  <strong>Target HSV:</strong>
+  <%= @target_hsv %>
+</p>
 
 <div class="wrap">
 
@@ -6,8 +14,9 @@
   <% @preferred.each do |image| %>
     <div class="box">
       <div class="boxInner">
-        <%= image_tag image.data.url %>
-        <div class="titleBox"><%= image.title.to_s %></div>
+        <%= image[:hsv] %>
+        <%= image_tag image[:image].data.url %>
+        <div class="titleBox"><%= image[:image].title.to_s %></div>
       </div>
     </div>
   <% end %>
