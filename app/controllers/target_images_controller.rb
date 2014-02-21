@@ -12,6 +12,8 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1
   # GET /target_images/1.json
   def show
+    @target_image = TargetImage.find(params[:id])
+    @face_feature = JSON.parse(@target_image.face_feature)
   end
 
   # GET /target_images/new
@@ -80,12 +82,37 @@ class TargetImagesController < ApplicationController
 
 
   # 顔の特徴量を抽出して、処理時間とともにJSON形式で表示する
+  # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
-    service = TargetImagesService.new
-    result = service.prefer(TargetImage.find(params[:id]))
+    #service = TargetImagesService.new
+    #result = service.prefer(TargetImage.find(params[:id]))
+    #render json: result
 
-    #json = { time: result[0], result: result[1] }
-    render json: result
+    preferred = []
+    target_image = TargetImage.find(params[:id])
+    face_feature = JSON.parse(target_image.face_feature)
+    #render text: face_feature[0]['hair_color']
+    target_r = face_feature[0]['hair_color']['red'].to_i
+    target_g = face_feature[0]['hair_color']['green'].to_i
+    target_b = face_feature[0]['hair_color']['blue'].to_i
+
+    Image.all.each do |image|
+      if image.face_feature == '[]'
+        next
+      end
+
+      image_face = JSON.parse(image.face_feature)
+      r = image_face[0]['hair_color']['red'].to_i
+      g = image_face[0]['hair_color']['green'].to_i
+      b = image_face[0]['hair_color']['blue'].to_i
+
+      #if (target_r - r).abs < 50 and (target_g - g).abs < 30 and (target_b - b).abs < 30
+      if (target_r - r).abs < 100 and (target_g - g).abs < 100 and (target_b - b).abs < 100
+        preferred.push(image)
+      end
+    end
+
+    render text: preferred
   end
 
   private
