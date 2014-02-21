@@ -1,9 +1,11 @@
 Ispic::Application.routes.draw do
   resources :target_images do
-    collection do
+    member do
       get 'prefer'
+      #get ':action/:id'
     end
   end
+  #get ':controller/:action/:id/'
 
   resources :images
 
