@@ -88,7 +88,7 @@ class TargetImagesController < ApplicationController
     #result = service.prefer(TargetImage.find(params[:id]))
     #render json: result
 
-    preferred = []
+    @preferred = []
     target_image = TargetImage.find(params[:id])
     face_feature = JSON.parse(target_image.face_feature)
     #render text: face_feature[0]['hair_color']
@@ -106,13 +106,14 @@ class TargetImagesController < ApplicationController
       g = image_face[0]['hair_color']['green'].to_i
       b = image_face[0]['hair_color']['blue'].to_i
 
-      #if (target_r - r).abs < 50 and (target_g - g).abs < 30 and (target_b - b).abs < 30
-      if (target_r - r).abs < 100 and (target_g - g).abs < 100 and (target_b - b).abs < 100
-        preferred.push(image)
+      if (target_r - r).abs < 30 and (target_g - g).abs < 30 and (target_b - b).abs < 30
+      #if (target_r - r).abs < 100 and (target_g - g).abs < 100 and (target_b - b).abs < 100
+        @preferred.push(image)
       end
     end
 
-    render text: preferred
+    #render text: @preferred
+
   end
 
   private

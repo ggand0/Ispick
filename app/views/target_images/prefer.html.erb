@@ -1,0 +1,14 @@
+<h1>Listing preferred images</h1>
+
+<div class="wrap">
+
+  <!-- Define all of the tiles: -->
+  <% @preferred.each do |image| %>
+    <div class="box">
+      <div class="boxInner">
+        <%= image_tag image.data.url %>
+        <div class="titleBox"><%= image.title.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
