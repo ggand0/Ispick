@@ -4,7 +4,6 @@ require "AnimeFace"
 require "RMagick"
 
 class TargetImagesService
-
   def get_face_feature(image_url)
     url = image_url.split('?')[0]
     image = Magick::ImageList.new(url)
