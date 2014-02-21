@@ -80,7 +80,9 @@ class TargetImagesController < ApplicationController
     result = service.prefer(TargetImage.find(params[:id]))
 
     #render text: 'require success!'
-    render text: result[0]
+    json = { time: result[0], result: result[1] }
+    #render text: result[0]+'¥n'+result[1]
+    render json: json
   end
 
   private
