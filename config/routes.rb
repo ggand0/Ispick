@@ -1,5 +1,9 @@
 Ispic::Application.routes.draw do
-  resources :target_images
+  resources :target_images do
+    collection do
+      get 'prefer'
+    end
+  end
 
   resources :images
 

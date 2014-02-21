@@ -70,6 +70,15 @@ class TargetImagesController < ApplicationController
     end
   end
 
+
+
+  def prefer
+    service = TargetImageService.new
+    list = service.prefer()
+
+    render text: 'require success!'
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_target_image
