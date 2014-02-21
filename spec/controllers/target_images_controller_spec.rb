@@ -117,36 +117,19 @@ describe TargetImagesController do
 
     describe "with valid params" do
       it "updates the requested target_image" do
-        TargetImage.delete_all
-        puts '¥n'
-        puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s#target_image.id.to_s
+        #TargetImage.delete_all
+        #puts '¥n'
+        #puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s
+
         # Assuming there are no other target_images in the database, this
         # specifies that the TargetImage created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         #TargetImage.any_instance.should_receive(:update).with({ "title" => "MyString" })
-        #TargetImage.any_instance.should_receive(:update_attributes)
-        #target_image = TargetImage.create! valid_attributes
-        #target_image.should_receive(:update_attributes).with(@updated_attr)
-
-        # これは通った
-        #expect(target_image).to receive(:debug)
-        #puts target_image.debug
-        # これも通る
-        #expect(target_image).to receive(:update_attributes)
-        #target_image.update_attributes(@updated_attr)
-        #target_image.should_receive(:update_attributes).with(@updated_attr)
-        #target_image.update_attributes(@updated_attr)
-
-        #TargetImage.first.should_receive(:update_attributes)
         target_image = TargetImage.create! valid_attributes
-        puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s
-        #TargetImage.any_instance.should_receive(:update_attributes)
-        #TargetImage.first.should_receive(:update_attributes)
 
+        # TargetImage.any_instanceだと何故か通らないのでexpect_any_instance_ofを使う
         expect_any_instance_of(TargetImage).to receive(:update_attributes).with(@updated_attr)
-        #TargetImage.first.update_attributes(@updated_attr)
-        #target_image.update_attributes(@updated_attr)
 
         #put :update, { id: target_image.to_param, target_image: @updated}, valid_session
         put :update, { id: target_image.id, target_image: @updated_attr }, valid_session
@@ -204,7 +187,7 @@ describe TargetImagesController do
 
   describe "Find preferred images" do
     it "Returns list of images" do
-      Image.new!
+      Image.new
       target_image = TargetImage.create! valid_attributes
       images = target_image.find_preferred
       images.length.should eq(1)
