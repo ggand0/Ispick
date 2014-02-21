@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/services/target_images_service"
+
 class TargetImagesController < ApplicationController
   before_action :set_target_image, only: [:show, :edit, :update, :destroy]
 
@@ -73,10 +75,12 @@ class TargetImagesController < ApplicationController
 
 
   def prefer
-    service = TargetImageService.new
-    list = service.prefer()
 
-    render text: 'require success!'
+    service = TargetImagesService.new
+    result = service.prefer(TargetImage.find(params[:id]))
+
+    #render text: 'require success!'
+    render text: result[0]
   end
 
   private
