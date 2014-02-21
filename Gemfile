@@ -63,7 +63,7 @@ gem 'rb-readline', '~> 0.4.2'
 group :development, :test do
 	gem 'nokogiri'
 	gem 'mechanize'
-  gem 'rmagick'                                    # Image processing lib. Used by AnimeFace
+  gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
 
 
 	gem 'better_errors'                              # Improve error page
