@@ -32,6 +32,12 @@ class TargetImagesController < ApplicationController
 
     respond_to do |format|
       if @target_image.save
+        # 顔の特徴量を抽出する
+        service = TargetImagesService.new
+        face_feature = service.prefer(@target_image)
+        json_string = face_feature[:result].to_json
+        @target_image.update_attributes({ face_feature: json_string })
+
         format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
@@ -73,16 +79,13 @@ class TargetImagesController < ApplicationController
   end
 
 
-
+  # 顔の特徴量を抽出して、処理時間とともにJSON形式で表示する
   def prefer
-
     service = TargetImagesService.new
     result = service.prefer(TargetImage.find(params[:id]))
 
-    #render text: 'require success!'
-    json = { time: result[0], result: result[1] }
-    #render text: result[0]+'¥n'+result[1]
-    render json: json
+    #json = { time: result[0], result: result[1] }
+    render json: result
   end
 
   private
