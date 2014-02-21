@@ -19,6 +19,7 @@ class TargetImagesController < ApplicationController
 
   # GET /target_images/1/edit
   def edit
+    #@target_image = TargetImage.find(params[:id])
   end
 
   # POST /target_images
@@ -41,8 +42,15 @@ class TargetImagesController < ApplicationController
   # PATCH/PUT /target_images/1
   # PATCH/PUT /target_images/1.json
   def update
+    target = TargetImage.find(params[:id])
+    hash = { title: params[:target_image][:title], data: params[:target_image][:data]}
+    h = { title: params[:target_image][:title] }
+
     respond_to do |format|
-      if @target_image.update(target_image_params)
+      #if @target_image.update(target_image_params)
+      if @target_image.update_attributes(hash)
+      #if target.update_attributes(hash)
+      #if @target_image.update_attributes(title: params[:target_image][:title], data: params[:target_image][:data])
         format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
         format.json { head :no_content }
       else

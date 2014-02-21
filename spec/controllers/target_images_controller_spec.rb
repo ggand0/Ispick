@@ -23,7 +23,11 @@ describe TargetImagesController do
   # This should return the minimal set of attributes required to create a valid
   # TargetImage. As you add validations to TargetImage, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "title" => "MyString" } }
+  #let(:valid_attributes) { { "title" => "MyString" } }
+  let(:valid_attributes) {{
+    title: "MyString",
+    data: fixture_file_upload('files/madoka.png')
+  }}
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -71,6 +75,7 @@ describe TargetImagesController do
 
       it "assigns a newly created target_image as @target_image" do
         post :create, {:target_image => valid_attributes}, valid_session
+        #puts :target_image# => target_image
         assigns(:target_image).should be_a(TargetImage)
         assigns(:target_image).should be_persisted
       end
@@ -85,29 +90,66 @@ describe TargetImagesController do
       it "assigns a newly created but unsaved target_image as @target_image" do
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        post :create, {:target_image => { "title" => "invalid value" }}, valid_session
+        post :create, { target_image: { title: "invalid value", data: nil }}, valid_session
         assigns(:target_image).should be_a_new(TargetImage)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        post :create, {:target_image => { "title" => "invalid value" }}, valid_session
+        post :create, { target_image: { title: "invalid value", data: nil }}, valid_session
         response.should render_template("new")
       end
     end
   end
 
   describe "PUT update" do
+    before :each do
+      @updated_attr = {
+        title: "updated",
+        data: fixture_file_upload('files/madoka.png')
+      }
+      @updated = {
+        title: "invalid updated",
+        data: fixture_file_upload('files/madoka.png')
+      }
+    end
+
     describe "with valid params" do
       it "updates the requested target_image" do
-        target_image = TargetImage.create! valid_attributes
+        TargetImage.delete_all
+        puts '¥n'
+        puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s#target_image.id.to_s
         # Assuming there are no other target_images in the database, this
         # specifies that the TargetImage created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        TargetImage.any_instance.should_receive(:update).with({ "title" => "MyString" })
-        put :update, {:id => target_image.to_param, :target_image => { "title" => "MyString" }}, valid_session
+        #TargetImage.any_instance.should_receive(:update).with({ "title" => "MyString" })
+        #TargetImage.any_instance.should_receive(:update_attributes)
+        #target_image = TargetImage.create! valid_attributes
+        #target_image.should_receive(:update_attributes).with(@updated_attr)
+
+        # これは通った
+        #expect(target_image).to receive(:debug)
+        #puts target_image.debug
+        # これも通る
+        #expect(target_image).to receive(:update_attributes)
+        #target_image.update_attributes(@updated_attr)
+        #target_image.should_receive(:update_attributes).with(@updated_attr)
+        #target_image.update_attributes(@updated_attr)
+
+        #TargetImage.first.should_receive(:update_attributes)
+        target_image = TargetImage.create! valid_attributes
+        puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s
+        #TargetImage.any_instance.should_receive(:update_attributes)
+        #TargetImage.first.should_receive(:update_attributes)
+
+        expect_any_instance_of(TargetImage).to receive(:update_attributes).with(@updated_attr)
+        #TargetImage.first.update_attributes(@updated_attr)
+        #target_image.update_attributes(@updated_attr)
+
+        #put :update, { id: target_image.to_param, target_image: @updated}, valid_session
+        put :update, { id: target_image.id, target_image: @updated_attr }, valid_session
       end
 
       it "assigns the requested target_image as @target_image" do
@@ -128,7 +170,7 @@ describe TargetImagesController do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value" }}, valid_session
+        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value", data: nil }}, valid_session
         assigns(:target_image).should eq(target_image)
       end
 
@@ -136,7 +178,7 @@ describe TargetImagesController do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value" }}, valid_session
+        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value", data: nil }}, valid_session
         response.should render_template("edit")
       end
     end
@@ -157,4 +199,15 @@ describe TargetImagesController do
     end
   end
 
+
+
+
+  describe "Find preferred images" do
+    it "Returns list of images" do
+      Image.new!
+      target_image = TargetImage.create! valid_attributes
+      images = target_image.find_preferred
+      images.length.should eq(1)
+    end
+  end
 end
