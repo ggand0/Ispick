@@ -18,6 +18,9 @@
 # Ignore Gemfile.lock
 Gemfile.lock
 
+# Ignore .DS_store
+.DS_Store
+
 *.rbc
 *.sassc
 .sass-cache

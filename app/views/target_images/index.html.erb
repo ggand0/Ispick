@@ -5,6 +5,7 @@
   <div class="box">
     <div class="boxInner">
       <%= link_to 'Show', target_image %>
+      <%= link_to 'Prefer', prefer_target_image_path(target_image) %>
       <%= link_to 'Edit', edit_target_image_path(target_image) %>
       <%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %>
       <%= image_tag target_image.data.url %>

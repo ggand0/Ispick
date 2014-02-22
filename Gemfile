@@ -61,24 +61,25 @@ gem 'rb-readline', '~> 0.4.2'
 
 
 group :development, :test do
-	gem 'nokogiri'
+	gem 'nokogiri'                                   # For scraping
 	gem 'mechanize'
+  gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
+  gem 'resque'                                     # For background jobs
 
-	#gem 'bubble-wrap'
-	gem 'better_errors'								# Improve error page
-  	gem 'binding_of_caller'
-  	gem 'fuubar'									# テスト進行状況可視化
+	gem 'better_errors'                              # Improve error page
+  gem 'binding_of_caller'
+  gem 'fuubar'									                   # テスト進行状況可視化
 	gem 'guard'
 	gem 'guard-coffeescript'
 	gem 'guard-teaspoon'
-	gem 'rb-fsevent'								# used by guard
-	gem "phantomjs", ">= 1.8.1.1"
+	gem 'rb-fsevent'								                 # Used by guard
+	gem 'phantomjs', '>= 1.8.1.1'
 	gem 'mocha', '~> 0.14.0', :require => false
-	gem 'teaspoon'
-	gem 'jquery-fileupload-rails'					# Upload multiple files
-	gem 'rspec-rails', '>= 2.6.0'					# Testing framework
-  	gem "rails-erd"									# モデル関連図生成
-  	gem 'simplecov'									# カバレッジ
+	gem 'teaspoon'                                   # Test runner
+	gem 'jquery-fileupload-rails'					           # Upload multiple files
+	gem 'rspec-rails', '>= 2.6.0'					           # Testing framework
+  gem 'rails-erd'                                  # モデル関連図生成
+  gem 'simplecov'                                  # カバレッジ測定
 	gem 'simplecov-rcov'
-	gem 'pry-rails'									# Improve console
+	gem 'pry-rails'									                 # Improve the console
 end

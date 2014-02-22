@@ -1,3 +1,6 @@
+require "#{Rails.root}/app/services/target_images_service"
+require "#{Rails.root}/app/workers/get_face_feature"
+
 class TargetImagesController < ApplicationController
   before_action :set_target_image, only: [:show, :edit, :update, :destroy]
 
@@ -10,6 +13,13 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1
   # GET /target_images/1.json
   def show
+    @target_image = TargetImage.find(params[:id])
+    # 顔の特徴量を、JSON文字列からJSONArrayへ変換する
+    if @target_image.face_feature.nil?
+      @face_feature = "Not extracted."
+    else
+      @face_feature = JSON.parse(@target_image.face_feature)
+    end
   end
 
   # GET /target_images/new
@@ -30,6 +40,9 @@ class TargetImagesController < ApplicationController
 
     respond_to do |format|
       if @target_image.save
+        # 顔特徴抽出処理をbackground jobに投げる
+        Resque.enqueue(Face, @target_image.id)
+
         format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
@@ -67,6 +80,43 @@ class TargetImagesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to target_images_url }
       format.json { head :no_content }
+    end
+  end
+
+
+
+
+  # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
+  def prefer
+    @preferred = []
+    target_image = TargetImage.find(params[:id])
+    if target_image.face_feature.nil?
+      #return @preferred
+      return 'Not extracted yet. まだ抽出されていません。'
+    end
+
+    face_feature = JSON.parse(target_image.face_feature)
+    target_r = face_feature[0]['hair_color']['red'].to_i
+    target_g = face_feature[0]['hair_color']['green'].to_i
+    target_b = face_feature[0]['hair_color']['blue'].to_i
+    @target_rgb = ["%.2f" % target_r, "%.2f" % target_g, "%.2f" % target_b]
+    @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
+
+    Image.all.each do |image|
+      if image.face_feature == '[]' or image.face_feature.nil?
+        next
+      end
+
+      image_face = JSON.parse(image.face_feature)
+      r = image_face[0]['hair_color']['red'].to_i
+      g = image_face[0]['hair_color']['green'].to_i
+      b = image_face[0]['hair_color']['blue'].to_i
+      hsv = Utility::rgb_to_hsv(r, g, b, false)
+
+      if (@target_hsv[0] - hsv[0]).abs < 20
+        hsv = Utility::round_array(hsv)
+        @preferred.push({image: image, hsv: hsv})
+      end
     end
   end
 

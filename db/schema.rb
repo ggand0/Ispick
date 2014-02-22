@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 20140219122139) do
   create_table "images", force: true do |t|
     t.string   "title"
     t.string   "caption"
+    t.string   "face_feature"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
@@ -26,6 +27,7 @@ ActiveRecord::Schema.define(version: 20140219122139) do
 
   create_table "target_images", force: true do |t|
     t.string   "title"
+    t.string   "face_feature"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
