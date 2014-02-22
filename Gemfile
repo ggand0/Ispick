@@ -61,10 +61,10 @@ gem 'rb-readline', '~> 0.4.2'
 
 
 group :development, :test do
-	gem 'nokogiri'
+	gem 'nokogiri'                                   # For scraping
 	gem 'mechanize'
   gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
-
+  gem 'resque'                                     # For background jobs
 
 	gem 'better_errors'                              # Improve error page
   gem 'binding_of_caller'

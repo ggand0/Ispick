@@ -1,4 +1,5 @@
 require "#{Rails.root}/app/services/target_images_service"
+require "#{Rails.root}/app/workers/get_face_feature"
 
 class TargetImagesController < ApplicationController
   before_action :set_target_image, only: [:show, :edit, :update, :destroy]
@@ -13,7 +14,12 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1.json
   def show
     @target_image = TargetImage.find(params[:id])
-    @face_feature = JSON.parse(@target_image.face_feature)
+    # 顔の特徴量を、JSON文字列からJSONArrayへ変換する
+    if @target_image.face_feature.nil?
+      @face_feature = "Not extracted."
+    else
+      @face_feature = JSON.parse(@target_image.face_feature)
+    end
   end
 
   # GET /target_images/new
@@ -34,12 +40,15 @@ class TargetImagesController < ApplicationController
 
     respond_to do |format|
       if @target_image.save
+=begin
         # 顔の特徴量を抽出する
         service = TargetImagesService.new
         face_feature = service.prefer(@target_image)
         json_string = face_feature[:result].to_json
         @target_image.update_attributes({ face_feature: json_string })
-
+=end
+        #Resque.enqueue(Face, @target_image)
+        Resque.enqueue(Face, @target_image.id)
         format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
@@ -92,6 +101,10 @@ class TargetImagesController < ApplicationController
 
     @preferred = []
     target_image = TargetImage.find(params[:id])
+    if target_image.face_feature.nil?
+      return @preferred
+    end
+
     face_feature = JSON.parse(target_image.face_feature)
     #render text: face_feature[0]['hair_color']
     target_r = face_feature[0]['hair_color']['red'].to_i
