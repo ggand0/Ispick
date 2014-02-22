@@ -3,7 +3,7 @@
 <ul class="boxline">
 <% @images.each do |image| %>
   <li>
-    <%= image_tag image.data.url %>
+    <%= image_tag image.data.url(:thumb) %>
   </li>
 <% end %>
 </ul>
