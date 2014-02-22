@@ -1,8 +1,14 @@
 <h1>Listing images</h1>
 
+<ul class="boxline">
+<% @images.each do |image| %>
+  <li>
+    <%= image_tag image.data.url %>
+  </li>
+<% end %>
+</ul>
+<!--
 <div class="wrap">
-
-  <!-- Define all of the tiles: -->
   <% @images.each do |image| %>
     <div class="box">
       <div class="boxInner">
@@ -12,3 +18,4 @@
     </div>
   <% end %>
 </div>
+-->

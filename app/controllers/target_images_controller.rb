@@ -121,6 +121,14 @@ class TargetImagesController < ApplicationController
     [h, s, v]
   end
 
+  def round_array(array)
+    result = []
+    array.each do |i|
+      result.push("%.2f" % i)
+    end
+    result
+  end
+
   # 顔の特徴量を抽出して、処理時間とともにJSON形式で表示する
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
@@ -135,7 +143,7 @@ class TargetImagesController < ApplicationController
     target_r = face_feature[0]['hair_color']['red'].to_i
     target_g = face_feature[0]['hair_color']['green'].to_i
     target_b = face_feature[0]['hair_color']['blue'].to_i
-    @target_rgb = [target_r, target_g, target_b]
+    @target_rgb = ["%.2f" % target_r, "%.2f" % target_g, "%.2f" % target_b]
     @target_hsv = self.RGB2HSV(target_r, target_g, target_b, false)
 
     Image.all.each do |image|
@@ -151,6 +159,7 @@ class TargetImagesController < ApplicationController
 
       #if (target_r - r).abs < 30 and (target_g - g).abs < 30 and (target_b - b).abs < 30
       if (@target_hsv[0] - hsv[0]).abs < 20
+        hsv = self.round_array(hsv)
         @preferred.push({image: image, hsv: hsv})
       end
     end

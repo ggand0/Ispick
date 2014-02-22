@@ -2,6 +2,37 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+// 簡易版 from http://goo.gl/zsi5mT
+/* サムネイル画像をタイル状に並べる */
+ul.boxline {
+    padding-left: 0!important;
+    text-align: left;
+    margin: 0 0 15px;
+}
+ 
+ul.boxline li {
+    width: 76px;
+    display: inline-block;
+    vertical-align: top;
+    white-space: normal;
+    word-wrap: normal;
+    font-size: 12px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 2px;
+}
+ 
+ul.boxline li img {
+    display: block!important;
+    border: 1px solid #d0a600!important;
+    height: 55px!important;
+    width: 72px!important;
+    margin: 2px!important;
+    padding: 2px!important;
+}
+
+
+// from http://www.dwuser.com/education/content/creating-responsive-tiled-layout-with-pure-css/
 body {
    margin: 0;
    padding: 0;
