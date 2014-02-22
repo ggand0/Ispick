@@ -4,6 +4,7 @@ class CreateImages < ActiveRecord::Migration
       t.string :title
       t.string :caption
       t.string :face_feature
+      t.string :src_url
 
       t.timestamps
     end

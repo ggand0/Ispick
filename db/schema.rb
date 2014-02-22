@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 20140219122139) do
     t.string   "title"
     t.string   "caption"
     t.string   "face_feature"
+    t.string   "src_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
