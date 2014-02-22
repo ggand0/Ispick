@@ -2,7 +2,7 @@ class Face
   # Woeker起動時に指定するQUEUE名
   @queue = :resque_face
 
-  #def self.perform(target_image)
+  #def self.perform(target_image)# これだとdataにアクセスする所で落ちる。hashが渡されてしまうのか？
   def self.perform(target_id)
     target_image = TargetImage.find(target_id)
 
