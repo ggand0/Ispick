@@ -40,15 +40,9 @@ class TargetImagesController < ApplicationController
 
     respond_to do |format|
       if @target_image.save
-=begin
-        # 顔の特徴量を抽出する
-        service = TargetImagesService.new
-        face_feature = service.prefer(@target_image)
-        json_string = face_feature[:result].to_json
-        @target_image.update_attributes({ face_feature: json_string })
-=end
-        #Resque.enqueue(Face, @target_image)
+        # 顔特徴抽出処理をbackground jobに投げる
         Resque.enqueue(Face, @target_image.id)
+
         format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
@@ -92,21 +86,16 @@ class TargetImagesController < ApplicationController
 
 
 
-  # 顔の特徴量を抽出して、処理時間とともにJSON形式で表示する
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
-    #service = TargetImagesService.new
-    #result = service.prefer(TargetImage.find(params[:id]))
-    #render json: result
-
     @preferred = []
     target_image = TargetImage.find(params[:id])
     if target_image.face_feature.nil?
-      return @preferred
+      #return @preferred
+      return 'Not extracted yet. まだ抽出されていません。'
     end
 
     face_feature = JSON.parse(target_image.face_feature)
-    #render text: face_feature[0]['hair_color']
     target_r = face_feature[0]['hair_color']['red'].to_i
     target_g = face_feature[0]['hair_color']['green'].to_i
     target_b = face_feature[0]['hair_color']['blue'].to_i
@@ -114,7 +103,7 @@ class TargetImagesController < ApplicationController
     @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
 
     Image.all.each do |image|
-      if image.face_feature == '[]'
+      if image.face_feature == '[]' or image.face_feature.nil?
         next
       end
 
@@ -124,14 +113,11 @@ class TargetImagesController < ApplicationController
       b = image_face[0]['hair_color']['blue'].to_i
       hsv = Utility::rgb_to_hsv(r, g, b, false)
 
-      #if (target_r - r).abs < 30 and (target_g - g).abs < 30 and (target_b - b).abs < 30
       if (@target_hsv[0] - hsv[0]).abs < 20
         hsv = Utility::round_array(hsv)
         @preferred.push({image: image, hsv: hsv})
       end
     end
-
-    #render text: @preferred
   end
 
   private
