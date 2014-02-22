@@ -1,7 +1,7 @@
-require "pp"
-require "rubygems"
-require "AnimeFace"
-require "RMagick"
+require 'pp'
+require 'rubygems'
+require 'AnimeFace'
+require 'RMagick'
 
 class TargetImagesService
   def get_face_feature(image_url)

@@ -186,11 +186,14 @@ describe TargetImagesController do
 
 
   describe "Find preferred images" do
-    it "Returns list of images" do
+    it "returns list of images" do
       Image.new
       target_image = TargetImage.create! valid_attributes
-      images = target_image.find_preferred
-      images.length.should eq(1)
+      #images = target_image.prefer
+      #images.should be_an Array
+
+      get :prefer, {:id => target_image.id}, valid_session
+      response.should render_template("prefer")
     end
   end
 end
