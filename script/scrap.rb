@@ -13,4 +13,15 @@ module Scrap
 
     puts 'DONE!!'
   end
+
+  # Imageモデル生成＆DB保存
+  def self.save_image(title, src_url, caption='')
+    image = Image.new(title: title, src_url: src_url, caption: caption)
+    image.image_from_url src_url
+
+    duplicate = Image.where(src_url: src_url)
+    if duplicate.count == 0
+      image.save!
+    end
+  end
 end

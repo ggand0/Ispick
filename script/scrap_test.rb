@@ -16,9 +16,5 @@ html.css('img').each do |item|
   puts item['title']
 
   # 抽出情報からImageモデルを生成
-  image = Image.new(title: item['title'])
-  image.image_from_url root_img_url
-
-  # DBに保存
-  image.save!
+  Scrap::save_image(item['title'], root_img_url)
 end

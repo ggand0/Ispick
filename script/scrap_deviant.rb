@@ -32,9 +32,7 @@ module Scrap::Deviant
       puts img_url
 
       # Imageモデル生成＆DB保存
-      image = Image.new(title: e.css("title").first.content)
-      image.image_from_url img_url
-      image.save!
+      Scrap::save_image(e.css("title").first.content, img_url)
     end
   end
 

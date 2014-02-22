@@ -34,9 +34,7 @@ module Scrap::Pixiv
       puts img_url
 
       # Imageモデル生成＆DB保存
-      image = Image.new(title: title.encode("UTF-8"), caption: caption)
-      image.image_from_url img_url
-      image.save!
+      Scrap::save_image(title.encode("UTF-8"), img_url, caption)
     end
   end
 

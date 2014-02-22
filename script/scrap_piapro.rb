@@ -27,9 +27,7 @@ module Scrap::Piapro
       puts img_url
 
       # Imageモデル生成＆DB保存
-    	image = Image.new(title: item.text)
-    	image.image_from_url img_url
-    	image.save!
+      Scrap::save_image(item.text, img_url)
     end
   end
 
