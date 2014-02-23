@@ -1,5 +1,5 @@
 class Image < ActiveRecord::Base
-  has_one :featurable, as: :featurable
+  has_one :feature, as: :featurable
 
 	has_attached_file :data,
     :styles => {

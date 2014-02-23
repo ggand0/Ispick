@@ -23,7 +23,7 @@ module Scrap
 
     if image.save
       # 特徴抽出処理をresqueに投げる
-      #Resque.enqueue(ImageFace, image.id)
+      Resque.enqueue(ImageFace, image.id)
     end
 
   end
