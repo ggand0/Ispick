@@ -1,5 +1,12 @@
 # encoding: utf-8
 namespace :scrap do
+  desc "Imagesテーブルリセット"
+  task reset: :environment do
+    # Imageモデルを全消去
+    puts 'Deleting Image model...'
+    Image.delete_all
+  end
+
   desc "DB内Imagesテーブルをリセット後、抽出スクリプトを走らせる"
   task :rescrap_all => :environment do
     # Imageモデルを全消去
