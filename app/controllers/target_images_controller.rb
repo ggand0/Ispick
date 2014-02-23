@@ -7,7 +7,7 @@ class TargetImagesController < ApplicationController
   # GET /target_images
   # GET /target_images.json
   def index
-    @target_images = TargetImage.all
+    @target_images = TargetImage.all.page(params[:page])
   end
 
   # GET /target_images/1
@@ -35,7 +35,6 @@ class TargetImagesController < ApplicationController
   # POST /target_images
   # POST /target_images.json
   def create
-    #target_image_params # titleのみのhash
     @target_image = TargetImage.new(title: params[:target_image][:title], data: params[:target_image][:data])
 
     respond_to do |format|
@@ -118,6 +117,9 @@ class TargetImagesController < ApplicationController
         @preferred.push({image: image, hsv: hsv})
       end
     end
+
+    # Pagenate the array
+    @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)
   end
 
   private
