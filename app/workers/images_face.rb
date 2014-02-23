@@ -13,7 +13,6 @@ class ImageFace
     feature = Face.new(face: json_string)
     image.feature = feature
     feature.save!
-    #image.update_attributes({ face_feature: json_string })
 
     puts 'IMAGE : FACE EXTRACTION DONE!'
   end

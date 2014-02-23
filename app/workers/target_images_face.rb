@@ -9,7 +9,10 @@ class Face
     service = TargetImagesService.new
     face_feature = service.prefer(target_image)
     json_string = face_feature[:result].to_json
-    target_image.update_attributes({ face_feature: json_string })
+
+    feature = Face.new(face: json_string)
+    target_image.feature = feature
+    feature.save!
 
     puts 'TARGET : FACE EXTRACTION DONE!'
   end
