@@ -21,6 +21,6 @@
 
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
-every 10.minutes do
+every 15.minutes do
   rake "scrap:images"
 end
