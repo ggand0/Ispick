@@ -1,4 +1,6 @@
 class Image < ActiveRecord::Base
+  has_one :featurable, as: :featurable
+
 	has_attached_file :data,
     :styles => {
       :thumb => "100x100#",

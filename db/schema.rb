@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140219122139) do
+ActiveRecord::Schema.define(version: 20140223122359) do
+
+  create_table "features", force: true do |t|
+    t.string   "face"
+    t.integer  "featurable_id"
+    t.string   "featurable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "images", force: true do |t|
     t.string   "title"
