@@ -64,6 +64,7 @@ gem 'mechanize'
 gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'whenever', :require => false                # Support crontab
+gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 
 group :development, :test do
