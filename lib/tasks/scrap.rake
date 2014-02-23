@@ -24,7 +24,7 @@ namespace :scrap do
   end
 
   desc "画像を対象webサイトから抽出する"
-  task image: :environment do
+  task images: :environment do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrap"

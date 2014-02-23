@@ -65,6 +65,7 @@ group :development, :test do
 	gem 'mechanize'
   gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
   gem 'resque'                                     # For background jobs
+  gem 'whenever', :require => false                # Support crontab
 
 	gem 'better_errors'                              # Improve error page
   gem 'binding_of_caller'
