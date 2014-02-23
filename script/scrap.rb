@@ -1,3 +1,5 @@
+require "#{Rails.root}/app/workers/images_face"
+
 module Scrap
   require "#{Rails.root}/script/scrap_nico"
   require "#{Rails.root}/script/scrap_piapro"
@@ -6,7 +8,7 @@ module Scrap
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrap_all()
-    #Scrap::Nico.scrap()
+    Scrap::Nico.scrap()
     Scrap::Piapro.scrap()
     Scrap::Pixiv.scrap()
     Scrap::Deviant.scrap()
@@ -19,9 +21,10 @@ module Scrap
     image = Image.new(title: title, src_url: src_url, caption: caption)
     image.image_from_url src_url
 
-    duplicate = Image.where(src_url: src_url)
-    if duplicate.count == 0
-      image.save!
+    if image.save
+      # 特徴抽出処理をresqueに投げる
+      #Resque.enqueue(ImageFace, image.id)
     end
+
   end
 end

@@ -6,6 +6,8 @@ class Image < ActiveRecord::Base
       :medium => "200x200" },
     :use_timestamp => false
 
+  validates_uniqueness_of :src_url
+
 	def image_from_url(url)
 		self.data = open(url)
 	end
