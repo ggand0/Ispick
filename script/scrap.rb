@@ -18,12 +18,26 @@ module Scrap
 
   # Imageモデル生成＆DB保存
   def self.save_image(title, src_url, caption='')
-    image = Image.new(title: title, src_url: src_url, caption: caption)
-    image.image_from_url src_url
+    begin
+      image = Image.new(title: title, src_url: src_url, caption: caption)
+      image.image_from_url src_url
+    rescue Exception => e
+      puts e
+      # 失敗したら諦める
+      return
+    end
 
-    if image.save
-      # 特徴抽出処理をresqueに投げる
-      Resque.enqueue(ImageFace, image.id)
+    # 高頻度で失敗し得るので例外は投げないようにする
+    begin
+      if image.save
+        # 特徴抽出処理をresqueに投げる
+        Resque.enqueue(ImageFace, image.id)
+      else
+        Rails.logger.info('Image model saving failed.')
+        puts 'Image model saving failed.'
+      end
+    rescue Exception => e
+      puts e
     end
 
   end
