@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe "target_images/index" do
   before(:each) do
-    assign(:target_images, [
+    assign(:target_images, Kaminari.paginate_array([
       stub_model(TargetImage,
         :title => "Title"
       ),
       stub_model(TargetImage,
         :title => "Title"
       )
-    ])
+    ]).page(1))
   end
 
   it "renders a list of target_images" do
