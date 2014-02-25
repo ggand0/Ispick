@@ -87,14 +87,16 @@ class TargetImagesController < ApplicationController
 
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
+
     @preferred = []
     target_image = TargetImage.find(params[:id])
-    if target_image.face_feature.nil?
+
+    if target_image.feature.nil?
       #return @preferred
       return 'Not extracted yet. まだ抽出されていません。'
     end
 
-    face_feature = JSON.parse(target_image.face_feature)
+    face_feature = JSON.parse(target_image.feature.face)
     target_r = face_feature[0]['hair_color']['red'].to_i
     target_g = face_feature[0]['hair_color']['green'].to_i
     target_b = face_feature[0]['hair_color']['blue'].to_i
@@ -102,11 +104,11 @@ class TargetImagesController < ApplicationController
     @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
 
     Image.all.each do |image|
-      if image.face_feature == '[]' or image.face_feature.nil?
+      if (not image.feature.nil? and image.feature.face == '[]') or image.feature.nil?
         next
       end
 
-      image_face = JSON.parse(image.face_feature)
+      image_face = JSON.parse(image.feature.face)
       r = image_face[0]['hair_color']['red'].to_i
       g = image_face[0]['hair_color']['green'].to_i
       b = image_face[0]['hair_color']['blue'].to_i

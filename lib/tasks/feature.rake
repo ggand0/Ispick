@@ -14,14 +14,21 @@ namespace :feature do
     target_images = TargetImage.all
     target_images.each do |target_image|
       # 既に抽出済みの場合は飛ばす
-      if not target_image.face_feature.nil?
+      if not target_image.feature.nil?
         next
+        puts 'continued.'
       end
 
       service = TargetImagesService.new
       face_feature = service.prefer(target_image)
       json_string = face_feature[:result].to_json
-      target_image.update_attributes({ face_feature: json_string })
+      feature = Feature.new(face: json_string)
+      Feature.transaction do
+        feature.save!
+        Image.transaction do
+          target_image.feature = feature
+        end
+      end
 
       puts (target_image.id - TargetImage.first.id + 1).to_s + ' / ' + TargetImage.count.to_s
     end
