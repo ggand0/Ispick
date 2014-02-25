@@ -12,6 +12,8 @@ module Scrap
     Scrap::Piapro.scrap()
     Scrap::Pixiv.scrap()
     Scrap::Deviant.scrap()
+    Scrap::Futaba.scrap()
+    Scrap::Nichan.scrap()
 
     puts 'DONE!!'
   end
