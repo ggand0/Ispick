@@ -87,7 +87,7 @@ class TargetImagesController < ApplicationController
 
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   def prefer
-
+    # Test comment! 14/02/26 15:49
     @preferred = []
     target_image = TargetImage.find(params[:id])
 
