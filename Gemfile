@@ -65,10 +65,12 @@ group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
 
+  gem 'spring'
+  gem 'spring-commands-rspec'
   gem 'guard'
   gem 'guard-coffeescript'
   gem 'guard-teaspoon'
-  gem 'rb-fsevent'                                  # Used by guard
+  gem 'rb-fsevent'                                  # Used by guard and spring
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
   #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので検討中
