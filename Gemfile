@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.0.2'#'3.2.16'
+gem 'rails', '4.0.2'
 
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
@@ -20,8 +20,6 @@ gem 'coffee-rails', '~> 4.0.0', :git => 'https://github.com/rails/coffee-rails.g
 #gem 'therubyracer', platforms: :ruby
 gem 'libv8', '~> 3.11.8.13'
 gem 'therubyracer'#, '0.11.0beta8'
-#gem 'therubyracer', '0.10.2'
-#gem 'libv8', '3.11.8.3'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -34,10 +32,6 @@ gem 'jbuilder', '~> 1.2'
 
 # added for image uploading by me
 gem 'paperclip', '~> 3.0'
-
-#gem 'linecache19', '>= 0.5.13', :git => 'https://github.com/robmathews/linecache19-0.5.13.git'
-#gem 'ruby-debug-base19x', '>= 0.11.30.pre10'
-#gem 'ruby-debug-ide', '>= 0.4.17.beta14'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
@@ -68,19 +62,25 @@ gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 
 group :development, :test do
-	gem 'better_errors'                              # Improve error page
+  gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'fuubar'									                   # テスト進行状況可視化
-	gem 'guard'
-	gem 'guard-coffeescript'
-	gem 'guard-teaspoon'
-	gem 'rb-fsevent'								                 # Used by guard
-	gem 'phantomjs', '>= 1.8.1.1'
-	gem 'mocha', '~> 0.14.0', :require => false
-	gem 'teaspoon'                                   # Test runner
-	gem 'rspec-rails', '>= 2.6.0'					           # Testing framework
-  gem 'rails-erd'                                  # モデル関連図生成
-  gem 'simplecov'                                  # カバレッジ測定
-	gem 'simplecov-rcov'
-	gem 'pry-rails'									                 # Improve the console
+
+  gem 'guard'
+  gem 'guard-coffeescript'
+  gem 'guard-teaspoon'
+  gem 'rb-fsevent'                                  # Used by guard
+  gem 'teaspoon'                                    # JS test runner
+  gem 'phantomjs', '>= 1.8.1.1'
+  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので検討中
+
+  #gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
+  gem 'rspec-rails'
+  gem 'guard-rspec', :require => false
+  gem 'factory_girl_rails'                          # A fixtures replacement
+  gem 'simplecov'                                   # カバレッジ測定
+  gem 'simplecov-rcov'
+  gem 'fuubar'                                      # テスト進行状況可視化
+
+  gem 'pry-rails'                                   # Improve the console
+  gem 'rails-erd'                                   # モデル関連図生成
 end
