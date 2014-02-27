@@ -23,11 +23,7 @@ describe TargetImagesController do
   # This should return the minimal set of attributes required to create a valid
   # TargetImage. As you add validations to TargetImage, be sure to
   # adjust the attributes here as well.
-  #let(:valid_attributes) { { "title" => "MyString" } }
-  let(:valid_attributes) {{
-    title: "MyString",
-    data: fixture_file_upload('files/madoka.png')
-  }}
+  let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -47,6 +43,24 @@ describe TargetImagesController do
       target_image = TargetImage.create! valid_attributes
       get :show, {:id => target_image.to_param}, valid_session
       assigns(:target_image).should eq(target_image)
+    end
+
+    describe "with already extracted model" do
+      it "assigns the face-feature json as @face_feature" do
+        FactoryGirl.create(:feature_test1)
+        target_image = TargetImage.first
+
+        get :show, {:id => target_image.to_param}, valid_session
+        assigns(:face_feature).should eq('[{"zero value": 0}]')
+      end
+    end
+    describe "with NOT extracted model" do
+      it "assigns the face-feature json as @face_feature" do
+        target_image = FactoryGirl.create(:target_image)
+
+        get :show, {:id => target_image.to_param}, valid_session
+        assigns(:face_feature).should eq('Not extracted.')
+      end
     end
   end
 
@@ -117,18 +131,10 @@ describe TargetImagesController do
 
     describe "with valid params" do
       it "updates the requested target_image" do
-        #TargetImage.delete_all
-        #puts '¥n'
-        #puts 'DEBUG UPDATE TEST : ' + TargetImage.count.to_s
-
-        # Assuming there are no other target_images in the database, this
-        # specifies that the TargetImage created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        #TargetImage.any_instance.should_receive(:update).with({ "title" => "MyString" })
         target_image = TargetImage.create! valid_attributes
 
         # TargetImage.any_instanceだと何故か通らないのでexpect_any_instance_ofを使う
+        # 追記：mochaを入れてると競合してany_instanceが動かないらしい。
         expect_any_instance_of(TargetImage).to receive(:update_attributes).with(@updated_attr)
 
         #put :update, { id: target_image.to_param, target_image: @updated}, valid_session
@@ -184,15 +190,36 @@ describe TargetImagesController do
 
 
 
+  describe "GET prefer" do
+    describe "with face feature" do
+      it "returns preferred images array" do
+        FactoryGirl.create(:feature_madoka)
+        FactoryGirl.create(:feature_image)
 
-  describe "Find preferred images" do
-    it "returns list of images" do
-      Image.new
+        target_image = TargetImage.first
+        get :prefer, {id: target_image.id}, valid_session
+        assigns(:preferred).should be_an(Array)
+      end
+    end
+
+    describe "with resemble image" do
+      # 似てる画像を正しく判定する
+      it "returns proper preferred images array" do
+        target_image = FactoryGirl.create(:feature_madoka)
+        FactoryGirl.create(:feature_madoka1)# 似てる
+        FactoryGirl.create(:feature_madoka2)# 似てない
+        FactoryGirl.create(:feature_test2)  # 抽出出来てない
+        FactoryGirl.create(:image)          # 抽出してない
+
+        get :prefer, {id: target_image.id}, valid_session
+        assigns(:preferred).count.should eq(1)
+      end
+    end
+
+    it "renders the 'prefer' template" do
       target_image = TargetImage.create! valid_attributes
-      #images = target_image.prefer
-      #images.should be_an Array
 
-      get :prefer, {:id => target_image.id}, valid_session
+      get :prefer, {id: target_image.id}, valid_session
       response.should render_template("prefer")
     end
   end
