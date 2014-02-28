@@ -27,8 +27,8 @@ module Scrap
       return
     end
 
-    # 高頻度で失敗し得るので例外は投げないようにする
     begin
+      # 高頻度で失敗し得るので例外は投げないようにする
       if image.save
         # 特徴抽出処理をresqueに投げる
         Resque.enqueue(ImageFace, image.id)

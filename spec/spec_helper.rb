@@ -1,6 +1,7 @@
 require 'simplecov'
 SimpleCov.start do
-  add_filter "/vendor/bundle/"
+  add_filter '/vendor/bundle/'
+  add_filter '/script/pixiv'
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
