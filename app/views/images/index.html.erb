@@ -4,7 +4,7 @@
 <% @images.each do |image| %>
   <li>
     <%= link_to(image_tag(image.data.url(:thumb)),
-      {controller: 'images', action: 'show', id: image.id.to_s }) %>
+      { controller: 'images', action: 'show', id: image.id.to_s }) %>
   </li>
 <% end %>
 </ul>
