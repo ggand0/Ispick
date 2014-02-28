@@ -10,29 +10,40 @@ module Scrap::Deviant
   # 後はここを参照：http://b.hatena.ne.jp/pentiumx/deviantart/
   ROOT_URL = 'http://backend.deviantart.com/rss.xml?type=deviation&q=boost%3Apopular+max_age%3A24h+in%3Amanga%2Fdigital+anime'
 
+  def self.is_adult(html)
+    # アダルトな画像（"mature content"みたいに表現されてる）のデバッグ用url
+    #page = 'http://ecchi-enzo.deviantart.com/art/Top-Heavy-ft-Sui-Feng-FREE-435076127'
+    # mature画像はクリックをsimulateしないと抽出出来ないくさいので飛ばす
+    mature = html.css("div[class='dev-content-mature mzone-main']").first
+    if not mature.nil?
+      return true
+    end
+    false
+  end
+
+  def self.get_contents(page, title)
+    html = Nokogiri::HTML(open(page))
+
+    if self.is_adult(html)
+      return
+    end
+
+    # "dev-content-full"とdev-content-normal"で２種類画像ソースが用意されているようだ
+    main = html.css("img[class='dev-content-full']").first
+    img_url = main['src']
+    puts img_url
+
+    # Imageモデル生成＆DB保存
+    Scrap::save_image(title, img_url)
+  end
+
   def self.scrap()
     xml = Nokogiri::XML(open(ROOT_URL))
     puts 'Extracting : ' + ROOT_URL
 
-    items_css = xml.css("item").map do |e|
-      page = e.css("link").first.content
-      html = Nokogiri::HTML(open(page))
-
-      # アダルトな画像（"mature content"みたいに表現されてる）のデバッグ用url
-      #page = 'http://ecchi-enzo.deviantart.com/art/Top-Heavy-ft-Sui-Feng-FREE-435076127'
-      # mature画像はクリックをsimulateしないと抽出出来ないくさいので飛ばす
-      mature = html.css("div[class='dev-content-mature mzone-main']").first
-      if not mature.nil?
-        next
-      end
-
-      # "dev-content-full"とdev-content-normal"で２種類画像ソースが用意されているようだ
-      main = html.css("img[class='dev-content-full']").first
-      img_url = main['src']
-      puts img_url
-
-      # Imageモデル生成＆DB保存
-      Scrap::save_image(e.css("title").first.content, img_url)
+    xml.css("item").map do |item|
+      page = item.css("link").first.content
+      self.get_contents(page, item.css("title").first.content)
     end
   end
 
