@@ -1,4 +1,5 @@
 Ispic::Application.routes.draw do
+  get "welcome/index"
   resources :target_images do
     member do
       get 'prefer'
