@@ -1,4 +1,6 @@
 <h1>Listing target_images</h1>
+<%= link_to 'New Target image', new_target_image_path %>
+<br>
 
 <!-- Define all of the tiles: -->
 <% @target_images.each do |target_image| %>
@@ -15,7 +17,3 @@
 <% end %>
 
 <%= paginate @target_images %>
-
-<br>
-<br>
-<%= link_to 'New Target image', new_target_image_path %>
