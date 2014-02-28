@@ -1,2 +1,8 @@
-<h1>Welcome#index</h1>
-<p>Find me in app/views/welcome/index.html.erb</p>
+<h1>Ispic prototype</h1>
+<p>Find this html in app/views/welcome/index.html.erb</p>
+
+<%= image_tag 'snowmiku0.jpg', size: '600x375' %>
+<br>
+<%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
+<br>
+<%= link_to('うpした嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
