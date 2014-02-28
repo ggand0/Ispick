@@ -10,13 +10,14 @@ class Face
     face_feature = service.prefer(target_image)
     json_string = face_feature[:result].to_json
 
+    feature = Feature.new(face: json_string)
     Feature.transaction do
       feature.save!
-      Image.transaction do
+      TargetImage.transaction do
         target_image.feature = feature
       end
     end
 
-    puts 'TARGET : FACE EXTRACTION DONE!'
+    #puts 'TARGET : FACE EXTRACTION DONE!'
   end
 end

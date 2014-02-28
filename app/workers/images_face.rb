@@ -18,6 +18,6 @@ class ImageFace
       end
     end
 
-    puts 'IMAGE : FACE EXTRACTION DONE!'
+    #puts 'IMAGE : FACE EXTRACTION DONE!'
   end
 end

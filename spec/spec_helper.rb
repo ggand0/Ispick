@@ -1,6 +1,7 @@
 require 'simplecov'
 SimpleCov.start do
-  add_filter "/vendor/bundle/"
+  add_filter '/vendor/bundle/'
+  add_filter '/script/pixiv'
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
@@ -44,4 +45,9 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+  config.include FactoryGirl::Syntax::Methods
+  config.before do
+    FactoryGirl.reload
+  end
 end

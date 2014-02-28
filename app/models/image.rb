@@ -8,7 +8,7 @@ class Image < ActiveRecord::Base
       :medium => "200x200" },
     :use_timestamp => false
 
-  default_scope :order => 'created_at DESC'
+  default_scope { order('created_at DESC') }
   paginates_per 100
 
   validates_uniqueness_of :src_url

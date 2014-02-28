@@ -1,21 +1,27 @@
 module Utility
+  # Round values in an array
+  def self.round_array(array, n=2)
+    array.map{ |i| i.round(n) }
+  end
 
+  # Convert RGB value to HSV value
   def self.rgb_to_hsv(r, g, b, cone_model)
     h = 0
     s = 0
     v = 0
-    max = [[r, g].max, b].max
-    min = [[r, g].min, b].min
+    max = [r, g, b].max
+    min = [r, g, b].min
+    #puts max.to_s + ' ' + min.to_s
 
     # hue
     if max == min
       h = 0
     elsif max == r
-      h = (60 * (g - b) * 1.0 / (max - min)*1.0) + 0
+      h = (60*(g - b) / (max - min)*1.0) + 0
     elsif max == g
-      h = (60 * (b - r) * 1.0 / (max - min)*1.0) + 120
+      h = (60*(b - r) / (max - min)*1.0) + 120
     else
-      h = (60 * (r - g) * 1.0 / (max - min)*1.0) + 240
+      h = (60*(r - g) / (max - min)*1.0) + 240
     end
 
     while h < 0 do
@@ -26,25 +32,18 @@ module Utility
     if cone_model
       s = max - min
     else
-      #s = 0 if max==0 else (max-min)*1.0/max*255*1.0
       if max == 0
         s = 0
       else
-        s = (max-min)*1.0 / max*255*1.0
+        s = ((max - min) / (max*1.0)) * 255
       end
     end
 
     # value
     v = max
 
-    [h, s, v]
+    # Conver SV to % style
+    [h, s/255.0*100, v/255.0*100]
   end
 
-  def self.round_array(array)
-    result = []
-    array.each do |i|
-      result.push("%.2f" % i)
-    end
-    result
-  end
 end

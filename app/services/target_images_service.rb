@@ -4,11 +4,10 @@ require 'AnimeFace'
 require 'RMagick'
 
 class TargetImagesService
+  # URL先の画像の顔特徴量をデフォルト設定で抽出する
   def get_face_feature(image_url)
-    url = image_url.split('?')[0]
-    image = Magick::ImageList.new(url)
-    result0 = AnimeFace::detect(image)
-    result0
+    image = Magick::ImageList.new(image_url)
+    AnimeFace::detect(image)
   end
 
   def prefer(target_image)

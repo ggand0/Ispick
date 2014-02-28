@@ -14,11 +14,12 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1.json
   def show
     @target_image = TargetImage.find(params[:id])
-    # 顔の特徴量を、JSON文字列からJSONArrayへ変換する
-    if @target_image.face_feature.nil?
-      @face_feature = "Not extracted."
+    # 顔の特徴量を、JSON文字列からJSON Arrayへ変換する
+    if @target_image.feature.nil?
+      @face_feature = 'Not extracted.'
     else
-      @face_feature = JSON.parse(@target_image.face_feature)
+      #@face_feature = JSON.parse(@target_image.feature.face)
+      @face_feature = @target_image.feature.face
     end
   end
 
@@ -29,13 +30,12 @@ class TargetImagesController < ApplicationController
 
   # GET /target_images/1/edit
   def edit
-    #@target_image = TargetImage.find(params[:id])
   end
 
   # POST /target_images
   # POST /target_images.json
   def create
-    @target_image = TargetImage.new(title: params[:target_image][:title], data: params[:target_image][:data])
+    @target_image = TargetImage.new(target_image_params)
 
     respond_to do |format|
       if @target_image.save
@@ -56,13 +56,10 @@ class TargetImagesController < ApplicationController
   def update
     target = TargetImage.find(params[:id])
     hash = { title: params[:target_image][:title], data: params[:target_image][:data]}
-    h = { title: params[:target_image][:title] }
 
     respond_to do |format|
       #if @target_image.update(target_image_params)
       if @target_image.update_attributes(hash)
-      #if target.update_attributes(hash)
-      #if @target_image.update_attributes(title: params[:target_image][:title], data: params[:target_image][:data])
         format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
         format.json { head :no_content }
       else
@@ -86,13 +83,12 @@ class TargetImagesController < ApplicationController
 
 
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
+  # GET /target_images/1/prefer
   def prefer
-
     @preferred = []
     target_image = TargetImage.find(params[:id])
 
     if target_image.feature.nil?
-      #return @preferred
       return 'Not extracted yet. まだ抽出されていません。'
     end
 
@@ -104,7 +100,9 @@ class TargetImagesController < ApplicationController
     @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
 
     Image.all.each do |image|
-      if (not image.feature.nil? and image.feature.face == '[]') or image.feature.nil?
+      # 抽出されていないか、抽出出来ていないImageは飛ばす
+      if (not image.feature.nil? and image.feature.face == '[]' or
+        image.feature.nil?)
         next
       end
 
@@ -132,6 +130,6 @@ class TargetImagesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def target_image_params
-      params.require(:target_image).permit(:title)
+      params.require(:target_image).permit(:title, :data)
     end
 end
