@@ -11,6 +11,11 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     @image = Image.find(params[:id])
+    if @image.feature.nil?
+      @face_feature = 'Not extracted.'
+    else
+      @face_feature = @image.feature.face
+    end
   end
 
   # DELETE /images/1

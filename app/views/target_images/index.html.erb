@@ -1,4 +1,6 @@
 <h1>Listing target_images</h1>
+<%= link_to 'New Target image', new_target_image_path %>
+<br>
 
 <!-- Define all of the tiles: -->
 <% @target_images.each do |target_image| %>
@@ -8,14 +10,10 @@
       <%= link_to 'Prefer', prefer_target_image_path(target_image) %>
       <%= link_to 'Edit', edit_target_image_path(target_image) %>
       <%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %>
-      <%= image_tag target_image.data.url %>
+      <%= link_to(image_tag(target_image.data.url), { controller: 'target_images', action: 'show', id: target_image.id.to_s }) %>
       <div class="titleBox"><%= target_image.title.to_s %></div>
     </div>
   </div>
 <% end %>
 
 <%= paginate @target_images %>
-
-<br>
-<br>
-<%= link_to 'New Target image', new_target_image_path %>

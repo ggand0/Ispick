@@ -3,21 +3,10 @@
 <ul class="boxline">
 <% @images.each do |image| %>
   <li>
-    <%= image_tag image.data.url(:thumb) %>
+    <%= link_to(image_tag(image.data.url(:thumb)),
+      { controller: 'images', action: 'show', id: image.id.to_s }) %>
   </li>
 <% end %>
 </ul>
 
 <%= paginate @images %>
-<!--
-<div class="wrap">
-  <% @images.each do |image| %>
-    <div class="box">
-      <div class="boxInner">
-        <%= image_tag image.data.url %>
-        <div class="titleBox"><%= image.title.to_s %></div>
-      </div>
-    </div>
-  <% end %>
-</div>
--->

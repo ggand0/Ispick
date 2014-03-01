@@ -9,7 +9,13 @@
   <strong>Caption:</strong>
   <%= @image.caption %>
 </p>
+
+<p>
+  <strong>Face feature:</strong>
+  <%= @face_feature %>
+</p>
+
+<br>
 <%= image_tag @image.data.url %>
 <br>
-
 <%= link_to 'Back', images_path %>
