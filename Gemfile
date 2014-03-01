@@ -85,4 +85,10 @@ group :development, :test do
 
   gem 'pry-rails'                                   # Improve the console
   gem 'rails-erd'                                   # モデル関連図生成
+  gem 'capistrano', '~> 3.1.0'
+  gem 'capistrano-rails'
+  gem 'capistrano-rbenv', '~> 2.0'
+  gem 'capistrano-bundler', '~> 1.1.2'
+  gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
+  #gem 'capistrano_colors'                           # capistrano実行時に色をつけるためのgem
 end
