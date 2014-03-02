@@ -217,6 +217,12 @@ GEM
       redis-namespace (~> 1.2)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
+    resque-web (0.0.4)
+      coffee-rails
+      jquery-rails
+      resque
+      sass-rails
+      twitter-bootstrap-rails
     rmagick (2.13.2)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
@@ -287,6 +293,11 @@ GEM
       polyglot (>= 0.3.1)
     turbolinks (2.2.1)
       coffee-rails
+    twitter-bootstrap-rails (2.2.8)
+      actionpack (>= 3.1)
+      execjs
+      rails (>= 3.1)
+      railties (>= 3.1)
     tzinfo (0.3.38)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
@@ -334,6 +345,7 @@ DEPENDENCIES
   rb-fsevent
   rb-readline (~> 0.4.2)
   resque
+  resque-web
   rmagick
   rspec-rails
   sass-rails (~> 4.0.0)!
