@@ -201,6 +201,13 @@ describe TargetImagesController do
         assigns(:preferred).should be_an(Array)
       end
 
+      it "renders the 'prefer' template" do
+        face_feature = FactoryGirl.create(:feature_madoka)
+
+        get :prefer, {id: face_feature.featurable_id}, valid_session
+        response.should render_template('prefer')
+      end
+
       describe "with resemble image" do
         # 似てる画像を正しく判定する
         it "returns proper preferred images array" do
@@ -216,28 +223,25 @@ describe TargetImagesController do
       end
     end
 
-    # feature.face is []の時
+
     describe "with invalid face feature" do
+      # feature.face is []の時
       it "should redirects index when face length is zero" do
-        target_image = FactoryGirl.create(:feature_test2)
+        face_feature = FactoryGirl.create(:feature_test2)
 
-        get :prefer, {id: target_image.id}, valid_session
+        # TargetImage.preferを呼ぶ
+        get :prefer, {id: face_feature.featurable_id}, valid_session
         response.should redirect_to(target_images_path)
       end
 
-      it "should redirects index when face is nil" do
-        target_image = FactoryGirl.create(:feature_test3)
+      # feature is nilの時
+      it "should redirects index when feature is nil" do
+        target_image = TargetImage.create! valid_attributes
 
         get :prefer, {id: target_image.id}, valid_session
         response.should redirect_to(target_images_path)
       end
     end
 
-    it "renders the 'prefer' template" do
-      target_image = TargetImage.create! valid_attributes
-
-      get :prefer, {id: target_image.id}, valid_session
-      response.should render_template("prefer")
-    end
   end
 end
