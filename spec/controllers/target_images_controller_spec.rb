@@ -191,7 +191,7 @@ describe TargetImagesController do
 
 
   describe "GET prefer" do
-    describe "with face feature" do
+    describe "with valid face feature" do
       it "returns preferred images array" do
         FactoryGirl.create(:feature_madoka)
         FactoryGirl.create(:feature_image)
@@ -200,19 +200,36 @@ describe TargetImagesController do
         get :prefer, {id: target_image.id}, valid_session
         assigns(:preferred).should be_an(Array)
       end
+
+      describe "with resemble image" do
+        # 似てる画像を正しく判定する
+        it "returns proper preferred images array" do
+          target_image = FactoryGirl.create(:feature_madoka)
+          FactoryGirl.create(:feature_madoka1)# 似てる
+          FactoryGirl.create(:feature_madoka2)# 似てない
+          FactoryGirl.create(:feature_test2)  # 抽出出来てない
+          FactoryGirl.create(:image)          # 抽出してない
+
+          get :prefer, {id: target_image.id}, valid_session
+          assigns(:preferred).count.should eq(1)
+        end
+      end
     end
 
-    describe "with resemble image" do
-      # 似てる画像を正しく判定する
-      it "returns proper preferred images array" do
-        target_image = FactoryGirl.create(:feature_madoka)
-        FactoryGirl.create(:feature_madoka1)# 似てる
-        FactoryGirl.create(:feature_madoka2)# 似てない
-        FactoryGirl.create(:feature_test2)  # 抽出出来てない
-        FactoryGirl.create(:image)          # 抽出してない
+    # feature.face is []の時
+    describe "with invalid face feature" do
+      it "should redirects index when face length is zero" do
+        target_image = FactoryGirl.create(:feature_test2)
 
         get :prefer, {id: target_image.id}, valid_session
-        assigns(:preferred).count.should eq(1)
+        response.should redirect_to(target_images_path)
+      end
+
+      it "should redirects index when face is nil" do
+        target_image = FactoryGirl.create(:feature_test3)
+
+        get :prefer, {id: target_image.id}, valid_session
+        response.should redirect_to(target_images_path)
       end
     end
 
