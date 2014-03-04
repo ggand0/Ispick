@@ -96,7 +96,7 @@ namespace :resque do
   desc "start resque workers as a daemon"
   task :start_daemon do
     on roles(:all) do
-      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec rails runner script/extract features restart"
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec rails runner script/extract_features restart"
     end
   end
 end
