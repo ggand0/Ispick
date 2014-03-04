@@ -57,7 +57,8 @@ gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
 gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
-gem 'resque-web', require: 'resque_web'           # Web interface for resque
+gem 'resque-web', require: 'resque_web'          # Web interface for resque
+gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'whenever', :require => false                # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
