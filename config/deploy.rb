@@ -36,7 +36,8 @@ set :bundle_gemfile, "Gemfile"
 # set :pty, true
 
 # Default value for :linked_files is []
-# set :linked_files, %w{config/database.yml}
+#set :linked_files, %w{config/database.yml}
+set :linked_files, %w{config/config.yml}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -45,15 +46,22 @@ set :bundle_gemfile, "Gemfile"
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
 # Default value for keep_releases is 5
-set :keep_releases, 1
+set :keep_releases, 5
 
 namespace :deploy do
 
   desc 'Restart application'
   task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
+    on roles(:all), in: :sequence, wait: 5 do
       # Your restart mechanism here, for example:
       # execute :touch, release_path.join('tmp/restart.txt')
+      execute "mkdir -p #{release_path}/tmp/pids"        # サブディレクトリごと作成
+      pid_file = "#{release_path}/tmp/pids/server.pid"
+      if test "[ -e #{pid_file} ]"
+        execute "kill -9 `cat tmp/pids/server.pid`"
+      else
+        execute "cd #{release_path} && ~/.rbenv/bin/rbenv exec bundle exec rails server -e production -d"
+      end
     end
   end
 
