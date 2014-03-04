@@ -231,7 +231,7 @@ describe TargetImagesController do
 
         # TargetImage.preferを呼ぶ
         get :prefer, {id: face_feature.featurable_id}, valid_session
-        response.should redirect_to(target_images_path)
+        assigns(:message).should eq('Could not get face feature from this image. 抽出できませんでした。')
       end
 
       # feature is nilの時
@@ -239,7 +239,7 @@ describe TargetImagesController do
         target_image = TargetImage.create! valid_attributes
 
         get :prefer, {id: target_image.id}, valid_session
-        response.should redirect_to(target_images_path)
+        assigns(:message).should eq('Not extracted yet. まだ抽出されていません。')
       end
     end
 

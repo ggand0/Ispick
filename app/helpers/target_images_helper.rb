@@ -7,4 +7,12 @@ module TargetImagesHelper
       'No matches.'
     end
   end
+
+  def paginate_target_images(message, array)
+    if not message == ''
+      message
+    else
+      paginate_zero(array)
+    end
+  end
 end

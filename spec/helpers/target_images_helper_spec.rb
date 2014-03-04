@@ -29,4 +29,25 @@ describe TargetImagesHelper do
       helper.paginate_zero(target_image).should be_a(String)
     end
   end
+
+  describe "paginate_target_images method" do
+    it "should return message argument if it is not empty" do
+      helper.paginate_target_images('Not extracted yet.', []).should eq('Not extracted yet.')
+    end
+
+    it "should return notice string if array size is zero" do
+      helper.paginate_target_images('', []).should eq('No matches.')
+    end
+
+    # ref: https://github.com/amatsuda/kaminari/blob/master/spec/helpers/action_view_extension_spec.rb
+    it "should return pagination otherwise" do
+      TargetImage.create! valid_attributes
+      TargetImage.create! valid_attributes
+      TargetImage.create! valid_attributes
+      target_image = TargetImage.all.page(1)
+
+      helper.paginate_target_images('', target_image).should be_a(String)
+    end
+  end
+
 end
