@@ -48,6 +48,10 @@ set :linked_files, %w{config/config.yml}
 # Default value for keep_releases is 5
 set :keep_releases, 5
 
+
+before 'deploy:finished', 'whenever:update_crontab'
+before 'deploy:finished', 'resque:start_daemon'
+
 namespace :deploy do
 
   desc 'Restart application'
@@ -76,4 +80,23 @@ namespace :deploy do
     end
   end
 
+end
+
+namespace :whenever do
+  desc "update crontab using whenever's schedule"
+  task :update_crontab do
+    on roles(:all) do
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --clear-crontab"
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab"
+    end
+  end
+end
+namespace :resque do
+  desc "start resque workers as a daemon"
+  task :start_daemon do
+    on roles(:all) do
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec rails runner script/extract features restart"
+    end
+  end
 end
