@@ -1,12 +1,7 @@
 Ispic::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # 外部からサーバーにアクセスして開発する時(実行環境がcentosで開発環境がwindowsに有る時など)に設定する：
-  # lib/development.local.sample.rbをリネームし、Local::IPの値を開発マシンIPに書き換える
-  require "#{Rails.root}/lib/development.local.rb"
-  Local::IP.each do |ip|
-    BetterErrors::Middleware.allow_ip! ip if ip
-  end
+  BetterErrors::Middleware.allow_ip! ENV['TRUSTED_IP'] if ENV['TRUSTED_IP']
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
