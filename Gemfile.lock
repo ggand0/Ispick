@@ -349,7 +349,7 @@ DEPENDENCIES
   resque
   resque-web
   rmagick
-  rspec-rails
+  rspec-rails (>= 2.6.0)
   sass-rails (~> 4.0.0)!
   sdoc
   simplecov

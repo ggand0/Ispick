@@ -59,6 +59,7 @@ gem 'rmagick', :require => false                 # Image processing lib. Used by
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
+#gem 'systemu'
 gem 'whenever', :require => false                # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
@@ -75,10 +76,9 @@ group :development, :test do
   gem 'rb-fsevent'                                  # Used by guard and spring
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
-  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので検討中
+  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
 
-  #gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
-  gem 'rspec-rails'
+  gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
   gem 'guard-rspec', :require => false
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
@@ -92,5 +92,4 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.0'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
-  #gem 'capistrano_colors'                           # capistrano実行時に色をつけるためのgem
 end

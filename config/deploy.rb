@@ -38,6 +38,7 @@ set :bundle_gemfile, "Gemfile"
 # Default value for :linked_files is []
 #set :linked_files, %w{config/database.yml}
 set :linked_files, %w{config/config.yml}
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/assets}
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -47,7 +48,6 @@ set :linked_files, %w{config/config.yml}
 
 # Default value for keep_releases is 5
 set :keep_releases, 5
-
 
 before 'deploy:finished', 'whenever:update_crontab'
 before 'deploy:finished', 'resque:start_daemon'
@@ -59,23 +59,22 @@ namespace :deploy do
     on roles(:all), in: :sequence, wait: 5 do
       # Your restart mechanism here, for example:
       # execute :touch, release_path.join('tmp/restart.txt')
-      execute "mkdir -p #{release_path}/tmp/pids"        # サブディレクトリごと作成
-      pid_file = "#{release_path}/tmp/pids/server.pid"
+      pid_file = "#{shared_path}/tmp/pids/server.pid"
       if test "[ -e #{pid_file} ]"
-        execute "kill -9 `cat tmp/pids/server.pid`"
-      else
-        execute "cd #{release_path} && ~/.rbenv/bin/rbenv exec bundle exec rails server -e production -d"
+        execute "kill -9 `cat #{pid_file}`"
       end
+      execute "cd #{release_path} && ~/.rbenv/bin/rbenv exec bundle exec rails server -e production -d"
     end
   end
+
 
   # 全部処理を止める
   desc 'stop a server'
   task :stop do
     on roles(:all) do
-      pid_file = "#{current_path}/tmp/pids/server.pid"
+      pid_file = "#{shared_path}/tmp/pids/server.pid"
       if test "[ -e #{pid_file} ]"
-        execute "kill -9 `cat #{current_path}/tmp/pids/server.pid`"
+        execute "kill -9 `cat #{pid_file}`"
       end
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --clear-crontab"
       #execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec rails runner script/extract_features stop"
@@ -85,10 +84,10 @@ namespace :deploy do
 
   #  上記linked_filesで使用するファイルをアップロードするタスク
   #  deployが行われる前に実行する必要がある。
-  desc 'upload importabt files'
+  desc 'upload secret files'
   task :upload do
     on roles(:app) do |host|
-      upload!('config/database.yml',"#{shared_path}/config/database.yml")
+      upload!('config/config.yml',"#{shared_path}/config/config.yml")
     end
   end
 
@@ -97,9 +96,9 @@ namespace :deploy do
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
       # Here we can do anything such as:
-      # within release_path do
-      #   execute :rake, 'cache:clear'
-      # end
+      within release_path do
+        execute :rake, 'tmp:cache:clear'
+      end
     end
   end
 
