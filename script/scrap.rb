@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 require "#{Rails.root}/app/workers/images_face"
 
 module Scrap
@@ -5,6 +6,9 @@ module Scrap
   require "#{Rails.root}/script/scrap_piapro"
   require "#{Rails.root}/script/scrap_pixiv"
   require "#{Rails.root}/script/scrap_deviant"
+  require "#{Rails.root}/script/scrap_futaba"
+  require "#{Rails.root}/script/scrap_2ch"
+  require "#{Rails.root}/script/scrap_4chan"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrap_all()
@@ -14,7 +18,7 @@ module Scrap
     Scrap::Deviant.scrap()
     Scrap::Futaba.scrap()
     Scrap::Nichan.scrap()
-
+    Scrap::Fourchan.scrap()
     puts 'DONE!!'
   end
 
@@ -33,7 +37,7 @@ module Scrap
     begin
       if image.save
         # 特徴抽出処理をresqueに投げる
-        Resque.enqueue(ImageFace, image.id)
+        #Resque.enqueue(ImageFace, image.id)
       else
         Rails.logger.info('Image model saving failed.')
         puts 'Image model saving failed.'
