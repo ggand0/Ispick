@@ -69,6 +69,29 @@ namespace :deploy do
     end
   end
 
+  # 全部処理を止める
+  desc 'stop a server'
+  task :stop do
+    on roles(:all) do
+      pid_file = "#{current_path}/tmp/pids/server.pid"
+      if test "[ -e #{pid_file} ]"
+        execute "kill -9 `cat #{current_path}/tmp/pids/server.pid`"
+      end
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --clear-crontab"
+      #execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec rails runner script/extract_features stop"
+      execute "cd #{current_path}/script && ~/.rbenv/bin/rbenv exec bundle exec rails runner extract_features stop"
+    end
+  end
+
+  #  上記linked_filesで使用するファイルをアップロードするタスク
+  #  deployが行われる前に実行する必要がある。
+  desc 'upload importabt files'
+  task :upload do
+    on roles(:app) do |host|
+      upload!('config/database.yml',"#{shared_path}/config/database.yml")
+    end
+  end
+
   after :publishing, :restart
 
   after :restart, :clear_cache do
