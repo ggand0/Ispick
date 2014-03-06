@@ -1,7 +1,7 @@
 <h1>Ispic prototype</h1>
 <p>Find this html in app/views/welcome/index.html.erb</p>
 
-<%= image_tag 'snowmiku0.jpg', size: '600x375' %>
+<%= image_tag asset_path('snowmiku0.jpg'), size: '600x375' %>
 <br>
 <%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
 <br>

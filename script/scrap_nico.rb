@@ -9,7 +9,12 @@ module Scrap::Nico
   def self.get_contents(item)
     # 元ページを開く
     page = item.css("link").first.content
-    html = Nokogiri::HTML(open(page))
+    begin
+      html = Nokogiri::HTML(open(page))
+    rescue Exception => e
+      # ログイン求められて失敗した時用
+      return
+    end
 
     # 画像のソースurlを探して格納
     # id名が「illust_area」であるtableタグを探し、その中にあるタグをさらに降りていく

@@ -1,0 +1,6 @@
+# http://stackoverflow.com/questions/11973967/rails-custom-environment-resque-enqueue-does-not-create-jobs
+development: localhost:6379
+test: localhost:6379
+integration: localhost:6379
+staging: localhost:6379
+production: localhost:6379

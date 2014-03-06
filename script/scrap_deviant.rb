@@ -22,7 +22,11 @@ module Scrap::Deviant
   end
 
   def self.get_contents(page, title)
-    html = Nokogiri::HTML(open(page))
+    begin
+      html = Nokogiri::HTML(open(page))
+    rescue Exception => e
+      return
+    end
 
     if self.is_adult(html)
       return

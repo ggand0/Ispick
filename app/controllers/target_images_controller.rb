@@ -86,10 +86,14 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1/prefer
   def prefer
     @preferred = []
+    @message = ''
     target_image = TargetImage.find(params[:id])
 
-    if target_image.feature.nil?
-      return 'Not extracted yet. まだ抽出されていません。'
+    # 正しい特徴値が無い場合はindexにredirectする。この後の処理は行いたくないのでreturnもする。
+    if target_image.feature == nil
+      return @message = 'Not extracted yet. まだ抽出されていません。'
+    elsif target_image.feature.face == '[]'
+      return @message = 'Could not get face feature from this image. 抽出できませんでした。'
     end
 
     face_feature = JSON.parse(target_image.feature.face)

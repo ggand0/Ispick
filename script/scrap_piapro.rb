@@ -8,7 +8,11 @@ module Scrap::Piapro
     # リンク先がサイト内URLで表されているので、ROOT_URLと組み合わせてURL生成しアクセス
     page_url = item['href']
     root_img_url = URI.join(ROOT_URL, page_url).to_s
-    page = Nokogiri::HTML(open(root_img_url))
+    begin
+      page = Nokogiri::HTML(open(root_img_url))
+    rescue Exception => e
+      return
+    end
 
     # ...style="background:url(http://c1.piapro.jp/xxx.png) no-repeat center;">
     # という文字列からURLを切り取る

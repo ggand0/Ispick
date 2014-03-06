@@ -191,7 +191,7 @@ describe TargetImagesController do
 
 
   describe "GET prefer" do
-    describe "with face feature" do
+    describe "with valid face feature" do
       it "returns preferred images array" do
         FactoryGirl.create(:feature_madoka)
         FactoryGirl.create(:feature_image)
@@ -200,27 +200,48 @@ describe TargetImagesController do
         get :prefer, {id: target_image.id}, valid_session
         assigns(:preferred).should be_an(Array)
       end
-    end
 
-    describe "with resemble image" do
-      # 似てる画像を正しく判定する
-      it "returns proper preferred images array" do
-        target_image = FactoryGirl.create(:feature_madoka)
-        FactoryGirl.create(:feature_madoka1)# 似てる
-        FactoryGirl.create(:feature_madoka2)# 似てない
-        FactoryGirl.create(:feature_test2)  # 抽出出来てない
-        FactoryGirl.create(:image)          # 抽出してない
+      it "renders the 'prefer' template" do
+        face_feature = FactoryGirl.create(:feature_madoka)
 
-        get :prefer, {id: target_image.id}, valid_session
-        assigns(:preferred).count.should eq(1)
+        get :prefer, {id: face_feature.featurable_id}, valid_session
+        response.should render_template('prefer')
+      end
+
+      describe "with resemble image" do
+        # 似てる画像を正しく判定する
+        it "returns proper preferred images array" do
+          target_image = FactoryGirl.create(:feature_madoka)
+          FactoryGirl.create(:feature_madoka1)# 似てる
+          FactoryGirl.create(:feature_madoka2)# 似てない
+          FactoryGirl.create(:feature_test2)  # 抽出出来てない
+          FactoryGirl.create(:image)          # 抽出してない
+
+          get :prefer, {id: target_image.id}, valid_session
+          assigns(:preferred).count.should eq(1)
+        end
       end
     end
 
-    it "renders the 'prefer' template" do
-      target_image = TargetImage.create! valid_attributes
 
-      get :prefer, {id: target_image.id}, valid_session
-      response.should render_template("prefer")
+    describe "with invalid face feature" do
+      # feature.face is []の時
+      it "should redirects index when face length is zero" do
+        face_feature = FactoryGirl.create(:feature_test2)
+
+        # TargetImage.preferを呼ぶ
+        get :prefer, {id: face_feature.featurable_id}, valid_session
+        assigns(:message).should eq('Could not get face feature from this image. 抽出できませんでした。')
+      end
+
+      # feature is nilの時
+      it "should redirects index when feature is nil" do
+        target_image = TargetImage.create! valid_attributes
+
+        get :prefer, {id: target_image.id}, valid_session
+        assigns(:message).should eq('Not extracted yet. まだ抽出されていません。')
+      end
     end
+
   end
 end
