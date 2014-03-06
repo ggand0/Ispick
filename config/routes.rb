@@ -1,9 +1,21 @@
+require 'resque_web'
+
 Ispic::Application.routes.draw do
+  get "welcome/index"
+  resources :target_images do
+    member do
+      get 'prefer'
+    end
+  end
+
+  resources :images, only: [:index, :show, :destroy]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'welcome#index'
+  mount ResqueWeb::Engine => '/resque_web'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

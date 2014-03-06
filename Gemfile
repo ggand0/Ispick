@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.0.2'#'3.2.16'
+gem 'rails', '4.0.2'
 
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
@@ -18,6 +18,8 @@ gem 'coffee-rails', '~> 4.0.0', :git => 'https://github.com/rails/coffee-rails.g
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 #gem 'therubyracer', platforms: :ruby
+gem 'libv8', '~> 3.11.8.13'
+gem 'therubyracer'#, '0.11.0beta8'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -30,10 +32,6 @@ gem 'jbuilder', '~> 1.2'
 
 # added for image uploading by me
 gem 'paperclip', '~> 3.0'
-
-#gem 'linecache19', '>= 0.5.13', :git => 'https://github.com/robmathews/linecache19-0.5.13.git'
-#gem 'ruby-debug-base19x', '>= 0.11.30.pre10'
-#gem 'ruby-debug-ide', '>= 0.4.17.beta14'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
@@ -55,22 +53,43 @@ end
 # rails consoleを起動するために必要
 gem 'rb-readline', '~> 0.4.2'
 
+gem 'nokogiri'                                   # For scraping
+gem 'mechanize'
+gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
+gem 'resque'                                     # For background jobs
+gem 'resque-web', require: 'resque_web'          # Web interface for resque
+gem 'daemon-spawn', require: 'daemon_spawn'
+#gem 'systemu'
+gem 'whenever', :require => false                # Support crontab
+gem 'kaminari'
+gem 'jquery-fileupload-rails'                    # Upload multiple files
 
 group :development, :test do
-	gem 'better_errors'								# Improve error page
-  	gem 'binding_of_caller'
-  	gem 'fuubar'									# テスト進行状況可視化
-	gem 'guard'
-	gem 'guard-coffeescript'
-	gem 'guard-teaspoon'
-	gem 'rb-fsevent'								# used by guard
-	gem "phantomjs", ">= 1.8.1.1"
-	gem 'mocha', '~> 0.14.0', :require => false
-	gem 'teaspoon'
-	gem 'jquery-fileupload-rails'					# Upload multiple files
-	gem 'rspec-rails', '>= 2.6.0'					# Testing framework
-  	gem "rails-erd"									# モデル関連図生成
-  	gem 'simplecov'									# カバレッジ
-	gem 'simplecov-rcov'
-	gem 'pry-rails'									# Improve console
+  gem 'better_errors'                               # Improve error page
+  gem 'binding_of_caller'
+
+  gem 'spring'
+  gem 'spring-commands-rspec'
+  gem 'guard'
+  gem 'guard-coffeescript'
+  gem 'guard-teaspoon'
+  gem 'rb-fsevent'                                  # Used by guard and spring
+  gem 'teaspoon'                                    # JS test runner
+  gem 'phantomjs', '>= 1.8.1.1'
+  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
+
+  gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
+  gem 'guard-rspec', :require => false
+  gem 'factory_girl_rails'                          # A fixtures replacement
+  gem 'simplecov'                                   # カバレッジ測定
+  gem 'simplecov-rcov'
+  gem 'fuubar'                                      # テスト進行状況可視化
+
+  gem 'pry-rails'                                   # Improve the console
+  gem 'rails-erd'                                   # モデル関連図生成
+  gem 'capistrano', '~> 3.1.0'
+  gem 'capistrano-rails'
+  gem 'capistrano-rbenv', '~> 2.0'
+  gem 'capistrano-bundler', '~> 1.1.2'
+  gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
 end

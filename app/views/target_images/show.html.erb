@@ -1,0 +1,17 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @target_image.title %>
+</p>
+<%= link_to 'Edit', edit_target_image_path(@target_image) %> |
+<%= link_to 'Back', target_images_path %>
+<br>
+
+<p>
+  <strong>Face feature:</strong>
+  <%= @face_feature %>
+</p>
+
+<br>
+<%= image_tag @target_image.data.url %>
