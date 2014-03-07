@@ -7,6 +7,28 @@ describe Utility do
     "eyes"=>{"left"=>{"colors"=>{"blue"=>79, "green"=>87, "red"=>67}}, "right"=>{"colors"=>{"blue"=>61, "green"=>70, "red"=>44}}}}]
   }
 
+
+  describe "get_hsv_distance" do
+    it "should return a distance hash" do
+      color_hash0 = { hair: [0, 0, 0], skin: [0, 0, 0], left_eye:[0, 0, 0], right_eye:[0, 0, 0] }
+      color_hash1 = { hair: [10, 0, 0], skin: [10, 0, 0], left_eye:[10, 0, 0], right_eye:[10, 0, 0] }
+
+      dist_hash = Utility.get_hsv_distance(color_hash0, color_hash1)
+      dist_hash.should be_a(Hash)
+      dist_hash[:hair].should eq(10)
+      dist_hash[:skin].should eq(10)
+      dist_hash[:left_eye].should eq(10)
+      dist_hash[:right_eye].should eq(10)
+    end
+  end
+
+  describe "hsv_distance" do
+    it "should return a distance" do
+      dist = Utility.hsv_distance([0, 0, 0], [10, 0, 0])
+      dist.should eq(10)
+    end
+  end
+
   describe "get_colors" do
     it "should return a hash" do
       hash = Utility::get_colors(valid_hash, false)

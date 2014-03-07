@@ -52,6 +52,16 @@ module Utility
     [r, g, b]
   end
 
+  # Calculate hsv distance to all face feature
+  def self.get_hsv_distance(color_hash0, color_hash1)
+    dist_hash = {}
+    dist_hash[:hair] = Utility.hsv_distance(color_hash0[:hair], color_hash1[:hair])
+    dist_hash[:skin] = Utility.hsv_distance(color_hash0[:skin], color_hash1[:skin])
+    dist_hash[:left_eye] = Utility.hsv_distance(color_hash0[:left_eye], color_hash1[:left_eye])
+    dist_hash[:right_eye] = Utility.hsv_distance(color_hash0[:right_eye], color_hash1[:right_eye])
+    dist_hash
+  end
+
   # Calculate a distance of two hsv value
   def self.hsv_distance(hsv0, hsv1)
     dif = [hsv1[0]-hsv0[0], hsv1[1]-hsv0[1], hsv1[2]-hsv0[2]]

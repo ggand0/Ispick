@@ -41,10 +41,11 @@ class TargetImagesService
       image_face = JSON.parse(image.feature.face)
       image_colors = Utility::get_colors(image_face, true)
 
-      distance = Utility::hsv_distance(target_colors[:hair], image_colors[:hair])
-      if distance < 30 and
-        Utility::hsv_distance(target_colors[:left_eye], image_colors[:left_eye]) < 100 and
-        Utility::hsv_distance(target_colors[:right_eye], image_colors[:right_eye]) < 100
+      distance = Utility::get_hsv_distance(target_colors, image_colors)
+      if distance[:hair] < 30 and
+        distance[:skin] < 100 and
+        distance[:left_eye] < 100 and
+        distance[:right_eye] < 100
 
         hsv = Utility::round_array(image_colors[:hair])
         preferred.push({image: image, hsv: distance})
