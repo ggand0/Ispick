@@ -96,31 +96,14 @@ class TargetImagesController < ApplicationController
       return @message = 'Could not get face feature from this image. 抽出できませんでした。'
     end
 
-    face_feature = JSON.parse(target_image.feature.face)
-    target_r = face_feature[0]['hair_color']['red'].to_i
-    target_g = face_feature[0]['hair_color']['green'].to_i
-    target_b = face_feature[0]['hair_color']['blue'].to_i
-    @target_rgb = ["%.2f" % target_r, "%.2f" % target_g, "%.2f" % target_b]
-    @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
+    # Get preferred images array
+    service = TargetImagesService.new
+    result = service.get_preferred_images(target_image)
+    @preferred = result[:images]
+    @target_colors = result[:target_colors]
 
-    Image.all.each do |image|
-      # 抽出されていないか、抽出出来ていないImageは飛ばす
-      if (not image.feature.nil? and image.feature.face == '[]' or
-        image.feature.nil?)
-        next
-      end
-
-      image_face = JSON.parse(image.feature.face)
-      r = image_face[0]['hair_color']['red'].to_i
-      g = image_face[0]['hair_color']['green'].to_i
-      b = image_face[0]['hair_color']['blue'].to_i
-      hsv = Utility::rgb_to_hsv(r, g, b, false)
-
-      if (@target_hsv[0] - hsv[0]).abs < 20
-        hsv = Utility::round_array(hsv)
-        @preferred.push({image: image, hsv: hsv})
-      end
-    end
+    # sort
+    @preferred = @preferred.sort_by{|value| value[:hsv]}
 
     # Pagenate the array
     @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)
