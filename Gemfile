@@ -66,6 +66,7 @@ gem 'resque'                                     # For background jobs
 gem 'whenever', :require => false                # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
+gem 'twitter'
 
 group :development, :test do
 	gem 'better_errors'                              # Improve error page

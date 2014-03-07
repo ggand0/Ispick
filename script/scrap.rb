@@ -9,6 +9,7 @@ module Scrap
   require "#{Rails.root}/script/scrap_futaba"
   require "#{Rails.root}/script/scrap_2ch"
   require "#{Rails.root}/script/scrap_4chan"
+  require "#{Rails.root}/script/scrap_twitter"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrap_all()
@@ -19,6 +20,7 @@ module Scrap
     Scrap::Futaba.scrap()
     Scrap::Nichan.scrap()
     Scrap::Fourchan.scrap()
+    Scrap::Twitter.scrap()
     puts 'DONE!!'
   end
 
