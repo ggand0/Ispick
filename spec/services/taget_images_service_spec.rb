@@ -25,4 +25,31 @@ describe TargetImagesService do
       list.should be_an(Hash)
     end
   end
+
+  describe "get_preferred_images" do
+    it "returns a valid data" do
+      face_feature = FactoryGirl.create(:feature_madoka)
+      target_image = TargetImage.find(face_feature.featurable_id)
+
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      result.should be_a(Hash)
+      result[:images].should be_an(Array)
+      result[:target_colors].should be_a(Hash)
+    end
+
+    it "returns a precise preferred image" do
+      face_feature = FactoryGirl.create(:feature_madoka)
+      target_image = TargetImage.find(face_feature.featurable_id)
+      # 似てるImageが存在している場合
+      FactoryGirl.create(:feature_madoka1)
+
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+
+      # そのImageが推薦される
+      result[:images].length.should eq(1)
+    end
+  end
+
 end
