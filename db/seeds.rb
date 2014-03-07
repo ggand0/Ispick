@@ -8,6 +8,7 @@
 
 include ActionDispatch::TestProcess
 require "#{Rails.root}/app/workers/images_face"
+require "#{Rails.root}/app/workers/target_images_face"
 
 # Generate images
 files = Dir["#{Rails.root}/spec/files/images/*"]
@@ -29,14 +30,14 @@ end
 
 
 # Generate target_images
-files = Dir["#{Rails.root}/spec/files/images/*"]
+files = Dir["#{Rails.root}/spec/files/target_images/*"]
 count = 0
 
 files.each do |f|
   target_image = TargetImage.new(title: 'seed data ' + count.to_s, data: fixture_file_upload(f))
   begin
-    if image.save
-      Resque.enqueue(ImageFace, image.id)
+    if target_image.save
+      Resque.enqueue(Face, target_image.id)
     else
       puts 'failed.'
     end
