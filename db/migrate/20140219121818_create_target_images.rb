@@ -1,8 +1,7 @@
 class CreateTargetImages < ActiveRecord::Migration
   def change
     create_table :target_images do |t|
-      t.string :title
-      t.string :face_feature
+      t.text :title
 
       t.timestamps
     end

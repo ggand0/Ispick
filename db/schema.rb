@@ -14,7 +14,7 @@
 ActiveRecord::Schema.define(version: 20140223122359) do
 
   create_table "features", force: true do |t|
-    t.string   "face"
+    t.text     "face"
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -22,10 +22,9 @@ ActiveRecord::Schema.define(version: 20140223122359) do
   end
 
   create_table "images", force: true do |t|
-    t.string   "title"
-    t.string   "caption"
-    t.string   "face_feature"
-    t.string   "src_url"
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
@@ -35,8 +34,8 @@ ActiveRecord::Schema.define(version: 20140223122359) do
   end
 
   create_table "target_images", force: true do |t|
-    t.string   "title"
-    t.string   "face_feature"
+    t.text     "title"
+    t.text     "face_feature"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
