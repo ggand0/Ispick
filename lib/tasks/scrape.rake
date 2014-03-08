@@ -23,11 +23,38 @@ namespace :scrape do
     Rake::Task["feature:image_all"].invoke
   end
 
-  desc "画像を対象webサイトから抽出する"
+  desc "画像を対象webサイト全てから抽出する"
   task images: :environment do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrape"
     Scrape.scrape_all()
+  end
+
+
+  # 以下、whenever用タスク
+  require "#{Rails.root}/script/scrape"
+  desc "every 5 min"
+  task min5: :environment do
+    puts 'Scraping images from target websites...'
+    Scrape.scrape_5min()
+  end
+
+  desc "every 15 min"
+  task min15: :environment do
+    puts 'Scraping images from target websites...'
+    Scrape.scrape_15min()
+  end
+
+  desc "every 30 min"
+  task min30: :environment do
+    puts 'Scraping images from target websites...'
+    Scrape.scrape_30min()
+  end
+
+  desc "every 60 min"
+  task min60: :environment do
+    puts 'Scraping images from target websites...'
+    Scrape.scrape_60min()
   end
 end
