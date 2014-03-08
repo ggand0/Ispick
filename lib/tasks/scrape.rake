@@ -1,5 +1,5 @@
 # encoding: utf-8
-namespace :scrap do
+namespace :scrape do
   desc "Imagesテーブルリセット"
   task reset: :environment do
     # Imageモデルを全消去
@@ -8,7 +8,7 @@ namespace :scrap do
   end
 
   desc "DB内Imagesテーブルをリセット後、抽出スクリプトを走らせる"
-  task :rescrap_all => :environment do
+  task :rescrape_all => :environment do
     # Imageモデルを全消去
     puts 'Deleting Image model...'
     Image.delete_all
@@ -16,7 +16,7 @@ namespace :scrap do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrap"
-    Scrap.scrap_all()
+    Scrap.scrape_all()
 
     # 全Imageに対して顔の特徴抽出処理を行う
     puts 'Extracting face feature to all images...'
@@ -28,6 +28,6 @@ namespace :scrap do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrap"
-    Scrap.scrap_all()
+    Scrap.scrape_all()
   end
 end

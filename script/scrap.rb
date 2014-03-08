@@ -12,15 +12,15 @@ module Scrap
   require "#{Rails.root}/script/scrap_twitter"
 
   # 対象webサイト全てから画像抽出を行う。
-  def self.scrap_all()
-    #Scrap::Nico.scrap()
-    #Scrap::Piapro.scrap()
-    #Scrap::Pixiv.scrap()
-    #Scrap::Deviant.scrap()
-    #Scrap::Futaba.scrap()
-    #Scrap::Nichan.scrap()
+  def self.scrape_all()
+    Scrap::Nico.scrap()
+    Scrap::Piapro.scrap()
+    Scrap::Pixiv.scrap()
+    Scrap::Deviant.scrap()
+    Scrap::Futaba.scrap()
+    Scrap::Nichan.scrap()
     Scrap::Fourchan.scrap()
-    #Scrap::Twitter.scrap()
+    Scrap::Twitter.scrap()
     puts 'DONE!!'
   end
 
