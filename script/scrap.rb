@@ -39,7 +39,7 @@ module Scrap
       # 高頻度で失敗し得るので例外は投げないようにする
       if image.save
         # 特徴抽出処理をresqueに投げる
-        #Resque.enqueue(ImageFace, image.id)
+        Resque.enqueue(ImageFace, image.id)
       else
         Rails.logger.info('Image model saving failed.')
         puts 'Image model saving failed.'
