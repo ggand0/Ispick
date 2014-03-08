@@ -6,33 +6,42 @@ require 'securerandom'
 
 
 # 4chanから2次画像を抽出する
-module Scrap::Fourchan
+module Scrape::Fourchan
 
   # 4chanURL
   ROOT_URL = 'http://www.4chan.org/'
-  
+
   # 関数定義
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # 変数
     board = "c"   # 板の名称(タイトルではない)
-    limit = 5
+    limit = 2
 
     # スレッドの内容を取得する
     thread_id = self.get_thread_id_list(board, limit)
+    puts thread_id.length.to_s
     thread_post = self.get_thread_post_list(board, thread_id)
+    puts thread_post.length.to_s
     image_url = self.get_image_url_list(board, thread_post)
+    puts 'count:'+image_url.length.to_s
 
     # Imageモデル生成＆DB保存
     image_url.each do |value|
       img_name = self.get_image_name(value)
       printf("%s : %s\n", img_name, value)
-      Scrap::save_image(img_name, value)
+
+      # 4chanは１枚のサイズが大きい傾向にあるので、先に調べる
+      if not Scrape::is_duplicate(value)
+        Scrape::save_image(img_name, value)
+      else
+        puts 'Skipping a duplicate image...'
+      end
     end
 
   end
-  
+
   # 4chan内の板の一覧(ハッシュ)を取得する関数
   def self.get_board_list()
     url = "http://a.4cdn.org/boards.json"
@@ -52,10 +61,14 @@ module Scrap::Fourchan
     data = JSON.parse(json)
     thread_id_list = []
     data.each do |page|
-      thread_id_list = page["threads"].map { |value| value["no"] }
-      if thread_id_list.size >= limit then
-        thread_is_list = thread_id_list[0, limit]
-        return thread_id_list   # Array
+      #thread_id_list = page["threads"].map { |value| value["no"] }
+      page["threads"].each do |thread|
+        # 上限決まってる場合は1つずつpushするしかない？
+        thread_id_list.push(thread["no"])
+        if thread_id_list.size >= limit then
+          thread_is_list = thread_id_list[0, limit]
+          return thread_id_list   # Array
+        end
       end
     end
     thread_id_list    # Array

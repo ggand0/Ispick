@@ -2,7 +2,7 @@
 require 'open-uri'
 
 # 公式APIを有するので色々調整出来そう
-module Scrap::Deviant
+module Scrape::Deviant
   # Use official api
   # boost%3Apopular : 人気順
   # max_age%3A24h : 24時間以内のimage
@@ -38,10 +38,14 @@ module Scrap::Deviant
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrap::save_image(title, img_url)
+    if not Scrape::is_duplicate(img_url)
+      Scrape::save_image(title, img_url)
+    else
+      puts 'Skipping a duplicate image...'
+    end
   end
 
-  def self.scrap()
+  def self.scrape()
     xml = Nokogiri::XML(open(ROOT_URL))
     puts 'Extracting : ' + ROOT_URL
 

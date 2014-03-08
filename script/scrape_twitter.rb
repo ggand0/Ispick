@@ -4,13 +4,13 @@ require 'securerandom'
 
 
 # 4chanから2次画像を抽出する
-module Scrap::Twitter
+module Scrape::Twitter
 
     # TwitterURL
     ROOT_URL = 'https://twitter.com'
 
     # 関数定義
-    def self.scrap()
+    def self.scrape()
         puts 'Extracting : ' + ROOT_URL
 
         # 変数
@@ -32,7 +32,11 @@ module Scrap::Twitter
         image_url.each do |value|
             img_name = self.get_image_name(value)
             puts "#{img_name} : #{value}"
-            Scrap::save_image(img_name, value)
+            if not Scrape::is_duplicate(value)
+              Scrape::save_image(img_name, value)
+            else
+              puts 'Skipping a duplicate image...'
+            end
         end
     end
 

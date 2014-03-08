@@ -25,6 +25,7 @@ files.each do |f|
   rescue Exception => e
     puts e
   end
+  puts 'Seeding images table : ' + (count+1).to_s + ' / ' + files.length.to_s
   count += 1
 end
 
@@ -44,5 +45,8 @@ files.each do |f|
   rescue Exception => e
     puts e
   end
+  puts 'Seeding target_images table : ' + (count+1).to_s + ' / ' + files.length.to_s
   count += 1
 end
+
+puts 'DONE!'

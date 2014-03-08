@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'open-uri'
 
-module Scrap::Nico
+module Scrape::Nico
 
   # ニコ静RSS(非公式)
   ROOT_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
@@ -23,11 +23,15 @@ module Scrap::Nico
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrap::save_image(item.css("title").first.content, img_url)
+    if not Scrape::is_duplicate(img_url)
+      Scrape::save_image(item.css("title").first.content, img_url)
+    else
+      puts 'Skipping a duplicate image...'
+    end
   end
 
   # ニコニコ静画。非公式RSSから新着イラストを抽出する
-  def self.scrap()
+  def self.scrape()
     xml = Nokogiri::XML(open(ROOT_URL))
     puts 'Extracting : ' + ROOT_URL
 

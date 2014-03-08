@@ -35,7 +35,6 @@ ActiveRecord::Schema.define(version: 20140223122359) do
 
   create_table "target_images", force: true do |t|
     t.text     "title"
-    t.text     "face_feature"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"

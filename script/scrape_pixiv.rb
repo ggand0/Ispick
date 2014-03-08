@@ -5,7 +5,7 @@ require 'net/http'
 require 'uri'
 
 # PixivはRSSもAPIも無く、非常に抽出しにくい
-module Scrap::Pixiv
+module Scrape::Pixiv
   # タグ：まどかわいい
   ROOT_URL = "http://spapi.pixiv.net/iphone/search.php?s_mode=s_tag&word=%E3%81%BE%E3%81%A9%E3%81%8B%E3%82%8F%E3%81%84%E3%81%84&PHPSESSID=0"
 
@@ -21,11 +21,15 @@ module Scrap::Pixiv
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrap::save_image(title.encode("UTF-8"), img_url, caption)
+    if not Scrape::is_duplicate(img_url)
+      Scrape::save_image(title.encode("UTF-8"), img_url, caption)
+    else
+      puts 'Skipping a duplicate image...'
+    end
   end
 
   # 返ってきた文字列から割と強引に抽出する
-  def self.scrap()
+  def self.scrape()
     uri = URI.parse(ROOT_URL)
     result = Net::HTTP.get(uri)
 

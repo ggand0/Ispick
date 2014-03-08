@@ -1,7 +1,7 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrap"
+require "#{Rails.root}/script/scrape"
 
-describe Scrap::Pixiv do
+describe Scrape::Pixiv do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
@@ -14,17 +14,17 @@ describe Scrap::Pixiv do
       result = Net::HTTP.get(uri)
       lines = result.split("\n")
 
-      Scrap::Pixiv.get_contents(lines[0])
+      Scrape::Pixiv.get_contents(lines[0])
       Image.count.should eq(count+1)
     end
   end
 
-  describe "scrap method" do
+  describe "scrape method" do
     it "should call get_contents method at least 1 time" do
-      Scrap::Pixiv.stub(:get_contents).and_return()
-      Scrap::Pixiv.should_receive(:get_contents).at_least(20).times
+      Scrape::Pixiv.stub(:get_contents).and_return()
+      Scrape::Pixiv.should_receive(:get_contents).at_least(20).times
 
-      Scrap::Pixiv.scrap()
+      Scrape::Pixiv.scrape()
     end
   end
 end
