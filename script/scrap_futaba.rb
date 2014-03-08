@@ -9,7 +9,7 @@ module Scrap::Futaba
 
   # ふたばちゃんねるURL
   ROOT_URL = 'http://www.2chan.net/'
-  
+
   # 関数定義
   def self.scrap()
     puts 'Extracting : ' + ROOT_URL
@@ -39,10 +39,10 @@ module Scrap::Futaba
     img_url_array.each do |value|
       # 画像のタイトルを決定
       img_title = ""
-      if /^.*\/([0-9a-zA-Z]*)\..*$/ =~ value then
+      if /^.+\/(.*)\..*$/ =~ value then
         img_title = "futaba_" + $1
       end
-      
+
       # 出力テスト
       puts printf("%s : %s", img_title, value)
 
