@@ -5,13 +5,13 @@ require 'kconv'
 
 
 # ふたばちゃんねるから2次画像を抽出する
-module Scrap::Futaba
+module Scrape::Futaba
 
   # ふたばちゃんねるURL
   ROOT_URL = 'http://www.2chan.net/'
 
   # 関数定義
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # 画像URLを取得する
@@ -47,8 +47,8 @@ module Scrap::Futaba
       puts printf("%s : %s", img_title, value)
 
       # Imageモデル生成＆DB保存
-      if not Scrap::is_duplicate(value)
-        Scrap::save_image(img_title, value)
+      if not Scrape::is_duplicate(value)
+        Scrape::save_image(img_title, value)
       else
         puts 'Skipping a duplicate image...'
       end

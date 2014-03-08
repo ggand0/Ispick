@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'open-uri'
 
-module Scrap::Piapro
+module Scrape::Piapro
   ROOT_URL = 'http://piapro.jp/'
 
   def self.get_contents(item)
@@ -22,15 +22,15 @@ module Scrap::Piapro
     puts img_url
 
     # Imageモデル生成＆DB保存
-    if not Scrap::is_duplicate(img_url)
-      Scrap::save_image(item.text, img_url)
+    if not Scrape::is_duplicate(img_url)
+      Scrape::save_image(item.text, img_url)
     else
       puts 'Skipping a duplicate image...'
     end
   end
 
   # ピアプロは抽出しやすい
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # オフィシャルカテゴリに属するイラストの新着を見る

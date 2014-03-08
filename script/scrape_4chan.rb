@@ -6,13 +6,13 @@ require 'securerandom'
 
 
 # 4chanから2次画像を抽出する
-module Scrap::Fourchan
+module Scrape::Fourchan
 
   # 4chanURL
   ROOT_URL = 'http://www.4chan.org/'
 
   # 関数定義
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # 変数
@@ -33,8 +33,8 @@ module Scrap::Fourchan
       printf("%s : %s\n", img_name, value)
 
       # 4chanは１枚のサイズが大きい傾向にあるので、先に調べる
-      if not Scrap::is_duplicate(value)
-        Scrap::save_image(img_name, value)
+      if not Scrape::is_duplicate(value)
+        Scrape::save_image(img_name, value)
       else
         puts 'Skipping a duplicate image...'
       end

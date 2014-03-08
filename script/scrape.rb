@@ -1,44 +1,44 @@
 #-*- coding: utf-8 -*-
 require "#{Rails.root}/app/workers/images_face"
 
-module Scrap
-  require "#{Rails.root}/script/scrap_nico"
-  require "#{Rails.root}/script/scrap_piapro"
-  require "#{Rails.root}/script/scrap_pixiv"
-  require "#{Rails.root}/script/scrap_deviant"
-  require "#{Rails.root}/script/scrap_futaba"
-  require "#{Rails.root}/script/scrap_2ch"
-  require "#{Rails.root}/script/scrap_4chan"
-  require "#{Rails.root}/script/scrap_twitter"
+module Scrape
+  require "#{Rails.root}/script/scrape_nico"
+  require "#{Rails.root}/script/scrape_piapro"
+  require "#{Rails.root}/script/scrape_pixiv"
+  require "#{Rails.root}/script/scrape_deviant"
+  require "#{Rails.root}/script/scrape_futaba"
+  require "#{Rails.root}/script/scrape_2ch"
+  require "#{Rails.root}/script/scrape_4chan"
+  require "#{Rails.root}/script/scrape_twitter"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
-    Scrap::Nico.scrap()
-    Scrap::Piapro.scrap()
-    Scrap::Pixiv.scrap()
-    Scrap::Deviant.scrap()
-    Scrap::Futaba.scrap()
-    Scrap::Nichan.scrap()
-    Scrap::Fourchan.scrap()
-    Scrap::Twitter.scrap()
+    Scrape::Nico.scrape()
+    Scrape::Piapro.scrape()
+    Scrape::Pixiv.scrape()
+    Scrape::Deviant.scrape()
+    Scrape::Futaba.scrape()
+    Scrape::Nichan.scrape()
+    #Scrape::Fourchan.scrape()
+    Scrape::Twitter.scrape()
     puts 'DONE!!'
   end
 
   def self.scrape_5min
-    Scrap::Nico.scrap()
-    Scrap::Futaba.scrap()
+    Scrap::Nico.scrape()
+    Scrap::Futaba.scrape()
   end
 
   def self.scrape_15min()
-    Scrap::Piapro.scrap()
-    Scrap::Nichan.scrap()
-    Scrap::Twitter.scrap()
+    Scrap::Piapro.scrape()
+    Scrap::Nichan.scrape()
+    Scrap::Twitter.scrape()
   end
 
   def self.scrape_60min()
-    Scrap::Pixiv.scrap()
-    Scrap::Deviant.scrap()
-    Scrap::Fourchan.scrap()
+    Scrap::Pixiv.scrape()
+    Scrap::Deviant.scrape()
+    Scrap::Fourchan.scrape()
     puts 'DONE!!'
   end
 

@@ -4,13 +4,13 @@ require 'open-uri'
 
 
 # 2ちゃんねるから2次画像を抽出する
-module Scrap::Nichan
+module Scrape::Nichan
 
   # 2ちゃんねるURL
   ROOT_URL = 'http://2ch.net/'
 
   # 関数定義
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # 2ちゃんねるのベースURL
@@ -37,8 +37,8 @@ module Scrap::Nichan
     img_url_array.each do |value|
       img_title = self.get_image_name(value)      # 画像のタイトルを決定
       printf("%s : %s\n", img_title, value)       # 出力テスト
-      if not Scrap::is_duplicate(value)           # Imageモデル生成＆DB保存
-        Scrap::save_image(img_title, value)
+      if not Scrape::is_duplicate(value)           # Imageモデル生成＆DB保存
+        Scrape::save_image(img_title, value)
       else
         puts 'Skipping a duplicate image...'
       end
