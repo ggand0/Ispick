@@ -34,7 +34,7 @@ describe Scrape::Deviant do
     end
 
     it "should not create an image model from mature image" do
-      Scrap::Deviant.stub(:is_adult).and_return(true)
+      Scrape::Deviant.stub(:is_adult).and_return(true)
       count = Image.count
       #xml = Nokogiri::XML(open('http://backend.deviantart.com/rss.xml?type=deviation&q=boost%3Apopular+max_age%3A24h+in%3Amanga%2Fdigital+anime'))
       #Scrap::Deviant.get_contents(xml.css("item")[1])
