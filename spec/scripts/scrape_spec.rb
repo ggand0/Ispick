@@ -1,44 +1,44 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrap"
+require "#{Rails.root}/script/scrape"
 
-describe Scrap do
+describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
   end
 
-  describe "scrap_all method" do
+  describe "scrape_all method" do
     it "runs all scraping script" do
-      Scrap::Nico.stub(:scrap).and_return()
-      Scrap::Piapro.stub(:scrap).and_return()
-      Scrap::Pixiv.stub(:scrap).and_return()
-      Scrap::Deviant.stub(:scrap).and_return()
-      Scrap::Futaba.stub(:scrap).and_return()
-      Scrap::Nichan.stub(:scrap).and_return()
-      Scrap::Fourchan.stub(:scrap).and_return()
-      Scrap::Twitter.stub(:scrap).and_return()
+      Scrape::Nico.stub(:scrape).and_return()
+      Scrape::Piapro.stub(:scrape).and_return()
+      Scrape::Pixiv.stub(:scrape).and_return()
+      Scrape::Deviant.stub(:scrape).and_return()
+      Scrape::Futaba.stub(:scrape).and_return()
+      Scrape::Nichan.stub(:scrape).and_return()
+      Scrape::Fourchan.stub(:scrape).and_return()
+      Scrape::Twitter.stub(:scrape).and_return()
 
-      Scrap::Nico.should_receive(:scrap)
-      Scrap::Piapro.should_receive(:scrap)
-      Scrap::Pixiv.should_receive(:scrap)
-      Scrap::Deviant.should_receive(:scrap)
-      Scrap::Futaba.should_receive(:scrap)
-      Scrap::Nichan.should_receive(:scrap)
-      Scrap::Fourchan.should_receive(:scrap)
-      Scrap::Twitter.should_receive(:scrap)
+      Scrape::Nico.should_receive(:scrape)
+      Scrape::Piapro.should_receive(:scrape)
+      Scrape::Pixiv.should_receive(:scrape)
+      Scrape::Deviant.should_receive(:scrape)
+      Scrape::Futaba.should_receive(:scrape)
+      Scrape::Nichan.should_receive(:scrape)
+      Scrape::Fourchan.should_receive(:scrape)
+      Scrape::Twitter.should_receive(:scrape)
 
-      Scrap.scrap_all()
+      Scrape.scrape_all()
     end
   end
 
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_url)
-      Scrap.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
+      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
     end
     it "should return false when arg url is NOT duplicate" do
       FactoryGirl.create(:image_url)
-      Scrap.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
+      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
     end
   end
 
@@ -48,7 +48,7 @@ describe Scrap do
         Image.any_instance.stub(:image_from_url).and_return()
         count = Image.count
 
-        Scrap::save_image('title', 'src_url')
+        Scrape::save_image('title', 'src_url')
         Image.count.should eq(count+1)
       end
 
@@ -58,7 +58,7 @@ describe Scrap do
           Image.any_instance.stub(:image_from_url).and_return()
           Rails.logger.should_receive(:info).with('Image model saving failed.')
 
-          Scrap::save_image('title', 'src_url')
+          Scrape::save_image('title', 'src_url')
         end
       end
 
@@ -69,7 +69,7 @@ describe Scrap do
           #Rails.logger.should_receive(:info).with('Image model saving failed.')
 
           count = Image.count
-          Scrap::save_image('title', 'src_url')
+          Scrape::save_image('title', 'src_url')
           Image.count.should eq(count)
         end
       end
@@ -77,7 +77,7 @@ describe Scrap do
     describe "with invalid attributes" do
       it "should not save the image" do
         count = Image.count
-        Scrap::save_image('title', 'url with no images')
+        Scrape::save_image('title', 'url with no images')
         Image.count.should eq(count)
       end
     end
