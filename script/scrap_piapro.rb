@@ -22,7 +22,11 @@ module Scrap::Piapro
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrap::save_image(item.text, img_url)
+    if not Scrap::is_duplicate(img_url)
+      Scrap::save_image(item.text, img_url)
+    else
+      puts 'Skipping a duplicate image...'
+    end
   end
 
   # ピアプロは抽出しやすい

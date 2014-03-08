@@ -15,7 +15,7 @@ module Scrap::Nichan
 
     # 2ちゃんねるのベースURL
     base_url = 'http://toro.2ch.net/illustrator/'    # イラストレータ板
-    
+
     # 2ちゃんねるのスレッドのdatファイルURLを取得する
     limit = 5
     thread_dat_url = self.get_dat_url(base_url, limit)    # 配列
@@ -37,15 +37,19 @@ module Scrap::Nichan
     img_url_array.each do |value|
       img_title = self.get_image_name(value)      # 画像のタイトルを決定
       printf("%s : %s\n", img_title, value)       # 出力テスト
-      Scrap::save_image(img_title, value)         # Imageモデル生成＆DB保存
+      if not Scrap::is_duplicate(value)           # Imageモデル生成＆DB保存
+        Scrap::save_image(img_title, value)
+      else
+        puts 'Skipping a duplicate image...'
+      end
     end
 
   end
 
   # スレッドのdatファイルへのURLを新着順に取得し、配列で返す関数
   def self.get_dat_url(base_url, limit)
-    # subject.txtのURL 
-    subject_url = base_url + 'subject.txt' 
+    # subject.txtのURL
+    subject_url = base_url + 'subject.txt'
 
     # スレッドのURLを取得
     thread_dat_url = []    # 空の配列

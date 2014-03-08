@@ -32,7 +32,11 @@ module Scrap::Twitter
         image_url.each do |value|
             img_name = self.get_image_name(value)
             puts "#{img_name} : #{value}"
-            Scrap::save_image(img_name, value)
+            if not Scrap::is_duplicate(value)
+              Scrap::save_image(img_name, value)
+            else
+              puts 'Skipping a duplicate image...'
+            end
         end
     end
 

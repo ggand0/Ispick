@@ -47,7 +47,11 @@ module Scrap::Futaba
       puts printf("%s : %s", img_title, value)
 
       # Imageモデル生成＆DB保存
-      Scrap::save_image(img_title, value)
+      if not Scrap::is_duplicate(value)
+        Scrap::save_image(img_title, value)
+      else
+        puts 'Skipping a duplicate image...'
+      end
     end
   end
 

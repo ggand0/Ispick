@@ -21,7 +21,11 @@ module Scrap::Pixiv
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrap::save_image(title.encode("UTF-8"), img_url, caption)
+    if not Scrap::is_duplicate(img_url)
+      Scrap::save_image(title.encode("UTF-8"), img_url, caption)
+    else
+      puts 'Skipping a duplicate image...'
+    end
   end
 
   # 返ってきた文字列から割と強引に抽出する
