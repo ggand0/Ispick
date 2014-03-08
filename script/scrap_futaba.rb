@@ -28,7 +28,7 @@ module Scrap::Futaba
 
       # 画像URLを取得
       if self.check_img_url(img_url) then
-          img_url_array.push(img_url)
+        img_url_array.push(img_url)
       end
     end
 
