@@ -13,15 +13,38 @@ module Scrap
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrap_all()
+    #Scrap::Nico.scrap()
+    #Scrap::Piapro.scrap()
+    #Scrap::Pixiv.scrap()
+    #Scrap::Deviant.scrap()
+    #Scrap::Futaba.scrap()
+    #Scrap::Nichan.scrap()
+    Scrap::Fourchan.scrap()
+    #Scrap::Twitter.scrap()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_5min
     Scrap::Nico.scrap()
+    Scrap::Futaba.scrap()
+  end
+
+  def self.scrape_15min()
     Scrap::Piapro.scrap()
+    Scrap::Nichan.scrap()
+    Scrap::Twitter.scrap()
+  end
+
+  def self.scrape_60min()
     Scrap::Pixiv.scrap()
     Scrap::Deviant.scrap()
-    Scrap::Futaba.scrap()
-    Scrap::Nichan.scrap()
     Scrap::Fourchan.scrap()
-    Scrap::Twitter.scrap()
     puts 'DONE!!'
+  end
+
+  # 重複したsrc_urlを持つレコードがDBにあるか調べる
+  def self.is_duplicate(src_url)
+    Image.where(src_url: src_url).length > 0
   end
 
   # Imageモデル生成＆DB保存

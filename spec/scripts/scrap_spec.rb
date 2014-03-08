@@ -13,13 +13,32 @@ describe Scrap do
       Scrap::Piapro.stub(:scrap).and_return()
       Scrap::Pixiv.stub(:scrap).and_return()
       Scrap::Deviant.stub(:scrap).and_return()
+      Scrap::Futaba.stub(:scrap).and_return()
+      Scrap::Nichan.stub(:scrap).and_return()
+      Scrap::Fourchan.stub(:scrap).and_return()
+      Scrap::Twitter.stub(:scrap).and_return()
 
       Scrap::Nico.should_receive(:scrap)
       Scrap::Piapro.should_receive(:scrap)
       Scrap::Pixiv.should_receive(:scrap)
       Scrap::Deviant.should_receive(:scrap)
+      Scrap::Futaba.should_receive(:scrap)
+      Scrap::Nichan.should_receive(:scrap)
+      Scrap::Fourchan.should_receive(:scrap)
+      Scrap::Twitter.should_receive(:scrap)
 
       Scrap.scrap_all()
+    end
+  end
+
+  describe "is_duplicate method" do
+    it "should return true when arg url is duplicate" do
+      FactoryGirl.create(:image_url)
+      Scrap.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
+    end
+    it "should return false when arg url is NOT duplicate" do
+      FactoryGirl.create(:image_url)
+      Scrap.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
     end
   end
 
