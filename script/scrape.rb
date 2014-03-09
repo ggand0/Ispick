@@ -56,17 +56,25 @@ module Scrape
 
   # Imageモデル生成＆DB保存
   def self.save_image(title, src_url, caption='')
+    # 重複を確認
+    if self.is_duplicate(src_url)
+      puts 'Skipping a duplicate image...'
+      return
+    end
+
+    # 新規レコードを作成
     begin
       image = Image.new(title: title, src_url: src_url, caption: caption)
       image.image_from_url src_url
     rescue Exception => e
+      # URLからImage.dataを設定するのに失敗したら諦める
       puts e
-      # 失敗したら諦める
       return
     end
 
+    # DBに保存する
     begin
-      # 高頻度で失敗し得るので例外は投げないようにする
+      # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
       if image.save
         # 特徴抽出処理をresqueに投げる
         Resque.enqueue(ImageFace, image.id)

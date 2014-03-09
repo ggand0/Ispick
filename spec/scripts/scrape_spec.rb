@@ -81,6 +81,14 @@ describe Scrape do
         Scrape::save_image('title', 'url with no images')
         Image.count.should eq(count)
       end
+
+      it 'should ignore duplicate image' do
+        image = FactoryGirl.create(:image_url)
+        count = Image.count
+
+        Scrape::save_image('title', image.data.url)
+        Image.count.should eq(count)
+      end
     end
   end
 
