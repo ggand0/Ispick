@@ -211,13 +211,13 @@ describe TargetImagesController do
       describe "with resemble image" do
         # 似てる画像を正しく判定する
         it "returns proper preferred images array" do
-          target_image = FactoryGirl.create(:feature_madoka)
+          face_feature = FactoryGirl.create(:feature_madoka)
           FactoryGirl.create(:feature_madoka1)# 似てる
           FactoryGirl.create(:feature_madoka2)# 似てない
           FactoryGirl.create(:feature_test2)  # 抽出出来てない
           FactoryGirl.create(:image)          # 抽出してない
 
-          get :prefer, {id: target_image.id}, valid_session
+          get :prefer, {id: face_feature.featurable_id}, valid_session
           assigns(:preferred).count.should eq(1)
         end
       end
