@@ -45,7 +45,7 @@ describe ImagesController do
       assigns(:image).should eq(image)
     end
 
-    it 'assigns the face feature as @face_feature' do
+    it "assigns the face feature as @face_feature" do
       feature_face = FactoryGirl.create(:feature_madoka1)
       get :show, {id: feature_face.featurable_id}, valid_session
       assigns(:face_feature).should eq(feature_face.face)
