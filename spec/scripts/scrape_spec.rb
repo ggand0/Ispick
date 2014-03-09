@@ -106,8 +106,8 @@ describe Scrape do
       end
     end
 
-    describe "with invalid attributes" do
-      it "should not save the image" do
+    describe 'with invalid attributes' do
+      it 'should not save the image' do
         count = Image.count
         Scrape::save_image('title', 'url with no images')
         Image.count.should eq(count)
@@ -117,7 +117,7 @@ describe Scrape do
         image = FactoryGirl.create(:image_url)
         count = Image.count
 
-        Scrape::save_image('title', image.data.url)
+        Scrape::save_image('title', image.src_url)
         Image.count.should eq(count)
       end
     end
