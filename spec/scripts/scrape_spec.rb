@@ -31,6 +31,37 @@ describe Scrape do
     end
   end
 
+  describe "scrape sub function method" do
+    it "runs all scraping script in _5min function" do
+      Scrape::Nico.stub(:scrape).and_return()
+      Scrape::Futaba.stub(:scrape).and_return()
+      Scrape::Nico.should_receive(:scrape)
+      Scrape::Futaba.should_receive(:scrape)
+      Scrape.scrape_5min()
+    end
+    it "runs all scraping script in _15min function" do
+      Scrape::Piapro.stub(:scrape).and_return()
+      Scrape::Nichan.stub(:scrape).and_return()
+      Scrape::Twitter.stub(:scrape).and_return()
+      Scrape::Piapro.should_receive(:scrape)
+      Scrape::Nichan.should_receive(:scrape)
+      Scrape::Twitter.should_receive(:scrape)
+      Scrape.scrape_15min()
+    end
+    it "runs all scraping script in _30min function" do
+      Scrape::Fourchan.stub(:scrape).and_return()
+      Scrape::Fourchan.should_receive(:scrape)
+      Scrape.scrape_30min()
+    end
+    it "runs all scraping script in _60min function" do
+      Scrape::Pixiv.stub(:scrape).and_return()
+      Scrape::Deviant.stub(:scrape).and_return()
+      Scrape::Pixiv.should_receive(:scrape)
+      Scrape::Deviant.should_receive(:scrape)
+      Scrape.scrape_60min()
+    end
+  end
+
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_url)
@@ -65,8 +96,8 @@ describe Scrape do
       describe "when DB raise an error during saving the image" do
         it "should not save the image" do
           Image.any_instance.stub(:image_from_url).and_return()
-          Image.any_instance.stub(:save).and_raise SQLite3::SQLException
-          #Rails.logger.should_receive(:info).with('Image model saving failed.')
+          #Image.any_instance.stub(:save).and_raise SQLite3::SQLException
+          Image.any_instance.stub(:save).and_raise Exception
 
           count = Image.count
           Scrape::save_image('title', 'src_url')
@@ -74,12 +105,22 @@ describe Scrape do
         end
       end
     end
+
     describe "with invalid attributes" do
       it "should not save the image" do
         count = Image.count
         Scrape::save_image('title', 'url with no images')
         Image.count.should eq(count)
       end
+
+      it "should ignore duplicate image" do
+        image = FactoryGirl.create(:image_url)
+        count = Image.count
+
+        Scrape::save_image('title', image.src_url)
+        Image.count.should eq(count)
+      end
     end
   end
+
 end

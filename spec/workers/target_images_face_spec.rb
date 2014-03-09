@@ -5,6 +5,10 @@ require "#{Rails.root}/app/services/target_images_service"
 describe Face do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
+  before do
+    IO.any_instance.stub(:puts)
+  end
+
   describe "perform method" do
     it "should create a new Feature model" do
       target_image = TargetImage.create! valid_attributes

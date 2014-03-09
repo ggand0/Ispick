@@ -8,11 +8,12 @@ module Scrape::Nico
 
   def self.get_contents(item)
     # 元ページを開く
-    page = item.css("link").first.content
     begin
+      page = item.css('link').first.content
       html = Nokogiri::HTML(open(page))
     rescue Exception => e
       # ログイン求められて失敗した時用
+      Rails.logger.info('Image model saving failed.')
       return
     end
 
@@ -23,11 +24,7 @@ module Scrape::Nico
     puts img_url
 
     # Imageモデル生成＆DB保存
-    if not Scrape::is_duplicate(img_url)
-      Scrape::save_image(item.css("title").first.content, img_url)
-    else
-      puts 'Skipping a duplicate image...'
-    end
+    Scrape::save_image(item.css("title").first.content, img_url)
   end
 
   # ニコニコ静画。非公式RSSから新着イラストを抽出する

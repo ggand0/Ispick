@@ -6,11 +6,12 @@ module Scrape::Piapro
 
   def self.get_contents(item)
     # リンク先がサイト内URLで表されているので、ROOT_URLと組み合わせてURL生成しアクセス
-    page_url = item['href']
-    root_img_url = URI.join(ROOT_URL, page_url).to_s
     begin
+      page_url = item['href']
+      root_img_url = URI.join(ROOT_URL, page_url).to_s
       page = Nokogiri::HTML(open(root_img_url))
     rescue Exception => e
+      Rails.logger.info('Image model saving failed.')
       return
     end
 
@@ -22,11 +23,7 @@ module Scrape::Piapro
     puts img_url
 
     # Imageモデル生成＆DB保存
-    if not Scrape::is_duplicate(img_url)
-      Scrape::save_image(item.text, img_url)
-    else
-      puts 'Skipping a duplicate image...'
-    end
+    Scrape::save_image(item.text, img_url)
   end
 
   # ピアプロは抽出しやすい
