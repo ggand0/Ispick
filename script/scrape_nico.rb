@@ -8,11 +8,12 @@ module Scrape::Nico
 
   def self.get_contents(item)
     # 元ページを開く
-    page = item.css("link").first.content
     begin
+      page = item.css('link').first.content
       html = Nokogiri::HTML(open(page))
     rescue Exception => e
       # ログイン求められて失敗した時用
+      Rails.logger.info('Image model saving failed.')
       return
     end
 

@@ -15,6 +15,17 @@ describe Scrape::Nico do
       Scrape::Nico.get_contents(xml.css("item")[0])
       Image.count.should eq(count+1)
     end
+
+    # 対象URLを開けなかったとき
+    it "should write a log when it fails to open the image page" do
+      count = Image.count
+      xml = Nokogiri::XML(open('http://google.com'))
+
+      Rails.logger.should_receive(:info).with('Image model saving failed.')
+      Scrape.should_not_receive(:save_image)
+
+      Scrape::Nico.get_contents(xml.css("item")[0])
+    end
   end
 
   describe "scrape method" do

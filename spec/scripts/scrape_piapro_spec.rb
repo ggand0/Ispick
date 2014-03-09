@@ -15,6 +15,15 @@ describe Scrape::Piapro do
       Scrape::Piapro.get_contents(html.css("a[class='i_image']")[0])
       Image.count.should eq(count+1)
     end
+
+    # 対象URLを開けなかったとき
+    it "should write a log when it fails to open the image page" do
+      Rails.logger.should_receive(:info).with('Image model saving failed.')
+      Scrape.should_not_receive(:save_image)
+
+      url = 'not_existed_url'
+      Scrape::Piapro.get_contents(url)
+    end
   end
 
   describe "scrape method" do

@@ -42,6 +42,15 @@ describe Scrape::Deviant do
       Scrape::Deviant.get_contents(url, 'test')
       Image.count.should eq(count)
     end
+
+    # 対象URLを開けなかったとき
+    it "should write a log when it fails to open the image page" do
+      Rails.logger.should_receive(:info).with('Image model saving failed.')
+      Scrape.should_not_receive(:save_image)
+
+      url = 'not_existed_url'
+      Scrape::Deviant.get_contents(url, 'test')
+    end
   end
 
   describe "scrape method" do

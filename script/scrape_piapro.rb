@@ -6,11 +6,12 @@ module Scrape::Piapro
 
   def self.get_contents(item)
     # リンク先がサイト内URLで表されているので、ROOT_URLと組み合わせてURL生成しアクセス
-    page_url = item['href']
-    root_img_url = URI.join(ROOT_URL, page_url).to_s
     begin
+      page_url = item['href']
+      root_img_url = URI.join(ROOT_URL, page_url).to_s
       page = Nokogiri::HTML(open(root_img_url))
     rescue Exception => e
+      Rails.logger.info('Image model saving failed.')
       return
     end
 
