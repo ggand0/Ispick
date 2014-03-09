@@ -16,7 +16,7 @@ describe Scrape::Piapro do
       Image.count.should eq(count+1)
     end
 
-    # 対象URLを開けなかったとき
+    # 対象URLを開けなかった時にログに書く事
     it "should write a log when it fails to open the image page" do
       Rails.logger.should_receive(:info).with('Image model saving failed.')
       Scrape.should_not_receive(:save_image)
@@ -27,7 +27,7 @@ describe Scrape::Piapro do
   end
 
   describe "scrape method" do
-    it "should call get_contents method at least 1 time" do
+    it "should call get_contents method at least 30 time" do
       Scrape::Piapro.stub(:get_contents).and_return()
       Scrape::Piapro.should_receive(:get_contents).at_least(30).times
 
