@@ -41,8 +41,14 @@ describe ImagesController do
   describe "GET show" do
     it "assigns the requested image as @image" do
       image = Image.create! valid_attributes
-      get :show, {:id => image.to_param}, valid_session
+      get :show, {id: image.to_param}, valid_session
       assigns(:image).should eq(image)
+    end
+
+    it 'assigns the face feature as @face_feature' do
+      feature_face = FactoryGirl.create(:feature_madoka1)
+      get :show, {id: feature_face.featurable_id}, valid_session
+      assigns(:face_feature).should eq(feature_face.face)
     end
   end
 
