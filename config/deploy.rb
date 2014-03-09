@@ -82,6 +82,15 @@ namespace :deploy do
     end
   end
 
+  desc 'stop a resque daemon'
+  task :stop_resque do
+    on roles(:all) do
+      #~/.rbenv/bin/rbenv exec bundle exec rails runner
+      #execute "cd #{current_path}/script && extract_features stop"
+      execute "~/.rbenv/bin/rbenv exec bundle exec rails runner #{current_path}/script/extract_features stop"
+    end
+  end
+
   #  上記linked_filesで使用するファイルをアップロードするタスク
   #  deployが行われる前に実行する必要がある。
   desc 'upload secret files'
