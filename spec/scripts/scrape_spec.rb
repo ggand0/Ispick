@@ -31,6 +31,37 @@ describe Scrape do
     end
   end
 
+  describe 'scrape sub function method' do
+    it 'runs all scraping script in _5min function' do
+      Scrape::Nico.stub(:scrape).and_return()
+      Scrape::Futaba.stub(:scrape).and_return()
+      Scrape::Nico.should_receive(:scrape)
+      Scrape::Futaba.should_receive(:scrape)
+      Scrape.scrape_5min()
+    end
+    it 'runs all scraping script in _15min function' do
+      Scrape::Piapro.stub(:scrape).and_return()
+      Scrape::Nichan.stub(:scrape).and_return()
+      Scrape::Twitter.stub(:scrape).and_return()
+      Scrape::Piapro.should_receive(:scrape)
+      Scrape::Nichan.should_receive(:scrape)
+      Scrape::Twitter.should_receive(:scrape)
+      Scrape.scrape_15min()
+    end
+    it 'runs all scraping script in _30min function' do
+      Scrape::Fourchan.stub(:scrape).and_return()
+      Scrape::Fourchan.should_receive(:scrape)
+      Scrape.scrape_30min()
+    end
+    it 'runs all scraping script in _60min function' do
+      Scrape::Pixiv.stub(:scrape).and_return()
+      Scrape::Deviant.stub(:scrape).and_return()
+      Scrape::Pixiv.should_receive(:scrape)
+      Scrape::Deviant.should_receive(:scrape)
+      Scrape.scrape_60min()
+    end
+  end
+
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_url)

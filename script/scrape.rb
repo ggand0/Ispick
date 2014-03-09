@@ -45,7 +45,6 @@ module Scrape
   def self.scrape_60min()
     Scrape::Pixiv.scrape()
     Scrape::Deviant.scrape()
-    Scrape::Fourchan.scrape()
     puts 'DONE!!'
   end
 
