@@ -24,11 +24,7 @@ module Scrape::Nico
     puts img_url
 
     # Imageモデル生成＆DB保存
-    if not Scrape::is_duplicate(img_url)
-      Scrape::save_image(item.css("title").first.content, img_url)
-    else
-      puts 'Skipping a duplicate image...'
-    end
+    Scrape::save_image(item.css("title").first.content, img_url)
   end
 
   # ニコニコ静画。非公式RSSから新着イラストを抽出する

@@ -39,11 +39,7 @@ module Scrape::Deviant
     puts img_url
 
     # Imageモデル生成＆DB保存
-    if not Scrape::is_duplicate(img_url)
-      Scrape::save_image(title, img_url)
-    else
-      puts 'Skipping a duplicate image...'
-    end
+    Scrape::save_image(title, img_url)
   end
 
   def self.scrape()
