@@ -8,6 +8,7 @@ describe Scrape do
   end
 
   describe "scrape_all method" do
+    # 全てのスクリプトを呼び出す事
     it "runs all scraping script" do
       Scrape::Nico.stub(:scrape).and_return()
       Scrape::Piapro.stub(:scrape).and_return()
@@ -32,6 +33,7 @@ describe Scrape do
   end
 
   describe "is_duplicate method" do
+    # 重複していた時にtrueを返す事
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_url)
       Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
@@ -44,6 +46,7 @@ describe Scrape do
 
   describe "save_image method" do
     describe "with valid attributes" do
+      # 新しいImageレコードを保存すること
       it "should create a new Image model" do
         Image.any_instance.stub(:image_from_url).and_return()
         count = Image.count
@@ -65,8 +68,8 @@ describe Scrape do
       describe "when DB raise an error during saving the image" do
         it "should not save the image" do
           Image.any_instance.stub(:image_from_url).and_return()
-          Image.any_instance.stub(:save).and_raise SQLite3::SQLException
-          #Rails.logger.should_receive(:info).with('Image model saving failed.')
+          #Image.any_instance.stub(:save).and_raise SQLite3::SQLException
+          Image.any_instance.stub(:save).and_raise Exception
 
           count = Image.count
           Scrape::save_image('title', 'src_url')
@@ -74,6 +77,7 @@ describe Scrape do
         end
       end
     end
+
     describe "with invalid attributes" do
       it "should not save the image" do
         count = Image.count
@@ -82,4 +86,5 @@ describe Scrape do
       end
     end
   end
+
 end
