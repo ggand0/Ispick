@@ -7,6 +7,34 @@ describe Utility do
     "eyes"=>{"left"=>{"colors"=>{"blue"=>79, "green"=>87, "red"=>67}}, "right"=>{"colors"=>{"blue"=>61, "green"=>70, "red"=>44}}}}]
   }
 
+  describe "evaluate_face_colors function" do
+    it "should return valid evaluation value" do
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.evaluate_face_colors(distance, [3, 1, 1, 1]).should eq(390)
+    end
+  end
+
+  describe "is_preferred function" do
+    it "should return true with preferred image" do
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(true)
+    end
+
+    it "should return false with NOT preferred image" do
+      distance = { hair: 31, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 101, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 100, left_eye: 101, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 101 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+    end
+  end
+
 
   describe "get_hsv_distance" do
     it "should return a distance hash" do

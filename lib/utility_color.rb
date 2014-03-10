@@ -1,4 +1,16 @@
 module Utility
+  def self.is_preferred(dist_hash, th_array)
+    dist_hash[:hair] <= th_array[0] and
+      dist_hash[:skin] <= th_array[1] and
+      dist_hash[:left_eye] <= th_array[2] and
+      dist_hash[:right_eye] <= th_array[3]
+  end
+
+  def self.evaluate_face_colors(dist_hash, th_array)
+    dist_hash[:hair] * th_array[0] + dist_hash[:skin] * th_array[1] +
+      dist_hash[:left_eye] * th_array[2] + dist_hash[:right_eye] * th_array[3]
+  end
+
   def self.get_colors(hash, is_hsv)
     color_hash = {}
 
