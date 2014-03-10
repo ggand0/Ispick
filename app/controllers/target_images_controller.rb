@@ -101,6 +101,7 @@ class TargetImagesController < ApplicationController
     result = service.get_preferred_images(target_image)
     @preferred = result[:images]
     @target_colors = result[:target_colors]
+    @debug = result[:debug]
 
     # sort
     @preferred = @preferred.sort_by{|value| value[:hsv][:hair]}

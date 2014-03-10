@@ -27,8 +27,8 @@ class TargetImagesService
   def get_preferred_images(target_image)
     preferred = []
     target_colors = {}
-    @time_db=0
-    @time_calc=0
+    time_db=0
+    time_calc=0
 
     face_feature = JSON.parse(target_image.feature.face)
     target_colors = Utility::get_colors(face_feature, true)
@@ -38,6 +38,7 @@ class TargetImagesService
     images = Image.joins(:feature).where.not(features: { face: '[]' }).includes(:feature)
     t1=Time.now
 
+    # featureがnilでなく'[]'でもないImageに対して：
     images.each do |image|
       image_face = JSON.parse(image.feature.face)
       image_colors = Utility::get_colors(image_face, true)
@@ -53,10 +54,11 @@ class TargetImagesService
       end
     end
     t2=Time.now
-    @time_db=t1-t0
-    @time_calc=t2-t1
+    time_db=t1-t0
+    time_calc=t2-t1
 
-    {images: preferred, target_colors: target_colors}
+    {images: preferred, target_colors: target_colors,
+      debug: { conunt: images.length, db: time_db, calc: time_calc }}
   end
 
 end
