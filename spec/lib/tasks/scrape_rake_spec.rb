@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe 'scrape:delete_old' do
+  before do
+    # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)
+  end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
@@ -13,6 +17,10 @@ describe 'scrape:delete_old' do
 end
 
 describe 'scrape:delete_excess' do
+  before do
+    # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)
+  end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
