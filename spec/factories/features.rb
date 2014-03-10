@@ -43,14 +43,14 @@ FactoryGirl.define do
   end
 
   # madoka0(madoka_homuraの特徴量に近い)
-  factory :feature_madoka_anime, class: Feature do
-    face ' [{"likelihood":0.9999865889549255,"face":{"x":51,"y":69,"width":139,"height":139},"skin_color":{"blue":208,"green":234,"red":253},"hair_color":{"blue":112,"green":79,"red":144},"eyes":{"left":{"x":142,"y":102,"width":37,"height":37,"colors":{"blue":52,"green":49,"red":105}},"right":{"x":65,"y":96,"width":43,"height":37,"colors":{"blue":36,"green":32,"red":91}}},"nose":{"x":115,"y":141},"chin":{"x":115,"y":184}}]'
+  factory :feature_madoka_multi, class: Feature do
+    face '[{"likelihood":0.9942452311515808,"face":{"x":132,"y":56,"width":152,"height":152},"skin_color":{"blue":195,"green":224,"red":252},"hair_color":{"blue":155,"green":145,"red":247},"eyes":{"left":{"x":221,"y":95,"width":37,"height":39,"colors":{"blue":107,"green":102,"red":195}},"right":{"x":154,"y":97,"width":40,"height":38,"colors":{"blue":99,"green":104,"red":165}}},"nose":{"x":195,"y":141},"chin":{"x":201,"y":177}}]'
     association :featurable, factory: :image
   end
 
   # homura0(madoka_homuraの特徴量に近い)
-  factory :feature_homura_anime, class: Feature do
-    face '[{"likelihood":1.0,"face":{"x":107,"y":143,"width":286,"height":286},"skin_color":{"blue":209,"green":236,"red":253},"hair_color":{"blue":84,"green":59,"red":77},"eyes":{"left":{"x":294,"y":230,"width":80,"height":75,"colors":{"blue":113,"green":119,"red":132}},"right":{"x":138,"y":234,"width":85,"height":73,"colors":{"blue":33,"green":44,"red":53}}},"nose":{"x":256,"y":318},"chin":{"x":252,"y":405}}]'
+  factory :feature_homura_multi, class: Feature do
+    face '[{"likelihood":0.9999999403953552,"face":{"x":122,"y":183,"width":61,"height":61},"skin_color":{"blue":217,"green":225,"red":244},"hair_color":{"blue":98,"green":91,"red":116},"eyes":{"left":{"x":160,"y":193,"width":19,"height":14,"colors":{"blue":41,"green":38,"red":68}},"right":{"x":126,"y":195,"width":18,"height":14,"colors":{"blue":179,"green":155,"red":157}}},"nose":{"x":152,"y":215},"chin":{"x":152,"y":238}}]'
     association :featurable, factory: :image
   end
 
