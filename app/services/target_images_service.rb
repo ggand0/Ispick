@@ -64,6 +64,9 @@ class TargetImagesService
 
     end
 
+    # Remove duplicates
+    preferred.uniq! { |value| value[:image] }
+
     # DEBUG: 時間計測
     t2=Time.now
     time_db=t1-t0
