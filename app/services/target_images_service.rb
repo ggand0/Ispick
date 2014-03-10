@@ -27,16 +27,25 @@ class TargetImagesService
   def get_preferred_images(target_image)
     preferred = []
     target_colors = {}
+    @time_db=0
+    @time_calc=0
 
     face_feature = JSON.parse(target_image.feature.face)
     target_colors = Utility::get_colors(face_feature, true)
 
-    Image.all.each do |image|
+    t0=Time.now
+    #images = Image.joins(:feature).all
+    images = Image.all.includes(:feature)
+    #images = Image.where(include: :feature, conditions: "not feature.nil? and feature.face != '[]'").includes(:feature)
+    t1=Time.now
+    images.each do |image|
       # 抽出されていないか、抽出出来ていないImageは飛ばす
       if (not image.feature.nil? and image.feature.face == '[]' or
         image.feature.nil?)
         next
       end
+=begin
+=end
 
       image_face = JSON.parse(image.feature.face)
       image_colors = Utility::get_colors(image_face, true)
@@ -51,6 +60,10 @@ class TargetImagesService
         preferred.push({image: image, hsv: distance})
       end
     end
+    t2=Time.now
+    @time_db=t1-t0
+    @time_calc=t2-t1
+    fdsa
 
     {images: preferred, target_colors: target_colors}
   end
