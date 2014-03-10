@@ -19,8 +19,7 @@ class TargetImagesService
     end_time = Time.now
     time = (end_time - start_time).to_s
 
-    json = { time: time, result: result }
-    json
+    { time: time, result: result }
   end
 
 
@@ -29,36 +28,49 @@ class TargetImagesService
     target_colors = {}
     time_db=0
     time_calc=0
+    t0=0
+    t1=0
+    t2=0
+    images_count=[]
 
-    face_feature = JSON.parse(target_image.feature.face)
-    target_colors = Utility::get_colors(face_feature, true)
+    # TargetImageの特徴量を取得
+    face_features = JSON.parse(target_image.feature.face)
+    face_features.each do |face_feature|
+      target_colors = Utility::get_colors(face_feature, true)
 
-    t0=Time.now
-    # 抽出されていないか、抽出出来ていないImageは飛ばす
-    images = Image.joins(:feature).where.not(features: { face: '[]' }).includes(:feature)
-    t1=Time.now
+      t0=Time.now
+      # 抽出されていないか、抽出出来ていないImageは飛ばす
+      images = Image.joins(:feature).where.not(features: { face: '[]' }).includes(:feature)
+      t1=Time.now
+      images_count.push(images.count)
 
-    # featureがnilでなく'[]'でもないImageに対して：
-    images.each do |image|
-      image_face = JSON.parse(image.feature.face)
-      image_colors = Utility::get_colors(image_face, true)
+      # feature != nil and feature != '[]'であるImageに対して：
+      images.each do |image|
+        image_faces = JSON.parse(image.feature.face)
+        image_faces.each do |image_face|
+          image_colors = Utility::get_colors(image_face, true)
+          distance = Utility::get_hsv_distance(target_colors, image_colors)
 
-      distance = Utility::get_hsv_distance(target_colors, image_colors)
-      if distance[:hair] < 30 and
-        distance[:skin] < 100 and
-        distance[:left_eye] < 100 and
-        distance[:right_eye] < 100
+          if distance[:hair] < 30 and
+            distance[:skin] < 100 and
+            distance[:left_eye] < 100 and
+            distance[:right_eye] < 100
 
-        hsv = Utility::round_array(image_colors[:hair])
-        preferred.push({image: image, hsv: distance})
+            hsv = Utility::round_array(image_colors[:hair])
+            preferred.push({image: image, hsv: distance})
+          end
+        end
       end
+
     end
+
+    # DEBUG: 時間計測
     t2=Time.now
     time_db=t1-t0
     time_calc=t2-t1
 
     {images: preferred, target_colors: target_colors,
-      debug: { conunt: images.length, db: time_db, calc: time_calc }}
+      debug: { count: images_count, db: time_db, calc: time_calc }}
   end
 
 end

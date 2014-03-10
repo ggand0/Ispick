@@ -31,30 +31,30 @@ describe Utility do
 
   describe "get_colors" do
     it "should return a hash" do
-      hash = Utility::get_colors(valid_hash, false)
+      hash = Utility::get_colors(valid_hash[0], false)
       hash.should be_a(Hash)
 
-      hash = Utility::get_colors(valid_hash, true)
+      hash = Utility::get_colors(valid_hash[0], true)
       hash.should be_a(Hash)
     end
   end
 
   describe "get_eye_color" do
     it "should return rgb array with valid hash" do
-      rgb = Utility::get_eye_color(valid_hash, 'left')
+      rgb = Utility::get_eye_color(valid_hash[0], 'left')
       rgb.should be_an(Array)
 
-      rgb = Utility::get_eye_color(valid_hash, 'right')
+      rgb = Utility::get_eye_color(valid_hash[0], 'right')
       rgb.should be_an(Array)
     end
   end
 
   describe "get_face_color" do
     it "should return rgb array with valid hash" do
-      rgb = Utility::get_face_color(valid_hash, 'hair_color')
+      rgb = Utility::get_face_color(valid_hash[0], 'hair_color')
       rgb.should be_an(Array)
 
-      rgb = Utility::get_face_color(valid_hash, 'skin_color')
+      rgb = Utility::get_face_color(valid_hash[0], 'skin_color')
       rgb.should be_an(Array)
     end
   end

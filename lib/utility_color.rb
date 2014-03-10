@@ -3,26 +3,26 @@ module Utility
     color_hash = {}
 
     # hair
-    r = hash[0]['hair_color']['red'].to_i
-    g = hash[0]['hair_color']['green'].to_i
-    b = hash[0]['hair_color']['blue'].to_i
+    r = hash['hair_color']['red'].to_i
+    g = hash['hair_color']['green'].to_i
+    b = hash['hair_color']['blue'].to_i
     color_hash[:hair] = [r, g, b]
 
     # skin
-    r = hash[0]['skin_color']['red'].to_i
-    g = hash[0]['skin_color']['green'].to_i
-    b = hash[0]['skin_color']['blue'].to_i
+    r = hash['skin_color']['red'].to_i
+    g = hash['skin_color']['green'].to_i
+    b = hash['skin_color']['blue'].to_i
     color_hash[:skin] = [r, g, b]
 
     # eyes
-    r = hash[0]['eyes']['left']['colors']['red'].to_i
-    g = hash[0]['eyes']['left']['colors']['green'].to_i
-    b = hash[0]['eyes']['left']['colors']['blue'].to_i
+    r = hash['eyes']['left']['colors']['red'].to_i
+    g = hash['eyes']['left']['colors']['green'].to_i
+    b = hash['eyes']['left']['colors']['blue'].to_i
     color_hash[:left_eye] = [r, g, b]
 
-    r = hash[0]['eyes']['right']['colors']['red'].to_i
-    g = hash[0]['eyes']['right']['colors']['green'].to_i
-    b = hash[0]['eyes']['right']['colors']['blue'].to_i
+    r = hash['eyes']['right']['colors']['red'].to_i
+    g = hash['eyes']['right']['colors']['green'].to_i
+    b = hash['eyes']['right']['colors']['blue'].to_i
     color_hash[:right_eye] = [r, g, b]
 
     # Convert rgb to hsv
@@ -38,17 +38,17 @@ module Utility
 
   # Get rgb color of eyes from feature hash
   def self.get_eye_color(hash, which_eye)
-    r = hash[0]['eyes'][which_eye]['colors']['red'].to_i
-    g = hash[0]['eyes'][which_eye]['colors']['green'].to_i
-    b = hash[0]['eyes'][which_eye]['colors']['blue'].to_i
+    r = hash['eyes'][which_eye]['colors']['red'].to_i
+    g = hash['eyes'][which_eye]['colors']['green'].to_i
+    b = hash['eyes'][which_eye]['colors']['blue'].to_i
     [r, g, b]
   end
 
   # Get rgb color of hair / skin from feature hash
   def self.get_face_color(hash, which_part)
-    r = hash[0][which_part]['red'].to_i
-    g = hash[0][which_part]['green'].to_i
-    b = hash[0][which_part]['blue'].to_i
+    r = hash[which_part]['red'].to_i
+    g = hash[which_part]['green'].to_i
+    b = hash[which_part]['blue'].to_i
     [r, g, b]
   end
 
