@@ -12,5 +12,6 @@ FactoryGirl.define do
   factory :image do
     title 'test'
     sequence(:src_url) { |n| "test#{n}.com" }
+    sequence(:created_at) { |n| n.day.ago }
   end
 end

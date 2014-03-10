@@ -85,6 +85,7 @@ group :development, :test do
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化
+  gem 'rake_shared_context'                         # Enable rake task testing
 
   gem 'pry-rails'                                   # Improve the console
   gem 'rails-erd'                                   # モデル関連図生成
