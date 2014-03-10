@@ -34,19 +34,11 @@ class TargetImagesService
     target_colors = Utility::get_colors(face_feature, true)
 
     t0=Time.now
-    #images = Image.joins(:feature).all
-    images = Image.all.includes(:feature)
-    #images = Image.where(include: :feature, conditions: "not feature.nil? and feature.face != '[]'").includes(:feature)
+    # 抽出されていないか、抽出出来ていないImageは飛ばす
+    images = Image.joins(:feature).where.not(features: { face: '[]' }).includes(:feature)
     t1=Time.now
-    images.each do |image|
-      # 抽出されていないか、抽出出来ていないImageは飛ばす
-      if (not image.feature.nil? and image.feature.face == '[]' or
-        image.feature.nil?)
-        next
-      end
-=begin
-=end
 
+    images.each do |image|
       image_face = JSON.parse(image.feature.face)
       image_colors = Utility::get_colors(image_face, true)
 
@@ -63,7 +55,6 @@ class TargetImagesService
     t2=Time.now
     @time_db=t1-t0
     @time_calc=t2-t1
-    fdsa
 
     {images: preferred, target_colors: target_colors}
   end
