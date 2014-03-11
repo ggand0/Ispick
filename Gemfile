@@ -55,15 +55,19 @@ gem 'rb-readline', '0.5.0'
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
-gem 'rmagick', require: false                 # Image processing lib. Used by AnimeFace
+gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
 #gem 'systemu'
-gem 'whenever', require: false                # Support crontab
+gem 'whenever', require: false                   # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'twitter'
+
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-twitter'
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page
