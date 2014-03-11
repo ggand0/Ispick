@@ -37,6 +37,6 @@ every 60.minutes do
   rake 'scrape:min60'
 end
 
-#every 1.days do
-#  rake 'scrape:reset'
-#end
+every 1.hours do
+  rake 'scrape:delete_excess 10000'
+end

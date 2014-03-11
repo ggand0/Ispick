@@ -11,23 +11,24 @@ namespace :scrape do
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
-    Image.where("created_at < ?", 1.year.ago).destroy_all
+    Image.where("created_at < ?", 1.week.ago).destroy_all
 
-    puts 'Deleted: ' + (Image.count - before_count).to_s + ' images'
+    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
     puts 'Current image count: ' + Image.count.to_s
   end
 
+  # @limit 最大保存数
   desc "最大保存数を超えている場合古いImageから順に削除"
-  task delete_excess: :environment do
+  task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
-    limit = 10000
     before_count = Image.count
-    if Image.count > limit
-      delete_num = Image.count - limit
-      Image.find(:all, limit: delete_num, order: created_at).destroy_all
+    if Image.count > args[:limit]
+      delete_num = Image.count - args[:limit]
+      puts Image.limit(delete_num).order(:created_at)
+      Image.limit(delete_num).order(:created_at).destroy_all
     end
 
-    puts 'Deleted: ' + (Image.count - before_count).to_s + ' images'
+    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
     puts 'Current image count: ' + Image.count.to_s
   end
 
