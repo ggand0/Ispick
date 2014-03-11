@@ -15,6 +15,12 @@
   <%= @face_feature %>
 </p>
 
+<p>
+  <strong>Source URL:</strong>
+  <%= link_to 'source image URL', @image.src_url %>
+</p>
+
+<br>
 <%= link_to 'Destroy', @image, method: :delete, data: { confirm: 'Are you sure?' } %>
 
 <br>
