@@ -1,6 +1,8 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  resources :delivered_images
+
   # Devise
 =begin
   devise_for :users, :controllers => {
