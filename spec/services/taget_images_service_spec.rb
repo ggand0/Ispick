@@ -37,6 +37,9 @@ describe TargetImagesService do
       result.should be_a(Hash)
       result[:images].should be_an(Array)
       result[:target_colors].should be_a(Hash)
+
+      # check unique
+      result[:images].uniq.length.should eq(result[:images].length)
     end
 
     describe "with single face" do

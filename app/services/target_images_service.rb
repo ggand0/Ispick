@@ -51,13 +51,9 @@ class TargetImagesService
           image_colors = Utility::get_colors(image_face, true)
           distance = Utility::get_hsv_distance(target_colors, image_colors)
 
-          if distance[:hair] < 30 and
-            distance[:skin] < 100 and
-            distance[:left_eye] < 100 and
-            distance[:right_eye] < 100
-
-            hsv = Utility::round_array(image_colors[:hair])
-            preferred.push({image: image, hsv: distance})
+          if Utility::is_preferred(distance, [30, 100, 100, 100])
+            evaluation_value = Utility::evaluate_face_colors(distance, [3, 1, 1, 1])
+            preferred.push({image: image, hsv: distance, value: evaluation_value})
           end
         end
       end

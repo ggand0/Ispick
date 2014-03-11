@@ -104,7 +104,10 @@ class TargetImagesController < ApplicationController
     @debug = result[:debug]
 
     # sort
-    @preferred = @preferred.sort_by{|value| value[:hsv][:hair]}
+    #@preferred = @preferred.sort_by{|value| value[:hsv][:hair]}
+    @preferred = @preferred.sort_by do |value|
+      value[:value]# 評価値でソート
+    end
 
     # Pagenate the array
     @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)
