@@ -21,6 +21,17 @@ Devise.setup do |config|
   # available as additional gems.
   require 'devise/orm/active_record'
 
+
+  # API key
+  if Rails.env.production?
+    #config.omniauth :facebook, "App ID", "App Secret"
+    #config.omniauth :twitter,  "Consumer key", "Consumer secret"
+    config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
+  else
+    #config.omniauth :facebook, "App ID", "App Secret"
+    config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
+  end
+
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
   # just :email. You can configure it to use [:username, :subdomain], so for
