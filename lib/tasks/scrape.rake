@@ -40,12 +40,12 @@ namespace :scrape do
 
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrap"
+    require "#{Rails.root}/script/scrape"
     Scrape.scrape_all()
 
     # 全Imageに対して顔の特徴抽出処理を行う
     puts 'Extracting face feature to all images...'
-    Rake::Task["feature:image_all"].invoke
+    Rake::Task['feature:face_images'].invoke
   end
 
   desc "画像を対象webサイト全てから抽出する"
