@@ -11,10 +11,9 @@ namespace :scrape do
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
-    #Image.where("created_at < ?", 1.week.ago).destroy_all
-    puts 'now:'+DateTime.now.to_s
-    old = DateTime.now - 7.days
-    puts 'old:'+old.to_s
+
+    # http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
+    old = DateTime.now.utc - 7.days   # rails onlyな書き方
     Image.where("created_at < ?", old).destroy_all
 
     puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'

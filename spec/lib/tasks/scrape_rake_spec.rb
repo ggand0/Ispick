@@ -25,10 +25,12 @@ describe "scrape:delete_old" do
   its(:prerequisites) { should include('environment') }
 
   it "deletes old records" do
-    # 1.day.ago to 100.day.ago
-    FactoryGirl.create_list(:image, 100)
+    # 2013/12/31 to 2014/01/09
+    FactoryGirl.create_list(:image, 10)
+    DateTime.stub(:now).and_return(Time.mktime 2014, 1, 10)
+
     subject.invoke
-    Image.count.should eq(6)
+    Image.count.should eq(8)
   end
 end
 
