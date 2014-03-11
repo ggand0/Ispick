@@ -51,7 +51,7 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # rails consoleを起動するために必要
-gem 'rb-readline', '~> 0.4.2'
+gem 'rb-readline', '0.5.0'
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
