@@ -11,7 +11,11 @@ namespace :scrape do
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
-    Image.where("created_at < ?", 1.week.ago).destroy_all
+    #Image.where("created_at < ?", 1.week.ago).destroy_all
+    puts 'now:'+DateTime.now.to_s
+    old = DateTime.now - 7.days
+    puts 'old:'+old.to_s
+    Image.where("created_at < ?", old).destroy_all
 
     puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
     puts 'Current image count: ' + Image.count.to_s
