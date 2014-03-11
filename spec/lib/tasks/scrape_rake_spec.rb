@@ -42,9 +42,9 @@ describe "scrape:delete_excess" do
   its(:prerequisites) { should include('environment') }
 
   it "delete old recoreds to fit the limit" do
-    FactoryGirl.create_list(:image, 101)
-    subject.invoke 100
-    Image.count.should eq(100)
+    FactoryGirl.create_list(:image, 11)
+    subject.invoke 10
+    Image.count.should eq(10)
   end
 end
 
