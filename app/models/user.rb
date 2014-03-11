@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  has_many :delivered_images
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   #devise :trackable, :omniauthable, :omniauth_providers => [:facebook, :twitter]
