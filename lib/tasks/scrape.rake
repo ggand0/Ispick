@@ -3,8 +3,33 @@ namespace :scrape do
   desc "Imagesテーブルリセット"
   task reset: :environment do
     # Imageモデルを全消去
-    puts 'Deleting Image model...'
+    puts 'Deleting all images...'
     Image.delete_all
+  end
+
+  desc "指定された時期より古いImageを削除"
+  task delete_old: :environment do
+    puts 'Deleting old images...'
+    before_count = Image.count
+    Image.where("created_at < ?", 1.week.ago).destroy_all
+
+    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
+    puts 'Current image count: ' + Image.count.to_s
+  end
+
+  # @limit 最大保存数
+  desc "最大保存数を超えている場合古いImageから順に削除"
+  task :delete_excess, [:limit] => :environment do |t, args|
+    puts 'Deleting excessed images...'
+    before_count = Image.count
+    if Image.count > args[:limit]
+      delete_num = Image.count - args[:limit]
+      puts Image.limit(delete_num).order(:created_at)
+      Image.limit(delete_num).order(:created_at).destroy_all
+    end
+
+    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
+    puts 'Current image count: ' + Image.count.to_s
   end
 
   desc "DB内Imagesテーブルをリセット後、抽出スクリプトを走らせる"

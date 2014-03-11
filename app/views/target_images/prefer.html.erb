@@ -1,3 +1,4 @@
+<%= debug @debug %>
 <h1>Listing preferred images</h1>
 <p>
   <strong>Target RGB:</strong>
@@ -12,22 +13,13 @@
   <% end %>
 </p>
 
-<!--
-<ul class="boxline">
-<% @preferred.each do |image| %>
-  <li>
-    <%= image_tag image[:image].data.url %>
-    <div class="titleBox"><%= image[:image].title.to_s %></div>
-    <%= image[:hsv] %>
-  </li>
-<% end %>
-</ul>
--->
 <div class="wrap">
   <% @preferred.each do |image| %>
     <div class="box">
       <div class="boxInner">
         <%= image[:hsv] %>
+        <br>
+        <%= image[:value] %>
         <%= link_to(image_tag(image[:image].data.url), { controller: 'images', action: 'show', id: image[:image].id.to_s }) %>
         <div class="titleBox"><%= image[:image].title.to_s %></div>
       </div>

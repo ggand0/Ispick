@@ -55,12 +55,12 @@ gem 'rb-readline', '~> 0.4.2'
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
-gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
+gem 'rmagick', require: false                 # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
 #gem 'systemu'
-gem 'whenever', :require => false                # Support crontab
+gem 'whenever', require: false                # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'twitter'
@@ -68,26 +68,28 @@ gem 'twitter'
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
+  gem 'pry-rails'                                   # Improve the console
+  gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'guard'
+  gem 'guard-rspec', require: false
   gem 'guard-coffeescript'
   gem 'guard-teaspoon'
   gem 'rb-fsevent'                                  # Used by guard and spring
+
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
   #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
 
-  gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
-  gem 'guard-rspec', :require => false
+  gem 'rspec-rails', '>= 2.6.0'                     # Testing framework
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化
+  gem 'rake_shared_context'                         # Enable rake task testing
 
-  gem 'pry-rails'                                   # Improve the console
-  gem 'rails-erd'                                   # モデル関連図生成
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-rails'
   gem 'capistrano-rbenv', '~> 2.0'

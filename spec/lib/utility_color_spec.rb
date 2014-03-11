@@ -7,6 +7,34 @@ describe Utility do
     "eyes"=>{"left"=>{"colors"=>{"blue"=>79, "green"=>87, "red"=>67}}, "right"=>{"colors"=>{"blue"=>61, "green"=>70, "red"=>44}}}}]
   }
 
+  describe "evaluate_face_colors function" do
+    it "should return valid evaluation value" do
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.evaluate_face_colors(distance, [3, 1, 1, 1]).should eq(390)
+    end
+  end
+
+  describe "is_preferred function" do
+    it "should return true with preferred image" do
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(true)
+    end
+
+    it "should return false with NOT preferred image" do
+      distance = { hair: 31, skin: 100, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 101, left_eye: 100, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 100, left_eye: 101, right_eye: 100 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+
+      distance = { hair: 30, skin: 100, left_eye: 100, right_eye: 101 }
+      Utility.is_preferred(distance, [30, 100, 100, 100]).should eq(false)
+    end
+  end
+
 
   describe "get_hsv_distance" do
     it "should return a distance hash" do
@@ -31,30 +59,30 @@ describe Utility do
 
   describe "get_colors" do
     it "should return a hash" do
-      hash = Utility::get_colors(valid_hash, false)
+      hash = Utility::get_colors(valid_hash[0], false)
       hash.should be_a(Hash)
 
-      hash = Utility::get_colors(valid_hash, true)
+      hash = Utility::get_colors(valid_hash[0], true)
       hash.should be_a(Hash)
     end
   end
 
   describe "get_eye_color" do
     it "should return rgb array with valid hash" do
-      rgb = Utility::get_eye_color(valid_hash, 'left')
+      rgb = Utility::get_eye_color(valid_hash[0], 'left')
       rgb.should be_an(Array)
 
-      rgb = Utility::get_eye_color(valid_hash, 'right')
+      rgb = Utility::get_eye_color(valid_hash[0], 'right')
       rgb.should be_an(Array)
     end
   end
 
   describe "get_face_color" do
     it "should return rgb array with valid hash" do
-      rgb = Utility::get_face_color(valid_hash, 'hair_color')
+      rgb = Utility::get_face_color(valid_hash[0], 'hair_color')
       rgb.should be_an(Array)
 
-      rgb = Utility::get_face_color(valid_hash, 'skin_color')
+      rgb = Utility::get_face_color(valid_hash[0], 'skin_color')
       rgb.should be_an(Array)
     end
   end
