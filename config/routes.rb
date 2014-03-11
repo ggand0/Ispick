@@ -2,13 +2,17 @@ require 'resque_web'
 
 Ispic::Application.routes.draw do
   # Devise
-  devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
-
-  devise_scope :user do
-    get 'sign_in', :to => 'devise/sessions#new', :as => :new_user_session
-    get 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
-  end
-
+=begin
+  devise_for :users, :controllers => {
+    :sessions      => "users/sessions",
+    :registrations => "users/registrations",
+    :passwords     => "users/passwords",
+    :omniauth_callbacks => "users/omniauth_callbacks"
+  }
+=end
+  devise_for :users, :controllers => {
+    :omniauth_callbacks => "users/omniauth_callbacks"
+  }
 
   get "welcome/index"
   resources :target_images do
