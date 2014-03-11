@@ -3,6 +3,13 @@
 
 <%= image_tag asset_path('snowmiku0.jpg'), size: '600x375' %>
 <br>
+<% if user_signed_in? %>
+  <%= link_to 'ログアウト', destroy_user_session_path, :method => :delete %>
+<% else %>
+  <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter)  %>
+<% end %>
+<br>
+<br>
 <%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
 <br>
 <%= link_to('うpした嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
