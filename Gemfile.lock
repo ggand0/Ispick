@@ -219,7 +219,7 @@ GEM
     rb-fsevent (0.9.4)
     rb-inotify (0.9.3)
       ffi (>= 0.5.0)
-    rb-readline (0.4.2)
+    rb-readline (0.5.0)
     rdoc (4.1.1)
       json (~> 1.4)
     redis (3.0.7)
@@ -372,7 +372,7 @@ DEPENDENCIES
   rails-erd
   rake_shared_context
   rb-fsevent
-  rb-readline (~> 0.4.2)
+  rb-readline (= 0.5.0)
   resque
   resque-web
   rmagick
