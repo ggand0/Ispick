@@ -1,5 +1,12 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def twitter
+    # Error handling
+    if request.env["omniauth.auth"].nil? or
+      request.env["omniauth.auth"]['provider'].nil?
+      redirect_to new_user_registration_url
+      return
+    end
+
     # You need to implement the method below in your model
     @user = User.find_for_twitter_oauth(request.env["omniauth.auth"], current_user)
 
