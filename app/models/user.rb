@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
         name:auth.extra.raw_info.name,
         provider:auth.provider,
         uid:auth.uid,
-        # email:auth.info.email, #emailを取得したい場合は、migrationにemailを追加してください。
+        email:auth.info.email, #emailを取得したい場合は、migrationにemailを追加してください。
         password:Devise.friendly_token[0,20]
       )
     end
