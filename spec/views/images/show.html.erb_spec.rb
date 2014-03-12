@@ -4,7 +4,8 @@ describe "images/show" do
   before(:each) do
     @image = assign(:image, stub_model(Image,
       :title => "Title",
-      :caption => "Caption"
+      :caption => "Caption",
+      src_url: 'http://goo.gl/4b7UUc'
     ))
   end
 

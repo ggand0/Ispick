@@ -1,0 +1,2 @@
+module DeliveredImagesHelper
+end

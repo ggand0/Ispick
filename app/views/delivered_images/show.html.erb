@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @delivered_image.title %>
+</p>
+
+<p>
+  <strong>Caption:</strong>
+  <%= @delivered_image.caption %>
+</p>
+
+<p>
+  <strong>Src url:</strong>
+  <%= @delivered_image.src_url %>
+</p>
+
+<%= link_to 'Edit', edit_delivered_image_path(@delivered_image) %> |
+<%= link_to 'Back', delivered_images_path %>
