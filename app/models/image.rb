@@ -2,7 +2,7 @@ class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
 
   # 明示的にテーブル名を指定することでエラー回避
-  default_scope order("#{table_name}.created_at DESC")
+  default_scope { order("#{table_name}.created_at DESC") }
   paginates_per 100
 
 	has_attached_file :data,
