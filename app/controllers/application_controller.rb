@@ -16,4 +16,14 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+  def after_sign_out_path_for(resource)
+    root_path
+  end
+
+  def after_sign_in_path_for(resource)
+    #user = current_user
+    #"/delivered_images?user_id=#{user.id}"
+    '/users/home'
+  end
 end

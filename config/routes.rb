@@ -1,22 +1,22 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
-  resources :delivered_images
+  resources :delivered_images do
+    collection do
+      get 'show_user_image'
+    end
+  end
 
   # Devise
-=begin
   devise_for :users, :controllers => {
     :sessions      => "users/sessions",
-    :registrations => "users/registrations",
+    #:registrations => "users/registrations",
     :passwords     => "users/passwords",
-    :omniauth_callbacks => "users/omniauth_callbacks"
-  }
-=end
-  devise_for :users, :controllers => {
     :omniauth_callbacks => "users/omniauth_callbacks"
   }
 
   get "welcome/index"
+  get "users/home"
   resources :target_images do
     member do
       get 'prefer'
