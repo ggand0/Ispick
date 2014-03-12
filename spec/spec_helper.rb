@@ -1,7 +1,11 @@
+# SimpleCov configuration
 require 'simplecov'
 SimpleCov.start do
+  # Ignore these paths
   add_filter '/vendor/bundle/'
   add_filter '/script/pixiv'
+  add_filter '/lib/tasks'
+  add_filter 'config/initializers/reload_lib'
 end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
@@ -46,8 +50,13 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 
+  # FactoryGirl configuration
   config.include FactoryGirl::Syntax::Methods
   config.before do
     FactoryGirl.reload
   end
+
+  # Devise configuration
+  config.include Devise::TestHelpers, :type => :controller
+  config.include ControllerMacros, :type => :controller
 end
