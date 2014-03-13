@@ -8,6 +8,7 @@
 <% else %>
   <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter)  %>
 <% end %>
+<%= link_to('Home', { controller: 'users', action: 'home' }) %>
 <br>
 <br>
 <%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
