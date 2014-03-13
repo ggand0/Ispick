@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   has_many :delivered_images
+  has_many :target_images
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
