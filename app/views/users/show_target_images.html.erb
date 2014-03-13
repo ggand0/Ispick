@@ -1,11 +1,17 @@
 <h1>YOUR target_Images</h1>
+<%= link_to 'New Target image', new_target_image_path %>
+<br>
 
 <div class="wrap">
-  <% @images.each do |image| %>
+  <% @images.each do |target_image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
-        <div class="titleBox"><%= image.title.to_s %></div>
+        <%= link_to 'Show', target_image %>
+        <%= link_to 'Prefer', prefer_target_image_path(target_image) %>
+        <%= link_to 'Edit', edit_target_image_path(target_image) %>
+        <%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= link_to(image_tag(target_image.data.url), { controller: 'delivered_images', action: 'show', id: target_image.id.to_s }) %>
+        <div class="titleBox"><%= target_image.title.to_s %></div>
       </div>
     </div>
   <% end %>
