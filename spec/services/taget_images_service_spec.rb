@@ -73,6 +73,18 @@ describe TargetImagesService do
       end
     end
 
+    describe "with already delivered target_image" do
+      it "should ignore old images before last_delivered_at datetime" do
+        FactoryGirl.create(:feature_image_old)
+        FactoryGirl.create(:feature_image_new)
+        face_feature = FactoryGirl.create(:feature_target_delivered)
+        target_image = TargetImage.find(face_feature.featurable_id)
+
+        service = TargetImagesService.new
+        result = service.get_preferred_images(target_image)
+        result[:images].length.should eq(1)
+      end
+    end
   end
 
 end

@@ -45,7 +45,7 @@ class TargetImagesService
       # 最後に配信された日時より後に取得された画像のみ見る（それ以外は一度調べているはず）
       # nilだった場合は初めて配信対象となるtarget_imageなので全てのImageを見る
       if target_image.last_delivered_at
-        images = images.where('create_at > ?', target_image.last_delivered_at)
+        images = images.where('images.created_at > ?', target_image.last_delivered_at)
       end
       t1=Time.now
       images_count.push(images.count)
