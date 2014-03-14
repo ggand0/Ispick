@@ -43,6 +43,7 @@ every 1.hours do
 end
 
 # 全てのユーザーに推薦イラストを配信
-every 1.hours do
+#every 1.hours do
+every 5.minutes do
   rake 'deliver:all'
 end
