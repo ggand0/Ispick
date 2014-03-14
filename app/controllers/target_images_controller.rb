@@ -35,14 +35,16 @@ class TargetImagesController < ApplicationController
   # POST /target_images
   # POST /target_images.json
   def create
-    @target_image = TargetImage.new(target_image_params)
+    #@target_image = TargetImage.new(target_image_params)
+    @target_image = current_user.target_images.build(target_image_params)
 
     respond_to do |format|
       if @target_image.save
         # 顔特徴抽出処理をbackground jobに投げる
         Resque.enqueue(Face, @target_image.id)
 
-        format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
+        #format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
+        format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
         format.html { render action: 'new' }
@@ -60,7 +62,8 @@ class TargetImagesController < ApplicationController
     respond_to do |format|
       #if @target_image.update(target_image_params)
       if @target_image.update_attributes(hash)
-        format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        #format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

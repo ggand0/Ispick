@@ -29,6 +29,8 @@ describe TargetImagesController do
   # in order to pass any filters (e.g. authentication) defined in
   # TargetImagesController. Be sure to keep this updated too.
   let(:valid_session) { {} }
+  let(:user) { FactoryGirl.create(:user) }
+  before { sign_in user }
 
   describe "GET index" do
     it "assigns all target_images as @target_images" do
@@ -41,7 +43,7 @@ describe TargetImagesController do
   describe "GET show" do
     it "assigns the requested target_image as @target_image" do
       target_image = TargetImage.create! valid_attributes
-      get :show, {:id => target_image.to_param}, valid_session
+      get :show, {id: target_image.to_param}, valid_session
       assigns(:target_image).should eq(target_image)
     end
 
@@ -50,7 +52,7 @@ describe TargetImagesController do
         FactoryGirl.create(:feature_test1)
         target_image = TargetImage.first
 
-        get :show, {:id => target_image.to_param}, valid_session
+        get :show, {id: target_image.to_param}, valid_session
         assigns(:face_feature).should eq('[{"zero value": 0}]')
       end
     end
@@ -58,7 +60,7 @@ describe TargetImagesController do
       it "assigns the face-feature json as @face_feature" do
         target_image = FactoryGirl.create(:target_image)
 
-        get :show, {:id => target_image.to_param}, valid_session
+        get :show, {id: target_image.to_param}, valid_session
         assigns(:face_feature).should eq('Not extracted.')
       end
     end
@@ -74,7 +76,7 @@ describe TargetImagesController do
   describe "GET edit" do
     it "assigns the requested target_image as @target_image" do
       target_image = TargetImage.create! valid_attributes
-      get :edit, {:id => target_image.to_param}, valid_session
+      get :edit, {id: target_image.to_param}, valid_session
       assigns(:target_image).should eq(target_image)
     end
   end
@@ -83,20 +85,21 @@ describe TargetImagesController do
     describe "with valid params" do
       it "creates a new TargetImage" do
         expect {
-          post :create, {:target_image => valid_attributes}, valid_session
+          post :create, {target_image: valid_attributes}, valid_session
         }.to change(TargetImage, :count).by(1)
       end
 
       it "assigns a newly created target_image as @target_image" do
-        post :create, {:target_image => valid_attributes}, valid_session
+        post :create, {target_image: valid_attributes}, valid_session
         #puts :target_image# => target_image
         assigns(:target_image).should be_a(TargetImage)
         assigns(:target_image).should be_persisted
       end
 
       it "redirects to the created target_image" do
-        post :create, {:target_image => valid_attributes}, valid_session
-        response.should redirect_to(TargetImage.last)
+        post :create, {target_image: valid_attributes}, valid_session
+        #response.should redirect_to(TargetImage.last)
+        response.should redirect_to('/users/show_target_images')
       end
     end
 
@@ -150,7 +153,8 @@ describe TargetImagesController do
       it "redirects to the target_image" do
         target_image = TargetImage.create! valid_attributes
         put :update, {:id => target_image.to_param, :target_image => valid_attributes}, valid_session
-        response.should redirect_to(target_image)
+        #response.should redirect_to(target_image)
+        response.should redirect_to('/users/show_target_images')
       end
     end
 

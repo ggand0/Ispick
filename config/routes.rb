@@ -9,7 +9,7 @@ Ispic::Application.routes.draw do
 
   # Devise
   devise_for :users, :controllers => {
-    :sessions      => "users/sessions",
+    #:sessions      => "users/sessions",
     #:registrations => "users/registrations",
     :passwords     => "users/passwords",
     :omniauth_callbacks => "users/omniauth_callbacks"
@@ -17,6 +17,7 @@ Ispic::Application.routes.draw do
 
   get "welcome/index"
   get "users/home"
+  get "users/show_target_images"
   resources :target_images do
     member do
       get 'prefer'

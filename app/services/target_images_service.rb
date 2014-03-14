@@ -41,10 +41,16 @@ class TargetImagesService
       t0=Time.now
       # 抽出されていないか、抽出出来ていないImageは飛ばす
       images = Image.joins(:feature).where.not(features: { face: '[]' }).includes(:feature)
+
+      # 最後に配信された日時より後に取得された画像のみ見る（それ以外は一度調べているはず）
+      # nilだった場合は初めて配信対象となるtarget_imageなので全てのImageを見る
+      if target_image.last_delivered_at
+        images = images.where('images.created_at > ?', target_image.last_delivered_at)
+      end
       t1=Time.now
       images_count.push(images.count)
 
-      # feature != nil and feature != '[]'であるImageに対して：
+      # Image.feature != nil and Image.feature != '[]'であるImageに対して：
       images.each do |image|
         image_faces = JSON.parse(image.feature.face)
         image_faces.each do |image_face|
