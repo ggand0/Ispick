@@ -1,16 +1,18 @@
-<h1>Ispic prototype</h1>
-<p>Find this html in app/views/welcome/index.html.erb</p>
+<h1>Ispick prototype v2</h1>
+<p>Ispick is an illustration curation service!</p>
 
-<%= image_tag asset_path('snowmiku0.jpg'), size: '600x375' %>
+<%# image_tag asset_path('snowmiku0.jpg'), size: '600x375' %>
+<%= image_tag asset_path('icecave0.png'), size: '400x187' %>
 <br>
 <% if user_signed_in? %>
   <%= link_to 'ログアウト', destroy_user_session_path, :method => :delete %>
 <% else %>
   <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter)  %>
 <% end %>
-<%= link_to('Home', { controller: 'users', action: 'home' }) %>
+<br>
+<%= link_to('User Home', { controller: 'users', action: 'home' }) %>
 <br>
 <br>
 <%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
 <br>
-<%= link_to('うpした嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
+<%= link_to('うpされた嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
