@@ -6,7 +6,7 @@ Ispic::Application.routes.draw do
       get 'show_user_image'
     end
     member do
-      post 'favor'
+      put 'favor'
     end
   end
 

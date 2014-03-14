@@ -63,7 +63,13 @@ class DeliveredImagesController < ApplicationController
 
   # PUT favor
   def favor
-    @delivered_image.update_attributes!(favored: true)
+    if not @delivered_image.favored
+      @delivered_image.update_attributes!(favored: true)
+    else
+      @delivered_image.update_attributes!(favored: false)
+    end
+
+    redirect_to :back
   end
 
   private
