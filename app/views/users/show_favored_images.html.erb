@@ -6,8 +6,9 @@
   <% @images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-        <%= image.favored %>
+        <div class='favored'>
+          <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
+        </div>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
