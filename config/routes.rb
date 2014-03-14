@@ -5,6 +5,9 @@ Ispic::Application.routes.draw do
     collection do
       get 'show_user_image'
     end
+    member do
+      put 'favor'
+    end
   end
 
   # Devise
@@ -18,6 +21,7 @@ Ispic::Application.routes.draw do
   get "welcome/index"
   get "users/home"
   get "users/show_target_images"
+  get 'users/show_favored_images'
   resources :target_images do
     member do
       get 'prefer'

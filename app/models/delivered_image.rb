@@ -13,6 +13,6 @@ class DeliveredImage < ActiveRecord::Base
       medium: "200x200" },
     use_timestamp: false
 
-  # 一応
+  # Imageモデルで一度validateされているはずだが、一応定義
   validates_uniqueness_of :src_url
 end

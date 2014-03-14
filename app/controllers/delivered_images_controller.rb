@@ -1,5 +1,5 @@
 class DeliveredImagesController < ApplicationController
-  before_action :set_delivered_image, only: [:show, :edit, :update, :destroy]
+  before_action :set_delivered_image, only: [:show, :edit, :update, :destroy, :favor]
 
   # GET /delivered_images
   # GET /delivered_images.json
@@ -59,6 +59,18 @@ class DeliveredImagesController < ApplicationController
       format.html { redirect_to delivered_images_url }
       format.json { head :no_content }
     end
+  end
+
+  # PUT favor
+  def favor
+    if not @delivered_image.favored
+      @delivered_image.update_attributes!(favored: true)
+    else
+      @delivered_image.update_attributes!(favored: false)
+    end
+
+    # そのうちAjax callするようにする
+    redirect_to :back
   end
 
   private

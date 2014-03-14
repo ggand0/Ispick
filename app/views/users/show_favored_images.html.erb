@@ -1,20 +1,14 @@
-<h1>TODAY's Images</h1>
-<%= link_to('登録イラスト一覧', { controller: 'users', action: 'show_target_images' }) %>
-<%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
+<h1>Clipped Images</h1>
+<%= link_to 'Back', controller: 'users', action: 'home' %>
+<br>
 
 <div class="wrap">
   <% @images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-
-        <% if image.favored %>
-          <div class='favored'>
-            <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-          </div>
-        <% else %>
+        <div class='favored'>
           <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-        <% end %>
-
+        </div>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>

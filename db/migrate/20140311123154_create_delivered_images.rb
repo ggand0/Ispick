@@ -5,6 +5,7 @@ class CreateDeliveredImages < ActiveRecord::Migration
       t.text :caption
       t.text :src_url
       t.integer :user_id
+      t.boolean :favored
 
       t.timestamps
     end
