@@ -5,6 +5,9 @@ Ispic::Application.routes.draw do
     collection do
       get 'show_user_image'
     end
+    member do
+      post 'favor'
+    end
   end
 
   # Devise

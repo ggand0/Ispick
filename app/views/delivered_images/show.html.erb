@@ -15,5 +15,11 @@
   <strong>Source URL:</strong>
   <%= link_to 'source image URL', @delivered_image.src_url %>
 </p>
+
+<p>
+  <strong>Is Favored:</strong>
+  <%= @delivered_image.favored %>
+</p>
+
 <br>
 <%= image_tag @delivered_image.data.url %>
