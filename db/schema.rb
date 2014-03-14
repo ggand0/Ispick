@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.text     "caption"
     t.text     "src_url"
     t.integer  "user_id"
+    t.boolean  "favored"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
