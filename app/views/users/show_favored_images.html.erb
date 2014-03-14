@@ -1,6 +1,8 @@
 <h1>Clipped Images</h1>
 <%= link_to 'Back', controller: 'users', action: 'home' %>
 <br>
+<%= link_to 'Download zip', controller: 'users', action: 'download_favored_images' %>
+<br>
 
 <div class="wrap">
   <% @images.each do |image| %>

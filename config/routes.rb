@@ -22,6 +22,7 @@ Ispic::Application.routes.draw do
   get "users/home"
   get "users/show_target_images"
   get 'users/show_favored_images'
+  get 'users/download_favored_images'
   resources :target_images do
     member do
       get 'prefer'
