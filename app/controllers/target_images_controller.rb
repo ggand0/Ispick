@@ -62,7 +62,8 @@ class TargetImagesController < ApplicationController
     respond_to do |format|
       #if @target_image.update(target_image_params)
       if @target_image.update_attributes(hash)
-        format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        #format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
