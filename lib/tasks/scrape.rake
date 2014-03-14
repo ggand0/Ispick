@@ -25,7 +25,7 @@ namespace :scrape do
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
     before_count = Image.count
-    if Image.count > args[:limit]
+    if Image.count > args[:limit].to_i
       delete_num = Image.count - args[:limit]
       puts Image.limit(delete_num).order(:created_at)
       Image.limit(delete_num).order(:created_at).destroy_all
