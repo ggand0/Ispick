@@ -14,18 +14,17 @@ namespace :deliver do
     delivered = []
 
     user = User.find(args[:user_id])
+    count_all = user.target_images.length
     user.target_images.each do |t|
-      puts 'Processing ' + (count+1).to_s + ' / ' + targets.length.to_s
+      puts 'Processing ' + (count+1).to_s + ' / ' + count_all.to_s
       service = TargetImagesService.new
       result = service.get_preferred_images(t)
 
       puts 'Got preferred images...'
       puts result[:images].count
-
       result[:images].each do |i|
-        #delivered.push(DeliveredImage.create(data: i[:image].data, title: i[:image].title))
-        image = i[:image]
-        if image = DeliveredImage.create(data: image.data, title: image.title, src_url: image.src_url)
+        im = i[:image]
+        if image = DeliveredImage.create(data: im.data, title: im.title, src_url: im.src_url)
           user.delivered_images << image
         end
       end
