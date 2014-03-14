@@ -1,4 +1,5 @@
 <p id="notice"><%= notice %></p>
+<%= link_to 'Back', delivered_images_path %>
 
 <p>
   <strong>Title:</strong>
@@ -11,9 +12,8 @@
 </p>
 
 <p>
-  <strong>Src url:</strong>
-  <%= @delivered_image.src_url %>
+  <strong>Source URL:</strong>
+  <%= link_to 'source image URL', @delivered_image.src_url %>
 </p>
-
-<%= link_to 'Edit', edit_delivered_image_path(@delivered_image) %> |
-<%= link_to 'Back', delivered_images_path %>
+<br>
+<%= image_tag @delivered_image.data.url %>
