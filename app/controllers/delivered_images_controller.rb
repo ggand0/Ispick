@@ -69,6 +69,7 @@ class DeliveredImagesController < ApplicationController
       @delivered_image.update_attributes!(favored: false)
     end
 
+    # そのうちAjax callするようにする
     redirect_to :back
   end
 
