@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 20140311123343) do
   create_table "target_images", force: true do |t|
     t.text     "title"
     t.integer  "user_id"
+    t.datetime "last_delivered_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"

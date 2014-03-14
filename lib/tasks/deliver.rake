@@ -8,14 +8,13 @@ namespace :deliver do
     end
   end
 
-  desc "User.firstにdeliver"
+  desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
-    delivered = []
-    user = User.find(args[:user_id])
-    targets = user.target_images
-
     count = 0
-    targets.each do |t|
+    delivered = []
+
+    user = User.find(args[:user_id])
+    user.target_images.each do |t|
       puts 'Processing ' + (count+1).to_s + ' / ' + targets.length.to_s
       service = TargetImagesService.new
       result = service.get_preferred_images(t)
@@ -25,10 +24,13 @@ namespace :deliver do
 
       result[:images].each do |i|
         #delivered.push(DeliveredImage.create(data: i[:image].data, title: i[:image].title))
-        if image = DeliveredImage.create(data: i[:image].data, title: i[:image].title, src_url: i[:image].src_url)
+        image = i[:image]
+        if image = DeliveredImage.create(data: image.data, title: image.title, src_url: image.src_url)
           user.delivered_images << image
         end
       end
+
+      t.last_delivered_at = DateTime.now
       count += 1
     end
 
