@@ -3,13 +3,14 @@ require 'spec_helper'
 describe "deliver:all" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
   it "deliver images to all users" do
     user = FactoryGirl.create(:user)
+    Rake::Task['deliver:user'].stub(:invoke).and_return
     Rake::Task['deliver:user'].should_receive(:invoke).exactly(1).times
     subject.invoke
   end

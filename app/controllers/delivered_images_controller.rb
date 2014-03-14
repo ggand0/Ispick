@@ -12,12 +12,6 @@ class DeliveredImagesController < ApplicationController
   def show
   end
 
-  # 特定ユーザーの配信イラストのみ表示する
-  # GET
-  def show_user_image
-    @delivered_images = DeliveredImage.where(:user_id => params[:user_id])
-  end
-
   # GET /delivered_images/new
   def new
     @delivered_image = DeliveredImage.new
