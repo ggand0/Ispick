@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'zip'
+
 class UsersController < ApplicationController
   def home
     if signed_in?
@@ -27,21 +30,11 @@ class UsersController < ApplicationController
     end
   end
 
-  def title_with_ext
-    #"#{self.title}#{File.extname(self.image.path)}"
-  end
-
   def download_favored_images
-    require 'rubygems'
-    require 'zip'
-
     if signed_in?
       # クリップされた配信イラストを取得
       @images = current_user.delivered_images.where(favored: true)
-
-      #file_name  = project.title.downcase.gsub(' ', '_destroy')
-      filename = current_user.name
-      file_name  = "#{filename}.zip"
+      file_name  = "#{current_user.name}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
       Zip::OutputStream.open(temp_file.path) do |zos|
