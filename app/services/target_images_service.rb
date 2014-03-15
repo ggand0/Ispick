@@ -34,7 +34,14 @@ class TargetImagesService
     images_count=[]
 
     # TargetImageの特徴量を取得
+    # nilチェック
+    if target_image.feature.nil? or target_image.feature.face.nil? or
+      target_image.feature.face == '[]'
+      return 'Feature of the target_image is invalid!'
+    end
     face_features = JSON.parse(target_image.feature.face)
+
+
     face_features.each do |face_feature|
       target_colors = Utility::get_colors(face_feature, true)
 
