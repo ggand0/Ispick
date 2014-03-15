@@ -42,6 +42,25 @@ describe TargetImagesService do
       result[:images].uniq.length.should eq(result[:images].length)
     end
 
+    it "returns if target_image.feature is nil or '[]'" do
+      target_image = FactoryGirl.create(:target_image)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+
+      face_feature = FactoryGirl.create(:feature_test2)
+      target_image = TargetImage.find(face_feature.featurable_id)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+
+      face_feature = FactoryGirl.create(:feature_test3)
+      target_image = TargetImage.find(face_feature.featurable_id)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+    end
+
     describe "with single face" do
       # 似た髪色を持つイラストを推薦すること
       it "returns a precise preferred image" do

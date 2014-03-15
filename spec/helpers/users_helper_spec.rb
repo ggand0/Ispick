@@ -11,5 +11,13 @@ require 'spec_helper'
 #   end
 # end
 describe UsersHelper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "get_clip_string method" do
+    it "returns valid string" do
+      image = FactoryGirl.create(:delivered_image)
+      expect(helper.get_clip_string(image)).to eq('Clip')
+
+      image.update_attributes(favored: true)
+      expect(helper.get_clip_string(image)).to eq('Unclip')
+    end
+  end
 end

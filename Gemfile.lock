@@ -278,6 +278,7 @@ GEM
       rspec-mocks (~> 2.14.0)
     ruby-graphviz (1.0.9)
     ruby-progressbar (1.4.1)
+    rubyzip (1.1.0)
     sass (3.2.14)
     sdoc (0.4.0)
       json (~> 1.8)
@@ -403,6 +404,7 @@ DEPENDENCIES
   resque-web
   rmagick
   rspec-rails (>= 2.6.0)
+  rubyzip
   sass-rails (~> 4.0.0)!
   sdoc
   simplecov

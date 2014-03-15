@@ -15,6 +15,6 @@ class Image < ActiveRecord::Base
   validates_uniqueness_of :src_url
 
 	def image_from_url(url)
-		self.data = open(url)
+    self.data = URI.parse(url)
 	end
 end

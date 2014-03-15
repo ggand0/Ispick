@@ -64,6 +64,7 @@ gem 'whenever', require: false                   # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'twitter'
+gem 'rubyzip'
 
 gem 'devise'
 gem 'omniauth'
