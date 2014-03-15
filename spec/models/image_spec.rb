@@ -10,6 +10,13 @@ describe Image do
       image.image_from_url(url)
       image.data.should_not be_nil
     end
+
+    it "save an image with extension" do
+      image = Image.new valid_attributes
+      url = 'http://www.madoka-magica.com/tv/character/img/chara1_img.png'
+      image.image_from_url(url)
+      expect(image.data.url).to match('png')
+    end
   end
 
 end
