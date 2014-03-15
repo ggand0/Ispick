@@ -157,4 +157,27 @@ describe DeliveredImagesController do
     end
   end
 
+  describe "PUT favor" do
+    before do
+      # rootにいたと仮定
+      request.env['HTTP_REFERER'] = '/'
+    end
+    it "update favored column to true if false" do
+      delivered_image = FactoryGirl.create(:delivered_image_unfavored_light)
+      put :favor, {id: delivered_image.id,
+        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light)},
+        valid_session
+      expect(DeliveredImage.first.favored).to eq(true)
+      expect(response).to redirect_to '/'
+    end
+    it "update favored column to false if true" do
+      delivered_image = FactoryGirl.create(:delivered_image_favored_light)
+      put :favor, {id: delivered_image.id,
+        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light)},
+        valid_session
+      expect(DeliveredImage.first.favored).to eq(false)
+      expect(response).to redirect_to '/'
+    end
+  end
+
 end
