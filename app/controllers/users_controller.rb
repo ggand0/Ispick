@@ -34,7 +34,6 @@ class UsersController < ApplicationController
   def download_favored_images
     require 'rubygems'
     require 'zip'
-    #require 'zip/zip'
 
     if signed_in?
       # クリップされた配信イラストを取得
@@ -42,26 +41,23 @@ class UsersController < ApplicationController
 
       #file_name  = project.title.downcase.gsub(' ', '_destroy')
       filename = current_user.name
-      file_name  = "#{file_name}.zip"
-      #file_name = "#{filename}#{File.extname(self.image.path)}"
+      file_name  = "#{filename}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
-      #Zip::ZipOutputStream.open(temp_file.path) do |zos|
       Zip::OutputStream.open(temp_file.path) do |zos|
         @images.each do |image|
-          zos.put_next_entry(image.title)
+          title = "#{image.title}#{File.extname(image.data.path)}"
+          zos.put_next_entry(title)
           zos.print IO.read(image.data.path)
         end
       end
 
-      send_file temp_file.path, :type => 'application/zip',
-                                :disposition => 'attachment',
-                                :filename => file_name
+      send_file temp_file.path, type: 'application/zip',
+                                disposition: 'attachment',
+                                filename: file_name
       temp_file.close
-
-      #render action: 'signed_in'
     else
-      render action: 'not_signed_in'
+      redirect_to :back
     end
   end
 
