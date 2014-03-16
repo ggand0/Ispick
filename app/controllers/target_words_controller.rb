@@ -61,6 +61,23 @@ class TargetWordsController < ApplicationController
     end
   end
 
+  # キーワードが一致するtitleやcaptionを持つImageを推薦する
+  # GET /target_words/1/prefer
+  def prefer
+    # 推薦されたImageを入れる配列。テンプレートに渡されて中身の一覧が表示される。
+    @preferred = []
+
+    #target_word = TargetWord.find(params[:id])
+    # @target_word.data => 'まどか'
+    images = Image.where.not(title => nil)
+    images.each do |image|
+      if near_to_keyword
+        @preferred.push(image)
+      end
+    end
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_target_word

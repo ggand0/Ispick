@@ -1,7 +1,11 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
-  resources :target_words
+  resources :target_words do
+    member do
+      get 'prefer'
+    end
+  end
 
   get "welcome/index"
 
