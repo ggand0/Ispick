@@ -22,6 +22,7 @@ class UsersController < ApplicationController
   end
 
   def show_target_words
+    # Test commit
     if signed_in?
       @words = current_user.target_words
       render action: 'show_target_words'
