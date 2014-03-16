@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140311123343) do
+ActiveRecord::Schema.define(version: 20140316044420) do
 
   create_table "delivered_images", force: true do |t|
     t.text     "title"
@@ -47,6 +47,13 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.datetime "data_updated_at"
   end
 
+  create_table "people", force: true do |t|
+    t.string   "name"
+    t.string   "type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "target_images", force: true do |t|
     t.text     "title"
     t.integer  "user_id"
@@ -57,6 +64,12 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+  end
+
+  create_table "target_words", force: true do |t|
+    t.string   "word"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: true do |t|
@@ -81,5 +94,13 @@ ActiveRecord::Schema.define(version: 20140311123343) do
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["uid"], name: "index_users_on_uid", unique: true, using: :btree
+
+  create_table "words", force: true do |t|
+    t.string   "data"
+    t.integer  "alias_id"
+    t.integer  "keyword_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end
