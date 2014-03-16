@@ -14,7 +14,7 @@ class UsersController < ApplicationController
 
   def show_target_images
     if signed_in?
-      @images = current_user.target_images
+      @target_images = current_user.target_images
       render action: 'show_target_images'
     else
       render action: 'not_signed_in'
