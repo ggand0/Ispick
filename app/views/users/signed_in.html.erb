@@ -11,13 +11,7 @@
 
         <div class="favored">
           <div class="id"><%= image.id %></div>
-          <% if image.favored %>
-            <%# link_to get_clip_string(image), favor_delivered_image_path(image), method: :put %>
-            <div class="clipped"> Unclip </div>
-          <% else %>
-            <%# link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-            <div class="not_clipped"> Clip </div>
-          <% end %>
+          <%= raw get_clip_string_styled(image) %>
         </div>
 
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>

@@ -5,22 +5,18 @@
 $ ->
   addClipEvent = () ->
     $favored = $('.favored')
-    console.log($favored)
-
-    console.log($favored.children('.id'))
     $favored.click((e) ->
       console.log('Begin clipping request.')
-      #$.getJSON('/model_data/' + $(@).text() + '.json', (data) ->
 
-      #console.log($(this).children('.id').html())
       id = $(this).children('.id').html()
       url = '/delivered_images/' + id + '/favor'
-      #$.post('/delivered_images/' + id + '/favor', (data) ->
       $.ajax({
         url: url,
         type: 'PUT',
         success: (result) ->
           console.log('Succeeded to clip!')
+          # css変更
+
       })
     )
 
