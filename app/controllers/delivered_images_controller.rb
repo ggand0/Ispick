@@ -70,7 +70,8 @@ class DeliveredImagesController < ApplicationController
     end
 
     # そのうちAjax callするようにする
-    redirect_to :back
+    #redirect_to :back
+    render nothing: true
   end
 
   private

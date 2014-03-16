@@ -5,10 +5,12 @@
 <%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
 
 <div class="wrap">
-  <% @images.each do |image| %>
+  <% @delivered_images.each do |image| %>
     <div class="box">
       <div class="boxInner">
+
         <div class="favored">
+          <div class="id"><%= image.id %></div>
           <% if image.favored %>
             <%# link_to get_clip_string(image), favor_delivered_image_path(image), method: :put %>
             <div class="clipped"> Unclip </div>
@@ -26,4 +28,4 @@
   <% end %>
 </div>
 
-<%= paginate @images %>
+<%= paginate @delivered_images %>
