@@ -34,7 +34,7 @@ class UsersController < ApplicationController
     if signed_in?
       # クリップされた配信イラストを取得
       @images = current_user.delivered_images.where(favored: true)
-      file_name  = "#{current_user.name}.zip"
+      file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
       Zip::OutputStream.open(temp_file.path) do |zos|
