@@ -1,0 +1,21 @@
+<h1>YOUR target_words</h1>
+<%= link_to 'New Target word', new_target_word_path %>
+<br>
+<%= link_to 'Back', controller: 'users', action: 'home' %>
+<br>
+
+<div class="wrap">
+  <% @words.each do |target_word| %>
+    <div class="box">
+      <div class="boxInner">
+        <%= link_to 'Show', target_word %>
+        <%= link_to 'Prefer', prefer_target_word_path(target_word) %>
+        <%= link_to 'Edit', edit_target_word_path(target_word) %>
+        <%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <div class="titleBox"><%= target_word.data.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate_target_images(@message, @words) %>

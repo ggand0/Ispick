@@ -21,6 +21,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def show_target_words
+    if signed_in?
+      @words = current_user.target_words
+      render action: 'show_target_words'
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
   def show_favored_images
     if signed_in?
       @images = current_user.delivered_images.where(favored: true).page(params[:page]).per(25)

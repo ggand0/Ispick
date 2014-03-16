@@ -16,6 +16,7 @@ Ispic::Application.routes.draw do
     collection do
       get 'home'
       get 'show_target_images'
+      get 'show_target_words'
       get 'show_favored_images'
       get 'download_favored_images'
     end
