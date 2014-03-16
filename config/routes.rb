@@ -1,6 +1,8 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  resources :target_words
+
   get "welcome/index"
 
   # Devise

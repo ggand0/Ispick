@@ -1,0 +1,27 @@
+<h1>Listing target_words</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Word</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @target_words.each do |target_word| %>
+      <tr>
+        <td><%= target_word.word %></td>
+        <td><%= link_to 'Show', target_word %></td>
+        <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>
+        <td><%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Target word', new_target_word_path %>
