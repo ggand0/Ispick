@@ -1,4 +1,6 @@
-<h1>TODAY's Images</h1>
+<%# javascript_include_tag  %>
+
+<h1>TODAY's Delivered Images</h1>
 <%= link_to('登録イラスト一覧', { controller: 'users', action: 'show_target_images' }) %>
 <%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
 
@@ -6,14 +8,15 @@
   <% @images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-
-        <% if image.favored %>
-          <div class='favored'>
-            <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-          </div>
-        <% else %>
-          <%= link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
-        <% end %>
+        <div class="favored">
+          <% if image.favored %>
+            <%# link_to get_clip_string(image), favor_delivered_image_path(image), method: :put %>
+            <div class="clipped"> Unclip </div>
+          <% else %>
+            <%# link_to get_clip_string(image), favor_delivered_image_path(image), method: :put%>
+            <div class="not_clipped"> Clip </div>
+          <% end %>
+        </div>
 
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>

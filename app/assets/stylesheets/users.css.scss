@@ -2,6 +2,17 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+.favored {
+  float: left;
+  margin-right: 5px;
+}
+.clipped {
+  color: #02C293;
+}
+.not_clipped {
+
+}
+
 .favored a {
   color: #02C293;//#02C25E;
   float: left;
