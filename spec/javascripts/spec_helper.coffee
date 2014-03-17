@@ -38,6 +38,7 @@
 # You can require javascript files here. A good place to start is by requiring your application.js.
 #= require application
 #= require support/chai
+#= require support/sinon
 window.assert = chai.assert
 window.expect = chai.expect
-window.should = chai.should()
+#window.should = chai.should()  # globalに置くとエラー発生するので諦めた
