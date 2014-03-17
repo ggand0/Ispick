@@ -69,8 +69,9 @@ class DeliveredImagesController < ApplicationController
       @delivered_image.update_attributes!(favored: false)
     end
 
-    # そのうちAjax callするようにする
-    redirect_to :back
+    # Ajax callで呼ばれることを想定
+    # favoredが変更された結果を返す
+    render text: @delivered_image.favored
   end
 
   private

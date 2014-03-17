@@ -2,9 +2,8 @@
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
-guard 'coffeescript', :input => 'app/assets/javascripts'
+guard 'coffeescript', input: 'app/assets/javascripts'
 
-=begin
 guard :teaspoon do
   # Implementation files
   watch(%r{app/assets/javascripts/(.+).js}) { |m| "#{m[1]}_spec" }
@@ -12,7 +11,6 @@ guard :teaspoon do
   # Specs / Helpers
   watch(%r{spec/javascripts/(.*)})
 end
-=end
 
 guard :rspec, cmd: 'spring rspec' do
   watch(%r{^spec/.+_spec\.rb$})

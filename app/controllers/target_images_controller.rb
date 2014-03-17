@@ -77,7 +77,8 @@ class TargetImagesController < ApplicationController
   def destroy
     @target_image.destroy
     respond_to do |format|
-      format.html { redirect_to target_images_url }
+      #format.html { redirect_to target_images_url }
+      format.html { redirect_to show_target_images_users_path }
       format.json { head :no_content }
     end
   end

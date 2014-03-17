@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def home
     if signed_in?
       # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      @images = current_user.delivered_images.page(params[:page]).per(25)
+      @delivered_images = current_user.delivered_images.page(params[:page]).per(25)
       render action: 'signed_in'
     else
       render action: 'not_signed_in'
@@ -14,7 +14,7 @@ class UsersController < ApplicationController
 
   def show_target_images
     if signed_in?
-      @images = current_user.target_images
+      @target_images = current_user.target_images
       render action: 'show_target_images'
     else
       render action: 'not_signed_in'
@@ -34,7 +34,7 @@ class UsersController < ApplicationController
     if signed_in?
       # クリップされた配信イラストを取得
       @images = current_user.delivered_images.where(favored: true)
-      file_name  = "#{current_user.name}.zip"
+      file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
       Zip::OutputStream.open(temp_file.path) do |zos|
