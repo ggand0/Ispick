@@ -24,5 +24,4 @@ $ ->
     )
 
   #addClipEvent()
-  #console.log(window.Clip)
   window.Clip.addClipEvents()
