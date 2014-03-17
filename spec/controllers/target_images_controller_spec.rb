@@ -188,7 +188,7 @@ describe TargetImagesController do
     it "redirects to the target_images list" do
       target_image = TargetImage.create! valid_attributes
       delete :destroy, {:id => target_image.to_param}, valid_session
-      response.should redirect_to(target_images_url)
+      response.should redirect_to(show_target_images_users_path)
     end
   end
 
