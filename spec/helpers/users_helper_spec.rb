@@ -20,4 +20,14 @@ describe UsersHelper do
       expect(helper.get_clip_string(image)).to eq('Unclip')
     end
   end
+
+  describe "get_clip_string_styled" do
+    it "returns valid string" do
+      image = FactoryGirl.create(:delivered_image)
+      expect(raw helper.get_clip_string_styled(image)).to eq('<span style="color: #000;">Clip</span>')
+
+      image.update_attributes(favored: true)
+      expect(raw helper.get_clip_string_styled(image)).to eq('<span style="color: #02C293;">Unclip</span>')
+    end
+  end
 end
