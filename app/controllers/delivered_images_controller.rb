@@ -1,5 +1,5 @@
 class DeliveredImagesController < ApplicationController
-  before_action :set_delivered_image, only: [:show, :edit, :update, :destroy, :favor]
+  before_action :set_delivered_image, only: [:show, :edit, :update, :destroy, :favor, :avoid]
 
   # GET /delivered_images
   # GET /delivered_images.json
@@ -72,6 +72,16 @@ class DeliveredImagesController < ApplicationController
     # Ajax callで呼ばれることを想定
     # favoredが変更された結果を返す
     render text: @delivered_image.favored
+  end
+
+  # PUT avoid
+  def avoid
+    if not @delivered_image.avoided
+      @delivered_image.update_attributes!(avoided: true)
+    else
+      @delivered_image.update_attributes!(avoided: false)
+    end
+    redirect_to :back
   end
 
   private
