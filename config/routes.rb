@@ -25,6 +25,7 @@ Ispic::Application.routes.draw do
     end
     member do
       put 'favor'
+      put 'avoid'
     end
   end
 

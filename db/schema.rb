@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.text     "src_url"
     t.integer  "user_id"
     t.boolean  "favored"
+    t.boolean  "avoided"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
@@ -47,6 +48,15 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.datetime "data_updated_at"
   end
 
+  create_table "people", force: true do |t|
+    t.string   "name"
+    t.string   "type"
+    t.text     "aliases"
+    t.text     "keywords"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "target_images", force: true do |t|
     t.text     "title"
     t.integer  "user_id"
@@ -57,6 +67,13 @@ ActiveRecord::Schema.define(version: 20140311123343) do
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+  end
+
+  create_table "target_words", force: true do |t|
+    t.string   "word"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: true do |t|
