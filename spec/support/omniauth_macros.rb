@@ -4,8 +4,8 @@ module OmniauthMacros
     # authentication hashes to return during integration testing.
     OmniAuth.config.test_mode = true
     OmniAuth.config.mock_auth[:twitter] = OmniAuth::AuthHash.new({
-      :provider => 'twitter',
-      :uid => '123545',
+      provider: 'twitter',
+      uid: '12345678',
       info: { nickname: 'pentiumx' }
       # etc.
     })
