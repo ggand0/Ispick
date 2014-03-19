@@ -19,6 +19,15 @@ FactoryGirl.define do
         create_list(:delivered_image_file, evaluator.images_count, user: user)
       end
     end
+
+    factory :user_with_target_images do
+      ignore do
+        images_count 5
+      end
+      after(:create) do |user, evaluator|
+        create_list(:target_image, evaluator.images_count, user: user)
+      end
+    end
   end
   factory :facebook_user, class: User do
     email 'test@example.com'
