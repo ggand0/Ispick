@@ -13,14 +13,18 @@ describe "favored_images page" do
   end
 
   it "Watch favored_images list" do
-    #save_and_open_page
     expect(page).to have_css("img[@alt='Madoka']")
   end
 
   it "Unclip an image" do
     click_link 'Unclip'
-    save_and_open_page
+    #save_and_open_page
     expect(page.all('.box').count).to eq(0)
+  end
+
+  it "Download all images" do
+    click_link 'Download zip'
+    expect(page.response_headers['Content-Type']).to eq('application/zip')
   end
 
   it "Go back to user home" do
