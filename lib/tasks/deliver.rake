@@ -19,16 +19,7 @@ namespace :deliver do
   desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
     t0 = Time.now
-    count = 0
-    delivered = []
-
-    user = User.find(args[:user_id])
-    count_all = user.target_images.length
-    user.target_images.each do |t|
-      Deliver.deliver_from_target(user, t, count_all, count)
-      count += 1
-    end
-
+    Deliver.deliver(args[:user_id])
     t1 = Time.now
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'

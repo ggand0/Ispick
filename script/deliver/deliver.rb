@@ -7,6 +7,18 @@ module Deliver
   MAX_DELIVER_NUM = 100
   MAX_DELIVER_SIZE = 100*1024*1024
 
+  def self.deliver(user_id)
+    count = 0
+    delivered = []
+
+    user = User.find(user_id)
+    count_all = user.target_images.length
+    user.target_images.each do |t|
+      Deliver.deliver_from_target(user, t, count_all, count)
+      count += 1
+    end
+  end
+
   def self.deliver_from_target(user, target_image, count_all, count)
     # 推薦イラストを取得
     puts 'Processing ' + (count+1).to_s + ' / ' + count_all.to_s
