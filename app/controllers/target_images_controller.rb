@@ -77,7 +77,6 @@ class TargetImagesController < ApplicationController
   def destroy
     @target_image.destroy
     respond_to do |format|
-      #format.html { redirect_to target_images_url }
       format.html { redirect_to show_target_images_users_path }
       format.json { head :no_content }
     end
@@ -106,12 +105,6 @@ class TargetImagesController < ApplicationController
     @preferred = result[:images]
     @target_colors = result[:target_colors]
     @debug = result[:debug]
-
-    # sort
-    #@preferred = @preferred.sort_by{|value| value[:hsv][:hair]}
-    @preferred = @preferred.sort_by do |value|
-      value[:value]# 評価値でソート
-    end
 
     # Pagenate the array
     @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)

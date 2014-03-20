@@ -17,6 +17,12 @@
 </p>
 
 <p>
+  <strong>Size in bytes:</strong><br>
+  <%= bytes_to_kilobytes(@delivered_image.data.size) %> KB<br>
+  <%= bytes_to_megabytes(@delivered_image.data.size) %> MB<br>
+</p>
+
+<p>
   <strong>Is Favored:</strong>
   <%= @delivered_image.favored %>
 </p>

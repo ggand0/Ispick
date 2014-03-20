@@ -19,8 +19,11 @@
   <strong>Source URL:</strong>
   <%= link_to 'source image URL', @image.src_url %>
 </p>
-
-<br>
+<p>
+  <strong>Size in bytes:</strong><br>
+  <%= bytes_to_kilobytes(@image.data.size) %> KB<br>
+  <%= bytes_to_megabytes(@image.data.size) %> MB<br>
+</p>
 <%= link_to 'Destroy', @image, method: :delete, data: { confirm: 'Are you sure?' } %>
 
 <br>

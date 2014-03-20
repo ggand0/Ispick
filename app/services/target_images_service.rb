@@ -65,7 +65,7 @@ class TargetImagesService
           distance = Utility::get_hsv_distance(target_colors, image_colors)
 
           if Utility::is_preferred(distance, [30, 100, 100, 100])
-            evaluation_value = Utility::evaluate_face_colors(distance, [3, 1, 1, 1])
+            evaluation_value = Utility::evaluate_face_colors(distance, [5, 1, 1, 1])
             preferred.push({image: image, hsv: distance, value: evaluation_value})
           end
         end
@@ -75,6 +75,11 @@ class TargetImagesService
 
     # Remove duplicates
     preferred.uniq! { |value| value[:image] }
+
+    # sort
+    preferred = preferred.sort_by do |value|
+      value[:value]# 評価値でソート
+    end
 
     # DEBUG: 時間計測
     t2=Time.now

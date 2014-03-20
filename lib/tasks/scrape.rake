@@ -1,5 +1,6 @@
 # encoding: utf-8
 namespace :scrape do
+  @DEFAULT = 10000
   desc "Imagesテーブルリセット"
   task reset: :environment do
     # Imageモデルを全消去
@@ -24,10 +25,18 @@ namespace :scrape do
   desc "最大保存数を超えている場合古いImageから順に削除"
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
+
+    if args[:limit]
+      limit = args[:limit].to_i
+    else
+      limit = @DEFAULT
+    end
+    puts 'limit: ' + limit.to_s
+
     before_count = Image.count
-    if Image.count > args[:limit].to_i
-      delete_num = Image.count - args[:limit]
-      puts Image.limit(delete_num).order(:created_at)
+    if Image.count > limit
+      delete_num = Image.count - limit
+      #puts Image.limit(delete_num).order(:created_at)
       Image.limit(delete_num).order(:created_at).destroy_all
     end
 

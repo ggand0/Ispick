@@ -3,6 +3,16 @@
 <br>
 <%= link_to 'Download zip', controller: 'users', action: 'download_favored_images' %>
 <br>
+<p>
+  <strong>Clipped images count:</strong>
+  <%= @images.count %>
+</p>
+<p>
+  <strong>Total size of clipped images in bytes:</strong><br>
+  <%= bytes_to_kilobytes(get_total_size(@images)) %> KB<br>
+  <%= bytes_to_megabytes(get_total_size(@images)) %> MB<br>
+</p>
+<br>
 
 <div class="wrap">
   <% @images.each do |image| %>

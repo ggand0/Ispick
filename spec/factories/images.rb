@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :image_file, class: Image do
     title 'madoka'
+    sequence(:src_url) { |n| "test#{n}.com" }
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
   end
 
