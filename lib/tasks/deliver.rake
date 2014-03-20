@@ -1,8 +1,13 @@
 require "#{Rails.root}/app/services/target_images_service"
+require "#{Rails.root}/script/deliver/deliver"
+require "#{Rails.root}/app/helpers/application_helper"
+include ApplicationHelper
 
 namespace :deliver do
   # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
   @MAX_DELIVER_NUM = 100
+  # [MB]
+  @MAX_DELIVER_SIZE = 100
 
   desc "Deliver images to all users"
   task all: :environment do
@@ -13,7 +18,6 @@ namespace :deliver do
 
   desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
-
     t0 = Time.now
     count = 0
     delivered = []
@@ -62,12 +66,21 @@ namespace :deliver do
         puts '- Creating delivered_images:' + c.to_s + ' / ' + result[:images].count.to_s if c % 10 == 0
       end
 
+      # １ユーザーの最大容量を超えていたら古い順に削除
+      Deliver.delete_excessed_records(user.delivered_images, @MAX_DELIVER_NUM)
+
+      # 最終配信日時を記録
       t.last_delivered_at = DateTime.now
       count += 1
     end
+
+
 
     t1 = Time.now
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end
+
+
+
 end
