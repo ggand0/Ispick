@@ -6,10 +6,12 @@
 $ ->
   addClipEvent = () ->
     $favored = $('.favored')
+
     $favored.click((e) ->
       id = $(this).children('.id').html()
       url = '/delivered_images/' + id + '/favor'
       $target = $(this).children('span')
+      $img = $(this).parent()
       $.ajax({
         url: url,
         type: 'PUT',
@@ -20,8 +22,12 @@ $ ->
           text = if is_favored then 'Unclip' else 'Clip'
           $target.css('color', color)
           $target.text(text)
+
+          # 実験中
+          #document.location.reload()
+          #$img.css('display', 'none') if not is_favored
       })
     )
 
-  #addClipEvent()
-  window.Clip.addClipEvents()
+  addClipEvent()
+  #window.Clip.addClipEvents()
