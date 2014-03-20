@@ -10,6 +10,7 @@ namespace :deliver do
 
   desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
+    t0 = Time.now
     count = 0
     delivered = []
 
@@ -24,15 +25,19 @@ namespace :deliver do
       puts result[:images].count
       result[:images].each do |i|
         im = i[:image]
-        if image = DeliveredImage.create(data: im.data, title: im.title, src_url: im.src_url)
+        file = File.open(im.data.path)
+        if image = DeliveredImage.create(data: file, title: im.title, src_url: im.src_url)
           user.delivered_images << image
         end
+        file.close
       end
 
       t.last_delivered_at = DateTime.now
       count += 1
     end
 
+    t1 = Time.now
+    puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end
 end
