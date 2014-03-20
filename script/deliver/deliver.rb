@@ -4,8 +4,10 @@ require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 module Deliver
+  # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
   MAX_DELIVER_NUM = 100
-  MAX_DELIVER_SIZE = 100*1024*1024
+  # [MB]
+  MAX_DELIVER_SIZE = 100
 
   def self.deliver(user_id)
     count = 0
@@ -79,12 +81,13 @@ module Deliver
 
     # 削除する数を計算（順に消してシミュレートしていく）
     images.order(:created_at).each do |i|
-      image_size -= i.data.size
+      image_size -= bytes_to_megabytes(i.data.size)
       delete_count += 1
       break if image_size <= max_size
     end
 
     # 古い順(created_atのASC)
+    puts 'Deleting excessed images: ' + delete_count.to_s
     images.limit(delete_count).order(:created_at).destroy_all
     images
   end

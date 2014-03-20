@@ -21,7 +21,7 @@ namespace :deliver do
     t0 = Time.now
     Deliver.deliver(args[:user_id])
     t1 = Time.now
-    puts ''
+    puts '-----------------------------------'# 35 chars
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end
