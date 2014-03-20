@@ -5,6 +5,16 @@
 <%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
 <br>
 <br>
+<p>
+  <strong>Delivered images count:</strong>
+  <%= current_user.delivered_images.count %>
+</p>
+<p>
+  <strong>Total size of delivered images in bytes:</strong><br>
+  <%= bytes_to_kilobytes(get_total_size(current_user.delivered_images)) %> KB<br>
+  <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
+</p>
+<br>
 <%= paginate @delivered_images %>
 <div class="wrap">
   <% @delivered_images.each do |image| %>
