@@ -71,7 +71,12 @@ class DeliveredImagesController < ApplicationController
 
     # Ajax callで呼ばれることを想定
     # favoredが変更された結果を返す
-    render text: @delivered_image.favored
+    if params[:render] == 'true'
+      render text: @delivered_image.favored
+    else
+      #render nothing: true
+      redirect_to show_favored_images_users_path
+    end
   end
 
   # PUT avoid

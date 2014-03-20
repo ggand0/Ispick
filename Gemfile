@@ -94,6 +94,8 @@ group :development, :test do
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化
   gem 'rake_shared_context'                         # Enable rake task testing
+  gem 'capybara'
+  gem 'launchy'
 
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-rails'

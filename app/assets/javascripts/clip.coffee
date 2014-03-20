@@ -1,6 +1,6 @@
 window.Clip = {}
 
-Clip.addClipEvents = () ->
+Clip.addClipEvents = (do_render) ->
   console.log('Adding events...')
   $favored = $('.favored')
   $favored.click((e) ->
@@ -10,6 +10,7 @@ Clip.addClipEvents = () ->
     $.ajax({
       url: url,
       type: 'PUT',
+      data: { render: do_render }
       success: (result) ->
         # css変更
         is_favored = (result is 'true')
@@ -17,5 +18,8 @@ Clip.addClipEvents = () ->
         text = if is_favored then 'Unclip' else 'Clip'
         $target.css('color', color)
         $target.text(text)
+
+        if not do_render
+          document.location.reload(true)
     })
   )

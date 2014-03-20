@@ -15,6 +15,8 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'
+require 'capybara'
+require 'capybara/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -61,4 +63,10 @@ RSpec.configure do |config|
   # Devise configuration
   config.include Devise::TestHelpers, :type => :controller
   config.include ControllerMacros, :type => :controller
+
+  # Capybara
+  config.include Capybara::DSL
+  # Integration Test helper
+  config.include OmniauthMacros
+
 end
