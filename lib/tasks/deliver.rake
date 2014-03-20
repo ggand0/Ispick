@@ -7,7 +7,7 @@ namespace :deliver do
   # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
   @MAX_DELIVER_NUM = 100
   # [MB]
-  @MAX_DELIVER_SIZE = 100*1024*1024
+  @MAX_DELIVER_SIZE = 100#*1024*1024
 
   desc "Deliver images to all users"
   task all: :environment do
@@ -21,6 +21,7 @@ namespace :deliver do
     t0 = Time.now
     Deliver.deliver(args[:user_id])
     t1 = Time.now
+    puts ''
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end
