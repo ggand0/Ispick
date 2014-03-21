@@ -1,6 +1,6 @@
 class DeliveredImage < ActiveRecord::Base
-  has_one :feature, as: :featurable
   belongs_to :user
+  has_one :feature, as: :featurable
 
   # 明示的にテーブル名を指定することでエラー回避
   default_scope { order("#{table_name}.created_at DESC") }
