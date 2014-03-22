@@ -1,18 +1,22 @@
 module ApplicationHelper
   # [KB]
   def bytes_to_kilobytes(byte)
-    (byte / 1024.0).round(3)
+    return 0 if not byte      # nilの場合0を返す
+    (byte / 1024.0).round(3)  # KBに換算する
   end
   # [MB]
   def bytes_to_megabytes(byte)
+    return 0 if not byte
     (byte / (1024.0*1024.0)).round(3)
   end
   # [KB]
   def bytes_to_kilobytes_mac(byte)
+    return 0 if not byte
     (byte / 1000.0).round(3)
   end
   # [MB]
   def bytes_to_megabytes_mac(byte)
+    return 0 if not byte
     (byte / (1000.0*1000.0)).round(3)
   end
 
