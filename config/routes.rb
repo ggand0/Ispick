@@ -36,6 +36,7 @@ Ispic::Application.routes.draw do
   end
 
   resources :images, only: [:index, :show, :destroy]
+  resources :favored_images, only: [:show, :destroy]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
