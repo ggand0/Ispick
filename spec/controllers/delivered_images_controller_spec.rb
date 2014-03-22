@@ -159,25 +159,30 @@ describe DeliveredImagesController do
 
   describe "PUT favor" do
     before do
-      # rootにいたと仮定
-      #request.env['HTTP_REFERER'] = '/'
+      login_user
     end
-    it "update favored column to true if false" do
+    it "Add delivered_image to User.favored_images" do
       delivered_image = FactoryGirl.create(:delivered_image_unfavored_light)
-      put :favor, {id: delivered_image.id,
-        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light)},
-        valid_session
-      expect(DeliveredImage.first.favored).to eq(true)
-      #render text: @delivered_image.favoredをテスト
-      expect(response.body).to eq('true')#render_template(text: 'true')
+      put :favor, {
+        id: delivered_image.id,
+        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light),
+        render: 'true'
+      }, valid_session
+
+      expect(User.first.favored_images.count).to eq(1)
+      expect(response.body).to eq('true')
     end
-    it "update favored column to false if true" do
-      delivered_image = FactoryGirl.create(:delivered_image_favored_light)
-      put :favor, {id: delivered_image.id,
-        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light)},
-        valid_session
-      expect(DeliveredImage.first.favored).to eq(false)
-      expect(response.body).to eq('false')
+
+    it "return true if it's already favored" do
+      #delivered_image = FactoryGirl.create(:delivered_image_favored_light)
+      favored_image = FactoryGirl.create(:favored_image_with_delivered)
+      put :favor, {
+        id: favored_image.delivered_image.id,
+        delivered_image: favored_image.delivered_image,
+        render: 'true'
+      }, valid_session
+
+      expect(response.body).to eq('true')
     end
   end
 
