@@ -1,7 +1,8 @@
 class FavoredImage < ActiveRecord::Base
   belongs_to :user
+  has_one :delivered_image
 
   has_attached_file :data
 
-  validates_uniqueness_of :src_url
+  validates :src_url, uniqueness: { scope: :user_id }
 end

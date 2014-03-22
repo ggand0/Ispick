@@ -1,5 +1,6 @@
 class DeliveredImage < ActiveRecord::Base
   belongs_to :user
+  belongs_to :favored_image
   has_one :feature, as: :featurable
 
   # 明示的にテーブル名を指定することでエラー回避

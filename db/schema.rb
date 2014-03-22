@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20140320181847) do
     t.text     "caption"
     t.text     "src_url"
     t.integer  "user_id"
+    t.integer  "favored_image_id"
     t.boolean  "favored"
     t.boolean  "avoided"
     t.datetime "created_at"
