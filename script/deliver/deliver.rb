@@ -81,9 +81,10 @@ module Deliver
 
     # 削除する数を計算（順に消してシミュレートしていく）
     images.order(:created_at).each do |i|
+      break if image_size <= max_size
       image_size -= bytes_to_megabytes(i.data.size)
       delete_count += 1
-      break if image_size <= max_size
+      #break if image_size <= max_size
     end
 
     # 古い順(created_atのASC)

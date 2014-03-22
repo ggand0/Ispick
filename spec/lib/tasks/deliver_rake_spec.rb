@@ -31,8 +31,8 @@ describe "deliver:user" do
 
     face_feature = FactoryGirl.create(:feature_madoka)          # target_image
     target_image = TargetImage.find(face_feature.featurable_id)
-    FactoryGirl.create(:feature_madoka1)                        # 似てるimage
-    FactoryGirl.create(:feature_madoka2)                        # 似てないimage
+    FactoryGirl.create(:feature_madoka1_file)                        # 似てるimage
+    FactoryGirl.create(:feature_madoka2_file)                        # 似てないimage
     user.target_images << TargetImage.first
     puts 'USER:' + user.id.to_s + ' / ' + User.count.to_s
     puts 'IMAGE:' + Image.first.id.to_s + ' / ' + Image.count.to_s
