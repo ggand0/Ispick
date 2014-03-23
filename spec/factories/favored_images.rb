@@ -13,6 +13,7 @@ FactoryGirl.define do
     caption "MyText"
     src_url "MyText"
     user_id 1
+    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
   end
 
