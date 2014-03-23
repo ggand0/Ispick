@@ -21,7 +21,7 @@
     <% next if image.avoided %>
     <div class="box">
       <div class="boxInner">
-
+        <%= image.created_at %>
         <div class="favored">
           <div class="id"><%= image.id %></div>
           <%= raw get_clip_string_styled(image) %>
