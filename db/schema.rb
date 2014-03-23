@@ -11,14 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140316052711) do
+ActiveRecord::Schema.define(version: 20140323082200) do
 
   create_table "delivered_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
     t.integer  "user_id"
+    t.integer  "favored_image_id"
     t.boolean  "favored"
+    t.boolean  "avoided"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"
@@ -47,11 +49,16 @@ ActiveRecord::Schema.define(version: 20140316052711) do
     t.datetime "data_updated_at"
   end
 
+  create_table "keywords", force: true do |t|
+    t.boolean  "is_alias"
+    t.text     "word"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "type"
-    t.text     "aliases"
-    t.text     "keywords"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
