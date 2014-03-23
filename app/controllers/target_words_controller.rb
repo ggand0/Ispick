@@ -31,8 +31,7 @@ class TargetWordsController < ApplicationController
 
     respond_to do |format|
       if @target_word.save
-        format.html { redirect_to @target_word, notice: 'Target word was successfully created.' }
-        #format.html { redirect_to controller: 'users', action: 'show_target_words' }
+        format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
       else
         format.html { render action: 'new' }

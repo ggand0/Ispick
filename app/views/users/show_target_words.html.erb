@@ -12,7 +12,7 @@
         <%= link_to 'Prefer', prefer_target_word_path(target_word) %>
         <%= link_to 'Edit', edit_target_word_path(target_word) %>
         <%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <div class="titleBox"><%= target_word.data.to_s %></div>
+        <div class="titleBox"><%= target_word.word %></div>
       </div>
     </div>
   <% end %>
