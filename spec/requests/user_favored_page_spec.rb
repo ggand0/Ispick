@@ -16,8 +16,8 @@ describe "favored_images page" do
     expect(page).to have_css("img[@alt='Madoka']")
   end
 
-  it "Unclip an image" do
-    click_link 'Unclip'
+  it "Destroy an image" do
+    click_link 'Destroy'
     #save_and_open_page
     expect(page.all('.box').count).to eq(0)
   end

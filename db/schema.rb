@@ -11,15 +11,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140311123343) do
+ActiveRecord::Schema.define(version: 20140320181847) do
 
   create_table "delivered_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
     t.integer  "user_id"
+    t.integer  "favored_image_id"
     t.boolean  "favored"
     t.boolean  "avoided"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+  end
+
+  create_table "favored_images", force: true do |t|
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_file_name"

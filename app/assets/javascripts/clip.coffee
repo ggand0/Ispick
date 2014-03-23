@@ -15,7 +15,7 @@ Clip.addClipEvents = (do_render) ->
         # css変更
         is_favored = (result is 'true')
         color = if is_favored then '#02C293' else '#000'
-        text = if is_favored then 'Unclip' else 'Clip'
+        text = if is_favored then 'Clipped' else 'Clip'
         $target.css('color', color)
         $target.text(text)
 

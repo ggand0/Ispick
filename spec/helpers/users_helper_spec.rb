@@ -16,8 +16,8 @@ describe UsersHelper do
       image = FactoryGirl.create(:delivered_image)
       expect(helper.get_clip_string(image)).to eq('Clip')
 
-      image.update_attributes(favored: true)
-      expect(helper.get_clip_string(image)).to eq('Unclip')
+      image = FactoryGirl.create(:favored_image_with_delivered)
+      expect(helper.get_clip_string(image.delivered_image)).to eq('Clipped')
     end
   end
 
@@ -26,8 +26,9 @@ describe UsersHelper do
       image = FactoryGirl.create(:delivered_image)
       expect(raw helper.get_clip_string_styled(image)).to eq('<span style="color: #000;">Clip</span>')
 
-      image.update_attributes(favored: true)
-      expect(raw helper.get_clip_string_styled(image)).to eq('<span style="color: #02C293;">Unclip</span>')
+      image = FactoryGirl.create(:favored_image_with_delivered)
+      expect(raw helper.get_clip_string_styled(image.delivered_image)).to eq(
+        '<span style="color: #02C293;">Clipped</span>')
     end
   end
 end

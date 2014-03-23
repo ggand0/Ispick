@@ -62,21 +62,33 @@ class DeliveredImagesController < ApplicationController
   end
 
   # PUT favor
+  # Ajax callで呼ばれることを想定
   def favor
+    # 一方通行
     if not @delivered_image.favored
       @delivered_image.update_attributes!(favored: true)
-    else
-      @delivered_image.update_attributes!(favored: false)
     end
 
-    # Ajax callで呼ばれることを想定
+    # src_urlが被ってたらvalidationでfalseが返る
+    favored_image = current_user.favored_images.build(
+      title: @delivered_image.title,
+      caption: @delivered_image.caption,
+      data: @delivered_image.data,
+      src_url: @delivered_image.src_url
+    )
+    # User.favored_imagesに追加
+    if favored_image.save
+      favored_image.delivered_image = @delivered_image
+    end
+
     # favoredが変更された結果を返す
     if params[:render] == 'true'
-      render text: @delivered_image.favored
+      # そのdelivered_imageがfavoredされているかどうかを返す
+      render text: @delivered_image.favored_image != nil
     else
-      #render nothing: true
       redirect_to show_favored_images_users_path
     end
+
   end
 
   # PUT avoid

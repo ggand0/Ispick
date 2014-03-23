@@ -80,15 +80,17 @@ module Deliver
     image_size = bytes_to_megabytes(get_total_size(images))
 
     # 削除する数を計算（順に消してシミュレートしていく）
-    images.order(:created_at).each do |i|
-      image_size -= bytes_to_megabytes(i.data.size)
-      delete_count += 1
+    images.reorder('created_at ASC').each do |i|
       break if image_size <= max_size
+      image_size -= bytes_to_megabytes(i.data.size)
+      #puts image_size
+      delete_count += 1
     end
 
     # 古い順(created_atのASC)
     puts 'Deleting excessed images: ' + delete_count.to_s
-    images.limit(delete_count).order(:created_at).destroy_all
+    images = images.reorder('created_at ASC').limit(delete_count)
+    images.destroy_all
     images
   end
 end

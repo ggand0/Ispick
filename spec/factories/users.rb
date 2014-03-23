@@ -34,7 +34,7 @@ FactoryGirl.define do
         images_count 5
       end
       after(:create) do |user, evaluator|
-        create_list(:delivered_image_favored, evaluator.images_count, user: user)
+        create_list(:favored_image_file, evaluator.images_count, user: user)
       end
     end
   end
