@@ -8,7 +8,7 @@ module Scrape
 
   # 4chanURL
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
-  
+
   # 関数定義
   # スクレイピングを行う
   def self.scrap()
@@ -20,7 +20,8 @@ module Scrape
     anime_page = self.get_anime_page(url)
     anime_character_page = self.get_anime_character_page(anime_page)
     anime_character = self.get_anime_character_name(anime_character_page)
-    self.hash_output(anime_character)
+    #self.hash_output(anime_character)
+    self.save_to_database(anime_character)
   end
 
 
@@ -41,7 +42,7 @@ module Scrape
 
     # アニメ名:アニメのページURLのハッシュを取得
     # カテゴリに分かれたページのURLを取得
-    html.css('a').each do |item| 
+    html.css('a').each do |item|
       if /Category/ =~ item["class"]  or /CategoryTreeLabel/ =~ item["class"] then
         category_url = "http://ja.wikipedia.org%s" % [item['href']]
         anime_page[item.inner_text] = self.get_category_anime_page(item.inner_text, category_url)
@@ -49,7 +50,7 @@ module Scrape
     end
 
     # ページ一覧からアニメURLを取得
-    html.css('li > a').each do |item| 
+    html.css('li > a').each do |item|
       if /アカウント/ =~ item.inner_text then
         break
       end
@@ -124,7 +125,7 @@ module Scrape
           raise e
         end
       end
-      
+
       page_title = html.css('h1[class="firstHeading"] > span')[0].inner_text
       anime = page_title if /#{page_title}/ =~ anime
 
@@ -213,6 +214,17 @@ module Scrape
         f.write("#{value}\n")
       end
       f.write("\n")
+    end
+  end
+
+  # Peopleテーブルへ保存
+  def self.save_to_database(input_hash)
+    input_hash.each do |key, array|
+      array.each do |value|
+        person = Person.create(name: value, name_type: 'Character')
+        person.keywords.create(word: key)
+        person.save!
+      end
     end
   end
 
