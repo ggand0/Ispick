@@ -52,13 +52,14 @@ ActiveRecord::Schema.define(version: 20140323082200) do
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
     t.text     "word"
+    t.integer  "person_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "people", force: true do |t|
     t.string   "name"
-    t.string   "type"
+    t.string   "name_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
