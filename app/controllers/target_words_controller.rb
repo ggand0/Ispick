@@ -4,6 +4,7 @@ class TargetWordsController < ApplicationController
   # GET /target_words
   # GET /target_words.json
   def index
+    #@search = Person.search(params[:query])
     @target_words = TargetWord.all
   end
 
@@ -15,6 +16,8 @@ class TargetWordsController < ApplicationController
   # GET /target_words/new
   def new
     @target_word = TargetWord.new
+    @search = Person.search(params[:q])
+    @people = @search.result(distinct: true)
   end
 
   # GET /target_words/1/edit
@@ -24,11 +27,12 @@ class TargetWordsController < ApplicationController
   # POST /target_words
   # POST /target_words.json
   def create
-    @target_word = TargetWord.new(target_word_params)
+    @target_word = current_user.target_words.build(target_word_params)
 
     respond_to do |format|
       if @target_word.save
         format.html { redirect_to @target_word, notice: 'Target word was successfully created.' }
+        #format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
       else
         format.html { render action: 'new' }
@@ -75,6 +79,12 @@ class TargetWordsController < ApplicationController
         @preferred.push(image)
       end
     end
+  end
+
+  def search
+    @search = Person.search(params[:q])
+    @people = @search.result(distinct: true)
+    render :new
   end
 
 

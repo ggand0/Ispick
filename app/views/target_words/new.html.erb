@@ -1,5 +1,28 @@
 <h1>New target_word</h1>
 
-<%= render 'form' %>
+<%# render 'form' %>
+<%= search_form_for @search, url: search_target_words_path, html: { method: :post } do |f| %>
+  <%= f.label :name_cont, 'キャラクタ名' %>
+  <%= f.text_field :name_cont %>
+  <div>
+    <%= f.submit '検索する' %>
+  </div>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @people.each do |person| %>
+      <tr>
+        <td><%= link_to person.name, { action: 'create', id: person.id, target_word: { word: person.name}}, method: :post %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= link_to 'Back', target_words_path %>
