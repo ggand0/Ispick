@@ -1,17 +1,18 @@
 #-*- coding: utf-8 -*-
 require 'nokogiri'
 require 'open-uri'
+require 'natto'
 
 
 # wikipediaからアニメのキャラクター名を抽出する
-module Scrape
+module Scrape::Wiki
 
   # 4chanURL
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
 
   # 関数定義
   # スクレイピングを行う
-  def self.scrap()
+  def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
     # 起点となるWikipediaカテゴリページのURL
@@ -222,13 +223,27 @@ module Scrape
     input_hash.each do |key, array|
       array.each do |value|
         person = Person.create(name: value, name_type: 'Character')
-        person.keywords.create(word: key)
+        person.keywords.create(word: key, is_alias: false)
+
+        #tmp = value.gsub(/(（|）)/, ' ')# => 鹿目 まどか かなめ まどか
+        tmp = value.gsub(/（.*/, '')
+        tmp = tmp.gsub(/ /, '')         # => 鹿目まどか
+        #puts tmp
+
+        # keywords保存の例
+        #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される
+        #person.keywords.create(word: 'ピンク', is_alias: false)
+
+        # mecab使用例
+        # ref : http://qiita.com/k-shogo/items/0f8a98c52913c729c7eb
+        #mecab = Natto::MeCab.new
+        #mecab.parse('まどかだよっ！') do |n|
+        #  puts n.surface # => まどか/だ/よ/っ/！　など
+        #end
+
         person.save!
       end
     end
   end
 
 end
-
-
-Scrape.scrap()
