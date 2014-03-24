@@ -4,7 +4,6 @@ class TargetWordsController < ApplicationController
   # GET /target_words
   # GET /target_words.json
   def index
-    #@search = Person.search(params[:query])
     @target_words = TargetWord.all
   end
 
@@ -17,7 +16,7 @@ class TargetWordsController < ApplicationController
   def new
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
-    @people = @search.result(distinct: true)
+    @people = @search.result(distinct: true).page(params[:page]).per(50)
   end
 
   # GET /target_words/1/edit
@@ -28,6 +27,7 @@ class TargetWordsController < ApplicationController
   # POST /target_words.json
   def create
     @target_word = current_user.target_words.build(target_word_params)
+    @target_word.person = Person.find(params[:id])
 
     respond_to do |format|
       if @target_word.save
@@ -82,7 +82,7 @@ class TargetWordsController < ApplicationController
 
   def search
     @search = Person.search(params[:q])
-    @people = @search.result(distinct: true)
+    @people = @search.result(distinct: true).page(params[:page]).per(50)
     render :new
   end
 
@@ -95,6 +95,6 @@ class TargetWordsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def target_word_params
-      params.require(:target_word).permit(:word)
+      params.require(:target_word).permit(:word, :id)
     end
 end
