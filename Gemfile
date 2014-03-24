@@ -66,6 +66,7 @@ gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'twitter'
 gem 'rubyzip'
 gem 'ransack'
+gem 'natto'
 
 gem 'devise'
 gem 'omniauth'

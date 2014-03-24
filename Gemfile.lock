@@ -178,6 +178,8 @@ GEM
     multi_json (1.8.4)
     multipart-post (2.0.0)
     mysql2 (0.3.15)
+    natto (0.9.6)
+      ffi (>= 1.9.0)
     naught (1.0.0)
     net-http-digest_auth (1.4)
     net-http-persistent (2.9.4)
@@ -395,6 +397,7 @@ DEPENDENCIES
   libv8 (~> 3.11.8.13)
   mechanize
   mysql2
+  natto
   nokogiri
   omniauth
   omniauth-twitter
