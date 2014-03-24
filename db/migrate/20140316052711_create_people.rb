@@ -3,6 +3,7 @@ class CreatePeople < ActiveRecord::Migration
     create_table :people do |t|
       t.string :name
       t.string :name_type
+      t.integer :target_word_id
 
       t.timestamps
     end
