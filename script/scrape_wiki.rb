@@ -222,13 +222,11 @@ module Scrape::Wiki
   def self.save_to_database(input_hash)
     input_hash.each do |key, array|
       array.each do |value|
-        person = Person.create(name: value, name_type: 'Character')
-        person.keywords.create(word: key, is_alias: false)
-
-        #tmp = value.gsub(/(（|）)/, ' ')# => 鹿目 まどか かなめ まどか
+        #value => 鹿目 まどか (かなめ　まどか)
         tmp = value.gsub(/（.*/, '')
         tmp = tmp.gsub(/ /, '')         # => 鹿目まどか
-        #puts tmp
+        person = Person.create(name: tmp, name_display: value, name_type: 'Character')
+        person.keywords.create(word: key, is_alias: false)
 
         # keywords保存の例
         #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される
@@ -240,6 +238,7 @@ module Scrape::Wiki
         #mecab.parse('まどかだよっ！') do |n|
         #  puts n.surface # => まどか/だ/よ/っ/！　など
         #end
+        # =>パフォーマンスに問題あり？ => C++/C#
 
         person.save!
       end
