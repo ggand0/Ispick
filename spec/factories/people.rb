@@ -3,6 +3,6 @@
 FactoryGirl.define do
   factory :person do
     name "MyString"
-    type ""
+    name_type ""
   end
 end

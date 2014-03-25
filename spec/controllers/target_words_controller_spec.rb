@@ -29,6 +29,10 @@ describe TargetWordsController do
   # in order to pass any filters (e.g. authentication) defined in
   # TargetWordsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
+  let(:user) { FactoryGirl.create(:user) }
+  before do
+    sign_in user
+  end
 
   describe "GET index" do
     it "assigns all target_words as @target_words" do
@@ -64,35 +68,41 @@ describe TargetWordsController do
   describe "POST create" do
     describe "with valid params" do
       it "creates a new TargetWord" do
+        person = FactoryGirl.create(:person)
         expect {
-          post :create, {:target_word => valid_attributes}, valid_session
+          post :create, { target_word: valid_attributes, id: person.id }, valid_session
         }.to change(TargetWord, :count).by(1)
       end
 
       it "assigns a newly created target_word as @target_word" do
-        post :create, {:target_word => valid_attributes}, valid_session
+        person = FactoryGirl.create(:person)
+        post :create, { target_word: valid_attributes, id: person.id }, valid_session
         assigns(:target_word).should be_a(TargetWord)
         assigns(:target_word).should be_persisted
       end
 
-      it "redirects to the created target_word" do
-        post :create, {:target_word => valid_attributes}, valid_session
-        response.should redirect_to(TargetWord.last)
+      # ユーザの登録ワード一覧ページへリダイレクトする事
+      it "redirects to the list of target_words" do
+        person = FactoryGirl.create(:person)
+        post :create, { target_word: valid_attributes, id: person.id }, valid_session
+        response.should redirect_to(show_target_words_users_path)
       end
     end
 
     describe "with invalid params" do
       it "assigns a newly created but unsaved target_word as @target_word" do
         # Trigger the behavior that occurs when invalid params are submitted
+        person = FactoryGirl.create(:person)
         TargetWord.any_instance.stub(:save).and_return(false)
-        post :create, {:target_word => { "word" => "invalid value" }}, valid_session
+        post :create, { target_word: valid_attributes, id: person.id }, valid_session
         assigns(:target_word).should be_a_new(TargetWord)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
+        person = FactoryGirl.create(:person)
         TargetWord.any_instance.stub(:save).and_return(false)
-        post :create, {:target_word => { "word" => "invalid value" }}, valid_session
+        post :create, { target_word: valid_attributes, id: person.id }, valid_session
         response.should render_template("new")
       end
     end
