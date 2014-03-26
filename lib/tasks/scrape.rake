@@ -94,4 +94,12 @@ namespace :scrape do
     puts 'Scraping images from target websites...'
     Scrape.scrape_60min()
   end
+
+  desc "キャラクタに関する静的なDBを構築する"
+  task wiki: :environment do
+    require "#{Rails.root}/script/scrape_wiki.rb"
+    puts 'Scraping character names...'
+    Scrape::Wiki.scrape()
+  end
+
 end

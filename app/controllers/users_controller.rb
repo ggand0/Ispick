@@ -22,6 +22,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def show_target_words
+    # Test commit
+    if signed_in?
+      @words = current_user.target_words
+      render action: 'show_target_words'
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
   def show_favored_images
     if signed_in?
       # favored_imagesを表示するようにする

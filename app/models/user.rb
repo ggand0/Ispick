@@ -2,6 +2,7 @@ class User < ActiveRecord::Base
   has_many :delivered_images
   has_many :target_images
   has_many :favored_images
+  has_many :target_words
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable

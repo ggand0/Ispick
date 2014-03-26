@@ -1,6 +1,15 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  resources :target_words do
+    collection do
+      match 'search' => 'target_words#search', via: [:get, :post], as: :search
+    end
+    member do
+      get 'prefer'
+    end
+  end
+
   get "welcome/index"
 
   # Devise
@@ -14,6 +23,7 @@ Ispic::Application.routes.draw do
     collection do
       get 'home'
       get 'show_target_images'
+      get 'show_target_words'
       get 'show_favored_images'
       get 'download_favored_images'
     end
@@ -37,6 +47,11 @@ Ispic::Application.routes.draw do
 
   resources :images, only: [:index, :show, :destroy]
   resources :favored_images, only: [:show, :destroy]
+  resources :people do
+    collection do
+      match 'search' => 'people#search', via: [:get, :post], as: :search
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

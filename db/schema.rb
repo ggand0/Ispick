@@ -12,7 +12,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20140320181847) do
-
   create_table "delivered_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
@@ -62,11 +61,19 @@ ActiveRecord::Schema.define(version: 20140320181847) do
     t.datetime "data_updated_at"
   end
 
+  create_table "keywords", force: true do |t|
+    t.boolean  "is_alias"
+    t.text     "word"
+    t.integer  "person_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "people", force: true do |t|
     t.string   "name"
-    t.string   "type"
-    t.text     "aliases"
-    t.text     "keywords"
+    t.string   "name_display"
+    t.string   "name_type"
+    t.integer  "target_word_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
