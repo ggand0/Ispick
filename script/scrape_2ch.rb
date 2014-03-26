@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 require 'nokogiri'
 require 'open-uri'
+require 'kconv'
 
 
 # 2ちゃんねるから2次画像を抽出する
@@ -18,11 +19,13 @@ module Scrape::Nichan
 
     # 2ちゃんねるのスレッドのdatファイルURLを取得する
     limit = 5
-    thread_dat_url = self.get_dat_url(base_url, limit)    # 配列
+    thread_dats = self.get_dat_url(base_url, limit)    # ハッシュ
 
     # 画像URLを取得する
     img_url_array = []    # 空の配列
-    thread_dat_url.each do |url|
+    puts thread_dats.class
+    puts thread_dats[:title]
+    thread_dats[:url].each do |url|
       # datファイルの内容を文字列として取得
       dat_text = Nokogiri::HTML(open(url)).to_s
       str = "㎡"
@@ -34,16 +37,14 @@ module Scrape::Nichan
     img_url_array.uniq!
 
     # URLの配列について処理
-    img_url_array.each do |value|
-      img_title = self.get_image_name(value)      # 画像のタイトルを決定
-      printf("%s : %s\n", img_title, value)       # 出力テスト
-      if not Scrape::is_duplicate(value)           # Imageモデル生成＆DB保存
-        Scrape::save_image(img_title, value)
-      else
-        puts 'Skipping a duplicate image...'
-      end
-    end
+    # zipで2配列をiterateする：http://goo.gl/6ikMRg
+    img_url_array.zip(thread_dats[:title]).each do |url, title|
+      img_title = self.get_image_name(url)      # 画像のタイトルを決定
+      printf("%s : %s\n", title, url)           # 出力テスト
 
+      #Scrape::save_image(img_title, url)        # Imageモデル生成＆DB保存
+      Scrape::save_image(title, url)            # Imageモデル生成＆DB保存
+    end
   end
 
   # スレッドのdatファイルへのURLを新着順に取得し、配列で返す関数
@@ -53,22 +54,31 @@ module Scrape::Nichan
 
     # スレッドのURLを取得
     thread_dat_url = []    # 空の配列
+    thread_dat_title = []
     open(subject_url) do |con|
       con.each do |line|
         # datファイルのURLを配列に追加
-        if /^(.*\.dat)/ =~ line then
-          dat_url = base_url + 'dat/' + $1
+        if /^(.*\.dat)/ =~ line then        # 正規表現にその行がマッチすれば
+          dat_url = base_url + 'dat/' + $1  # マッチした文字列をurlに使用
           thread_dat_url.push(dat_url)
+
+          # "xxx.dat<>"後の文字列がタイトルであると見越して取得
+          thread_title = line.match(/.*dat<>/).post_match
+          thread_dat_title.push(thread_title.toutf8)
         end
-        return thread_dat_url if thread_dat_url.size >= limit
+
+        return { url: thread_dat_url, title: thread_dat_title } if thread_dat_url.size >= limit
       end
     end
-    thread_dat_url
+
+    { url: thread_dat_url, title: thread_dat_title }
   end
 
   # datファイルのテキストから画像のURLを取得し、配列で返す関数
   def self.get_img_url(text)
     img_url = []    # 空の配列
+    #res_text = []
+
     # jpg, png, gif形式以外ならば除外する
     img_url += text.scan(/http:\/\/.*?\.jpg/i)
     img_url += text.scan(/http:\/\/.*?\.png/i)

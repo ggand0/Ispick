@@ -102,4 +102,10 @@ namespace :scrape do
     Scrape::Wiki.scrape()
   end
 
+  desc "2chから画像抽出する"
+  task nichan: :environment do
+    require "#{Rails.root}/script/scrape_2ch.rb"
+    Scrape::Nichan.scrape()
+  end
+
 end
