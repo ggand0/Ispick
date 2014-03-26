@@ -167,4 +167,16 @@ describe TargetWordsController do
     end
   end
 
+  describe "search action" do
+    it "assigns ransack variable" do
+      get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
+      expect(assigns(:search)).to be_a(Ransack::Search)
+    end
+    it "assigns search result properly" do
+      FactoryGirl.create(:person_madoka)
+      get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
+      expect(assigns(:people).count).to eq(1)
+    end
+  end
+
 end

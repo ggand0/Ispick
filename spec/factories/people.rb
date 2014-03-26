@@ -5,4 +5,10 @@ FactoryGirl.define do
     name "MyString"
     name_type ""
   end
+
+  factory :person_madoka, class: Person do
+    name '鹿目まどか'
+    name_type 'Character'
+    name_display '鹿目 まどか（かなめ まどか）'
+  end
 end
