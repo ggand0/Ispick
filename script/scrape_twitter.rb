@@ -18,7 +18,8 @@ module Scrape::Twitter
     #keyword = "まどか"     # ハッシュタグによる検索を行う際のキーワード
 
     count = Image.count
-    # ひとまず、全ての登録済みのTargetWordに対して新着画像を取得する事にする
+    # 全ての登録済みのTargetWordに対して新着画像を取得する
+    # しかしながらTargetWord.count=10000とかになったら厳しいかも
     TargetWord.all.each do |target_word|
       keywords = []
       if target_word.person.keywords
@@ -29,6 +30,7 @@ module Scrape::Twitter
       keywords.uniq!
 
       # Person.nameで検索（e.g. "鹿目まどか"）
+      # エイリアスも含めるならkeywords.eachする
       self.scrape_with_keyword(target_word.person.name, limit)
     end
 
