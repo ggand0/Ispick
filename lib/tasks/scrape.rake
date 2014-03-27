@@ -114,4 +114,10 @@ namespace :scrape do
     Scrape::Nico.scrape()
   end
 
+  desc "ピアプロから画像抽出する"
+  task piapro: :environment do
+    require "#{Rails.root}/script/scrape_piapro.rb"
+    Scrape::Piapro.scrape()
+  end
+
 end
