@@ -20,6 +20,14 @@
   <%= link_to 'source image URL', @image.src_url %>
 </p>
 <p>
+
+<p>
+  <strong>Tags:</strong>
+  <% @image.tags.each do |tag| %>
+  <%= tag.name %>
+  <% end %>
+</p>
+<p>
   <strong>Size in bytes:</strong><br>
   <%= bytes_to_kilobytes(@image.data.size) %> KB<br>
   <%= bytes_to_megabytes(@image.data.size) %> MB<br>

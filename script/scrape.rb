@@ -54,7 +54,7 @@ module Scrape
   end
 
   # Imageモデル生成＆DB保存
-  def self.save_image(title, src_url, caption='')
+  def self.save_image(title, src_url, caption='', tags=[])
     # 重複を確認
     if self.is_duplicate(src_url)
       puts 'Skipping a duplicate image...'
@@ -65,6 +65,7 @@ module Scrape
     begin
       image = Image.new(title: title, src_url: src_url, caption: caption)
       image.image_from_url src_url
+      tags.each { |tag| image.tags << tag }
     rescue Exception => e
       # URLからImage.dataを設定するのに失敗したら諦める
       puts e
