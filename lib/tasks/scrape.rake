@@ -108,4 +108,10 @@ namespace :scrape do
     Scrape::Nichan.scrape()
   end
 
+  desc "ニコ静から画像抽出する"
+  task nico: :environment do
+    require "#{Rails.root}/script/scrape_nico.rb"
+    Scrape::Nico.scrape()
+  end
+
 end

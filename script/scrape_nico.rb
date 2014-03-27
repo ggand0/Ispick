@@ -23,8 +23,17 @@ module Scrape::Nico
     img_url = main['src'].split('?')[0]
     puts img_url
 
+    # 画像の文字情報を取得
+    title = item.css('title').first.content
+    tags = self.get_tags(html)
+    caption = html.css("meta[name='description']").attr('content')
+
     # Imageモデル生成＆DB保存
-    Scrape::save_image(item.css("title").first.content, img_url)
+    Scrape::save_image(title, img_url, caption, tags)
+  end
+
+  def self.get_tags(html)
+    html.css("a[class='tag']").map { |tag| Tag.new(name: tag.content) }
   end
 
   # ニコニコ静画。非公式RSSから新着イラストを抽出する
@@ -33,7 +42,7 @@ module Scrape::Nico
     puts 'Extracting : ' + ROOT_URL
 
     # itemタグ（イラスト）ごとに処理
-    xml.css("item").map do |item|
+    xml.css('item').map do |item|
       self.get_contents(item)
     end
   end
