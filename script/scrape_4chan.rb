@@ -16,8 +16,9 @@ module Scrape::Fourchan
     puts 'Extracting : ' + ROOT_URL
 
     # 変数
-    board = "c"   # 板の名称(タイトルではない)
-    limit = 2
+    board = 'c'   # 板の名称(タイトルではない)
+    limit = 5     # サイズが大きい画像が多くうpされている事に注意
+    image_limit = 50
 
     # スレッドの内容を取得する
     thread_id = self.get_thread_id_list(board, limit)
@@ -28,28 +29,26 @@ module Scrape::Fourchan
     puts 'count:'+image_url.length.to_s
 
     # Imageモデル生成＆DB保存
+    count = 0
     image_url.each do |value|
-      img_name = self.get_image_name(value)
-      printf("%s : %s\n", img_name, value)
+      img_name = self.get_image_name(value[:url])
+      comment = value[:com]
+      printf("%s : %s\n", img_name, value[:url])
 
-      # 4chanは１枚のサイズが大きい傾向にあるので、先に調べる
-      if not Scrape::is_duplicate(value)
-        Scrape::save_image(img_name, value)
-      else
-        puts 'Skipping a duplicate image...'
-      end
+      success = Scrape::save_image(img_name, value[:url], comment)
+      count += success ? 1 : 0
+      break if count >= image_limit
     end
-
   end
 
   # 4chan内の板の一覧(ハッシュ)を取得する関数
   def self.get_board_list()
-    url = "http://a.4cdn.org/boards.json"
+    url = 'http://a.4cdn.org/boards.json'
     json = open(url).read
     data = JSON.parse(json)
     board_list = {}
-    data["boards"].each do |value|
-      board_list[value["title"]] = value["board"]
+    data['boards'].each do |value|
+      board_list[value['title']] = value['board']
     end
     board_list    # Hash
   end
@@ -61,10 +60,8 @@ module Scrape::Fourchan
     data = JSON.parse(json)
     thread_id_list = []
     data.each do |page|
-      #thread_id_list = page["threads"].map { |value| value["no"] }
-      page["threads"].each do |thread|
-        # 上限決まってる場合は1つずつpushするしかない？
-        thread_id_list.push(thread["no"])
+      page['threads'].each do |thread|
+        thread_id_list.push(thread['no'])
         if thread_id_list.size >= limit then
           thread_is_list = thread_id_list[0, limit]
           return thread_id_list   # Array
@@ -81,7 +78,7 @@ module Scrape::Fourchan
       url = "http://a.4cdn.org/%s/res/%s.json" % [board, id]
       json = open(url).read
       data = JSON.parse(json)
-      thread_post_list.push(data["posts"])
+      thread_post_list.push(data['posts'])
     end
     thread_post_list    # Array
   end
@@ -91,9 +88,10 @@ module Scrape::Fourchan
     image_url = []
     thread_post.each do |post|
       post.each do |value|
-        if value.has_key?("tim") and value.has_key?("ext") then
-          url = "http://i.4cdn.org/%s/src/%s%s" % [board, value["tim"], value["ext"]]
-          image_url.push(url)
+        if value.has_key?('tim') and value.has_key?('ext') then
+          url = "http://i.4cdn.org/%s/src/%s%s" % [board, value['tim'], value['ext']]
+          com = value['com'] if value.has_key?('com')
+          image_url.push({ url: url, com: com })
         end
       end
     end
@@ -103,7 +101,7 @@ module Scrape::Fourchan
   # 画像の名称を決定する
   def self.get_image_name(url)
     if /.+\/(.*)?\..*/ =~ url then
-      image_name = "4chan_" + $1
+      image_name = '4chan_' + $1
       return image_name
     else
       image_name = SecureRandom.random_number(10**14)  # ランダムな14桁の数値

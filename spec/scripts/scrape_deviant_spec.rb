@@ -23,7 +23,7 @@ describe Scrape::Deviant do
   end
 
   describe "get_contents method" do
-    it "should create an image model from image source" do
+    it "should create an image model from an image source" do
       Scrape::Deviant.stub(:is_adult).and_return(false)
       count = Image.count
 
@@ -32,7 +32,7 @@ describe Scrape::Deviant do
       Image.count.should eq(count+1)
     end
 
-    it "should NOT create an image model from mature image" do
+    it "should NOT create an image model from a mature image" do
       Scrape::Deviant.stub(:is_adult).and_return(true)
       count = Image.count
 

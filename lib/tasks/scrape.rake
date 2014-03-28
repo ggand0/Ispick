@@ -102,4 +102,31 @@ namespace :scrape do
     Scrape::Wiki.scrape()
   end
 
+  # ----------------------------------
+  # 以下、１つのサイトから画像抽出するタスク
+  # ----------------------------------
+  desc "2chから画像抽出する"
+  task nichan: :environment do
+    require "#{Rails.root}/script/scrape_2ch.rb"
+    Scrape::Nichan.scrape()
+  end
+
+  desc "ニコ静から画像抽出する"
+  task nico: :environment do
+    require "#{Rails.root}/script/scrape_nico.rb"
+    Scrape::Nico.scrape()
+  end
+
+  desc "ピアプロから画像抽出する"
+  task piapro: :environment do
+    require "#{Rails.root}/script/scrape_piapro.rb"
+    Scrape::Piapro.scrape()
+  end
+
+  desc "4chanから画像抽出する"
+  task fchan: :environment do
+    require "#{Rails.root}/script/scrape_4chan.rb"
+    Scrape::Fourchan.scrape()
+  end
+
 end
