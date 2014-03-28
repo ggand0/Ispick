@@ -5,9 +5,9 @@ require 'open-uri'
 module Scrape::Deviant
   # Use official api
   # boost%3Apopular : 人気順
-  # max_age%3A24h : 24時間以内のimage
-  # in%3Amanga : mangaカテゴリ内のimage
-  # 後はここを参照：http://b.hatena.ne.jp/pentiumx/deviantart/
+  # max_age%3A24h   : 24時間以内のimage
+  # in%3Amanga      : mangaカテゴリ内のimage
+  # document        : http://b.hatena.ne.jp/pentiumx/deviantart/
   ROOT_URL = 'http://backend.deviantart.com/rss.xml?type=deviation&q=boost%3Apopular+max_age%3A24h+in%3Amanga%2Fdigital+anime'
 
   def self.is_adult(html)
@@ -29,17 +29,21 @@ module Scrape::Deviant
       return
     end
 
-    if self.is_adult(html)
-      return
-    end
+    # アダルト画像は除外
+    return if self.is_adult(html)
 
     # "dev-content-full"とdev-content-normal"で２種類画像ソースが用意されているようだ
-    main = html.css("img[class='dev-content-full']").first
+    main = html.css("img[class='dev-content-normal']").first
     img_url = main['src']
+    title = html.css('title').first.content
+    caption = html.css("meta[name='description']").attr('content')
+    tag_string = html.css("meta[name='keywords']").attr('content').content
+    tags = tag_string.split(', ')
+    tags = tags.map { |tag| Tag.new(name: tag) }
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrape::save_image(title, img_url)
+    Scrape::save_image(title, img_url, caption, tags)
   end
 
   def self.scrape()
