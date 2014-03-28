@@ -58,7 +58,7 @@ module Scrape
     # 重複を確認
     if self.is_duplicate(src_url)
       puts 'Skipping a duplicate image...'
-      return
+      return false
     end
 
     # 新規レコードを作成
@@ -69,7 +69,7 @@ module Scrape
     rescue Exception => e
       # URLからImage.dataを設定するのに失敗したら諦める
       puts e
-      return
+      return false
     end
 
     # DBに保存する
@@ -81,10 +81,12 @@ module Scrape
       else
         Rails.logger.info('Image model saving failed.')
         puts 'Image model saving failed.'
+        return false
       end
     rescue Exception => e
       puts e
+      return false
     end
-
+    true
   end
 end

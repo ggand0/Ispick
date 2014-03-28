@@ -17,7 +17,8 @@ module Scrape::Fourchan
 
     # 変数
     board = 'c'   # 板の名称(タイトルではない)
-    limit = 2     # サイズが大きい画像が多くうpされている事に注意
+    limit = 5     # サイズが大きい画像が多くうpされている事に注意
+    image_limit = 50
 
     # スレッドの内容を取得する
     thread_id = self.get_thread_id_list(board, limit)
@@ -28,12 +29,15 @@ module Scrape::Fourchan
     puts 'count:'+image_url.length.to_s
 
     # Imageモデル生成＆DB保存
+    count = 0
     image_url.each do |value|
       img_name = self.get_image_name(value[:url])
       comment = value[:com]
       printf("%s : %s\n", img_name, value[:url])
 
-      Scrape::save_image(img_name, value[:url], comment)
+      success = Scrape::save_image(img_name, value[:url], comment)
+      count += success ? 1 : 0
+      break if count >= image_limit
     end
   end
 
@@ -56,9 +60,7 @@ module Scrape::Fourchan
     data = JSON.parse(json)
     thread_id_list = []
     data.each do |page|
-      #thread_id_list = page["threads"].map { |value| value["no"] }
       page['threads'].each do |thread|
-        # 上限決まってる場合は1つずつpushするしかない？
         thread_id_list.push(thread['no'])
         if thread_id_list.size >= limit then
           thread_is_list = thread_id_list[0, limit]
