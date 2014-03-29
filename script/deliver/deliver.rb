@@ -37,7 +37,7 @@ module Deliver
   end
 
   # User.delivered_imagesへ追加
-  def self.deliver_images(user, images)
+  def self.deliver_images(user, images, target)
     c = 0
     images.each do |im|
       image = DeliveredImage.create(
@@ -46,7 +46,8 @@ module Deliver
         src_url: im.src_url,
         data: im.data
       )
-      im.tags.each { |tag| image.tags << tag }
+      #im.tags.each { |tag| image.tags << tag }
+      image.targetable = target# target_image / target_word
       if image
         user.delivered_images << image# ここがcritical
         user.save
@@ -60,7 +61,7 @@ module Deliver
   def self.limit_images(user, images)
     # 既に配信済みの画像である場合はskip
     images.reject! do |x|
-      puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
+      #puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
       user.delivered_images.any?{ |d| d.src_url == x.src_url }
     end
     puts 'Unique images: ' + images.count.to_s
@@ -88,7 +89,7 @@ module Deliver
 
     images = self.limit_images(user, images)
 
-    self.deliver_images(user, images)
+    self.deliver_images(user, images, target_word)
 
     puts target_word
     # 最終配信日時を記録
