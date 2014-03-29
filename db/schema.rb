@@ -60,6 +60,10 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "view_nums"
+    t.datetime "posted_time"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
