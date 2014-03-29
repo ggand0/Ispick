@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.text     "src_url"
     t.integer  "user_id"
     t.integer  "favored_image_id"
+    t.integer  "targetable_id"
+    t.string   "targetable_type"
     t.boolean  "favored"
     t.boolean  "avoided"
     t.datetime "created_at"
