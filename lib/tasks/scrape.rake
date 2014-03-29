@@ -129,4 +129,9 @@ namespace :scrape do
     Scrape::Fourchan.scrape()
   end
 
+  desc "Twitterから画像抽出する"
+  task twitter: :environment do
+    require "#{Rails.root}/script/scrape_twitter.rb"
+    Scrape::Twitter.scrape()
+  end
 end

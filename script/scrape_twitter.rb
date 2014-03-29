@@ -31,6 +31,7 @@ module Scrape::Twitter
 
       # Person.nameで検索（e.g. "鹿目まどか"）
       # エイリアスも含めるならkeywords.eachする
+      puts target_word.person.name
       self.scrape_with_keyword(target_word.person.name, limit)
     end
 
@@ -52,10 +53,10 @@ module Scrape::Twitter
 
     # Imageモデル生成＆DB保存
     image_url.each do |value|
-      img_name = self.get_image_name(value)
-      puts "#{img_name} : #{value}"
-      if not Scrape::is_duplicate(value)
-        Scrape::save_image(img_name, value)
+      img_name = self.get_image_name(value[:url])
+      puts "#{img_name} : #{value[:url]}"
+      if not Scrape::is_duplicate(value[:url])
+        Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
       else
         puts 'Skipping a duplicate image...'
       end
@@ -72,7 +73,7 @@ module Scrape::Twitter
         # entities内にメディア(画像等)を含む場合の処理
         if tweet.media? then
           tweet.media.each do |value|
-              image_url.push(value.media_uri.to_s)
+            image_url.push({ url: value.media_uri.to_s, caption: tweet.text })
           end
         end
       end

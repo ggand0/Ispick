@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.text     "src_url"
     t.integer  "user_id"
     t.integer  "favored_image_id"
+    t.integer  "targetable_id"
+    t.string   "targetable_type"
     t.boolean  "favored"
     t.boolean  "avoided"
     t.datetime "created_at"
@@ -101,6 +103,7 @@ ActiveRecord::Schema.define(version: 20140327034657) do
   create_table "target_words", force: true do |t|
     t.string   "word"
     t.integer  "user_id"
+    t.datetime "last_delivered_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

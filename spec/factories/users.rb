@@ -20,12 +20,30 @@ FactoryGirl.define do
       end
     end
 
+    factory :user_with_delivered_images_nofile do
+      ignore do
+        images_count 1
+      end
+      after(:create) do |user, evaluator|
+        create_list(:delivered_image, evaluator.images_count, user: user)
+      end
+    end
+
     factory :user_with_target_images do
       ignore do
         images_count 5
       end
       after(:create) do |user, evaluator|
         create_list(:target_image, evaluator.images_count, user: user)
+      end
+    end
+
+    factory :user_with_target_words do
+      ignore do
+        words_count 5
+      end
+      after(:create) do |user, evaluator|
+        create_list(:target_word, evaluator.words_count, user: user)
       end
     end
 

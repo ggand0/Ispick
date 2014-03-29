@@ -2,7 +2,6 @@
 
 FactoryGirl.define do
   factory :tag do
-    name "MyString"
-    image_id 1
+    name '鹿目まどか'
   end
 end
