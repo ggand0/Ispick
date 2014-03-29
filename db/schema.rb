@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(version: 20140327034657) do
   create_table "target_words", force: true do |t|
     t.string   "word"
     t.integer  "user_id"
+    t.datetime "last_delivered_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
