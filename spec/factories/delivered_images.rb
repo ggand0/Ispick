@@ -4,7 +4,8 @@ FactoryGirl.define do
   factory :delivered_image do
     title "MyText"
     caption "MyText"
-    src_url "MyText"
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+    association :user, factory: :twitter_user, strategy: :build
   end
 
   factory :delivered_image_file, class: DeliveredImage do
@@ -14,7 +15,7 @@ FactoryGirl.define do
     favored false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
-    #association :twitter_user
+
     association :user, factory: :twitter_user, strategy: :build
   end
 

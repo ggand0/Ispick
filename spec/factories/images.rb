@@ -13,7 +13,7 @@ FactoryGirl.define do
   factory :image do
     title 'test'
     caption 'test'
-    sequence(:src_url) { |n| "test#{n}.com" }
+    sequence(:src_url) { |n| "test#{n}@example.com" }
     sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
 
     factory :image_with_tags do

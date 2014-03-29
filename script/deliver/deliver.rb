@@ -36,11 +36,10 @@ module Deliver
     image.title.include?(word) or image.caption.include?(word)
   end
 
+  # User.delivered_imagesへ追加
   def self.deliver_images(user, images)
-    # User.delivered_imagesへ追加
     c = 0
-    images.each do |i|
-      im = i[:image]
+    images.each do |im|
       image = DeliveredImage.create(
         title: im.title,
         caption: im.caption,
@@ -53,14 +52,16 @@ module Deliver
         user.save
       end
       c += 1
-      puts '- Creating delivered_images:' + c.to_s + ' / ' + images.count.to_s if c % 10 == 0
+      puts '- Creating delivered_images:' + c.to_s + ' / ' +
+        images.count.to_s if c % 10 == 0
     end
   end
 
   def self.limit_images(user, images)
     # 既に配信済みの画像である場合はskip
     images.reject! do |x|
-      user.delivered_images.any?{ |d| d.src_url == x[:image].src_url }
+      puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
+      user.delivered_images.any?{ |d| d.src_url == x.src_url }
     end
     puts 'Unique images: ' + images.count.to_s
 

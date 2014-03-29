@@ -45,11 +45,37 @@ describe "Deliver" do
   end
 
   describe "limit_images function" do
+    it "rejects an image when it already exists" do
+      images = [ FactoryGirl.create(:image) ]
+      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
+      count = images.count
 
+      images = Deliver.limit_images(user, images)
+      expect(images.count).to eq(0)
+    end
+
+    it "limits images when its count excess max num" do
+      stub_const('Deliver::MAX_DELIVER_NUM', 1)
+      images = FactoryGirl.create_list(:image, 3)
+      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
+
+      images = Deliver.limit_images(user, images)
+      expect(images.count).to eq(1)
+    end
+
+    it "does nothing else" do
+
+    end
   end
 
   describe "deliver_images function" do
+    it "adds images to user.delivered_images" do
+      images = FactoryGirl.create_list(:image, 3)
+      user = FactoryGirl.create(:twitter_user)
 
+      Deliver.deliver_images(user, images)
+      expect(user.delivered_images.count).to eq(images.count)
+    end
   end
 
   describe "deliver_from_word function" do
