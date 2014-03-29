@@ -19,7 +19,21 @@
   <strong>Source URL:</strong>
   <%= link_to 'source image URL', @image.src_url %>
 </p>
+
 <p>
+  <strong>Page URL:</strong>
+  <%= link_to 'source page URL', @image.page_url.html_safe %>
+</p>
+
+<p>
+  <strong>Views:</strong>
+  <%= @image.view_nums %>
+</p>
+
+<p>
+  <strong>Posted at:</strong>
+  <%= @image.posted_time %>
+</p>
 
 <p>
   <strong>Tags:</strong>
