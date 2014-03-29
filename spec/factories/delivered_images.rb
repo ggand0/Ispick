@@ -8,6 +8,22 @@ FactoryGirl.define do
     association :user, factory: :twitter_user, strategy: :build
   end
 
+  factory :delivered_image_from_word, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+    association :user, factory: :twitter_user, strategy: :build
+    association :targetable, factory: :target_word
+  end
+
+  factory :delivered_image_from_image, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+    association :user, factory: :twitter_user, strategy: :build
+    association :targetable, factory: :target_image
+  end
+
   factory :delivered_image_file, class: DeliveredImage do
     title "MyText"
     caption "MyText"
