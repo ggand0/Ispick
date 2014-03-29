@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :target_word do
-    word "MyString"
+    word '鹿目 まどか（かなめ まどか）'
   end
 end
