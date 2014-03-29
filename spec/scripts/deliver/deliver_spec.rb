@@ -4,10 +4,11 @@ require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 describe "Deliver" do
+  before do
+    IO.any_instance.stub(:puts)
+  end
+
   describe "delete_excessed_records" do
-    before do
-      #IO.any_instance.stub(:puts)
-    end
     it "delete images properly" do
       FactoryGirl.create(:user_with_delivered_images, images_count: 5)
       images = User.first.delivered_images
@@ -70,10 +71,11 @@ describe "Deliver" do
 
   describe "deliver_images function" do
     it "adds images to user.delivered_images" do
+      target_word = FactoryGirl.create(:target_word)  # 仮にtarget_wordとする
       images = FactoryGirl.create_list(:image, 3)
       user = FactoryGirl.create(:twitter_user)
 
-      Deliver.deliver_images(user, images)
+      Deliver.deliver_images(user, images, target_word)
       expect(user.delivered_images.count).to eq(images.count)
     end
   end
