@@ -4,6 +4,7 @@ class CreateImages < ActiveRecord::Migration
       t.text :title
       t.text :caption
       t.text :src_url
+      t.attachment :data
 
       t.timestamps
     end

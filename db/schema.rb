@@ -17,6 +17,10 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
     t.integer  "user_id"
     t.integer  "favored_image_id"
     t.integer  "targetable_id"
@@ -25,10 +29,6 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.boolean  "avoided"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "data_file_name"
-    t.string   "data_content_type"
-    t.integer  "data_file_size"
-    t.datetime "data_updated_at"
   end
 
   create_table "favored_images", force: true do |t|
@@ -36,12 +36,12 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.text     "caption"
     t.text     "src_url"
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "features", force: true do |t|
@@ -56,12 +56,12 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "keywords", force: true do |t|
@@ -90,14 +90,14 @@ ActiveRecord::Schema.define(version: 20140327034657) do
 
   create_table "target_images", force: true do |t|
     t.text     "title"
-    t.integer  "user_id"
-    t.datetime "last_delivered_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+    t.integer  "user_id"
+    t.datetime "last_delivered_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "target_words", force: true do |t|
