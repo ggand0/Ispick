@@ -24,18 +24,18 @@ module Scrape::Fourchan
     thread_id = self.get_thread_id_list(board, limit)
     puts thread_id.length.to_s
     thread_post = self.get_thread_post_list(board, thread_id)
-    puts thread_post.length.to_s
     image_url = self.get_image_url_list(board, thread_post)
     puts 'count:'+image_url.length.to_s
 
     # Imageモデル生成＆DB保存
     count = 0
     image_url.each do |value|
-      img_name = self.get_image_name(value[:url])
-      comment = value[:com]
-      printf("%s : %s\n", img_name, value[:url])
+      img_name = self.get_image_name(value[:src_url])
+      value[:title] = img_name
+      printf("%s : %s\n", img_name, value[:src_url])
 
-      success = Scrape::save_image(img_name, value[:url], comment)
+      # image_limitの枚数分抽出する
+      success = Scrape::save_image(value)
       count += success ? 1 : 0
       break if count >= image_limit
     end
@@ -59,6 +59,7 @@ module Scrape::Fourchan
     json = open(url).read
     data = JSON.parse(json)
     thread_id_list = []
+
     data.each do |page|
       page['threads'].each do |thread|
         thread_id_list.push(thread['no'])
@@ -78,20 +79,41 @@ module Scrape::Fourchan
       url = "http://a.4cdn.org/%s/res/%s.json" % [board, id]
       json = open(url).read
       data = JSON.parse(json)
-      thread_post_list.push(data['posts'])
+      thread_post_list.push({ posts: data['posts'], id: id })
     end
     thread_post_list    # Array
   end
 
   # スレッドの内容の配列から画像URLを取得する関数
+  # @thread_post : postsとthread_id属性を持ったHash
   def self.get_image_url_list(board, thread_post)
     image_url = []
     thread_post.each do |post|
-      post.each do |value|
+      post[:posts].each do |value|
         if value.has_key?('tim') and value.has_key?('ext') then
           url = "http://i.4cdn.org/%s/src/%s%s" % [board, value['tim'], value['ext']]
           com = value['com'] if value.has_key?('com')
-          image_url.push({ url: url, com: com })
+
+          # 投稿日時を取得する
+          time_string = value['now']                   # 03\/24\/14(Mon)16:09
+          date = time_string.match(/.*\(/).to_s.delete!('(').split('/')  # 03, 24, 14
+          month = date[0].to_i
+          day = date[1].to_i
+          year = ('20'+date[2]).to_i
+          hour = time_string.match(/\d\d:/).to_s.delete!(':').to_i
+          min = time_string.match(/:\d\d/).to_s.delete!(':').to_i
+          posted_at = Time.mktime(year, month, day, hour, min).in_time_zone('Asia/Tokyo').utc
+
+          image_data = {
+            src_url: url,
+            # e.g. 'http://boards.4chan.org/c/res/2166071'
+            page_url: "http://boards.4chan.org/%s/res/%d" % [board, post[:id]],
+            caption: com,
+            posted_time: posted_at
+          }
+
+          #image_url.push({ url: url, com: com })
+          image_url.push(image_data)
         end
       end
     end
