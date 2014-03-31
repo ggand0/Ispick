@@ -2,14 +2,14 @@
 require "#{Rails.root}/app/workers/images_face"
 
 module Scrape
-  require "#{Rails.root}/script/scrape_nico"
-  require "#{Rails.root}/script/scrape_piapro"
-  require "#{Rails.root}/script/scrape_pixiv"
-  require "#{Rails.root}/script/scrape_deviant"
-  require "#{Rails.root}/script/scrape_futaba"
-  require "#{Rails.root}/script/scrape_2ch"
-  require "#{Rails.root}/script/scrape_4chan"
-  require "#{Rails.root}/script/scrape_twitter"
+  require "#{Rails.root}/script/scrape/scrape_nico"
+  require "#{Rails.root}/script/scrape/scrape_piapro"
+  require "#{Rails.root}/script/scrape/scrape_pixiv"
+  require "#{Rails.root}/script/scrape/scrape_deviant"
+  require "#{Rails.root}/script/scrape/scrape_futaba"
+  require "#{Rails.root}/script/scrape/scrape_2ch"
+  require "#{Rails.root}/script/scrape/scrape_4chan"
+  require "#{Rails.root}/script/scrape/scrape_twitter"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()

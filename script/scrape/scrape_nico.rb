@@ -1,9 +1,7 @@
 # coding: utf-8
 require 'open-uri'
-require "#{Rails.root}/script/scrape/niconico"
 
 module Scrape::Nico
-  include NicovideoAPIWrapper
 
   # ニコ静RSS(非公式)
   ROOT_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
@@ -12,7 +10,6 @@ module Scrape::Nico
     # 元ページを開く
     begin
       page_url = item.css('link').first.content
-      #page = agent.get('http://seiga.nicovideo.jp/seiga/im3881051')
       page = agent.get(page_url)
     rescue Exception => e
       # ログイン求められて失敗した時用
@@ -22,9 +19,6 @@ module Scrape::Nico
     end
 
     # 画像のソースurlを探して格納
-    # id名が「illust_area」であるtableタグを探し、その中にあるタグをさらに降りていく
-    #main = html.css("table[id='illust_area'] tr td img").first
-    #img_url = main['src'].split('?')[0]
     src_url = page.at("meta[@property='og:image']").attr('content')
     puts src_url
 

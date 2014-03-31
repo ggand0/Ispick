@@ -52,7 +52,7 @@ namespace :scrape do
 
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape"
+    require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_all()
 
     # 全Imageに対して顔の特徴抽出処理を行う
@@ -64,13 +64,13 @@ namespace :scrape do
   task images: :environment do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape"
+    require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_all()
   end
 
 
   # 以下、whenever用タスク
-  require "#{Rails.root}/script/scrape"
+  require "#{Rails.root}/script/scrape/scrape"
   desc "every 5 min"
   task min5: :environment do
     puts 'Scraping images from target websites...'
@@ -97,7 +97,7 @@ namespace :scrape do
 
   desc "キャラクタに関する静的なDBを構築する"
   task wiki: :environment do
-    require "#{Rails.root}/script/scrape_wiki.rb"
+    require "#{Rails.root}/script/scrape/scrape_wiki.rb"
     puts 'Scraping character names...'
     Scrape::Wiki.scrape()
   end
@@ -107,31 +107,31 @@ namespace :scrape do
   # ----------------------------------
   desc "2chから画像抽出する"
   task nichan: :environment do
-    require "#{Rails.root}/script/scrape_2ch.rb"
+    require "#{Rails.root}/script/scrape/scrape_2ch.rb"
     Scrape::Nichan.scrape()
   end
 
   desc "ニコ静から画像抽出する"
   task nico: :environment do
-    require "#{Rails.root}/script/scrape_nico.rb"
+    require "#{Rails.root}/script/scrape/scrape_nico.rb"
     Scrape::Nico.scrape()
   end
 
   desc "ピアプロから画像抽出する"
   task piapro: :environment do
-    require "#{Rails.root}/script/scrape_piapro.rb"
+    require "#{Rails.root}/script/scrape/scrape_piapro.rb"
     Scrape::Piapro.scrape()
   end
 
   desc "4chanから画像抽出する"
   task fchan: :environment do
-    require "#{Rails.root}/script/scrape_4chan.rb"
+    require "#{Rails.root}/script/scrape/scrape_4chan.rb"
     Scrape::Fourchan.scrape()
   end
 
   desc "Twitterから画像抽出する"
   task twitter: :environment do
-    require "#{Rails.root}/script/scrape_twitter.rb"
+    require "#{Rails.root}/script/scrape/scrape_twitter.rb"
     Scrape::Twitter.scrape()
   end
 end
