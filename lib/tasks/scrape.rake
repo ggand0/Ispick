@@ -129,6 +129,12 @@ namespace :scrape do
     Scrape::Fourchan.scrape()
   end
 
+  desc "2chanから画像抽出する"
+  task futaba: :environment do
+    require "#{Rails.root}/script/scrape/scrape_futaba.rb"
+    Scrape::Futaba.scrape()
+  end
+
   desc "Twitterから画像抽出する"
   task twitter: :environment do
     require "#{Rails.root}/script/scrape/scrape_twitter.rb"
