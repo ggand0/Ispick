@@ -67,6 +67,7 @@ gem 'twitter'
 gem 'rubyzip'
 gem 'ransack'
 gem 'natto'
+gem 'x2ch'
 
 gem 'devise'
 gem 'omniauth'
