@@ -68,6 +68,8 @@ gem 'rubyzip'
 gem 'ransack'
 gem 'natto'
 gem 'x2ch'
+#gem 'futaba', git: 'https://github.com/co-me/futaba'
+gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 
 gem 'devise'
 gem 'omniauth'
