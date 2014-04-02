@@ -11,7 +11,7 @@ describe Scrape do
     it "runs all scraping script" do
       Scrape::Nico.stub(:scrape).and_return()
       Scrape::Piapro.stub(:scrape).and_return()
-      Scrape::Pixiv.stub(:scrape).and_return()
+      #Scrape::Pixiv.stub(:scrape).and_return()
       Scrape::Deviant.stub(:scrape).and_return()
       Scrape::Futaba.stub(:scrape).and_return()
       Scrape::Nichan.stub(:scrape).and_return()
@@ -20,7 +20,7 @@ describe Scrape do
 
       Scrape::Nico.should_receive(:scrape)
       Scrape::Piapro.should_receive(:scrape)
-      Scrape::Pixiv.should_receive(:scrape)
+      #Scrape::Pixiv.should_receive(:scrape)
       Scrape::Deviant.should_receive(:scrape)
       Scrape::Futaba.should_receive(:scrape)
       Scrape::Nichan.should_receive(:scrape)
@@ -54,9 +54,9 @@ describe Scrape do
       Scrape.scrape_30min()
     end
     it "runs all scraping script in _60min function" do
-      Scrape::Pixiv.stub(:scrape).and_return()
+      #Scrape::Pixiv.stub(:scrape).and_return()
       Scrape::Deviant.stub(:scrape).and_return()
-      Scrape::Pixiv.should_receive(:scrape)
+      #Scrape::Pixiv.should_receive(:scrape)
       Scrape::Deviant.should_receive(:scrape)
       Scrape.scrape_60min()
     end

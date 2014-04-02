@@ -15,7 +15,7 @@ module Scrape
   def self.scrape_all()
     Scrape::Nico.scrape()
     Scrape::Piapro.scrape()
-    Scrape::Pixiv.scrape()
+    #Scrape::Pixiv.scrape()
     Scrape::Deviant.scrape()
     Scrape::Futaba.scrape()
     Scrape::Nichan.scrape()
@@ -43,7 +43,7 @@ module Scrape
   end
 
   def self.scrape_60min()
-    Scrape::Pixiv.scrape()
+    #Scrape::Pixiv.scrape()
     Scrape::Deviant.scrape()
     puts 'DONE!!'
   end
