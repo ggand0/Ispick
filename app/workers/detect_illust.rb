@@ -4,11 +4,14 @@ class DetectIllust
 
   def self.perform(image_id)
     image = Image.find(image_id)
-    tool_path = "#{Rails.root}/lib/opencv"
+    tool_path = "#{Rails.root}/lib/opencv.exe"
 
     # イラストかどうか判定する
+    puts image.data.path
     illust = %x(#{tool_path} #{image.data.path} 2>&1)
-    image.update_attribute(is_illust: (illust == 1 ? true : false))
+    puts illust
+    is_illust = (illust == 1 ? true : false)
+    image.update_attributes({is_illust: is_illust})
 
     puts 'ILLUST DETECTION DONE!'
   end
