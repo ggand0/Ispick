@@ -1,5 +1,5 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrape"
+require "#{Rails.root}/script/scrape/scrape"
 
 describe Scrape::Nico do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
