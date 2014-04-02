@@ -4,6 +4,7 @@ class CreateDeliveredImages < ActiveRecord::Migration
       t.text :title
       t.text :caption
       t.text :src_url
+      t.attachment :data
       t.integer :user_id
       t.integer :favored_image_id
       t.integer :targetable_id

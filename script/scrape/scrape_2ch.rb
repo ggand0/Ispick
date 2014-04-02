@@ -2,7 +2,8 @@
 require 'nokogiri'
 require 'open-uri'
 require 'kconv'
-
+require 'x2ch'
+include X2CH
 
 # 2ちゃんねるから2次画像を抽出する
 module Scrape::Nichan
@@ -15,17 +16,60 @@ module Scrape::Nichan
     puts 'Extracting : ' + ROOT_URL
 
     # 2ちゃんねるのベースURL
-    #base_url = 'http://toro.2ch.net/illustrator/'    # イラストレータ板
-    boards = [
-      'http://toro.2ch.net/illustrator/',    # イラストレータ板
-      'http://toro.2ch.net/anime/'            # アニメ板
-    ]
+
 
     # 2ちゃんねるのスレッドのdatファイルURLを取得する
+    bbs = Bbs.load
+    boards = [
+      #'http://toro.2ch.net/illustrator/',    # イラストレータ板
+      #'http://toro.2ch.net/anime/'            # アニメ板
+      bbs['漫画・小説等']['イラストレーター'],
+      bbs['漫画・小説等']['アニメ２']
+    ]
     limit = 5
-    boards.each do |board_url|
-      self.scrape_board(board_url, limit)
+    image_data = []
+    count = 0
+    boards.each do |board|
+      count = 0
+      board.threads.each do |thread|
+        #puts thread.url   # http://ikura.2ch.net/anime2/
+        #puts thread.dat   # 9246366142.dat
+        #puts thread.name  # 各関係者様
+        #puts thread.num   # 1
+
+        thread.each do |post|
+          #puts "#{post.name} <> #{post.mail} <> #{post.metadata} <> #{post.body}"
+          metadata = post.metadata
+          metadata.gsub!(/ ID:.*|¥..*|¥(.*¥)/, '') # => 2014/03/31 03:02:12
+          posted_at = DateTime.parse(metadata).change(offset: '+0900').utc
+
+          extensions = ['jpg', 'png', 'gif']
+          extensions.each do |ext|
+            urls = post.body.to_s.scan(/http:\/\/.*?\.#{ext}/i)
+            urls.each do |src_url|
+              info = {
+                title: self.get_image_name(src_url),
+                caption: post.body.to_s,
+                src_url: src_url,
+                page_url: thread.url+'dat/'+thread.dat,
+                site_name: '2ch',
+                posted_time: posted_at
+              }
+              image_data.push(info)
+
+              printf("%s : %s\n", info[:title], info[:src_url])
+              Scrape::save_image(info)
+            end
+          end
+        end
+        break if count >= limit
+        count += 1
+      end
     end
+
+    #boards.each do |board_url|
+    #  self.scrape_board(board_url, limit)
+    #end
   end
 
   def self.scrape_board(board_url, limit)
@@ -86,6 +130,26 @@ module Scrape::Nichan
 
   # datファイルのテキストから画像のURLを取得し、配列で返す関数
   def self.get_img_url(text)
+    #puts text
+    #puts text.split('<>').count
+    posts = []
+    puts text.toutf8
+    dsf
+    text.toutf8.each_line do |l|
+      puts l
+      m = l.match(/^(\d+)<>(.+?)<>(.*?)<>(.*?)<>(.+)<>.*$/).to_a
+      if m[0]
+        posts << Post.new(m[2], m[3], m[4], m[5])
+      else
+        m = l.match(/^(.+?)<>(.*?)<>(.*?)<>(.+)<>.*$/).to_a
+        if m[0]
+          posts << Post.new(m[1], m[2], m[3], m[4])
+        end
+      end
+    end
+    puts posts
+    fds
+
     img_url = []    # 空の配列
 
     # jpg, png, gif形式以外ならば除外する

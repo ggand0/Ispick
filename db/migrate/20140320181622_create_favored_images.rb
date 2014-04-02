@@ -5,6 +5,7 @@ class CreateFavoredImages < ActiveRecord::Migration
       t.text :caption
       t.text :src_url
       t.integer :user_id
+      t.attachment :data
 
       t.timestamps
     end

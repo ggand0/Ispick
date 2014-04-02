@@ -1,6 +1,6 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrape"
-require "#{Rails.root}/script/scrape_wiki"
+require "#{Rails.root}/script/scrape/scrape"
+require "#{Rails.root}/script/scrape/scrape_wiki"
 include Scrape::Wiki
 
 describe "Scrape" do

@@ -10,7 +10,7 @@ module Scrape::Pixiv
   ROOT_URL = "http://spapi.pixiv.net/iphone/search.php?s_mode=s_tag&word=%E3%81%BE%E3%81%A9%E3%81%8B%E3%82%8F%E3%81%84%E3%81%84&PHPSESSID=0"
 
   def self.get_contents(row)
-    items = row.split(",")
+    items = row.split(',')
     illust_id = items[0]
     illust_id = illust_id.gsub(/[^0-9A-Za-z]/, '')  # double quoteを除外
     title = items[3].force_encoding("UTF-8")        # encode()ではエラー
@@ -21,7 +21,12 @@ module Scrape::Pixiv
     puts img_url
 
     # Imageモデル生成＆DB保存
-    Scrape::save_image(title.encode("UTF-8"), img_url, caption)
+    image_data = {
+      title: title.encode('UTF-8'),
+      caption: caption,
+      src_url: img_url
+    }
+    Scrape::save_image(image_data)
   end
 
   # 返ってきた文字列から割と強引に抽出する

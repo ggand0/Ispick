@@ -6,6 +6,7 @@ SimpleCov.start do
   add_filter '/script/pixiv'
   add_filter '/lib/tasks'
   add_filter 'config/initializers/reload_lib'
+  add_filter 'config/initializers/teaspoon'
   add_filter '/spec/support'
 end
 

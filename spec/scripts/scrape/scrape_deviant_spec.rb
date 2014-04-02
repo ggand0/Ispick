@@ -1,5 +1,5 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrape"
+require "#{Rails.root}/script/scrape/scrape"
 
 describe Scrape::Deviant do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
@@ -23,12 +23,18 @@ describe Scrape::Deviant do
   end
 
   describe "get_contents method" do
+    before do
+      @image_data = {
+        title: 'test',
+        page_url: 'http://www.deviantart.com/art/Crossing-4-437129901'
+      }
+    end
+
     it "should create an image model from an image source" do
       Scrape::Deviant.stub(:is_adult).and_return(false)
       count = Image.count
 
-      url = 'http://www.deviantart.com/art/Crossing-4-437129901'
-      Scrape::Deviant.get_contents(url, 'test')
+      Scrape::Deviant.get_contents(@image_data)
       Image.count.should eq(count+1)
     end
 
@@ -37,7 +43,7 @@ describe Scrape::Deviant do
       count = Image.count
 
       url = 'http://www.deviantart.com/art/Crossing-4-437129901'
-      Scrape::Deviant.get_contents(url, 'test')
+      Scrape::Deviant.get_contents(@image_data)
       Image.count.should eq(count)
     end
 
@@ -47,7 +53,7 @@ describe Scrape::Deviant do
       Scrape.should_not_receive(:save_image)
 
       url = 'not_existed_url'
-      Scrape::Deviant.get_contents(url, 'test')
+      Scrape::Deviant.get_contents({title: 'test', src_url: url})
     end
   end
 

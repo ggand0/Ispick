@@ -2,7 +2,8 @@
 require 'nokogiri'
 require 'open-uri'
 require 'kconv'
-
+require 'futaba'
+#require "#{Rails.root}/lib/futaba"
 
 # ふたばちゃんねるから2次画像を抽出する
 module Scrape::Futaba
@@ -14,6 +15,30 @@ module Scrape::Futaba
   def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
+    board = Futaba::Board.new('http://dat.2chan.net/img2/')
+    threads = board.catalog.threads()
+    threads.each do |thread|
+      thread.posts().each do |post|
+        #puts "#{post.title} #{post.date} #{post.image} #{post.body} "
+        if post.image
+          image_data = {
+            title: post.title,
+            caption: post.body,
+            site_name: '2chan',
+            src_url: post.image.uri,
+            page_url: thread.uri,
+            posted_time: post.date
+          }
+          puts printf("%s : %s", image_data[:site_name], image_data[:src_url])
+          Scrape::save_image(image_data)
+        end
+      end
+    end
+
+    # self.scrape_board()
+  end
+
+  def self.scrape_board()
     # 画像URLを取得する
     url = 'http://dat.2chan.net/img2/futaba.htm'
     html = Nokogiri::HTML(open(url))
@@ -47,11 +72,7 @@ module Scrape::Futaba
       puts printf("%s : %s", img_title, value)
 
       # Imageモデル生成＆DB保存
-      if not Scrape::is_duplicate(value)
-        Scrape::save_image(img_title, value)
-      else
-        puts 'Skipping a duplicate image...'
-      end
+      Scrape::save_image(img_title, value)
     end
   end
 

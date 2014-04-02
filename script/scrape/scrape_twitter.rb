@@ -49,14 +49,14 @@ module Scrape::Twitter
     end
 
     # キーワードを含むハッシュタグの検索
-    image_url = self.hash_tag_search(client, keyword, limit)
+    image_data = self.hash_tag_search(client, keyword, limit)
 
     # Imageモデル生成＆DB保存
-    image_url.each do |value|
-      img_name = self.get_image_name(value[:url])
-      puts "#{img_name} : #{value[:url]}"
-      if not Scrape::is_duplicate(value[:url])
-        Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
+    image_data.each do |value|
+      puts "#{value[:title]} : #{value[:src_url]}"
+      if not Scrape::is_duplicate(value[:src_url])
+        #Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
+        Scrape.save_image(value, [ Tag.new(name: keyword) ])# attributes+tagsを渡す
       else
         puts 'Skipping a duplicate image...'
       end
@@ -66,14 +66,27 @@ module Scrape::Twitter
   # ハッシュタグによる画像URL検索
   def self.hash_tag_search(client, keyword, limit)
     # 例外処理
-    image_url = []
+    image_data = []
     begin
       # limitで指定された数だけツイートを取得
-      client.search("#{keyword} -rt", :locale => "ja", :result_type => "recent", :include_entity => true).take(limit).map do |tweet|
+      client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
+        :include_entity => true).take(limit).map do |tweet|
+        #puts tweet.favorite_count
+
         # entities内にメディア(画像等)を含む場合の処理
         if tweet.media? then
           tweet.media.each do |value|
-            image_url.push({ url: value.media_uri.to_s, caption: tweet.text })
+            url = value.media_uri.to_s
+            data = {
+              title: self.get_image_name(url),
+              src_url: url,
+              caption: tweet.text,
+              page_url: tweet.url.to_s,
+              site_name: 'twitter',
+              view_nums: tweet.retweet_count,
+              posted_time: tweet.created_at
+            }
+            image_data.push(data)
           end
         end
       end
@@ -85,7 +98,7 @@ module Scrape::Twitter
       sleep error.rate_limit.reset_in
       retry
     end
-    image_url   # Array
+    image_data   # Array
   end
 
   # 画像の名称を決定する

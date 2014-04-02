@@ -1,4 +1,11 @@
 GIT
+  remote: git@github.com:pentiumx/futaba.git
+  revision: 1033fe33ce302f5467bea181adc6d15a5f3c34e4
+  specs:
+    futaba (0.0.1)
+      nokogiri
+
+GIT
   remote: https://github.com/rails/coffee-rails.git
   revision: 4a0ad7630602589b8b9646c438eb0e73f74368f7
   specs:
@@ -377,6 +384,7 @@ GEM
     whenever (0.9.0)
       activesupport (>= 2.3.4)
       chronic (>= 0.6.3)
+    x2ch (0.9.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
 
@@ -396,6 +404,7 @@ DEPENDENCIES
   daemon-spawn
   devise
   factory_girl_rails
+  futaba!
   fuubar
   guard
   guard-coffeescript
@@ -439,3 +448,4 @@ DEPENDENCIES
   twitter
   uglifier (>= 1.3.0)
   whenever
+  x2ch
