@@ -79,7 +79,7 @@ describe Scrape do
         Image.any_instance.stub(:image_from_url).and_return()
         count = Image.count
 
-        Scrape::save_image('title', 'src_url')
+        Scrape::save_image({ title: 'title', src_url: 'src_url' })
         Image.count.should eq(count+1)
       end
 
@@ -89,18 +89,17 @@ describe Scrape do
           Image.any_instance.stub(:image_from_url).and_return()
           Rails.logger.should_receive(:info).with('Image model saving failed.')
 
-          Scrape::save_image('title', 'src_url')
+          Scrape::save_image({ title: 'title', src_url: 'src_url' })
         end
       end
 
       describe "when DB raise an error during saving the image" do
         it "should not save the image" do
           Image.any_instance.stub(:image_from_url).and_return()
-          #Image.any_instance.stub(:save).and_raise SQLite3::SQLException
           Image.any_instance.stub(:save).and_raise Exception
 
           count = Image.count
-          Scrape::save_image('title', 'src_url')
+          Scrape::save_image({ title: 'title', src_url: 'src_url' })
           Image.count.should eq(count)
         end
       end
@@ -109,7 +108,7 @@ describe Scrape do
     describe "with invalid attributes" do
       it "should not save the image" do
         count = Image.count
-        Scrape::save_image('title', 'url with no images')
+        Scrape::save_image({ title: 'title', src_url: 'url with no images' })
         Image.count.should eq(count)
       end
 
@@ -117,7 +116,7 @@ describe Scrape do
         image = FactoryGirl.create(:image_url)
         count = Image.count
 
-        Scrape::save_image('title', image.src_url)
+        Scrape::save_image({ title: 'title', src_url: image.src_url })
         Image.count.should eq(count)
       end
     end

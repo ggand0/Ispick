@@ -15,7 +15,7 @@ module Scrape::Deviant
   # アダルトコンテンツであるか判定する
   def self.is_adult(html)
     # アダルトな画像（"mature content"みたいに表現されてる）のデバッグ用url
-    #page = 'http://ecchi-enzo.deviantart.com/art/Top-Heavy-ft-Sui-Feng-FREE-435076127'
+    # page = 'http://ecchi-enzo.deviantart.com/art/Top-Heavy-ft-Sui-Feng-FREE-435076127'
     # mature画像はクリックをsimulateしないと抽出出来ないくさいので飛ばす
     mature = html.css("div[class='dev-content-mature mzone-main']").first
     if not mature.nil?
@@ -52,7 +52,7 @@ module Scrape::Deviant
       stats[node.text] = count.to_i
     end
     image_data[:view_nums] = stats['Views']
-    puts stats
+    #puts stats
 
     tag_string = html.css("meta[name='keywords']").attr('content').content
     tags = tag_string.split(', ')
@@ -69,7 +69,6 @@ module Scrape::Deviant
     xml.css('item').map do |item|
       posted_at = item.css('pubDate').first.content
       posted_at = DateTime.parse(posted_at).utc
-      puts posted_at
 
       image_data = {
         title: item.css('title').first.content,

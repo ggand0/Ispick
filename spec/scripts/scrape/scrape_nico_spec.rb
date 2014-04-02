@@ -6,6 +6,12 @@ describe Scrape::Nico do
   before do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
+
+    # Mechanize agentの作成
+    @agent = Mechanize.new
+    @agent.ssl_version = 'SSLv3'
+    @agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
+      'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
   end
 
   describe "get_contents method" do
@@ -14,7 +20,7 @@ describe Scrape::Nico do
       count = Image.count
       xml = Nokogiri::XML(open('http://seiga.nicovideo.jp/rss/illust/new'))
 
-      Scrape::Nico.get_contents(xml.css("item")[0])
+      Scrape::Nico.get_contents(xml.css("item")[0], @agent)
       Image.count.should eq(count+1)
     end
 
@@ -26,7 +32,7 @@ describe Scrape::Nico do
       Rails.logger.should_receive(:info).with('Image model saving failed.')
       Scrape.should_not_receive(:save_image)
 
-      Scrape::Nico.get_contents(xml.css("item")[0])
+      Scrape::Nico.get_contents(xml.css("item")[0], @agent)
     end
   end
 

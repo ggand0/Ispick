@@ -18,7 +18,7 @@ describe Scrape::Piapro do
 
     # 対象URLを開けなかった時にログに書く事
     it "writes a log when it fails to open the image page" do
-      Rails.logger.should_receive(:info).with('Image model saving failed.')
+      Rails.logger.should_receive(:info).with('Could not open the page.')
       Scrape.should_not_receive(:save_image)
 
       url = 'not_existed_url'
@@ -34,7 +34,7 @@ describe Scrape::Piapro do
 
       # イラスト表示ページ
       html = Nokogiri::HTML(open('http://piapro.jp/t/uvW_'))
-      Scrape::Piapro.get_contents(html)
+      Scrape::Piapro.get_contents(html, {title: 'test'})
 
       Image.count.should eq(count+1)
     end
