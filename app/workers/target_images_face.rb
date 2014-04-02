@@ -1,6 +1,6 @@
-class Face
+class TargetFace
   # Woeker起動時に指定するQUEUE名
-  @queue = :resque_face
+  @queue = :target_face
 
   def self.perform(target_id)
     target_image = TargetImage.find(target_id)
@@ -18,6 +18,6 @@ class Face
       end
     end
 
-    #puts 'TARGET : FACE EXTRACTION DONE!'
+    puts 'TARGET : FACE EXTRACTION DONE!'
   end
 end

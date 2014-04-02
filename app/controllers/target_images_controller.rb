@@ -41,7 +41,7 @@ class TargetImagesController < ApplicationController
     respond_to do |format|
       if @target_image.save
         # 顔特徴抽出処理をbackground jobに投げる
-        Resque.enqueue(Face, @target_image.id)
+        Resque.enqueue(TargetFace, @target_image.id)
 
         #format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.html { redirect_to controller: 'users', action: 'show_target_images' }
