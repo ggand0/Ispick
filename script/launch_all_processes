@@ -19,7 +19,7 @@ class ResqueWorkerDaemon < DaemonSpawn::Base
 end
 
 ResqueWorkerDaemon.spawn!({
-  processes: 2,
+  processes: 4,
   working_dir: Rails.root,
   pid_file: File.join(Rails.root, 'tmp', 'pids', 'extract_features.pid'),
   log_file: File.join(Rails.root, 'log', 'extract_features.log'),
