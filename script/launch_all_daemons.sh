@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
 # 全てのdaemonを起動する
-daemons/image_face start
-daemons/target_face start
-daemons/detect_illust start
+script/daemons/image_face start
+script/daemons/target_face start
+script/daemons/detect_illust start
