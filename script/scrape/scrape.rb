@@ -78,6 +78,7 @@ module Scrape
       if image.save
         # 特徴抽出処理をresqueに投げる
         Resque.enqueue(ImageFace, image.id)
+        Resque.enqueue(DetectIllust, image.id)
       else
         Rails.logger.info('Image model saving failed.')
         puts 'Image model saving failed.'

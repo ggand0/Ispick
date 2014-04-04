@@ -5,6 +5,7 @@ class CreateImages < ActiveRecord::Migration
       t.text :title
       t.text :caption
       t.text :src_url
+      t.boolean :is_illust
       t.attachment :data
 
       # 付加的な情報

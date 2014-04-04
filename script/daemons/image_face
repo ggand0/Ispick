@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../../config/application', __FILE__)
+Rails.application.require_environment!
+
+require "#{Rails.root}/app/workers/images_face"
+
+class ImageFaceDaemon < DaemonSpawn::Base
+  def start(args)
+    @worker = Resque::Worker.new('images_face')
+    @worker.verbose = true
+    @worker.work
+  end
+
+  def stop
+    @worker.try(:shutdown)
+  end
+end
+
+ImageFaceDaemon.spawn!({
+  processes: 2,
+  working_dir: Rails.root,
+  pid_file: File.join(Rails.root, 'tmp', 'pids', 'images_face.pid'),
+  log_file: File.join(Rails.root, 'log', 'images_face.log'),
+  sync_log: true,
+  singleton: true,
+  signal: 'QUIT'
+})
