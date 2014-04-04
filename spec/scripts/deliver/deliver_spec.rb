@@ -45,6 +45,22 @@ describe "Deliver" do
     end
   end
 
+  describe "create_delivered_image function" do
+    it "sets all image attributes necessary to new delivered_image" do
+      image = FactoryGirl.create(:image)
+      delivered_image = Deliver.create_delivered_image(image)
+
+      expect(delivered_image.title).to eq(image.title)
+      expect(delivered_image.caption).to eq(image.caption)
+      expect(delivered_image.src_url).to eq(image.src_url)
+      expect(delivered_image.page_url).to eq(image.page_url)
+      expect(delivered_image.posted_at).to eq(image.posted_time)
+      expect(delivered_image.site_name).to eq(image.site_name)
+      expect(delivered_image.views).to eq(image.view_nums)
+      expect(delivered_image.is_illust).to eq(image.is_illust)
+    end
+  end
+
   describe "limit_images function" do
     it "rejects an image when it already exists" do
       images = [ FactoryGirl.create(:image) ]
