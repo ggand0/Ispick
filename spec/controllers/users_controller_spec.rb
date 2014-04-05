@@ -17,6 +17,35 @@ describe UsersController do
     end
   end
 
+  describe "GET show_illusts" do
+    it "should render signed_in template when logged in" do
+      login_user
+      get :show_illusts, {}, valid_session
+      response.should render_template('signed_in')
+      sign_out :user
+    end
+
+    it "assigns delivered_images with records that have true value in its 'is_illust' column" do
+      login_user
+
+      #user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
+      #puts controller.current_user.delivered_images.count
+      controller.current_user.delivered_images << FactoryGirl.create(:delivered_image_photo)
+      controller.current_user.delivered_images << FactoryGirl.create(:delivered_image_illust)
+      #puts controller.current_user.delivered_images.count
+
+      get :show_illusts, {}, valid_session
+      expect(assigns(:delivered_images).count).to eq(1)
+
+      sign_out :user
+    end
+
+    it "should render not_signed_in template when NOT logged in" do
+      get :show_illusts, {}, valid_session
+      response.should render_template('not_signed_in')
+    end
+  end
+
   describe "GET show_target_images" do
     it "should render show_target_images template when logged in" do
       login_user

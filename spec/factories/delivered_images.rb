@@ -4,8 +4,25 @@ FactoryGirl.define do
   factory :delivered_image do
     title "MyText"
     caption "MyText"
+    is_illust true
+    avoided false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     association :user, factory: :twitter_user, strategy: :build
+  end
+
+  factory :delivered_image_photo, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    is_illust false
+    avoided false
+    sequence(:src_url) { |n| "photo#{n}@example.com"}
+  end
+  factory :delivered_image_illust, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    is_illust true
+    avoided false
+    sequence(:src_url) { |n| "illust#{n}@example.com"}
   end
 
   factory :delivered_image_from_word, class: DeliveredImage do
