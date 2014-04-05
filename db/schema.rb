@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
+    t.string   "md5_checksum"
     t.text     "page_url"
     t.text     "site_name"
     t.integer  "view_nums"

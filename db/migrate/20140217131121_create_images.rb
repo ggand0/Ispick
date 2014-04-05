@@ -7,6 +7,7 @@ class CreateImages < ActiveRecord::Migration
       t.text :src_url
       t.boolean :is_illust
       t.attachment :data
+      t.string :md5_checksum
 
       # 付加的な情報
       t.text :page_url
