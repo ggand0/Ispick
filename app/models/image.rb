@@ -15,20 +15,12 @@ class Image < ActiveRecord::Base
 
   validates_uniqueness_of :src_url
   validates_uniqueness_of :md5_checksum
-  #before_validation_on_create :generate_md5_checksum
-  before_validation(on: :create) do
-    #generate_md5_checksum()
-  end
 
   def generate_md5_checksum(file)
-    #self.md5_checksum = Digest::MD5.hexdigest(data.read) if self.data
     self.md5_checksum = Digest::MD5.hexdigest(file.read)
   end
 
 	def image_from_url(url)
-    #self.data = URI.parse(url)
-
-    #file = Tempfile.new([basename, extname])
     file = Tempfile.new('image')
     file.binmode
     open(URI.parse(url)) do |data|
