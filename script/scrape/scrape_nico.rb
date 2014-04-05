@@ -6,24 +6,37 @@ module Scrape::Nico
   # ニコ静RSS(非公式)
   ROOT_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
 
-  def self.get_contents(item, agent)
+  # @page : Mechanize::Page
+  def self.is_adult(page)
+    puts page
+    puts page.at("meta[@property='og:site_name']")
+    site_name = page.at("meta[@property='og:site_name']").attr('content')
+    site_name == 'ニコニコ春画'
+  end
+
+  def self.get_contents(page_url, agent, title)
     # 元ページを開く
     begin
-      page_url = item.css('link').first.content
+      #page_url = item.css('link').first.content
       page = agent.get(page_url)
     rescue Exception => e
       # ログイン求められて失敗した時用
       puts e
+      puts 'PAGE_URL:'
+      puts page_url
       Rails.logger.info('Image model saving failed.')
       return
     end
 
+    # 春画画像なら抽出を断念する
+    return if is_adult(page)
+
+    #begin
     # 画像のソースurlを探して格納
     src_url = page.at("meta[@property='og:image']").attr('content')
     puts src_url
 
     # 画像の文字情報を取得
-    title = item.css('title').first.content
     tags = self.get_tags(page)
     caption = page.at("meta[name='description']").attr('content')
 
@@ -55,6 +68,12 @@ module Scrape::Nico
 
     # Imageモデル生成＆DB保存
     Scrape::save_image(image_data, tags)
+=begin
+    rescue => e
+      puts e
+      Rails.logger.error('scrape:nico failed: '+page_url)
+    end
+=end
   end
 
   def self.get_tags(page)
@@ -75,7 +94,8 @@ module Scrape::Nico
 
     # itemタグ（イラスト）ごとに処理
     xml.css('item').map do |item|
-      self.get_contents(item, agent)
+      title = item.css('title').first.content
+      self.get_contents(item.css('link').first.content, agent, title)
     end
   end
 

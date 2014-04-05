@@ -7,7 +7,7 @@ require "#{Rails.root}/app/workers/images_face"
 
 class ImageFaceDaemon < DaemonSpawn::Base
   def start(args)
-    @worker = Resque::Worker.new('images_face')
+    @worker = Resque::Worker.new('image_face')
     @worker.verbose = true
     @worker.work
   end

@@ -13,6 +13,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def show_illusts
+    if signed_in?
+      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
+      delivered_images = current_user.delivered_images.
+        where('avoided IS NULL or avoided = false').where(is_illust: true)
+
+      @delivered_images = delivered_images.page(params[:page]).per(25)
+      render action: 'signed_in'
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
   def show_target_images
     if signed_in?
       @target_images = current_user.target_images

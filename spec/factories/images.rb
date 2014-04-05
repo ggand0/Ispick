@@ -16,6 +16,12 @@ FactoryGirl.define do
     sequence(:src_url) { |n| "test#{n}@example.com" }
     sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
 
+    sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
+    site_name 'some_site'
+    view_nums 10000
+    posted_time DateTime.now
+    is_illust true
+
     factory :image_with_tags do
       ignore do
         tags_count 5

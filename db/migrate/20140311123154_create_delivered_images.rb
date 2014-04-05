@@ -4,7 +4,13 @@ class CreateDeliveredImages < ActiveRecord::Migration
       t.text :title
       t.text :caption
       t.text :src_url
+      t.text :page_url
+      t.text :site_name
+      t.integer :views
+      t.datetime :posted_at
+      t.boolean :is_illust
       t.attachment :data
+
       t.integer :user_id
       t.integer :favored_image_id
       t.integer :targetable_id

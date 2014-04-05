@@ -36,16 +36,25 @@ module Deliver
     image.title.include?(word) or image.caption.include?(word)
   end
 
+  def self.create_delivered_image(image)
+    DeliveredImage.create(
+      title: image.title,
+      caption: image.caption,
+      src_url: image.src_url,
+      data: image.data,
+      posted_at: image.posted_time,
+      views: image.view_nums,
+      page_url: image.page_url,
+      site_name: image.site_name,
+      is_illust: image.is_illust
+    )
+  end
+
   # User.delivered_imagesへ追加
   def self.deliver_images(user, images, target)
     c = 0
     images.each do |im|
-      image = DeliveredImage.create(
-        title: im.title,
-        caption: im.caption,
-        src_url: im.src_url,
-        data: im.data
-      )
+      image = self.create_delivered_image(im)
       image.targetable = target# target_image or target_word
       if image
         # file.close出来てもuser.delivered_imagesはclose出来ない

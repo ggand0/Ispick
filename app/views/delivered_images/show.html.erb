@@ -17,8 +17,35 @@
 </p>
 
 <p>
+  <strong>Page URL:</strong>
+  <%= link_to 'source page URL', @delivered_image.page_url.html_safe if @delivered_image.page_url %>
+</p>
+
+<p>
   <strong>Delivered from:</strong>
   <%= show_targetable(@delivered_image) %>
+</p>
+
+<p>
+  <strong>Is an illustration:</strong>
+  <%= @delivered_image.is_illust %>
+</p>
+
+<p>
+  <strong>Views:</strong>
+  <%= @delivered_image.views %>
+</p>
+
+<p>
+  <strong>Posted at:</strong>
+  <%= @delivered_image.posted_at %>
+</p>
+
+<p>
+  <strong>Tags:</strong>
+  <%# @delivered_image.tags.each do |tag| %>
+  <%# tag.name %>
+  <%# end %>
 </p>
 
 <p>
