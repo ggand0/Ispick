@@ -12,6 +12,27 @@ describe Scrape::Nico do
     @agent.ssl_version = 'SSLv3'
     @agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
       'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
+
+    url = 'http://seiga.nicovideo.jp/rss/illust/new'
+    xml = Nokogiri::XML(open(url))
+    item = xml.css('item')[0]
+    @page_url = item.css('link').first.content
+    @title = item.css('title').first.content
+    puts @page_url
+  end
+
+  describe "is_adult function" do
+    it "returns true with an adult page" do
+      page_url = 'http://seiga.nicovideo.jp/seiga/im3833006'
+      page = @agent.get(page_url)
+      expect(Scrape::Nico.is_adult(page)).to eq(true)
+    end
+
+    it "returns false with a general page" do
+      page_url = 'http://seiga.nicovideo.jp/seiga/im1276537?track=seiga_illust_keyword'
+      page = @agent.get(page_url)
+      expect(Scrape::Nico.is_adult(page)).to eq(false)
+    end
   end
 
   describe "get_contents method" do
@@ -20,19 +41,27 @@ describe Scrape::Nico do
       count = Image.count
       xml = Nokogiri::XML(open('http://seiga.nicovideo.jp/rss/illust/new'))
 
-      Scrape::Nico.get_contents(xml.css("item")[0], @agent)
+      Scrape::Nico.get_contents(@page_url, @agent, @title)
       Image.count.should eq(count+1)
     end
 
     # 対象の画像URLを開けなかった時、ログに書き出すこと
     it "should write a log when it fails to open the image page" do
       count = Image.count
-      xml = Nokogiri::XML(open('http://google.com'))# 例えば、画像と無関係なURL
+      url = 'An invalid page url'
+      #xml = Nokogiri::XML(open(url))# 例えば、画像と無関係なURL
 
       Rails.logger.should_receive(:info).with('Image model saving failed.')
       Scrape.should_not_receive(:save_image)
 
-      Scrape::Nico.get_contents(xml.css("item")[0], @agent)
+      Scrape::Nico.get_contents(url, @agent, @title)
+    end
+
+    it "ignores adulut pages" do
+      page_url = 'http://seiga.nicovideo.jp/seiga/im3833006'
+
+      Scrape.should_not_receive(:save_image)
+      Scrape::Nico.get_contents(page_url, @agent, @title)
     end
   end
 
