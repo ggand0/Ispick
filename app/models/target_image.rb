@@ -15,4 +15,7 @@ class TargetImage < ActiveRecord::Base
     use_timestamp: false
 
   validates_presence_of :data
+  validates_attachment_size :data, less_than: 5.megabytes
+  validates_attachment_content_type :data, content_type: [ 'image/jpg', 'image/png', 'image/gif' ],
+                                    message: 'file must be of filetype .jpg/.png/.gif'
 end
