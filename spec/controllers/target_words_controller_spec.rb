@@ -167,6 +167,7 @@ describe TargetWordsController do
     end
   end
 
+
   describe "search action" do
     it "assigns ransack variable" do
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
@@ -176,6 +177,15 @@ describe TargetWordsController do
       FactoryGirl.create(:person_madoka)
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
       expect(assigns(:people).count).to eq(1)
+    end
+  end
+
+  describe "show_delivered action" do
+    it "assigns delivered_images" do
+      target_word = FactoryGirl.create(:word_with_delivered_images, images_count: 5)
+      get :show_delivered, { id: target_word.to_param }, valid_session
+
+      expect(assigns(:delivered_images).count).to eq(target_word.delivered_images.count)
     end
   end
 
