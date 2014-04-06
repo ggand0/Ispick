@@ -55,7 +55,7 @@ module Deliver
     c = 0
     images.each do |im|
       image = self.create_delivered_image(im)
-      image.targetable = target# target_image or target_word
+      target.delivered_images << image
       if image
         # file.close出来てもuser.delivered_imagesはclose出来ない
         # (userがglobalから参照される限りuser.delivered_images[i].dataも参照される)ので、
