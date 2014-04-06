@@ -57,8 +57,7 @@ class UsersController < ApplicationController
 
   def download_favored_images
     if signed_in?
-      # クリップされた配信イラストを取得
-      @images = current_user.delivered_images.where(favored: true)
+      @images = current_user.favored_images
       file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
