@@ -8,6 +8,16 @@ FactoryGirl.define do
     avoided false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     association :user, factory: :twitter_user, strategy: :build
+    association :targetable, factory: :target_word, strategy: :build
+  end
+
+  factory :delivered_image_with_targetable, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    is_illust true
+    avoided false
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+    association :targetable, factory: :target_word, strategy: :build
   end
 
   factory :delivered_image_photo, class: DeliveredImage do
