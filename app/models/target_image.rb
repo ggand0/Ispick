@@ -2,7 +2,7 @@ require "#{Rails.root}/lib/utility_color"
 
 class TargetImage < ActiveRecord::Base
   has_one :feature, as: :featurable
-  has_one :delivered_image, as: :targetable
+  has_many :delivered_images, as: :targetable
   belongs_to :user
   default_scope { order('created_at DESC') }
   paginates_per 100
@@ -15,4 +15,6 @@ class TargetImage < ActiveRecord::Base
     use_timestamp: false
 
   validates_presence_of :data
+  validates_attachment_size :data, less_than: 5.megabytes
+  validates_attachment_content_type :data, content_type: /^image\/(jpg|jpeg|pjpeg|png|x-png|gif)$/
 end

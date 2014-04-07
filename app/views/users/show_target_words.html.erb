@@ -4,18 +4,28 @@
 <%= link_to 'Back', controller: 'users', action: 'home' %>
 <br>
 
-<div class="wrap">
-  <% @words.each do |target_word| %>
-    <div class="box">
-      <div class="boxInner">
-        <%= link_to 'Show', target_word %>
-        <%= link_to 'Prefer', prefer_target_word_path(target_word) %>
-        <%= link_to 'Edit', edit_target_word_path(target_word) %>
-        <%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <div class="titleBox"><%= target_word.word %></div>
-      </div>
-    </div>
-  <% end %>
-</div>
+<table>
+  <thead>
+    <tr>
+      <th>Word</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @words.each do |target_word| %>
+      <tr>
+        <td><%= target_word.word %></td>
+        <td><%= link_to 'Show', target_word %></td>
+        <td><%= link_to 'ShowDelivered', show_delivered_target_word_path(target_word) %></td>
+        <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>
+        <td><%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= paginate_target_images(@message, @words) %>

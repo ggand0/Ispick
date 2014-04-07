@@ -7,6 +7,7 @@ Ispic::Application.routes.draw do
     end
     member do
       get 'prefer'
+      get 'show_delivered'
     end
   end
 
@@ -43,6 +44,7 @@ Ispic::Application.routes.draw do
   resources :target_images do
     member do
       get 'prefer'
+      get 'show_delivered'
     end
   end
 

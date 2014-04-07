@@ -2,7 +2,7 @@ require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/workers/target_images_face"
 
 class TargetImagesController < ApplicationController
-  before_action :set_target_image, only: [:show, :edit, :update, :destroy]
+  before_action :set_target_image, only: [:show, :edit, :update, :destroy, :show_delivered]
 
   # GET /target_images
   # GET /target_images.json
@@ -108,6 +108,10 @@ class TargetImagesController < ApplicationController
 
     # Pagenate the array
     @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)
+  end
+
+  def show_delivered
+    @delivered_images = @target_image.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
   end
 
   private

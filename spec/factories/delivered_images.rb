@@ -8,6 +8,20 @@ FactoryGirl.define do
     avoided false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     association :user, factory: :twitter_user, strategy: :build
+    association :targetable, factory: :target_word, strategy: :build
+  end
+
+  factory :delivered_image_no_association, class: DeliveredImage do
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+  end
+
+  factory :delivered_image_with_targetable, class: DeliveredImage do
+    title "MyText"
+    caption "MyText"
+    is_illust true
+    avoided false
+    sequence(:src_url) { |n| "test#{n}@example.com"}
+    association :targetable, factory: :target_word, strategy: :build
   end
 
   factory :delivered_image_photo, class: DeliveredImage do
@@ -48,6 +62,11 @@ FactoryGirl.define do
     favored false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
 
     association :user, factory: :twitter_user, strategy: :build
   end

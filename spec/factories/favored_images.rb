@@ -15,6 +15,11 @@ FactoryGirl.define do
     user_id 1
     sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
   end
 
   factory :favored_image_with_delivered, class: FavoredImage do

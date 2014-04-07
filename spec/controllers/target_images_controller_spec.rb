@@ -248,4 +248,14 @@ describe TargetImagesController do
     end
 
   end
+
+
+  describe "show_delivered action" do
+    it "assigns delivered_images" do
+      target_image = FactoryGirl.create(:image_with_delivered_images, images_count: 5)
+      get :show_delivered, { id: target_image.to_param }, valid_session
+
+      expect(assigns(:delivered_images).count).to eq(target_image.delivered_images.count)
+    end
+  end
 end

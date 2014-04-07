@@ -1,5 +1,5 @@
 class TargetWordsController < ApplicationController
-  before_action :set_target_word, only: [:show, :edit, :update, :destroy]
+  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered]
 
   # GET /target_words
   # GET /target_words.json
@@ -84,6 +84,10 @@ class TargetWordsController < ApplicationController
     @search = Person.search(params[:q])
     @people = @search.result(distinct: true).page(params[:page]).per(50)
     render :new
+  end
+
+  def show_delivered
+    @delivered_images = @target_word.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
   end
 
 
