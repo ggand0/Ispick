@@ -21,7 +21,8 @@ class Image < ActiveRecord::Base
   end
 
 	def image_from_url(url)
-    file = Tempfile.new('image')
+    extension = url.match(/.(jpg|jpeg|pjpeg|png|x-png|gif)$/).to_s
+    file = Tempfile.new(['image', extension])
     file.binmode
     open(URI.parse(url)) do |data|
       file.write data.read

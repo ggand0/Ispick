@@ -23,7 +23,7 @@ describe DeliveredImagesHelper do
     end
 
     it "show nothing when no targetable objects are given" do
-      delivered_image = FactoryGirl.create(:delivered_image)
+      delivered_image = FactoryGirl.create(:delivered_image_no_association)
       expect(helper.show_targetable(delivered_image)).to eq(nil)
     end
   end
