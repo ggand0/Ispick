@@ -1,31 +1,26 @@
-<h1>Listing delivered_images</h1>
+<%= javascript_include_tag 'users_home' %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Caption</th>
-      <th>Src url</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @delivered_images.each do |delivered_image| %>
-      <tr>
-        <td><%= delivered_image.title %></td>
-        <td><%= delivered_image.caption %></td>
-        <td><%= delivered_image.src_url %></td>
-        <td><%= link_to 'Show', delivered_image %></td>
-        <td><%= link_to 'Edit', edit_delivered_image_path(delivered_image) %></td>
-        <td><%= link_to 'Destroy', delivered_image, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
+<h1>Listing delivered_images of <%= image_tag @target_image.data.url(:thumb) %></h1>
 <br>
+<%= link_to 'Back', show_favored_images_users_path %>
+<br>
+<br>
+<div class="wrap">
+  <% @delivered_images.each do |delivered_image| %>
+    <div class="box">
+      <div class="boxInner">
+        <div class="favored">
+          <div class="id"><%= delivered_image.id %></div>
+          <%= raw get_clip_string_styled(delivered_image) %>
+        </div>
 
-<%= link_to 'New Delivered image', new_delivered_image_path %>
+        <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
+        <%= link_to 'Destroy', delivered_image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= link_to(image_tag(delivered_image.data.url), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
+        <div class="titleBox"><%= delivered_image.title.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate @delivered_images %>

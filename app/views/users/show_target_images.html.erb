@@ -9,6 +9,7 @@
     <div class="box">
       <div class="boxInner">
         <%= link_to 'Show', target_image %>
+        <td><%= link_to 'ShowDelivered', show_delivered_target_image_path(target_image) %></td>
         <%= link_to 'Prefer', prefer_target_image_path(target_image) %>
         <%= link_to 'Edit', edit_target_image_path(target_image) %>
         <%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %>
