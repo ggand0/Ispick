@@ -3,6 +3,11 @@ FactoryGirl.define do
     title 'madoka'
     sequence(:src_url) { |n| "test#{n}.com" }
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
   end
 
   factory :image_url, class: Image do
@@ -30,6 +35,11 @@ FactoryGirl.define do
         create_list(:tag, evaluator.tags_count, image: image)
       end
     end
+
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
   end
 
   factory :image_old, class: Image do
@@ -42,6 +52,9 @@ FactoryGirl.define do
     title 'test'
     sequence(:src_url) { |n| "test_new#{n}.com" }
     created_at  Time.utc(2014, 2, 1, 0, 0, 0)
-    #data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
   end
 end
