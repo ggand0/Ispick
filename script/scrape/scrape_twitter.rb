@@ -21,14 +21,6 @@ module Scrape::Twitter
     # 全ての登録済みのTargetWordに対して新着画像を取得する
     # しかしながらTargetWord.count=10000とかになったら厳しいかも
     TargetWord.all.each do |target_word|
-      keywords = []
-      if target_word.person.keywords
-        target_word.person.keywords.each do |key|
-          keywords.push(key.word) if key.is_alias
-        end
-      end
-      keywords.uniq!
-
       # Person.nameで検索（e.g. "鹿目まどか"）
       # エイリアスも含めるならkeywords.eachする
       puts target_word.person.name
@@ -40,6 +32,15 @@ module Scrape::Twitter
 
   # 対象のハッシュタグを持つツイートの画像を抽出する
   def self.scrape_with_keyword(keyword, limit)
+    client = self.get_client
+
+    # キーワードを含むハッシュタグの検索
+    image_data = self.get_tweets(client, keyword, limit)
+
+    self.save(image_data, keyword)
+  end
+
+  def self.get_client
     # Twitter APIによるリクエスト
     client = Twitter::REST::Client.new do |config|
       config.consumer_key        = "OJof3PJIJTP9xCFmOD1w"
@@ -47,10 +48,10 @@ module Scrape::Twitter
       config.access_token        = "875327030-hBjqCkLdBYmsjggmNS3rzdZKWuJ54QtzsHvkWFXP"
       config.access_token_secret = "Iyo7cwygF2Au2UgH5KDUEpG4pBpDWIeJ8EAFDOeUQ10rh"
     end
+    client
+  end
 
-    # キーワードを含むハッシュタグの検索
-    image_data = self.hash_tag_search(client, keyword, limit)
-
+  def self.save(image_data, keyword)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:title]} : #{value[:src_url]}"
@@ -63,33 +64,39 @@ module Scrape::Twitter
     end
   end
 
+  def self.get_tweets(client, keyword, limit)
+    image_data = []
+
+    # limitで指定された数だけツイートを取得
+    client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
+      :include_entity => true).take(limit).map do |tweet|
+      #puts tweet.favorite_count
+
+      # entities内にメディア(画像等)を含む場合の処理
+      if tweet.media? then
+        tweet.media.each do |value|
+          url = value.media_uri.to_s
+          data = {
+            title: self.get_image_name(url),
+            src_url: url,
+            caption: tweet.text,
+            page_url: tweet.url.to_s,
+            site_name: 'twitter',
+            view_nums: tweet.retweet_count,
+            posted_time: tweet.created_at
+          }
+          image_data.push(data)
+        end
+      end
+    end
+    image_data
+  end
+
   # ハッシュタグによる画像URL検索
   def self.hash_tag_search(client, keyword, limit)
     # 例外処理
-    image_data = []
     begin
-      # limitで指定された数だけツイートを取得
-      client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
-        :include_entity => true).take(limit).map do |tweet|
-        #puts tweet.favorite_count
-
-        # entities内にメディア(画像等)を含む場合の処理
-        if tweet.media? then
-          tweet.media.each do |value|
-            url = value.media_uri.to_s
-            data = {
-              title: self.get_image_name(url),
-              src_url: url,
-              caption: tweet.text,
-              page_url: tweet.url.to_s,
-              site_name: 'twitter',
-              view_nums: tweet.retweet_count,
-              posted_time: tweet.created_at
-            }
-            image_data.push(data)
-          end
-        end
-      end
+      return self.get_tweets(client, keyword, limit)
     # 検索ワードでツイートを取得できなかった場合の例外処理
     rescue Twitter::Error::ClientError
       puts "ツイートを取得できませんでした"
@@ -98,7 +105,7 @@ module Scrape::Twitter
       sleep error.rate_limit.reset_in
       retry
     end
-    image_data   # Array
+    #image_data   # Array
   end
 
   # 画像の名称を決定する
