@@ -27,7 +27,7 @@ module Scrape::Futaba
             site_name: '2chan',
             src_url: post.image.uri,
             page_url: thread.uri,
-            posted_time: post.date
+            posted_at: post.date
           }
           puts printf("%s : %s", image_data[:site_name], image_data[:src_url])
           Scrape::save_image(image_data)

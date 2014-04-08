@@ -109,7 +109,7 @@ module Scrape::Fourchan
             # e.g. 'http://boards.4chan.org/c/res/2166071'
             page_url: "http://boards.4chan.org/%s/res/%d" % [board, post[:id]],
             caption: com,
-            posted_time: posted_at
+            posted_at: posted_at
           }
 
           #image_url.push({ url: url, com: com })

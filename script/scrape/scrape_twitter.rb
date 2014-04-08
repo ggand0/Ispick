@@ -82,8 +82,9 @@ module Scrape::Twitter
             caption: tweet.text,
             page_url: tweet.url.to_s,
             site_name: 'twitter',
-            view_nums: tweet.retweet_count,
-            posted_time: tweet.created_at
+            views: tweet.retweet_count,
+            favorites: tweet.favorite_count,
+            posted_at: tweet.created_at
           }
           image_data.push(data)
         end

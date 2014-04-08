@@ -60,7 +60,7 @@ module Scrape::Piapro
       posted_at = DateTime.parse(time).change(offset: '+0900').utc
       image_data = {
         page_url: URI.join(ROOT_URL, item['href']).to_s,
-        posted_time: posted_at,
+        posted_at: posted_at,
         site_name: 'piapro'
       }
 

@@ -51,7 +51,8 @@ module Scrape::Deviant
       count.gsub!(/(\n|,| |\(.*)/, '')    # カンマ|空白|(以下 を除去
       stats[node.text] = count.to_i
     end
-    image_data[:view_nums] = stats['Views']
+    image_data[:views] = stats['Views']
+    image_data[:favorites] = stats['Favorites']
     #puts stats
 
     tag_string = html.css("meta[name='keywords']").attr('content').content
@@ -74,7 +75,7 @@ module Scrape::Deviant
         title: item.css('title').first.content,
         caption: item.css('description').first.content,
         page_url: item.css('link').first.content,
-        posted_time: posted_at,
+        posted_at: posted_at,
         site_name: 'deviantART'
       }
 

@@ -61,8 +61,9 @@ module Scrape::Nico
       caption: caption,
       src_url: src_url,
       page_url: page_url,
-      view_nums: views,
-      posted_time: posted_at,
+      views: views,
+      favorites: clips,
+      posted_at: posted_at,
       site_name: 'nicoimage'
     }
 
