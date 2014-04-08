@@ -141,6 +141,12 @@ namespace :scrape do
     Scrape::Twitter.scrape()
   end
 
+  desc "Tumblrから画像抽出する"
+  task tumblr: :environment do
+    require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
+    Scrape::Tumblr.scrape()
+  end
+
   desc "deviantARTから画像抽出する"
   task deviant: :environment do
     require "#{Rails.root}/script/scrape/scrape_deviant.rb"
