@@ -27,6 +27,7 @@ Ispic::Application.routes.draw do
       get 'show_target_images'
       get 'show_target_words'
       get 'show_favored_images'
+      get 'sort_delivered_images'
       get 'download_favored_images'
     end
   end

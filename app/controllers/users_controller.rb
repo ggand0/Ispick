@@ -13,6 +13,29 @@ class UsersController < ApplicationController
     end
   end
 
+  def sort_delivered_images
+    if signed_in?
+      delivered_images = current_user.delivered_images.reorder('favorites desc')
+      @delivered_images = delivered_images.page(params[:page]).per(25)
+      render action: 'signed_in'
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
+  def show_illusts
+    if signed_in?
+      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
+      delivered_images = current_user.delivered_images.
+        where('avoided IS NULL or avoided = false').where(is_illust: true)
+
+      @delivered_images = delivered_images.page(params[:page]).per(25)
+      render action: 'signed_in'
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
   def show_illusts
     if signed_in?
       # paginationについては調整中。数が固定されたらモデルに表示数を定義する
