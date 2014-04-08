@@ -70,6 +70,8 @@ gem 'natto'
 gem 'x2ch'
 #gem 'futaba', git: 'https://github.com/co-me/futaba'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
+gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
+#gem 'tumblr-rb'
 
 gem 'devise'
 gem 'omniauth'
