@@ -7,6 +7,7 @@ class CreateDeliveredImages < ActiveRecord::Migration
       t.text :page_url
       t.text :site_name
       t.integer :views
+      t.integer :favorites
       t.datetime :posted_at
       t.boolean :is_illust
       t.attachment :data
