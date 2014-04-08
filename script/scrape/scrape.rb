@@ -10,6 +10,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_2ch"
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_twitter"
+  require "#{Rails.root}/script/scrape/scrape_tumblr"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
@@ -21,6 +22,7 @@ module Scrape
     Scrape::Nichan.scrape()
     Scrape::Fourchan.scrape()
     Scrape::Twitter.scrape()
+    Scrape::Tumblr.scrape()
     puts 'DONE!!'
   end
 
@@ -34,6 +36,7 @@ module Scrape
     Scrape::Piapro.scrape()
     Scrape::Nichan.scrape()
     Scrape::Twitter.scrape()
+    Scrape::Tumblr.scrape()
     puts 'DONE!!'
   end
 
