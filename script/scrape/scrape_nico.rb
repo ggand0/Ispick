@@ -4,7 +4,9 @@ require 'open-uri'
 module Scrape::Nico
 
   # ニコ静RSS(非公式)
-  ROOT_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
+  RSS_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
+  TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
+  ROOT_URL = ''
 
   # @page : Mechanize::Page
   def self.is_adult(page)
@@ -17,7 +19,6 @@ module Scrape::Nico
   def self.get_contents(page_url, agent, title)
     # 元ページを開く
     begin
-      #page_url = item.css('link').first.content
       page = agent.get(page_url)
     rescue Exception => e
       # ログイン求められて失敗した時用
@@ -31,7 +32,6 @@ module Scrape::Nico
     # 春画画像なら抽出を断念する
     return if is_adult(page)
 
-    #begin
     # 画像のソースurlを探して格納
     src_url = page.at("meta[@property='og:image']").attr('content')
     puts src_url
@@ -69,12 +69,21 @@ module Scrape::Nico
 
     # Imageモデル生成＆DB保存
     Scrape::save_image(image_data, tags)
-=begin
-    rescue => e
-      puts e
-      Rails.logger.error('scrape:nico failed: '+page_url)
-    end
-=end
+  end
+
+  # delivered_images update用に、
+  # ログインしてstats情報だけ返す関数
+  def self.get_stats(page_url)
+    agent = self.login()
+    page = agent.get(page_url)
+
+    info_elements = page.at("ul[@class='illust_count']")
+    views = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
+    comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
+    clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
+    puts views.to_s+' '+comments.to_s+' '+clips.to_s
+
+    { views: views, favorites: clips}
   end
 
   def self.get_tags(page)
@@ -83,20 +92,56 @@ module Scrape::Nico
     tags.map { |tag| Tag.new(name: tag) }
   end
 
-  # ニコニコ静画。非公式RSSから新着イラストを抽出する
-  def self.scrape()
+  def self.login()
     agent = Mechanize.new
     agent.ssl_version = 'SSLv3'
     agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
       'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
+    agent
+  end
 
-    xml = Nokogiri::XML(open(ROOT_URL))
-    puts 'Extracting : ' + ROOT_URL
+  # ニコニコ静画。非公式RSSから新着イラストを抽出する
+  def self.scrape_rss()
+    agent = self.login()
+
+    xml = Nokogiri::XML(open(RSS_URL))
+    puts 'Extracting : ' + RSS_URL
 
     # itemタグ（イラスト）ごとに処理
     xml.css('item').map do |item|
       title = item.css('title').first.content
       self.get_contents(item.css('link').first.content, agent, title)
+    end
+  end
+
+  # タグ検索バージョンをデフォルトで使う事にする
+  def self.scrape()
+    agent = self.login()
+    limit = 50
+
+    TargetWord.all.each do |target_word|
+      puts target_word.person.name
+
+      #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
+      url = TAG_SEARCH_URL+'?page=1&query='+target_word.person.name
+      puts 'Extracting : ' + url
+
+      escaped = URI.escape(url)
+      xml = agent.get(escaped)
+      #puts xml.search('image').count
+
+      # http://seiga.nicovideo.jp/seiga/im3858537
+      # imageタグ（イラスト）ごとに処理
+      #xml.css('image').map do |item|
+      count = 0
+      xml.search('image').map do |item|
+        title = item.css('title').first.content
+        page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
+        self.get_contents(page_url, agent, title)
+
+        count += 1
+        break if count >= limit
+      end
     end
   end
 
