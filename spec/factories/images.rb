@@ -23,8 +23,8 @@ FactoryGirl.define do
 
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
     site_name 'some_site'
-    view_nums 10000
-    posted_time DateTime.now
+    views 10000
+    posted_at DateTime.now
     is_illust true
 
     factory :image_with_tags do

@@ -42,8 +42,9 @@ module Deliver
       caption: image.caption,
       src_url: image.src_url,
       data: image.data,
-      posted_at: image.posted_time,
-      views: image.view_nums,
+      posted_at: image.posted_at,
+      views: image.views,
+      favorites: image.favorites,
       page_url: image.page_url,
       site_name: image.site_name,
       is_illust: image.is_illust

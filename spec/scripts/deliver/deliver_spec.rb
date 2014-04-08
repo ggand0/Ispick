@@ -54,9 +54,9 @@ describe "Deliver" do
       expect(delivered_image.caption).to eq(image.caption)
       expect(delivered_image.src_url).to eq(image.src_url)
       expect(delivered_image.page_url).to eq(image.page_url)
-      expect(delivered_image.posted_at).to eq(image.posted_time)
+      expect(delivered_image.posted_at).to eq(image.posted_at)
       expect(delivered_image.site_name).to eq(image.site_name)
-      expect(delivered_image.views).to eq(image.view_nums)
+      expect(delivered_image.views).to eq(image.views)
       expect(delivered_image.is_illust).to eq(image.is_illust)
     end
   end
