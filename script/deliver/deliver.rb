@@ -47,6 +47,7 @@ module Deliver
       favorites: image.favorites,
       page_url: image.page_url,
       site_name: image.site_name,
+      module_name: image.module_name,
       is_illust: image.is_illust
     )
   end
@@ -153,4 +154,18 @@ module Deliver
     images.destroy_all
     images
   end
+
+
+  # User.all.delivered_imagesをupdateする
+  def self.update()
+    User.all.each do |user|
+      user.delivered_images.each do |delivered_image|
+        puts delivered_image.module_name
+        stats = Object.const_get(delivered_image.module_name).get_stats(delivered_image.page_url)
+        delivered = DeliveredImage.find(delivered_image.id)
+        delivered.update_attributes(favorites: stats[:favorites])
+      end
+    end
+  end
+
 end
