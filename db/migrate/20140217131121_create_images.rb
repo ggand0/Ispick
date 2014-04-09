@@ -12,6 +12,7 @@ class CreateImages < ActiveRecord::Migration
       # 付加的な情報
       t.text :page_url
       t.text :site_name
+      t.string :module_name
       t.integer :views
       t.integer :favorites
       t.datetime :posted_at
