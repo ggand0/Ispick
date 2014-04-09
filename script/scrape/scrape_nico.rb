@@ -64,7 +64,8 @@ module Scrape::Nico
       views: views,
       favorites: clips,
       posted_at: posted_at,
-      site_name: 'nicoimage'
+      site_name: 'nicoseiga',
+      module_name: 'Scrape::Nico',
     }
 
     # Imageモデル生成＆DB保存

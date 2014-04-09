@@ -79,6 +79,7 @@ module Scrape::Tumblr
         views: nil,
         favorites: likes.count,
         site_name: 'tumblr',
+        module_name: 'Scrape::Tumblr',
       }
       tags = image['tags'].map { |tag| Tag.new(name: tag) }
       image_data.push({ data: hash, tags: tags })

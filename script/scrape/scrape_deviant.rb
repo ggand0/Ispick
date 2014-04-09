@@ -76,7 +76,8 @@ module Scrape::Deviant
         caption: item.css('description').first.content,
         page_url: item.css('link').first.content,
         posted_at: posted_at,
-        site_name: 'deviantART'
+        site_name: 'deviantART',
+        module_name: 'Scrape::Deviant'
       }
 
       self.get_contents(image_data)

@@ -43,10 +43,14 @@ module Scrape::Twitter
   def self.get_client
     # Twitter APIによるリクエスト
     client = Twitter::REST::Client.new do |config|
+=begin
       config.consumer_key        = "OJof3PJIJTP9xCFmOD1w"
       config.consumer_secret     = "cSypo4EUdb8ZA3Rczo4YVgdhZ4IM7b7OhMN1RpBKc"
       config.access_token        = "875327030-hBjqCkLdBYmsjggmNS3rzdZKWuJ54QtzsHvkWFXP"
       config.access_token_secret = "Iyo7cwygF2Au2UgH5KDUEpG4pBpDWIeJ8EAFDOeUQ10rh"
+=end
+      config.consumer_key        = CONFIG['twitter_consumer_key']
+      config.consumer_secret     = CONFIG['twitter_consumer_secret']
     end
     client
   end
@@ -56,11 +60,11 @@ module Scrape::Twitter
 
     # limitで指定された数だけツイートを取得
     client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
-      :include_entity => true).take(limit).map do |tweet|
-      #puts tweet.favorite_count
+      include_entity: true).take(limit).map do |tweet|
 
       # entities内にメディア(画像等)を含む場合の処理
-      if tweet.media? then
+      if tweet.media? then      # v5.8.0
+      #if tweet.entities? then  # v5.5.1
         tweet.media.each do |value|
           url = value.media_uri.to_s
           data = {
@@ -69,6 +73,7 @@ module Scrape::Twitter
             caption: tweet.text,
             page_url: tweet.url.to_s,
             site_name: 'twitter',
+            module_name: 'Scrape::Twitter',
             views: tweet.retweet_count,
             favorites: tweet.favorite_count,
             posted_at: tweet.created_at
@@ -85,8 +90,8 @@ module Scrape::Twitter
     image_data.each do |value|
       puts "#{value[:title]} : #{value[:src_url]}"
       if not Scrape::is_duplicate(value[:src_url])
-        #Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
-        Scrape.save_image(value, [ Tag.new(name: keyword) ])# attributes+tagsを渡す
+        # attributes+tagsを渡す
+        Scrape.save_image(value, [ Tag.new(name: keyword) ])
       else
         puts 'Skipping a duplicate image...'
       end
@@ -107,6 +112,7 @@ module Scrape::Twitter
 
   # ハッシュタグによる画像URL検索
   def self.hash_tag_search(client, keyword, limit)
+    require 'twitter'
     # 例外処理
     begin
       return self.get_tweets(client, keyword, limit)
