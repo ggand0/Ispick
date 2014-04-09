@@ -6,7 +6,7 @@ describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     # コンソールに出力しないようにしておく
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
   end
 
   describe "scrape_with_keyword function" do
@@ -47,6 +47,14 @@ describe Scrape::Twitter do
       image = FactoryGirl.attributes_for(:image_file)
       puts image
       Scrape::Twitter.save([ image ], 'madoka')
+    end
+  end
+
+  describe "get_stats function" do
+    it "returns stats information from a page_url" do
+      url = 'https://twitter.com/ogipote/status/419125060968804352'
+      result = Scrape::Twitter.get_stats(url)
+      expect(result).to be_a(Hash)
     end
   end
 

@@ -56,21 +56,14 @@ module Scrape::Tumblr
     # limitで指定された数だけ画像を取得
     images = client.tagged(keyword)
     images.each do |image|
-      #puts image
-      #fsd
-
       #http://realotakuman.tumblr.com/post/80263089672/pixiv
       url = image['post_url']
       puts url
       html = Nokogiri::HTML(open(url))
 
-      #likes = html.css("meta[name='if:Show Likes']").attr('content').content
-      #likes = html.css('body').first.content.to_s.count('likes this')
-      #likes = html.css("ol[class='notes']").first.content.to_s.count('likes this')
       begin
         # show:likesを設定しているページのみgetしてみる
         likes = html.css("ol[class='notes']").first.content.to_s.scan(/likes this/)
-        #puts likes.count
       rescue => e
         # 非表示設定にしていてlikesが取れないページは諦める
         puts e
@@ -88,8 +81,6 @@ module Scrape::Tumblr
         site_name: 'tumblr',
       }
       tags = image['tags'].map { |tag| Tag.new(name: tag) }
-
-      #puts images['tags']
       image_data.push({ data: hash, tags: tags })
     end
     image_data
@@ -106,6 +97,22 @@ module Scrape::Tumblr
         puts 'Skipping a duplicate image...'
       end
     end
+  end
+
+  def self.get_stats(page_url)
+    html = Nokogiri::HTML(open(page_url))
+
+    # 抽出してきた時点でlikes数が取れている画像のはずだが、一応rescue
+    begin
+      # show:likesを設定しているページのみgetしてみる
+      likes = html.css("ol[class='notes']").first.content.to_s.scan(/likes this/)
+    rescue => e
+      # 非表示設定にしていてlikesが取れないページは諦める
+      puts e
+      Rails.logger.fail('Updating likes value has been failed: ' + page_url)
+      return
+    end
+    { views: nil, favorites: likes }
   end
 
 end

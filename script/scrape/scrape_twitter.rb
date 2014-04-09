@@ -51,19 +51,6 @@ module Scrape::Twitter
     client
   end
 
-  def self.save(image_data, keyword)
-    # Imageモデル生成＆DB保存
-    image_data.each do |value|
-      puts "#{value[:title]} : #{value[:src_url]}"
-      if not Scrape::is_duplicate(value[:src_url])
-        #Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
-        Scrape.save_image(value, [ Tag.new(name: keyword) ])# attributes+tagsを渡す
-      else
-        puts 'Skipping a duplicate image...'
-      end
-    end
-  end
-
   def self.get_tweets(client, keyword, limit)
     image_data = []
 
@@ -92,6 +79,31 @@ module Scrape::Twitter
     end
     image_data
   end
+
+  def self.save(image_data, keyword)
+    # Imageモデル生成＆DB保存
+    image_data.each do |value|
+      puts "#{value[:title]} : #{value[:src_url]}"
+      if not Scrape::is_duplicate(value[:src_url])
+        #Scrape::save_image(img_name, value[:url], value[:caption], [ Tag.new(name: keyword) ])
+        Scrape.save_image(value, [ Tag.new(name: keyword) ])# attributes+tagsを渡す
+      else
+        puts 'Skipping a duplicate image...'
+      end
+    end
+  end
+
+  def self.get_stats(page_url)
+    client = self.get_client()
+    id = page_url.match(/\/\d.*\d$/).to_s
+    puts id
+    puts id.gsub!(/\//, '')
+    tweet = client.status(id)
+    puts tweet.text
+
+    { views: nil, favorites: tweet.favorite_count }
+  end
+
 
   # ハッシュタグによる画像URL検索
   def self.hash_tag_search(client, keyword, limit)
