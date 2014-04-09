@@ -63,7 +63,7 @@ gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'whenever', require: false                   # Support crontab
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
-gem 'twitter'
+gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'rubyzip'
 gem 'ransack'
 gem 'natto'
@@ -71,7 +71,7 @@ gem 'x2ch'
 #gem 'futaba', git: 'https://github.com/co-me/futaba'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
-#gem 'tumblr-rb'
+#gem 'tumblr_client', git: 'git@github.com:pentiumx/tumblr_client.git'
 
 gem 'devise'
 gem 'omniauth'
