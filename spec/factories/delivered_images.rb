@@ -1,4 +1,5 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
+require "#{Rails.root}/spec/support/consts"
 
 FactoryGirl.define do
   factory :delivered_image do
@@ -7,6 +8,8 @@ FactoryGirl.define do
     is_illust true
     avoided false
     sequence(:src_url) { |n| "test#{n}@example.com"}
+    sequence(:page_url) { |n| Constants::URLS[n % Constants::URLS.count] }
+    sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
     association :user, factory: :twitter_user, strategy: :build
     association :targetable, factory: :target_word, strategy: :build
   end

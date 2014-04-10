@@ -35,6 +35,18 @@ describe Scrape::Nico do
     end
   end
 
+  describe "get_tags function" do
+
+  end
+
+  describe "get_stats function" do
+    it "returns stats hash from a certain page" do
+      page_url = 'http://seiga.nicovideo.jp/seiga/im3858537'
+      stats = Scrape::Nico.get_stats(page_url)
+      expect(stats).to be_a(Hash)
+    end
+  end
+
   describe "get_contents method" do
     # itemタグを参照するオブジェクトを渡した時に、新規Imageが保存されること
     it "should create an image model from image source" do
@@ -67,9 +79,12 @@ describe Scrape::Nico do
 
   describe "scrape method" do
     # 少なくとも20回はget_contentsメソッドを呼び出すこと
-    it "should call get_contents method at least 20 time" do
+    it "should call get_contents method at least 50 time" do
+      limit = 50
+      FactoryGirl.create(:person_madoka)
+
       Scrape::Nico.stub(:get_contents).and_return()
-      Scrape::Nico.should_receive(:get_contents).at_least(20).times
+      Scrape::Nico.should_receive(:get_contents).at_least(limit).times
 
       Scrape::Nico.scrape()
     end

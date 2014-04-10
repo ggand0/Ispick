@@ -53,7 +53,7 @@ module Scrape::Nichan
                 src_url: src_url,
                 page_url: thread.url+'dat/'+thread.dat,
                 site_name: '2ch',
-                posted_time: posted_at
+                posted_atß: posted_at
               }
               image_data.push(info)
 

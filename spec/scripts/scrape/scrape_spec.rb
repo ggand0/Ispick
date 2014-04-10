@@ -17,6 +17,7 @@ describe Scrape do
       Scrape::Nichan.stub(:scrape).and_return()
       Scrape::Fourchan.stub(:scrape).and_return()
       Scrape::Twitter.stub(:scrape).and_return()
+      Scrape::Tumblr.stub(:scrape).and_return()
 
       Scrape::Nico.should_receive(:scrape)
       Scrape::Piapro.should_receive(:scrape)
@@ -26,6 +27,7 @@ describe Scrape do
       Scrape::Nichan.should_receive(:scrape)
       Scrape::Fourchan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
+      Scrape::Tumblr.should_receive(:scrape)
 
       Scrape.scrape_all()
     end
@@ -43,9 +45,11 @@ describe Scrape do
       Scrape::Piapro.stub(:scrape).and_return()
       Scrape::Nichan.stub(:scrape).and_return()
       Scrape::Twitter.stub(:scrape).and_return()
+      Scrape::Tumblr.stub(:scrape).and_return()
       Scrape::Piapro.should_receive(:scrape)
       Scrape::Nichan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
+      Scrape::Tumblr.should_receive(:scrape)
       Scrape.scrape_15min()
     end
     it "runs all scraping script in _30min function" do

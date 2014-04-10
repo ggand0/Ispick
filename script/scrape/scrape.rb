@@ -10,41 +10,43 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_2ch"
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_twitter"
+  require "#{Rails.root}/script/scrape/scrape_tumblr"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
     Scrape::Nico.scrape()
     Scrape::Piapro.scrape()
-    #Scrape::Pixiv.scrape()
     Scrape::Deviant.scrape()
     Scrape::Futaba.scrape()
     Scrape::Nichan.scrape()
     Scrape::Fourchan.scrape()
     Scrape::Twitter.scrape()
+    Scrape::Tumblr.scrape()
     puts 'DONE!!'
   end
 
   def self.scrape_5min
     Scrape::Nico.scrape()
-    Scrape::Futaba.scrape()
+    #Scrape::Futaba.scrape()
     puts 'DONE!!'
   end
 
   def self.scrape_15min()
-    Scrape::Piapro.scrape()
-    Scrape::Nichan.scrape()
+    #Scrape::Piapro.scrape()
+    #Scrape::Nichan.scrape()
     Scrape::Twitter.scrape()
+    Scrape::Tumblr.scrape()
     puts 'DONE!!'
   end
 
   def self.scrape_30min()
-    Scrape::Fourchan.scrape()
+    #Scrape::Fourchan.scrape()
     puts 'DONE!!'
   end
 
   def self.scrape_60min()
     #Scrape::Pixiv.scrape()
-    Scrape::Deviant.scrape()
+    #Scrape::Deviant.scrape()
     puts 'DONE!!'
   end
 

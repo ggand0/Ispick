@@ -42,10 +42,12 @@ module Deliver
       caption: image.caption,
       src_url: image.src_url,
       data: image.data,
-      posted_at: image.posted_time,
-      views: image.view_nums,
+      posted_at: image.posted_at,
+      views: image.views,
+      favorites: image.favorites,
       page_url: image.page_url,
       site_name: image.site_name,
+      module_name: image.module_name,
       is_illust: image.is_illust
     )
   end
@@ -152,4 +154,21 @@ module Deliver
     images.destroy_all
     images
   end
+
+
+  # User.all.delivered_imagesをupdateする
+  def self.update()
+    User.all.each do |user|
+      user.delivered_images.each do |delivered_image|
+        stats = Object.const_get(delivered_image.module_name).get_stats(delivered_image.page_url)
+        next if not stats
+        delivered = DeliveredImage.find(delivered_image.id)
+
+        # favorites値を更新する
+        puts "#{delivered_image.site_name}: #{delivered_image.favorites} -> #{stats[:favorites]}"
+        delivered.update_attributes(favorites: stats[:favorites])
+      end
+    end
+  end
+
 end

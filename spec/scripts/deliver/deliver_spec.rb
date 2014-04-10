@@ -5,7 +5,7 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
   end
 
   describe "delete_excessed_records" do
@@ -54,9 +54,9 @@ describe "Deliver" do
       expect(delivered_image.caption).to eq(image.caption)
       expect(delivered_image.src_url).to eq(image.src_url)
       expect(delivered_image.page_url).to eq(image.page_url)
-      expect(delivered_image.posted_at).to eq(image.posted_time)
+      expect(delivered_image.posted_at).to eq(image.posted_at)
       expect(delivered_image.site_name).to eq(image.site_name)
-      expect(delivered_image.views).to eq(image.view_nums)
+      expect(delivered_image.views).to eq(image.views)
       expect(delivered_image.is_illust).to eq(image.is_illust)
     end
   end
@@ -100,6 +100,29 @@ describe "Deliver" do
     it "deliver properly" do
       FactoryGirl.create(:user_with_target_words, words_count: 5)
       Deliver.deliver_from_word(1, User.first.target_words.first)
+    end
+  end
+
+
+  describe "update function" do
+    it "call get_stats functions in proper module" do
+      require "#{Rails.root}/script/scrape/scrape"
+      require "#{Rails.root}/script/scrape/scrape_twitter"
+      require "#{Rails.root}/script/scrape/scrape_tumblr"
+      require "#{Rails.root}/script/scrape/scrape_nico"
+
+      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 5)
+      #puts user.delivered_images.count
+      user.delivered_images.each { |d| puts d.page_url }
+
+      Scrape::Twitter.stub(:get_stats).and_return({ views: 100, favorites: 100})
+      Scrape::Tumblr.stub(:get_stats).and_return({ views: 100, favorites: 100})
+      Scrape::Nico.stub(:get_stats).and_return({ views: 100, favorites: 100})
+      Scrape::Twitter.should_receive(:get_stats)
+      Scrape::Tumblr.should_receive(:get_stats)
+      Scrape::Nico.should_receive(:get_stats)
+
+      Deliver.update()
     end
   end
 end

@@ -41,3 +41,19 @@ describe "deliver:user" do
     expect(user.delivered_images.count).to eq(1)
   end
 end
+
+describe "deliver:update" do
+  # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
+  before do
+    IO.any_instance.stub(:puts)
+  end
+  include_context 'rake'
+  its(:prerequisites) { should include('environment') }
+
+  it "deliver recommended images to an user" do
+    puts 'DEBUG:' + Rails.env.to_s
+    user = FactoryGirl.create(:user_with_delivered_images, images_count: 5)
+    Deliver.should_receive(:update)
+    Deliver.update()
+  end
+end

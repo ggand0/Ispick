@@ -1,6 +1,5 @@
-
-require "#{Rails.root}/script/scrape/scrape"
 require 'spec_helper'
+require "#{Rails.root}/script/scrape/scrape"
 require "#{Rails.root}/script/scrape/scrape_twitter"
 
 describe Scrape::Twitter do
@@ -12,8 +11,11 @@ describe Scrape::Twitter do
 
   describe "scrape_with_keyword function" do
     it "call proper methods" do
-      Scrape::Twitter.hash_tag_search.should_recieve()
-      Scrape::Twitter.hash_tag_search.saves()
+      Scrape::Twitter.should_receive(:get_tweets)
+      Scrape::Twitter.should_receive(:save)
+      Scrape::Twitter.stub(:save).and_return()
+
+      Scrape::Twitter.scrape_with_keyword('madoka', 5)
     end
   end
 
@@ -28,7 +30,7 @@ describe Scrape::Twitter do
     it "returns tweet array" do
       client = Scrape::Twitter.get_client
       image_data = Scrape::Twitter.get_tweets(client, 'test', 50)
-      expect(image_data.count).to be > 0
+      expect(image_data).to be_an(Array)
     end
   end
 
@@ -43,7 +45,16 @@ describe Scrape::Twitter do
   describe "save function" do
     it "save to database properly" do
       image = FactoryGirl.attributes_for(:image_file)
-      Scrape::Twitter.save([ image ] )
+      puts image
+      Scrape::Twitter.save([ image ], 'madoka')
+    end
+  end
+
+  describe "get_stats function" do
+    it "returns stats information from a page_url" do
+      url = 'https://twitter.com/ogipote/status/419125060968804352'
+      result = Scrape::Twitter.get_stats(url)
+      expect(result).to be_a(Hash)
     end
   end
 
@@ -51,14 +62,15 @@ describe Scrape::Twitter do
     it "returns image_data array" do
       client = Scrape::Twitter.get_client
       image_data = Scrape::Twitter.hash_tag_search(client, 'test', 50)
-      expect(image_data.count).to be > 0
+      expect(image_data).to be_an(Array)
     end
   end
 
   describe "scrape method" do
-    # 少なくとも20回はget_contentsメソッドを呼び出すこと
-    it "should call get_contents method at least 20 time" do
-      Scrape::Twitter.scrape_with_keyword.should_recieve()
+    it "should call scrape_with_keyword function" do
+      FactoryGirl.create(:person_madoka)
+      Scrape::Twitter.should_receive(:scrape_with_keyword)
+      Scrape::Twitter.scrape()
     end
   end
 end
