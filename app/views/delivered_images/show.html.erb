@@ -23,40 +23,61 @@
 
 <p>
   <strong>Delivered from:</strong>
-  <%= show_targetable(@delivered_image) %>
+  <%= show_targetable(@delivered_image) + ' / ' + @delivered_image.site_name %>
 </p>
 
-<p>
-  <strong>Is an illustration:</strong>
-  <%= @delivered_image.is_illust %>
-</p>
+<h2>Detail:</h2>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Is an illustration</th>
+      <td><%= @delivered_image.is_illust %></td>
+    </tr>
+    <tr>
+      <th align="left">Views</th>
+      <td><%= @delivered_image.views %></td>
+    </tr>
+    <tr>
+      <th align="left">Favorites</th>
+      <td><%= @delivered_image.favorites %></td>
+    </tr>
+    <tr>
+      <th align="left">Updated_at</th>
+      <td><%= get_jst_string(@delivered_image.updated_at) %></td>
+    </tr>
+    <tr>
+      <th align="left">Posted_at</th>
+      <td><%= get_jst_string(@delivered_image.posted_at) %></td>
+    </tr>
+    <tr>
+      <th align="left">Tags</th>
+      <%# @delivered_image.tags.each do |tag| %>
+      <%# tag.name %>
+      <%# end %>
+    </tr>
+    <tr>
+      <th align="left">Size in bytes[KB]</th>
+      <td><%= bytes_to_kilobytes(@delivered_image.data.size) %> KB</td>
+    </tr>
+    <tr>
+      <th align="left">Size in bytes[MB]</th>
+      <td><%= bytes_to_megabytes(@delivered_image.data.size) %> MB</td>
+    </tr>
+  </thead>
 
-<p>
-  <strong>Views:</strong>
-  <%= @delivered_image.views %>
-</p>
-<p>
-  <strong>Favorites:</strong>
-  <%= @delivered_image.favorites %>
-</p>
+  <tbody>
+    <tr>
 
-<p>
-  <strong>Posted at:</strong>
-  <%= @delivered_image.posted_at %>
-</p>
 
-<p>
-  <strong>Tags:</strong>
-  <%# @delivered_image.tags.each do |tag| %>
-  <%# tag.name %>
-  <%# end %>
-</p>
 
-<p>
-  <strong>Size in bytes:</strong><br>
-  <%= bytes_to_kilobytes(@delivered_image.data.size) %> KB<br>
-  <%= bytes_to_megabytes(@delivered_image.data.size) %> MB<br>
-</p>
+
+
+
+
+
+    </tr>
+  </tbody>
+</table>
 
 <p>
   <strong>Is Favored:</strong>
