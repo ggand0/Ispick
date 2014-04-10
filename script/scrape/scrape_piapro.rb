@@ -19,28 +19,59 @@ module Scrape::Piapro
   end
 
   # 対象HTMLオブジェクトから画像・文字情報を抽出する
-  def self.get_contents(html, image_data)
+  #def self.get_contents(html, agent, image_data)
+  def self.get_contents(page_url, agent, image_data)
+    # NokogiriではなくMechanizeを使う
+    begin
+      page = agent.get(page_url)
+    rescue Exception => e
+      # ログイン求められて失敗した時用
+      puts e
+      puts 'PAGE_URL:'
+      puts page_url
+      Rails.logger.info('Image model saving failed.')
+      return
+    end
+    bookmarks = page.at("span[id='_bookmark_count_span']").content
+
     # ...style="background:url(http://c1.piapro.jp/xxx.png) no-repeat center;">
     # という文字列からURLを切り取る
-    str = html.css("div[class='dtl_works dtl_ill']").first
+    str = page.at("div[class='dtl_works dtl_ill']")
     src_url = str['style'][/\((.*?)\)/] # (...)の中のurlを取り出す
     src_url = src_url.gsub(/[()]/, "")  # ()を除去
-    puts src_url
 
-    title = html.css("h1[class='dtl_title']").first.content
-    caption = html.css("p[class='dtl_cap']").first.content
-    tag_elements = html.css("ul[class='taglist']").css('a')
+    title = page.at("h1[class='dtl_title']").content
+    caption = page.at("p[class='dtl_cap']").content
+    tag_elements = page.at("ul[class='taglist']").css('a')
     tags = tag_elements.map { |tag| Tag.new(name: tag.content) }
 
     info = {
       title: title,
       caption: caption,
-      src_url: src_url
+      src_url: src_url,
+      favorites: bookmarks
     }
     image_data = image_data.merge(info)
+    puts image_data[:src_url]
 
     # Imageモデル生成＆DB保存
     Scrape::save_image(image_data, tags)
+  end
+
+  def self.login()
+    agent = Mechanize.new
+    agent.ssl_version = 'SSLv3'
+    #agent.post('https://piapro.jp/login/',
+    #  'text' => CONFIG['piapro_email'],'password' => CONFIG['piapro_password'])
+    agent.get('https://piapro.jp/login/')
+    form = agent.page.forms[2]
+    username_field = form.field_with(name: '_username')
+    username_field.value = CONFIG['piapro_email']
+    password_field = form.field_with(name: '_password')
+    password_field.value = CONFIG['piapro_password']
+    result = form.submit
+
+    agent
   end
 
   # ピアプロは抽出しやすい
@@ -50,6 +81,7 @@ module Scrape::Piapro
     # オフィシャルカテゴリに属するイラストの新着を見る
     base_url = 'http://piapro.jp/illust/?categoryId=3'
     html = Nokogiri::HTML(open(base_url))
+    agent = self.login()
 
     # class属性名が「i_image」であるタグに注目
     html.css("div[class='i_main']").each do |main|
@@ -65,7 +97,8 @@ module Scrape::Piapro
       }
 
       html = self.get_illust_html(item)
-      self.get_contents(html, image_data) if html
+      #self.get_contents(html, agent, image_data) if html
+      self.get_contents(image_data[:page_url], agent, image_data) if html
     end
   end
 
