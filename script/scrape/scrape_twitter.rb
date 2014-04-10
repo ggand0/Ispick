@@ -51,6 +51,8 @@ module Scrape::Twitter
 =end
       config.consumer_key        = CONFIG['twitter_consumer_key']
       config.consumer_secret     = CONFIG['twitter_consumer_secret']
+      config.access_token        = CONFIG['twitter_access_token']
+      config.access_token_secret = CONFIG['twitter_access_token_secret']
     end
     client
   end
@@ -101,10 +103,13 @@ module Scrape::Twitter
   def self.get_stats(page_url)
     client = self.get_client()
     id = page_url.match(/\/\d.*\d$/).to_s
-    puts id
-    puts id.gsub!(/\//, '')
-    tweet = client.status(id)
-    puts tweet.text
+    begin
+      tweet = client.status(id)
+    rescue => e
+      # Twitter::Error::Forbidden:など
+      puts e
+      return false
+    end
 
     { views: nil, favorites: tweet.favorite_count }
   end

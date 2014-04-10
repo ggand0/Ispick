@@ -64,25 +64,27 @@ module Scrape::Tumblr
       begin
         # show:likesを設定しているページのみgetしてみる
         likes = html.css("ol[class='notes']").first.content.to_s.scan(/likes this/)
+
+        # photo以外だとここで落ちるはず
+        hash = {
+          title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
+          caption: image['caption'],
+          src_url: image['photos'].first['original_size']['url'],
+          page_url: image['post_url'],
+          posted_at: image['date'],
+          views: nil,
+          favorites: likes.count,
+          site_name: 'tumblr',
+          module_name: 'Scrape::Tumblr',
+        }
+        tags = image['tags'].map { |tag| Tag.new(name: tag) }
+        image_data.push({ data: hash, tags: tags })
       rescue => e
         # 非表示設定にしていてlikesが取れないページは諦める
         puts e
         next
       end
 
-      hash = {
-        title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
-        caption: image['caption'],
-        src_url: image['photos'].first['original_size']['url'],
-        page_url: image['post_url'],
-        posted_at: image['date'],
-        views: nil,
-        favorites: likes.count,
-        site_name: 'tumblr',
-        module_name: 'Scrape::Tumblr',
-      }
-      tags = image['tags'].map { |tag| Tag.new(name: tag) }
-      image_data.push({ data: hash, tags: tags })
     end
     image_data
   end

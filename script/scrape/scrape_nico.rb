@@ -82,7 +82,7 @@ module Scrape::Nico
     views = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
     comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
     clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
-    puts views.to_s+' '+comments.to_s+' '+clips.to_s
+    #puts views.to_s+' '+comments.to_s+' '+clips.to_s
 
     { views: views, favorites: clips}
   end
