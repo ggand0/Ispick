@@ -36,4 +36,9 @@ module ApplicationHelper
   def get_time_string(datetime)
     datetime.strftime("%Y年%m月%d日%H時%M分")
   end
+
+  # string
+  def get_jst_string(datetime)
+    get_time_string(utc_to_jst(datetime))
+  end
 end

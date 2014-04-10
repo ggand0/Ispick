@@ -35,4 +35,12 @@ describe ApplicationHelper do
       expect(helper.get_time_string(jst)).to eql('2014年04月01日09時00分')
     end
   end
+  describe "get_jst_string method" do
+    it "returns proper string from datetime value" do
+      utc = DateTime.new(2014, 4, 1, 0, 0).utc
+      created_at = ActiveSupport::TimeWithZone.new(utc, 'GMT')
+
+      expect(helper.get_jst_string(created_at)).to eql('2014年04月01日09時00分')
+    end
+  end
 end
