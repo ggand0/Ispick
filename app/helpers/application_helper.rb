@@ -26,4 +26,14 @@ module ApplicationHelper
     images.each { |n| total_size += n.data.size }
     total_size
   end
+
+  # DateTime
+  def utc_to_jst(datetime)
+    datetime.in_time_zone('Asia/Tokyo')
+  end
+
+  # string
+  def get_time_string(datetime)
+    datetime.strftime("%Y年%m月%d日%H時%M分")
+  end
 end
