@@ -5,7 +5,17 @@ class UsersController < ApplicationController
   def home
     if signed_in?
       # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      delivered_images = current_user.delivered_images.where('avoided IS NULL or avoided = false')
+      if params[:date]
+        #fds
+        start_day = DateTime.parse(params[:date]).change(offset: '+0900')
+        end_day = (DateTime.parse(params[:date])+1).change(offset: '+0900')
+        delivered_images = current_user.delivered_images.
+          where('avoided IS NULL or avoided = false').
+          where(created_at: start_day.utc..end_day.utc)
+      else
+        delivered_images = current_user.delivered_images.
+          where('avoided IS NULL or avoided = false')
+      end
       @delivered_images = delivered_images.page(params[:page]).per(25)
       render action: 'signed_in'
     else

@@ -31,6 +31,7 @@ Ispic::Application.routes.draw do
       get 'download_favored_images'
     end
   end
+  match '/:username' => 'users#home', via: :get
 
   resources :delivered_images do
     collection do
