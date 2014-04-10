@@ -37,13 +37,19 @@ every 60.minutes do
   rake 'scrape:min60'
 end
 
-# １万枚を超えたらその分Imagesから削除
+# 配信システム系
 every 30.minutes do
+  # １万枚を超えたらその分Imagesから削除
   rake 'scrape:delete_excess[10000]'
+
+  # 全てのユーザーに推薦イラストを配信
+  rake 'deliver:all'
+
+  # 配信画像の統計情報を更新する
+  rake 'deliver:update'
 end
 
-# 全てのユーザーに推薦イラストを配信
-#every 1.hours do
-every 30.minutes do
-  rake 'deliver:all'
+
+every 1.hours do
+
 end

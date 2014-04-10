@@ -160,9 +160,12 @@ module Deliver
   def self.update()
     User.all.each do |user|
       user.delivered_images.each do |delivered_image|
-        puts delivered_image.module_name
         stats = Object.const_get(delivered_image.module_name).get_stats(delivered_image.page_url)
+        next if not stats
         delivered = DeliveredImage.find(delivered_image.id)
+
+        # favorites値を更新する
+        puts "#{delivered_image.site_name}: #{delivered_image.favorites} -> #{stats[:favorites]}"
         delivered.update_attributes(favorites: stats[:favorites])
       end
     end
