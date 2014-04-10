@@ -29,4 +29,36 @@ module UsersHelper
     end
     total_size
   end
+
+  def test_menu_items
+    Proc.new do |primary|
+      primary.dom_class = "nav nav-tabs"
+      primary.item :home, 'Home', home_users_path
+      primary.item :key_1, 'Home', '#' do |sub_nav|
+        sub_nav.item :key_1_1, 'Home', home_users_path
+        sub_nav.item :key_1_2, 'Home', home_users_path
+      end
+    end
+  end
+  def date_menu_items
+    Proc.new do |primary|
+      primary.dom_class = "nav nav-tabs"
+      primary.item :dates, 'Dates', '#' do |sub_nav|
+        # 動的に日付メニューを追加する：user.created_atからtodayまで
+        user_created = current_user.created_at.to_date
+        today = Time.now.in_time_zone('Asia/Tokyo').to_date
+        #sym = ['1'.to_sym,'1'.to_sym,'1'.to_sym,'1'.to_sym,'1'.to_sym]
+        #[0,1,2,3,4].each do |n|
+        #  sub_nav.item sym[n], "#{n}", home_users_path
+        #end
+        range = (user_created..today).map{ |date| { date: date, str: date.strftime("%b %d") } }
+        range.each do |date|
+          sub_nav.item date[:str].to_sym, date[:str], home_users_path(
+            date: date[:date], y: date[:date].year, m: date[:date].month, d: date[:date].day)
+        end
+      end
+    end
+
+  end
+
 end

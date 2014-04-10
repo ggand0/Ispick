@@ -20,6 +20,9 @@
   <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
 </p>
 <br>
+<%= render_navigation expand_all: true, renderer: :bootstrap, &date_menu_items %>
+<%# render_navigation(expand_all: true, renderer: :bootstrap) %>
+<br>
 <%= paginate @delivered_images %>
 <div class="wrap">
   <% @delivered_images.each do |image| %>
