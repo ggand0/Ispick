@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Deviant do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
   end
 
   # R18コンテンツを判定する関数について
@@ -63,6 +63,15 @@ describe Scrape::Deviant do
       Scrape::Deviant.should_receive(:get_contents).at_least(20).times
 
       Scrape::Deviant.scrape()
+    end
+  end
+
+
+  describe "get_stats function" do
+    it "returns updated stats information" do
+      page_url = 'http://www.deviantart.com/art/Madoka-201395121'
+      result = Scrape::Deviant.get_stats(page_url)
+      expect(result).to be_a(Hash)
     end
   end
 end

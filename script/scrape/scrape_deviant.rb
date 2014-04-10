@@ -84,4 +84,23 @@ module Scrape::Deviant
     end
   end
 
+  def self.get_stats(page_url)
+    begin
+      html = Nokogiri::HTML(open(page_url))
+    rescue Exception => e
+      Rails.logger.info('Image model saving failed.')
+      return
+    end
+    stats_elements = html.css(
+      "div[class='dev-right-bar-content dev-metainfo-content dev-metainfo-stats'] dl").first
+    stats = {}
+    stats_elements.css('dt').each do |node|
+      # 数字のみに整形
+      count = node.next_element.text      # 次のnodeすなわちddタグを取得
+      count.gsub!(/(\n|,| |\(.*)/, '')    # カンマ|空白|(以下 を除去
+      stats[node.text] = count.to_i
+    end
+    { views: stats['Views'], favorites: stats['Favorites'] }
+  end
+
 end
