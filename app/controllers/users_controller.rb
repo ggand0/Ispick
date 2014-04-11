@@ -19,7 +19,7 @@ class UsersController < ApplicationController
         where(created_at: start_day.utc..end_day.utc)
 
       # イラスト判定リクエストがあれば：
-      delivered_images = delivered_images.where(is_illust: params[:illust]) if params[:illust]
+      delivered_images = delivered_images.where(is_illust: true) if params[:illust]
 
       # ソートリクエストがあれば：
       delivered_images = delivered_images.reorder('favorites desc') if params[:sort]

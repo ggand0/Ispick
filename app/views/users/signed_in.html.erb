@@ -1,9 +1,6 @@
 <%= javascript_include_tag 'users_home' %>
 
 <h1>TODAY's Delivered Images</h1>
-<%= link_to('登録イラスト一覧', { controller: 'users', action: 'show_target_images' }) %>
-<%= link_to('登録ワード一覧', { controller: 'users', action: 'show_target_words' }) %>
-<%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
 <br>
 <%= link_to 'イラストのみ表示する', request.parameters.merge({ illust: true }) %>
 <br>

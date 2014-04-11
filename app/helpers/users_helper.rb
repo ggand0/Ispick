@@ -30,13 +30,13 @@ module UsersHelper
     total_size
   end
 
-  def test_menu_items
+  def list_menu_items
     Proc.new do |primary|
       primary.dom_class = "nav nav-tabs"
-      primary.item :home, 'Home', home_users_path
-      primary.item :key_1, 'Home', '#' do |sub_nav|
-        sub_nav.item :key_1_1, 'Home', home_users_path
-        sub_nav.item :key_1_2, 'Home', home_users_path
+      primary.item :list, 'Lists', '#' do |sub_nav|
+        sub_nav.item :list_word, '登録ワード一覧', show_target_words_users_path
+        sub_nav.item :list_image, '登録イラスト一覧', show_target_images_users_path
+        sub_nav.item :list_clip, 'クリップイラスト一覧', show_favored_images_users_path
       end
     end
   end
@@ -50,14 +50,18 @@ module UsersHelper
 
         range = (user_created..today).map{ |date| { date: date, str: date.strftime("%b %d") } }
         range.each do |date|
-          #sub_nav.item date[:str].to_sym, date[:str], home_users_path(
-          #  year: date[:date].year, month: date[:date].month, day: date[:date].day)
           sub_nav.item date[:str].to_sym, date[:str],
             "/users/home/#{date[:date].year}/#{date[:date].strftime("%m")}/#{date[:date].strftime("%d")}"
         end
       end
-    end
 
+      # ユーザーが持つ一覧へのリンクをまとめるtab
+      primary.item :list, 'Lists', '#' do |sub_nav|
+        sub_nav.item :list_word, '登録ワード一覧', show_target_words_users_path
+        sub_nav.item :list_image, '登録イラスト一覧', show_target_images_users_path
+        sub_nav.item :list_clip, 'クリップイラスト一覧', show_favored_images_users_path
+      end
+    end
   end
 
 end
