@@ -29,9 +29,10 @@ Ispic::Application.routes.draw do
       get 'show_favored_images'
       get 'sort_delivered_images'
       get 'download_favored_images'
+      get "/home/:year/:month/:day" => "users#home",
+        constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[01][0-9]/ }
     end
   end
-  match '/:username' => 'users#home', via: :get
 
   resources :delivered_images do
     collection do
