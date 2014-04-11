@@ -1,13 +1,10 @@
 <%= javascript_include_tag 'users_home' %>
 
 <h1>TODAY's Delivered Images</h1>
-<%= link_to('登録イラスト一覧', { controller: 'users', action: 'show_target_images' }) %>
-<%= link_to('登録ワード一覧', { controller: 'users', action: 'show_target_words' }) %>
-<%= link_to('クリップイラスト一覧', { controller: 'users', action: 'show_favored_images' }) %>
 <br>
-<%= link_to('イラストのみ表示する', { controller: 'users', action: 'show_illusts' }) %>
+<%= link_to 'イラストのみ表示する', request.parameters.merge({ illust: true }) %>
 <br>
-<%= link_to('Sort by favorites', { controller: 'users', action: 'sort_delivered_images' }) %>
+<%= link_to 'Sort by favorites', request.parameters.merge({ sort: true }) %>
 <br>
 <br>
 <p>
@@ -19,6 +16,8 @@
   <%= bytes_to_kilobytes(get_total_size(current_user.delivered_images)) %> KB<br>
   <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
 </p>
+<br>
+<%= render_navigation expand_all: true, renderer: :bootstrap, &date_menu_items %>
 <br>
 <%= paginate @delivered_images %>
 <div class="wrap">

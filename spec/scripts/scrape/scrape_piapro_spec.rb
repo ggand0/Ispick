@@ -4,7 +4,9 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Piapro do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
+
+    @agent = Scrape::Piapro.login()
   end
 
   describe "get_illust_html function" do
@@ -32,11 +34,14 @@ describe Scrape::Piapro do
       #html = Nokogiri::HTML(open('http://piapro.jp/illust/?categoryId=3'))
       #Scrape::Piapro.get_contents(html.css("a[class='i_image']")[0])
 
+      # save_image functionが呼ばれるはず
+      Scrape.stub(:save_image).and_return
+      Scrape.should_receive(:save_image)
+
       # イラスト表示ページ
       html = Nokogiri::HTML(open('http://piapro.jp/t/uvW_'))
-      Scrape::Piapro.get_contents(html, {title: 'test'})
-
-      Image.count.should eq(count+1)
+      url = 'http://piapro.jp/t/mdHE'
+      Scrape::Piapro.get_contents(url, @agent, { title: 'test' })
     end
 
     # Tag
@@ -44,6 +49,16 @@ describe Scrape::Piapro do
       # 複数タグが登録されているイラスト
       #html = Nokogiri::HTML(open('http://piapro.jp/t/uvW_'))
       #Scrape::Piapro.get_contents(html)
+    end
+  end
+
+  describe "login function" do
+    it "returns mechanize agent" do
+      agent = Scrape::Piapro.login()
+      puts agent.methods
+      puts agent.status
+      #expect(agent).to be_a(Mechanize)
+      expect(agent).to be_a(Hash)
     end
   end
 

@@ -1,5 +1,5 @@
 <p id="notice"><%= notice %></p>
-<%= link_to 'Back', show_favored_images_users_path %>
+<%= link_to 'Back', :back %>
 
 <p>
   <strong>Title:</strong>
@@ -40,6 +40,10 @@
     <tr>
       <th align="left">Favorites</th>
       <td><%= @delivered_image.favorites %></td>
+    </tr>
+    <tr>
+      <th align="left">Created_at</th>
+      <td><%= get_jst_string(@delivered_image.created_at) %></td>
     </tr>
     <tr>
       <th align="left">Updated_at</th>
