@@ -88,7 +88,9 @@ module Scrape::Deviant
     begin
       html = Nokogiri::HTML(open(page_url))
     rescue Exception => e
-      Rails.logger.info('Image model saving failed.')
+      puts e
+      puts 'PAGE_URL: ' + page_url
+      Rails.logger.info('Could not open the page.')
       return
     end
     stats_elements = html.css(

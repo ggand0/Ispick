@@ -4,8 +4,7 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Piapro do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    #IO.any_instance.stub(:puts)
-
+    IO.any_instance.stub(:puts)
     @agent = Scrape::Piapro.login()
   end
 
@@ -30,16 +29,19 @@ describe Scrape::Piapro do
 
   describe "get_contents function" do
     it "creates an image model from image source" do
-      count = Image.count
-      #html = Nokogiri::HTML(open('http://piapro.jp/illust/?categoryId=3'))
-      #Scrape::Piapro.get_contents(html.css("a[class='i_image']")[0])
-
       # save_image functionが呼ばれるはず
       Scrape.stub(:save_image).and_return
       Scrape.should_receive(:save_image)
 
       # イラスト表示ページ
-      html = Nokogiri::HTML(open('http://piapro.jp/t/uvW_'))
+      url = 'http://piapro.jp/t/mdHE'
+      Scrape::Piapro.get_contents(url, @agent, { title: 'test' })
+    end
+
+    it "writes a log when it fails to open the page" do
+      @agent.stub(:get).and_raise
+      Rails.logger.should_receive(:info).with('Could not open the page.')
+
       url = 'http://piapro.jp/t/mdHE'
       Scrape::Piapro.get_contents(url, @agent, { title: 'test' })
     end
@@ -54,11 +56,16 @@ describe Scrape::Piapro do
 
   describe "login function" do
     it "returns mechanize agent" do
-      agent = Scrape::Piapro.login()
-      puts agent.methods
-      puts agent.status
-      #expect(agent).to be_a(Mechanize)
-      expect(agent).to be_a(Hash)
+      #agent = Scrape::Piapro.login()
+      expect(@agent).to be_a(Mechanize)
+    end
+    it "returns page with logged in" do
+      # ログイン後のページheaderに「ログイン」メニューは無い
+      page = @agent.get('http://piapro.jp/')
+      header = page.at("div[id='header_user']").content
+      #puts header.match(/ログアウト/)
+      match = header.match(/ログイン/)
+      expect(match).to eql(nil)
     end
   end
 
