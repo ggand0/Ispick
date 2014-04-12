@@ -263,17 +263,15 @@ describe TargetImagesController do
       request.env['HTTP_REFERER'] = '/'
     end
     it "Set 'enabled' attribute to false when it's true" do
-      target_image = FactoryGirl.create(:target_image_nofile)
-      target_image.update_attributes(enabled: true)
+      target_image = FactoryGirl.create(:target_image_enabled)
 
       expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: false})
       get :switch, { id: target_image.id }, valid_session
     end
     it "Set 'enabled' attribute to true when it's false" do
       target_image = FactoryGirl.create(:target_image_nofile)
-      target_image.update_attributes(enabled: false)
 
-      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: false})
+      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: true})
       get :switch, { id: target_image.to_param }, valid_session
     end
   end

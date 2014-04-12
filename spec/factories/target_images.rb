@@ -19,6 +19,20 @@ FactoryGirl.define do
       end
     end
   end
+  factory :target_image_nofile, class: TargetImage do
+    title 'madoka'
+    enabled false
+    to_create do |instance|
+      instance.save validate: false
+    end
+  end
+  factory :target_image_enabled, class: TargetImage do
+    title 'madoka'
+    enabled true
+    to_create do |instance|
+      instance.save validate: false
+    end
+  end
 
   factory :target_image1, class: TargetImage do
     title 'madoka1'
