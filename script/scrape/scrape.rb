@@ -15,11 +15,11 @@ module Scrape
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
     Scrape::Nico.scrape()
-    Scrape::Piapro.scrape()
-    Scrape::Deviant.scrape()
-    Scrape::Futaba.scrape()
-    Scrape::Nichan.scrape()
-    Scrape::Fourchan.scrape()
+    #Scrape::Piapro.scrape()
+    #Scrape::Deviant.scrape()
+    #Scrape::Futaba.scrape()
+    #Scrape::Nichan.scrape()
+    #Scrape::Fourchan.scrape()
     Scrape::Twitter.scrape()
     Scrape::Tumblr.scrape()
     puts 'DONE!!'
