@@ -113,8 +113,10 @@ class TargetImagesController < ApplicationController
   def show_delivered
     @delivered_images = @target_image.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
   end
+
   def switch
-    @target_image.enabled = @target_image.enabled ? false : true
+    enabled = @target_image.enabled ? false : true
+    @target_image.update_attributes(enabled: enabled)
     redirect_to :back
   end
 

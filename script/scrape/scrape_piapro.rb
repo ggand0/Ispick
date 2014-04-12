@@ -25,11 +25,10 @@ module Scrape::Piapro
     begin
       page = agent.get(page_url)
     rescue Exception => e
-      # ログイン求められて失敗した時用
+      # ページを開くのに失敗した場合
       puts e
-      puts 'PAGE_URL:'
-      puts page_url
-      Rails.logger.info('Image model saving failed.')
+      puts 'PAGE_URL: ' + page_url
+      Rails.logger.info('Could not open the page.')
       return
     end
     bookmarks = page.at("span[id='_bookmark_count_span']").content
@@ -40,11 +39,13 @@ module Scrape::Piapro
     src_url = str['style'][/\((.*?)\)/] # (...)の中のurlを取り出す
     src_url = src_url.gsub(/[()]/, "")  # ()を除去
 
+    # その他の情報を取得
     title = page.at("h1[class='dtl_title']").content
     caption = page.at("p[class='dtl_cap']").content
     tag_elements = page.at("ul[class='taglist']").css('a')
     tags = tag_elements.map { |tag| Tag.new(name: tag.content) }
 
+    # save_imageに渡すhash作成
     info = {
       title: title,
       caption: caption,
@@ -74,6 +75,10 @@ module Scrape::Piapro
     agent
   end
 
+  def self.get_stats
+
+  end
+
   # ピアプロは抽出しやすい
   def self.scrape()
     puts 'Extracting : ' + ROOT_URL
@@ -87,7 +92,6 @@ module Scrape::Piapro
     html.css("div[class='i_main']").each do |main|
       # JSTに変更してからUTCへ
       item = main.css("a[class='i_image']").first
-
       time = main.css("p[class='post']").first.content
       posted_at = DateTime.parse(time).change(offset: '+0900').utc
       image_data = {

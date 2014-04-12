@@ -24,21 +24,12 @@ describe "deliver:user" do
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
-  it "deliver recommended images to an user" do
+  it "call the proper function" do
     puts 'DEBUG:' + Rails.env.to_s
     user = FactoryGirl.create(:user)
-    #user = User.create(email: 'test@example.com', password: '12345678')
-
-    face_feature = FactoryGirl.create(:feature_madoka)          # target_image
-    target_image = TargetImage.find(face_feature.featurable_id)
-    FactoryGirl.create(:feature_madoka1_file)                        # 似てるimage
-    FactoryGirl.create(:feature_madoka2_file)                        # 似てないimage
-    user.target_images << TargetImage.first
-    puts 'USER:' + user.id.to_s + ' / ' + User.count.to_s
-    puts 'IMAGE:' + Image.first.id.to_s + ' / ' + Image.count.to_s
+    Deliver.should_receive(:deliver).with(user.id)
 
     subject.invoke user.id
-    expect(user.delivered_images.count).to eq(1)
   end
 end
 

@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Deviant do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   # R18コンテンツを判定する関数について
@@ -72,6 +72,13 @@ describe Scrape::Deviant do
       page_url = 'http://www.deviantart.com/art/Madoka-201395121'
       result = Scrape::Deviant.get_stats(page_url)
       expect(result).to be_a(Hash)
+    end
+    # failしたらログに書く事
+    it "writes a log when it fails to open the page" do
+      Rails.logger.should_receive(:info).with('Could not open the page.')
+
+      url = 'not_existed_url'
+      Scrape::Deviant.get_stats(url)
     end
   end
 end

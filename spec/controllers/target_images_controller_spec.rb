@@ -258,4 +258,21 @@ describe TargetImagesController do
       expect(assigns(:delivered_images).count).to eq(target_image.delivered_images.count)
     end
   end
+  describe "switch action" do
+    before(:each) do
+      request.env['HTTP_REFERER'] = '/'
+    end
+    it "Set 'enabled' attribute to false when it's true" do
+      target_image = FactoryGirl.create(:target_image_enabled)
+
+      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: false})
+      get :switch, { id: target_image.id }, valid_session
+    end
+    it "Set 'enabled' attribute to true when it's false" do
+      target_image = FactoryGirl.create(:target_image_nofile)
+
+      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: true})
+      get :switch, { id: target_image.to_param }, valid_session
+    end
+  end
 end

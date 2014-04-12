@@ -34,6 +34,8 @@
 
         <%= link_to 'Hide', avoid_delivered_image_path(image), method: :put %>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
+
         <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>

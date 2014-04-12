@@ -9,6 +9,7 @@ FactoryGirl.define do
     avoided false
     sequence(:src_url) { |n| "test#{n}@example.com"}
     sequence(:page_url) { |n| Constants::URLS[n % Constants::URLS.count] }
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
     association :user, factory: :twitter_user, strategy: :build
     association :targetable, factory: :target_word, strategy: :build
@@ -64,6 +65,8 @@ FactoryGirl.define do
     #avoided false
     favored false
     sequence(:src_url) { |n| "test#{n}@example.com"}
+    sequence(:page_url) { |n| Constants::URLS[n % Constants::URLS.count] }
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
 
     # save時にvalidationをスキップする
@@ -72,6 +75,7 @@ FactoryGirl.define do
     end
 
     association :user, factory: :twitter_user, strategy: :build
+    association :targetable, factory: :target_word, strategy: :build
   end
 
   factory :delivered_image_favored, class: DeliveredImage do
