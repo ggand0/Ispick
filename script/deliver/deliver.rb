@@ -16,10 +16,10 @@ module Deliver
     count_all = user.target_images.length
 
     user.target_words.each do |t|
-      Deliver.deliver_from_word(user, t)
+      Deliver.deliver_from_word(user, t) if t.enabled
     end
     user.target_images.each do |t|
-      Deliver.deliver_from_image(user, t, count_all, count)
+      Deliver.deliver_from_image(user, t, count_all, count) if t.enabled
       count += 1
     end
 
@@ -29,7 +29,7 @@ module Deliver
   end
 
   def self.contains_word(image, target_word)
-    word = target_word.person.name
+    word = target_word.person ? target_word.person.name : target_word.word
     image.tags.each do |tag|
       return true if tag.name.include?(word)
     end

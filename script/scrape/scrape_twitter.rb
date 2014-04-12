@@ -23,8 +23,11 @@ module Scrape::Twitter
     TargetWord.all.each do |target_word|
       # Person.nameで検索（e.g. "鹿目まどか"）
       # エイリアスも含めるならkeywords.eachする
-      puts target_word.person.name
-      self.scrape_with_keyword(target_word.person.name, limit)
+      if target_word.enabled
+        query = target_word.person ? target_word.person.name : target_word.word
+        puts query
+        self.scrape_with_keyword(query, limit)
+      end
     end
 
     puts 'Scraped: '+(Image.count-count).to_s

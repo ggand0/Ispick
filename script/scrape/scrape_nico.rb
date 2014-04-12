@@ -121,27 +121,29 @@ module Scrape::Nico
     limit = 50
 
     TargetWord.all.each do |target_word|
-      puts target_word.person.name
+      if target_word.enabled
+        #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
+        query = target_word.person ? target_word.person.name : target_word.word
+        puts query
+        url = TAG_SEARCH_URL+'?page=1&query='+query
+        puts 'Extracting : ' + url
 
-      #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
-      url = TAG_SEARCH_URL+'?page=1&query='+target_word.person.name
-      puts 'Extracting : ' + url
+        escaped = URI.escape(url)
+        xml = agent.get(escaped)
+        #puts xml.search('image').count
 
-      escaped = URI.escape(url)
-      xml = agent.get(escaped)
-      #puts xml.search('image').count
+        # http://seiga.nicovideo.jp/seiga/im3858537
+        # imageタグ（イラスト）ごとに処理
+        #xml.css('image').map do |item|
+        count = 0
+        xml.search('image').map do |item|
+          title = item.css('title').first.content
+          page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
+          self.get_contents(page_url, agent, title)
 
-      # http://seiga.nicovideo.jp/seiga/im3858537
-      # imageタグ（イラスト）ごとに処理
-      #xml.css('image').map do |item|
-      count = 0
-      xml.search('image').map do |item|
-        title = item.css('title').first.content
-        page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
-        self.get_contents(page_url, agent, title)
-
-        count += 1
-        break if count >= limit
+          count += 1
+          break if count >= limit
+        end
       end
     end
   end

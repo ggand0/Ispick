@@ -4,6 +4,7 @@ class CreateTargetWords < ActiveRecord::Migration
       t.string :word
       t.integer :user_id
       t.datetime :last_delivered_at
+      t.boolean :enabled
 
       t.timestamps
     end

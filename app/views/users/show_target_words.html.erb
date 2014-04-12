@@ -1,6 +1,8 @@
 <h1>YOUR target_words</h1>
 <%= link_to 'New Target word', new_target_word_path %>
 <br>
+<%= link_to 'Search Target words', search_target_words_path %>
+<br>
 <%= link_to 'Back', controller: 'users', action: 'home' %>
 <br>
 
@@ -8,6 +10,8 @@
   <thead>
     <tr>
       <th>Word</th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -21,6 +25,8 @@
         <td><%= target_word.word %></td>
         <td><%= link_to 'Show', target_word %></td>
         <td><%= link_to 'ShowDelivered', show_delivered_target_word_path(target_word) %></td>
+        <td><strong><%= target_word.enabled %></strong></td>
+        <td><%= link_to 'Switch', switch_target_word_path(target_word) %></td>
         <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>
         <td><%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>

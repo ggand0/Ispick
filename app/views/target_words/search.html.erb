@@ -1,0 +1,29 @@
+<h1>Search target_word</h1>
+
+<%= search_form_for @search, url: search_target_words_path, html: { method: :post } do |f| %>
+  <%= f.label :name_display_cont, 'キャラクタ名' %>
+  <%= f.text_field :name_display_cont %>
+  <div>
+    <%= f.submit '検索する' %>
+  </div>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @people.each do |person| %>
+      <tr>
+        <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { word: person.name_display}}, method: :post %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @people %>
+
+<%= link_to 'Back', target_words_path %>
