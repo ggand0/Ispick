@@ -26,6 +26,7 @@ class TargetWordsController < ApplicationController
   def create
     @target_word = current_user.target_words.build(target_word_params)
     @target_word.person = Person.find(params[:id]) if params[:id]
+    @target_word.enabled = true
 
     respond_to do |format|
       if @target_word.save

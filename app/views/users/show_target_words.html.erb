@@ -1,11 +1,11 @@
 <h1>YOUR target_words</h1>
+<br>
 <%= link_to 'New Target word', new_target_word_path %>
 <br>
 <%= link_to 'Search Target words', search_target_words_path %>
 <br>
-<%= link_to 'Back', controller: 'users', action: 'home' %>
 <br>
-
+<br>
 <table>
   <thead>
     <tr>
@@ -23,9 +23,9 @@
     <% @words.each do |target_word| %>
       <tr>
         <td><%= target_word.word %></td>
-        <td><%= link_to 'Show', target_word %></td>
+        <td><%# link_to 'Show', target_word %></td>
         <td><%= link_to 'ShowDelivered', show_delivered_target_word_path(target_word) %></td>
-        <td><strong><%= target_word.enabled %></strong></td>
+        <td><strong><%= target_word.enabled ? 'on' : 'off' %></strong></td>
         <td><%= link_to 'Switch', switch_target_word_path(target_word) %></td>
         <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>
         <td><%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -33,5 +33,9 @@
     <% end %>
   </tbody>
 </table>
+<br>
+<br>
+<p>「on」だと自動配信の対象になります。</p>
+<%= link_to 'Back', controller: 'users', action: 'home' %>
 
 <%= paginate_target_images(@message, @words) %>
