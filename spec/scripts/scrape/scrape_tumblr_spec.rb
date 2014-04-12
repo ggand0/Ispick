@@ -7,6 +7,27 @@ describe Scrape::Tumblr do
   before do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
+    @client = Scrape::Tumblr.get_client()
+  end
+
+  describe "scrape method" do
+    it "should call scrape_with_keyword function" do
+      FactoryGirl.create(:person_madoka)
+      Scrape::Tumblr.should_receive(:scrape_with_keyword)
+      Scrape::Tumblr.scrape()
+    end
+  end
+
+  describe "scrape_with_keyword function" do
+    it "calls proper functions" do
+      Scrape::Tumblr.should_receive(:get_client)
+      Scrape::Tumblr.should_receive(:get_images)
+      Scrape::Tumblr.should_receive(:save)
+      Scrape::Tumblr.stub(:get_images).and_return({})
+      Scrape::Tumblr.stub(:save).and_return()
+
+      Scrape::Tumblr.scrape_with_keyword('madoka', 5)
+    end
   end
 
   describe "get_stats function" do
@@ -24,12 +45,65 @@ describe Scrape::Tumblr do
     end
   end
 
+  describe "get_favorites function" do
+    it "returns favorites count of the post" do
+      page_url = 'http://senshi.org/post/82331944259/miku-x-cat-by-kenji'
+      html = Nokogiri::HTML(open(page_url))
+      result = Scrape::Tumblr.get_favorites(html)
 
-  describe "scrape method" do
-    it "should call scrape_with_keyword function" do
-      FactoryGirl.create(:person_madoka)
-      Scrape::Tumblr.should_receive(:scrape_with_keyword)
-      Scrape::Tumblr.scrape()
+      puts result
+      expect(result).not_to eql(nil)
     end
   end
+
+  describe "get_contents function" do
+    it "returns image_data hash" do
+      url = 'http://realotakuman.tumblr.com/post/80263089672/pixiv'
+      html = Nokogiri::HTML(open(url))
+      image = {
+        "blog_name"=>"realotakuman",
+        "id"=>80263089672,
+        "post_url"=>"http://realotakuman.tumblr.com/post/80263089672/pixiv",
+        "date"=>"2014-03-21 14:54:12 GMT",
+        "tags"=>["アナログ", "VOICEROID+", "結月ゆかり", "弦巻マキ"],
+        "note_count"=>3,
+        "caption"=>"blah blah",
+        "photos"=>[{"original_size"=>{
+          "width"=>697,
+          "height"=>981,
+          "url"=>"http://37.media.tumblr.com/9cbde1a610fd826c87600caa3372e176/tumblr_n2sk2cFwOB1qdwsovo1_1280.jpg"
+          }}]
+      }
+
+      image_data = Scrape::Tumblr.get_contents(html, image)
+      expect(image_data).to be_a(Hash)
+    end
+  end
+
+  describe "get_images function" do
+    it "returns a proper image_data array" do
+      Tumblr::Client.any_instance.stub(:tagged).and_return([{
+        'post_url' => 'http://realotakuman.tumblr.com/post/80263089672/pixiv'
+      }])
+      Tumblr::Client.any_instance.should_receive(:tagged)
+      Scrape::Tumblr.stub(:get_contents).and_return(
+        { data: { page_url: 'blog post url'}, tags: 'a tag' }
+      )
+      Scrape::Tumblr.should_receive(:get_contents)
+
+      image_data = Scrape::Tumblr.get_images(@client, 'madoka', 1)
+      expect(image_data).to be_an(Array)
+    end
+  end
+
+  describe "save function" do
+    it "save to database properly" do
+      image_data = { data: {src_url: 'blah'}, tags: 'blah' }
+      Scrape.stub(:save_image).and_return
+      Scrape.stub(:is_duplicate).and_return(false)
+
+      Scrape::Tumblr.save([image_data])
+    end
+  end
+
 end
