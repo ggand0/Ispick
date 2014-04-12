@@ -24,7 +24,7 @@
       <tr>
         <td><%= target_word.word %></td>
         <td><%# link_to 'Show', target_word %></td>
-        <td><%= link_to 'ShowDelivered', show_delivered_target_word_path(target_word) %></td>
+        <td><%= link_to 'このタグへの配信画像を見る', show_delivered_target_word_path(target_word) %></td>
         <td><strong><%= target_word.enabled ? 'on' : 'off' %></strong></td>
         <td><%= link_to 'Switch', switch_target_word_path(target_word) %></td>
         <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>
