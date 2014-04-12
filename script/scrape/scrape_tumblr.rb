@@ -121,13 +121,16 @@ module Scrape::Tumblr
     # 抽出してきた時点でlikes数が取れている画像のはずだが、一応rescue
     begin
       # show:likesを設定しているページのみgetしてみる
-      likes = html.css("ol[class='notes']").first.content.to_s.scan(/likes this/)
+      #likes = html.css("ol[class='notes']").first.content.to_s.scan(/likes this/)
+      likes = self.get_favorites(html)
     rescue => e
       # 非表示設定にしていてlikesが取れないページは諦める
       puts e
       Rails.logger.fail('Updating likes value has been failed: ' + page_url)
       return
     end
+
+    puts page_url if not likes# debug
     { views: nil, favorites: likes }
   end
 
