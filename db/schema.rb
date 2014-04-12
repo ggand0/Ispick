@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.datetime "data_updated_at"
     t.integer  "user_id"
     t.datetime "last_delivered_at"
+    t.boolean  "enabled"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -119,6 +120,7 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.string   "word"
     t.integer  "user_id"
     t.datetime "last_delivered_at"
+    t.boolean  "enabled"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
