@@ -29,16 +29,16 @@ module ApplicationHelper
 
   # DateTime
   def utc_to_jst(datetime)
-    datetime.in_time_zone('Asia/Tokyo')
+    datetime ? datetime.in_time_zone('Asia/Tokyo') : 'nil'
   end
 
   # string
   def get_time_string(datetime)
-    datetime.strftime("%Y年%m月%d日%H時%M分")
+    datetime ? datetime.strftime("%Y年%m月%d日%H時%M分") : 'nil'
   end
 
   # string
   def get_jst_string(datetime)
-    get_time_string(utc_to_jst(datetime))
+    datetime ? get_time_string(utc_to_jst(datetime)) : 'nil'
   end
 end
