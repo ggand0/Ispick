@@ -1,5 +1,5 @@
 class TargetWordsController < ApplicationController
-  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered]
+  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered, :switch]
 
   # GET /target_words
   # GET /target_words.json
@@ -15,8 +15,8 @@ class TargetWordsController < ApplicationController
   # GET /target_words/new
   def new
     @target_word = TargetWord.new
-    @search = Person.search(params[:q])
-    @people = @search.result(distinct: true).page(params[:page]).per(50)
+    #@search = Person.search(params[:q])
+    #@people = @search.result(distinct: true).page(params[:page]).per(50)
   end
 
   # GET /target_words/1/edit
@@ -27,7 +27,7 @@ class TargetWordsController < ApplicationController
   # POST /target_words.json
   def create
     @target_word = current_user.target_words.build(target_word_params)
-    @target_word.person = Person.find(params[:id])
+    @target_word.person = Person.find(params[:id]) if params[:id]
 
     respond_to do |format|
       if @target_word.save
@@ -81,13 +81,20 @@ class TargetWordsController < ApplicationController
   end
 
   def search
+    @target_word = TargetWord.new
     @search = Person.search(params[:q])
     @people = @search.result(distinct: true).page(params[:page]).per(50)
-    render :new
+    #render :new
   end
 
   def show_delivered
     @delivered_images = @target_word.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
+  end
+
+  def switch
+    enabled = @target_word.enabled ? false : true
+    @target_word.update_attributes(enabled: enabled)
+    redirect_to :back
   end
 
 
