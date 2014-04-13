@@ -5,3 +5,4 @@ script/daemons/image_face stop
 script/daemons/target_face stop
 script/daemons/detect_illust stop
 script/daemons/download_image stop
+script/daemons/copy_image stop
