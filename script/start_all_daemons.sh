@@ -4,3 +4,4 @@
 script/daemons/image_face start
 script/daemons/target_face start
 script/daemons/detect_illust start
+script/daemons/download_image start
