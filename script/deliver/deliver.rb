@@ -2,6 +2,7 @@
 require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
+require "#{Rails.root}/app/workers/copy_image"
 
 module Deliver
   # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
@@ -28,6 +29,16 @@ module Deliver
     puts 'Remain delivered_images:' + user.delivered_images.count.to_s
   end
 
+  def self.deliver_keyword(user_id, target_word_id)
+    user = User.find(user_id)
+    self.deliver_from_word(user, TargetWord.find(target_word_id))
+
+    # １ユーザーの最大容量を超えていたら古い順に削除
+    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
+    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
+  end
+
+
   def self.contains_word(image, target_word)
     word = target_word.person ? target_word.person.name : target_word.word
     image.tags.each do |tag|
@@ -41,7 +52,7 @@ module Deliver
       title: image.title,
       caption: image.caption,
       src_url: image.src_url,
-      data: image.data,
+      #data: image.data,
       posted_at: image.posted_at,
       views: image.views,
       favorites: image.favorites,
@@ -55,16 +66,22 @@ module Deliver
   # User.delivered_imagesへ追加
   def self.deliver_images(user, images, target)
     c = 0
-    images.each do |im|
-      image = self.create_delivered_image(im)
-      target.delivered_images << image
-      if image
+    images.each do |image|
+      delivered_image = self.create_delivered_image(image)
+
+      if delivered_image.save
+        target.delivered_images << delivered_image
         # file.close出来てもuser.delivered_imagesはclose出来ない
         # (userがglobalから参照される限りuser.delivered_images[i].dataも参照される)ので、
         # ファイルへの参照数がタスク終了するまで増加していくことに注意。
         # 開いているファイル数がulimitで設定されている数を超えると'Too many open files...'エラー
-        user.delivered_images << image# ここがcritical
+        user.delivered_images << delivered_image# ここがcritical
         user.save
+
+        #puts image.data.url
+        #puts delivered_image.id.to_s + ' / ' + image.id.to_s
+        Resque.enqueue(CopyImage, delivered_image.id, image.id)
+        #Resque.enqueue(CopyImage, user.deliver_images.last.id, im.data)
       end
       c += 1
       puts '- Creating delivered_images:' + c.to_s + ' / ' +
