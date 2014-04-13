@@ -13,6 +13,15 @@ FactoryGirl.define do
         create_list(:delivered_image_with_targetable, evaluator.images_count, targetable: target_word)
       end
     end
+
+    factory :word_with_person do
+      ignore do
+        words_count 1
+      end
+      after(:build) do |target_word, evaluator|
+        create_list(:person_madoka, evaluator.words_count, target_word: target_word)
+      end
+    end
   end
 
   factory :target_word_not_enabled, class: TargetWord do

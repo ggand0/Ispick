@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :person do
-    name "MyString"
+    name "鹿目まどか"
     name_type ""
   end
 
