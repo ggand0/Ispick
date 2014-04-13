@@ -29,6 +29,12 @@ module Scrape::Twitter
     puts 'Scraped: '+(Image.count-count).to_s
   end
 
+  def self.scrape_keyword(keyword)
+    limit   = 1000        # 取得するツイートの上限数
+    self.scrape_with_keyword(keyword, limit)
+  end
+
+
   # 対象のハッシュタグを持つツイートの画像を抽出する
   def self.scrape_with_keyword(keyword, limit)
     client = self.get_client

@@ -13,7 +13,7 @@ module Scrape::Tumblr
   def self.scrape()
     puts 'Extracting : ' + ROOT_URL
 
-    limit   = 100        # 取得するツイートの上限数
+    limit   = 100        # 取得するPostの上限数
     count = Image.count
 
     # 全ての登録済みのTargetWordに対して新着画像を取得する
@@ -30,6 +30,12 @@ module Scrape::Tumblr
 
     puts 'Scraped: '+(Image.count-count).to_s
   end
+
+  def self.scrape_keyword(keyword)
+    limit   = 100        # 取得するPostの上限数
+    self.scrape_with_keyword(keyword, limit)
+  end
+
 
   # 対象のハッシュタグを持つツイートの画像を抽出する
   def self.scrape_with_keyword(keyword, limit)

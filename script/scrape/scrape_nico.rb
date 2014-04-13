@@ -25,7 +25,7 @@ module Scrape::Nico
       puts e
       puts 'PAGE_URL:'
       puts page_url
-      Rails.logger.info('Image model saving failed.')
+      Rails.logger.info('Could not open the page.')
       return
     end
 
@@ -115,6 +115,12 @@ module Scrape::Nico
     end
   end
 
+  def self.scrape_keyword(keyword)
+    agent = self.login()
+    limit = 50
+    self.scrape_with_keyword(agent, keyword, limit)
+  end
+
   # タグ検索バージョンをデフォルトで使う事にする
   def self.scrape()
     agent = self.login()
@@ -125,26 +131,28 @@ module Scrape::Nico
         #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
         query = target_word.person ? target_word.person.name : target_word.word
         puts query
-        url = TAG_SEARCH_URL+'?page=1&query='+query
-        puts 'Extracting : ' + url
-
-        escaped = URI.escape(url)
-        xml = agent.get(escaped)
-        #puts xml.search('image').count
-
-        # http://seiga.nicovideo.jp/seiga/im3858537
-        # imageタグ（イラスト）ごとに処理
-        #xml.css('image').map do |item|
-        count = 0
-        xml.search('image').map do |item|
-          title = item.css('title').first.content
-          page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
-          self.get_contents(page_url, agent, title)
-
-          count += 1
-          break if count >= limit
-        end
+        self.scrape_with_keyword(agent, keyword, limit)
       end
+    end
+  end
+
+  def self.scrape_with_keyword(agent, keyword, limit)
+    url = TAG_SEARCH_URL+'?page=1&query='+keyword
+    puts 'Extracting : ' + url
+
+    escaped = URI.escape(url)
+    xml = agent.get(escaped)
+
+    # http://seiga.nicovideo.jp/seiga/im3858537
+    # imageタグ（イラスト）ごとに処理
+    count = 0
+    xml.search('image').map do |item|
+      title = item.css('title').first.content
+      page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
+      self.get_contents(page_url, agent, title)
+
+      count += 1
+      break if count >= limit
     end
   end
 

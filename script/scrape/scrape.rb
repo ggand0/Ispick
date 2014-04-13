@@ -25,6 +25,14 @@ module Scrape
     puts 'DONE!!'
   end
 
+  def self.scrape_keyword(keyword)
+    puts keyword
+    Scrape::Nico.scrape_keyword(keyword)
+    Scrape::Twitter.scrape_keyword(keyword)
+    Scrape::Tumblr.scrape_keyword(keyword)
+    puts 'DONE!!'
+  end
+
   def self.scrape_5min
     Scrape::Nico.scrape()
     #Scrape::Futaba.scrape()
@@ -66,7 +74,7 @@ module Scrape
     # 新規レコードを作成
     begin
       image = Image.new attributes
-      image.image_from_url attributes[:src_url]
+      #image.image_from_url attributes[:src_url]
       tags.each { |tag| image.tags << tag }
     rescue Exception => e
       # URLからImage.dataを設定するのに失敗したら諦める
@@ -79,11 +87,12 @@ module Scrape
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
       if image.save
         # 特徴抽出処理をresqueに投げる
-        Resque.enqueue(ImageFace, image.id)
+        #Resque.enqueue(ImageFace, image.id)
         Resque.enqueue(DetectIllust, image.id)
+        Resque.enqueue(DownloadImage, image.id, attributes[:src_url])
       else
-        Rails.logger.info('Image model saving failed.')
-        puts 'Image model saving failed.'
+        Rails.logger.info('Image model saving failed. (maybe due to duplication)')
+        puts 'Image model saving failed. (maybe due to duplication)'
         return false
       end
     rescue Exception => e
