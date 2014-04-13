@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../../config/application', __FILE__)
+Rails.application.require_environment!
+
+require "#{Rails.root}/app/workers/search_images"
+
+class SearchImagesDaemon < DaemonSpawn::Base
+  def start(args)
+    @worker = Resque::Worker.new('search_images')
+    @worker.verbose = true
+    @worker.work
+  end
+
+  def stop
+    @worker.try(:shutdown)
+  end
+end
+
+SearchImagesDaemon.spawn!({
+  processes: 1,
+  working_dir: Rails.root,
+  pid_file: File.join(Rails.root, 'tmp', 'pids', 'search_images.pid'),
+  log_file: File.join(Rails.root, 'log', 'search_images.log'),
+  sync_log: true,
+  singleton: true,
+  signal: 'QUIT'
+})
