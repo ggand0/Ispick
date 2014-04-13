@@ -3,11 +3,11 @@
 require File.expand_path('../../../config/application', __FILE__)
 Rails.application.require_environment!
 
-require "#{Rails.root}/app/workers/download_image"
+require "#{Rails.root}/app/workers/copy_image"
 
-class DownloadImageDaemon < DaemonSpawn::Base
+class CopyImageDaemon < DaemonSpawn::Base
   def start(args)
-    @worker = Resque::Worker.new('download_image')
+    @worker = Resque::Worker.new('copy_image')
     @worker.verbose = true
     @worker.work
   end
@@ -17,11 +17,11 @@ class DownloadImageDaemon < DaemonSpawn::Base
   end
 end
 
-DownloadImageDaemon.spawn!({
+CopyImageDaemon.spawn!({
   processes: 1,
   working_dir: Rails.root,
-  pid_file: File.join(Rails.root, 'tmp', 'pids', 'download_image.pid'),
-  log_file: File.join(Rails.root, 'log', 'download_image.log'),
+  pid_file: File.join(Rails.root, 'tmp', 'pids', 'copy_image.pid'),
+  log_file: File.join(Rails.root, 'log', 'copy_image.log'),
   sync_log: true,
   singleton: true,
   signal: 'QUIT'
