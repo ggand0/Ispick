@@ -5,7 +5,10 @@ class TargetWord < ActiveRecord::Base
   has_one :person
   has_many :delivered_images, as: :targetable
 
-  def after_create
-    Scrape.scrape_keyword(self.word)
+  after_create :search_keyword
+
+  def search_keyword
+    query = self.person ? self.person.name : self.word
+    Scrape.scrape_keyword(query)
   end
 end
