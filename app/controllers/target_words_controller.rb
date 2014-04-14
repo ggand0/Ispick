@@ -58,7 +58,7 @@ class TargetWordsController < ApplicationController
   def destroy
     @target_word.destroy
     respond_to do |format|
-      format.html { redirect_to target_words_url }
+      format.html { redirect_to show_target_words_users_path }
       format.json { head :no_content }
     end
   end
