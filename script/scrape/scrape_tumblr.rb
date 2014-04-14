@@ -116,10 +116,7 @@ module Scrape::Tumblr
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:data][:src_url]}"
-      # Tumblrの場合はtagsに検索したタグが含まれているはずなので、
-      # Tagオブジェクトに変換するだけ
-      tags = value[:tags].map { |tag| Tag.new(name: tag) }
-      Scrape.save_image(value[:data], tags, validation)
+      Scrape.save_image(value[:data], value[:tags], validation)
     end
   end
 

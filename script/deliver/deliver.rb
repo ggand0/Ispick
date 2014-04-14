@@ -110,6 +110,7 @@ module Deliver
     # 既に配信済みの画像である場合はskip
     images.reject! do |x|
       #puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
+      puts x.src_url
       user.delivered_images.any?{ |d| d.src_url == x.src_url }
     end
     puts 'Unique images: ' + images.count.to_s
@@ -125,7 +126,7 @@ module Deliver
 
   def self.deliver_from_word(user, target_word)
     # 単純に、title, caption, tagに文字列が含まれているかどうか調べる
-    images = Image.joins(:tags).where.not(title: nil, caption: nil, tags: { name: nil })
+    images = Image.includes(:tags).where.not(title: nil, caption: nil, tags: { name: nil }).references(:tags)
     puts images.count
 
     # target_wordに、何らかの文字情報が部分一致するimageがあれば残す
