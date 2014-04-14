@@ -5,6 +5,8 @@ describe "scrape:reset" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -37,6 +39,7 @@ end
 describe "scrape:delete_excess" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -58,6 +61,7 @@ end
 describe "scrape:images" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -72,6 +76,7 @@ end
 describe "scrape:keyword" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -89,6 +94,7 @@ end
 describe "scrape:min5" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -102,6 +108,7 @@ end
 describe "scrape:min15" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -114,6 +121,7 @@ end
 describe "scrape:min30" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -126,6 +134,7 @@ end
 describe "scrape:min60" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }

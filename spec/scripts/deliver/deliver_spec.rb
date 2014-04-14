@@ -5,7 +5,9 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
 
   describe "delete_excessed_records" do
