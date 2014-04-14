@@ -7,6 +7,8 @@ describe Scrape::Twitter do
   before do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
 
   describe "scrape_with_keyword function" do

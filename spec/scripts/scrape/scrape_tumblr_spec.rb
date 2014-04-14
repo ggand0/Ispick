@@ -7,6 +7,8 @@ describe Scrape::Tumblr do
   before do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
     @client = Scrape::Tumblr.get_client()
   end
 

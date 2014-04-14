@@ -7,6 +7,9 @@ describe Scrape::Nico do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
 
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
+
     # Mechanize agentの作成
     @agent = Mechanize.new
     @agent.ssl_version = 'SSLv3'

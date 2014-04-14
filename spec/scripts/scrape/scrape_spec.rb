@@ -5,6 +5,8 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
 
   describe "scrape_all method" do
