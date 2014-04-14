@@ -37,6 +37,25 @@ module Deliver
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
     puts 'Remain delivered_images:' + user.delivered_images.count.to_s
   end
+  def self.deliver_one(user_id, target_word_id, image_id)
+    user = User.find(user_id)
+    target_word = TargetWord.find(target_word_id)
+    image = Image.find(image_id)
+    delivered_image = self.create_delivered_image(image)
+
+    if delivered_image.save
+      target_word.delivered_images << delivered_image
+      user.delivered_images << delivered_image
+      user.save
+      Resque.enqueue(DownloadImage, delivered_image.class.name,
+        delivered_image.id, delivered_image.src_url)
+    end
+
+    # １ユーザーの最大容量を超えていたら古い順に削除
+    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
+    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
+  end
+
 
 
   def self.contains_word(image, target_word)
@@ -78,10 +97,8 @@ module Deliver
         user.delivered_images << delivered_image# ここがcritical
         user.save
 
-        #puts image.data.url
-        #puts delivered_image.id.to_s + ' / ' + image.id.to_s
-        Resque.enqueue(CopyImage, delivered_image.id, image.id)
-        #Resque.enqueue(CopyImage, user.deliver_images.last.id, im.data)
+        #Resque.enqueue(CopyImage, delivered_image.id, image.id)
+        Resque.enqueue(DownloadImage, delivered_image.class.name, delivered_image.id, delivered_image.src_url)
       end
       c += 1
       puts '- Creating delivered_images:' + c.to_s + ' / ' +
