@@ -32,19 +32,19 @@ module Scrape::Tumblr
   end
 
   def self.scrape_keyword(keyword)
-    limit   = 100        # 取得するPostの上限数
-    self.scrape_with_keyword(keyword, limit)
+    limit   = 10        # 取得するPostの上限数
+    self.scrape_with_keyword(keyword, limit, false)
   end
 
 
   # 対象のハッシュタグを持つツイートの画像を抽出する
-  def self.scrape_with_keyword(keyword, limit)
+  def self.scrape_with_keyword(keyword, limit, validation=true)
     client = self.get_client
 
     # キーワードを含むハッシュタグの検索
     image_data = self.get_images(client, keyword, limit)
 
-    self.save(image_data)
+    self.save(image_data, validation)
   end
 
   def self.get_client
@@ -93,7 +93,7 @@ module Scrape::Tumblr
 
     # limitで指定された数だけ画像を取得
     images = client.tagged(keyword)
-    images.each do |image|
+    images.each.take(limit) do |image|
       puts url = image['post_url']
       html = Nokogiri::HTML(open(url))
       begin
@@ -108,16 +108,12 @@ module Scrape::Tumblr
   end
 
 
-  def self.save(image_data)
+  def self.save(image_data, validation)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:data][:src_url]}"
-      if not Scrape::is_duplicate(value[:src_url])
-        # Tumblrの場合はtagsに検索したタグが含まれているはずなのでそのまま使う
-        Scrape.save_image(value[:data], value[:tags])
-      else
-        puts 'Skipping a duplicate image...'
-      end
+      # Tumblrの場合はtagsに検索したタグが含まれているはずなのでそのまま使う
+      Scrape.save_image(value[:data], value[:tags], validation)
     end
   end
 

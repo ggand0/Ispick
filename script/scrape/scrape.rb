@@ -63,10 +63,15 @@ module Scrape
     Image.where(src_url: src_url).length > 0
   end
 
+  def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
+    image_id = self.save_image(attributes, tags, validation)
+    Deliver.deliver_one(user_id, target_word_id, image_id)
+  end
+
   # Imageモデル生成＆DB保存
-  def self.save_image(attributes, tags=[])
+  def self.save_image(attributes, tags=[], validation=true)
     # 重複を確認
-    if self.is_duplicate(attributes[:src_url])
+    if validation and self.is_duplicate(attributes[:src_url])
       puts 'Skipping a duplicate image...'
       return false
     end
@@ -85,11 +90,11 @@ module Scrape
     # DBに保存する
     begin
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
-      if image.save
+      if image.save(validate: validation)
         # 特徴抽出処理をresqueに投げる
         #Resque.enqueue(ImageFace, image.id)
         Resque.enqueue(DetectIllust, image.id)
-        Resque.enqueue(DownloadImage, image.id, attributes[:src_url])
+        Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
       else
         Rails.logger.info('Image model saving failed. (maybe due to duplication)')
         puts 'Image model saving failed. (maybe due to duplication)'
@@ -99,6 +104,6 @@ module Scrape
       puts e
       return false
     end
-    true
+    image.id
   end
 end

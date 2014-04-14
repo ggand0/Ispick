@@ -16,7 +16,7 @@ module Scrape::Nico
     site_name == 'ニコニコ春画'
   end
 
-  def self.get_contents(page_url, agent, title)
+  def self.get_contents(page_url, agent, title, validation)
     # 元ページを開く
     begin
       page = agent.get(page_url)
@@ -69,7 +69,7 @@ module Scrape::Nico
     }
 
     # Imageモデル生成＆DB保存
-    Scrape::save_image(image_data, tags)
+    Scrape::save_image(image_data, tags, validation)
   end
 
   # delivered_images update用に、
@@ -117,8 +117,8 @@ module Scrape::Nico
 
   def self.scrape_keyword(keyword)
     agent = self.login()
-    limit = 50
-    self.scrape_with_keyword(agent, keyword, limit)
+    limit = 10
+    self.scrape_with_keyword(agent, keyword, limit, false)
   end
 
   # タグ検索バージョンをデフォルトで使う事にする
@@ -131,14 +131,14 @@ module Scrape::Nico
         #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
         query = target_word.person ? target_word.person.name : target_word.word
         puts query
-        self.scrape_with_keyword(agent, keyword, limit)
+        self.scrape_with_keyword(agent, query, limit, true)
       end
     end
   end
 
-  def self.scrape_with_keyword(agent, keyword, limit)
+  def self.scrape_with_keyword(agent, keyword, limit, validation)
     url = TAG_SEARCH_URL+'?page=1&query='+keyword
-    puts 'Extracting : ' + url
+    puts 'Extracting ' + limit.to_s + 'images from: ' + url
 
     escaped = URI.escape(url)
     xml = agent.get(escaped)
@@ -149,11 +149,12 @@ module Scrape::Nico
     xml.search('image').map do |item|
       title = item.css('title').first.content
       page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
-      self.get_contents(page_url, agent, title)
+      self.get_contents(page_url, agent, title, validation)
 
       count += 1
       break if count >= limit
     end
+    puts 'COUNT'+count.to_s
   end
 
 end
