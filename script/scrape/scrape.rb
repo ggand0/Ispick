@@ -92,8 +92,8 @@ module Scrape
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
       if image.save(validate: validation)
         # 特徴抽出処理をresqueに投げる
-        #Resque.enqueue(ImageFace, image.id)
-        Resque.enqueue(DetectIllust, image.id)
+        #Resque.enqueue(ImageFace, image.id)    # 一旦止める
+        #Resque.enqueue(DetectIllust, image.id) # DLした後にやる
         Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
       else
         Rails.logger.info('Image model saving failed. (maybe due to duplication)')
