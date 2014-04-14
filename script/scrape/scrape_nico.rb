@@ -16,7 +16,8 @@ module Scrape::Nico
     site_name == 'ニコニコ春画'
   end
 
-  def self.get_contents(page_url, agent, title, validation)
+  def self.get_contents(page_url, agent, title, validation=true)
+    t0 = Time.now
     # 元ページを開く
     begin
       page = agent.get(page_url)
@@ -67,7 +68,7 @@ module Scrape::Nico
       site_name: 'nicoseiga',
       module_name: 'Scrape::Nico',
     }
-
+    puts (Time.now - t0).to_s + 'sec'
     # Imageモデル生成＆DB保存
     Scrape::save_image(image_data, tags, validation)
   end

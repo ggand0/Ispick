@@ -93,7 +93,9 @@ module Scrape::Tumblr
 
     # limitで指定された数だけ画像を取得
     images = client.tagged(keyword)
-    images.each.take(limit) do |image|
+    #images.each.take(limit) do |image|
+    count=0
+    images.each do |image|
       puts url = image['post_url']
       html = Nokogiri::HTML(open(url))
       begin
@@ -103,17 +105,21 @@ module Scrape::Tumblr
         puts e
         next
       end
+      count+=1
+      break if count >= limit
     end
     image_data
   end
 
 
-  def self.save(image_data, validation)
+  def self.save(image_data, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:data][:src_url]}"
-      # Tumblrの場合はtagsに検索したタグが含まれているはずなのでそのまま使う
-      Scrape.save_image(value[:data], value[:tags], validation)
+      # Tumblrの場合はtagsに検索したタグが含まれているはずなので、
+      # Tagオブジェクトに変換するだけ
+      tags = value[:tags].map { |tag| Tag.new(name: tag) }
+      Scrape.save_image(value[:data], tags, validation)
     end
   end
 

@@ -101,7 +101,7 @@ module Scrape::Twitter
     image_data
   end
 
-  def self.save(image_data, keyword, validation)
+  def self.save(image_data, keyword, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:title]} : #{value[:src_url]}"
