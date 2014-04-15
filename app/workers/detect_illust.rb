@@ -8,8 +8,9 @@ class DetectIllust
   end
 
   # イラストかどうか判定する
-  def self.perform(image_id)
-    image = Image.find(image_id)
+  def self.perform(image_type, image_id)
+    #image = Image.find(image_id)
+    image = Object::const_get(image_type).find(image_id)
     tool_path = CONFIG['illust_detection_path']
     illust = self.get_result(tool_path, image).to_i
 

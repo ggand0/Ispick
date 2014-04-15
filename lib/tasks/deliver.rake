@@ -26,6 +26,16 @@ namespace :deliver do
     puts 'DONE!'
   end
 
+  desc "１つのキーワードのみに注目して画像を配信"
+  task :keyword, [:user_id, :target_word_id] =>  :environment do |t, args|
+    t0 = Time.now
+    Deliver.deliver_keyword(args[:user_id], args[:target_word_id])
+    t1 = Time.now
+    puts '-----------------------------------'# 35 chars
+    puts 'Elapsed time: ' + (t1-t0).to_s
+    puts 'DONE!'
+  end
+
 
   desc "全てのdelivered_imagesのfavoritesをupdateする"
   task :update, [:user_id] =>  :environment do |t, args|

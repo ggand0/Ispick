@@ -25,6 +25,14 @@ module Scrape
     puts 'DONE!!'
   end
 
+  def self.scrape_keyword(keyword)
+    puts keyword
+    Scrape::Nico.scrape_keyword(keyword)
+    Scrape::Twitter.scrape_keyword(keyword)
+    Scrape::Tumblr.scrape_keyword(keyword)
+    puts 'DONE!!'
+  end
+
   def self.scrape_5min
     Scrape::Nico.scrape()
     #Scrape::Futaba.scrape()
@@ -55,10 +63,15 @@ module Scrape
     Image.where(src_url: src_url).length > 0
   end
 
+  def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
+    image_id = self.save_image(attributes, tags, validation)
+    Deliver.deliver_one(user_id, target_word_id, image_id)
+  end
+
   # Imageモデル生成＆DB保存
-  def self.save_image(attributes, tags=[])
+  def self.save_image(attributes, tags=[], validation=true)
     # 重複を確認
-    if self.is_duplicate(attributes[:src_url])
+    if validation and self.is_duplicate(attributes[:src_url])
       puts 'Skipping a duplicate image...'
       return false
     end
@@ -66,7 +79,7 @@ module Scrape
     # 新規レコードを作成
     begin
       image = Image.new attributes
-      image.image_from_url attributes[:src_url]
+      #image.image_from_url attributes[:src_url]
       tags.each { |tag| image.tags << tag }
     rescue Exception => e
       # URLからImage.dataを設定するのに失敗したら諦める
@@ -77,19 +90,20 @@ module Scrape
     # DBに保存する
     begin
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
-      if image.save
+      if image.save(validate: validation)
         # 特徴抽出処理をresqueに投げる
-        Resque.enqueue(ImageFace, image.id)
-        Resque.enqueue(DetectIllust, image.id)
+        #Resque.enqueue(ImageFace, image.id)    # 一旦止める
+        #Resque.enqueue(DetectIllust, image.id) # DLした後にやる
+        Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
       else
-        Rails.logger.info('Image model saving failed.')
-        puts 'Image model saving failed.'
+        Rails.logger.info('Image model saving failed. (maybe due to duplication)')
+        puts 'Image model saving failed. (maybe due to duplication)'
         return false
       end
     rescue Exception => e
       puts e
       return false
     end
-    true
+    image.id
   end
 end

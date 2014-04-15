@@ -7,6 +7,9 @@ describe Scrape::Nico do
     # コンソールに出力しないようにしておく
     IO.any_instance.stub(:puts)
 
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
+
     # Mechanize agentの作成
     @agent = Mechanize.new
     @agent.ssl_version = 'SSLv3'
@@ -53,8 +56,9 @@ describe Scrape::Nico do
       count = Image.count
       xml = Nokogiri::XML(open('http://seiga.nicovideo.jp/rss/illust/new'))
 
+      Scrape.should_receive(:save_image)
       Scrape::Nico.get_contents(@page_url, @agent, @title)
-      Image.count.should eq(count+1)
+      #Image.count.should eq(count+1)
     end
 
     # 対象の画像URLを開けなかった時、ログに書き出すこと
@@ -63,7 +67,7 @@ describe Scrape::Nico do
       url = 'An invalid page url'
       #xml = Nokogiri::XML(open(url))# 例えば、画像と無関係なURL
 
-      Rails.logger.should_receive(:info).with('Image model saving failed.')
+      Rails.logger.should_receive(:info).with('Could not open the page.')
       Scrape.should_not_receive(:save_image)
 
       Scrape::Nico.get_contents(url, @agent, @title)

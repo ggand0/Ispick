@@ -23,7 +23,11 @@ module ApplicationHelper
   # [byte]
   def get_total_size(images)
     total_size = 0
-    images.each { |n| total_size += n.data.size }
+    images.each do |n|
+      if n.data and n.data.size
+        total_size += n.data.size
+      end
+    end
     total_size
   end
 

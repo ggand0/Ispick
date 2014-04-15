@@ -16,7 +16,8 @@ module Scrape::Nico
     site_name == 'ニコニコ春画'
   end
 
-  def self.get_contents(page_url, agent, title)
+  def self.get_contents(page_url, agent, title, validation=true)
+    t0 = Time.now
     # 元ページを開く
     begin
       page = agent.get(page_url)
@@ -25,7 +26,7 @@ module Scrape::Nico
       puts e
       puts 'PAGE_URL:'
       puts page_url
-      Rails.logger.info('Image model saving failed.')
+      Rails.logger.info('Could not open the page.')
       return
     end
 
@@ -67,9 +68,9 @@ module Scrape::Nico
       site_name: 'nicoseiga',
       module_name: 'Scrape::Nico',
     }
-
+    puts (Time.now - t0).to_s + 'sec'
     # Imageモデル生成＆DB保存
-    Scrape::save_image(image_data, tags)
+    Scrape::save_image(image_data, tags, validation)
   end
 
   # delivered_images update用に、
@@ -115,6 +116,12 @@ module Scrape::Nico
     end
   end
 
+  def self.scrape_keyword(keyword)
+    agent = self.login()
+    limit = 10
+    self.scrape_with_keyword(agent, keyword, limit, false)
+  end
+
   # タグ検索バージョンをデフォルトで使う事にする
   def self.scrape()
     agent = self.login()
@@ -125,27 +132,30 @@ module Scrape::Nico
         #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
         query = target_word.person ? target_word.person.name : target_word.word
         puts query
-        url = TAG_SEARCH_URL+'?page=1&query='+query
-        puts 'Extracting : ' + url
-
-        escaped = URI.escape(url)
-        xml = agent.get(escaped)
-        #puts xml.search('image').count
-
-        # http://seiga.nicovideo.jp/seiga/im3858537
-        # imageタグ（イラスト）ごとに処理
-        #xml.css('image').map do |item|
-        count = 0
-        xml.search('image').map do |item|
-          title = item.css('title').first.content
-          page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
-          self.get_contents(page_url, agent, title)
-
-          count += 1
-          break if count >= limit
-        end
+        self.scrape_with_keyword(agent, query, limit, true)
       end
     end
+  end
+
+  def self.scrape_with_keyword(agent, keyword, limit, validation)
+    url = TAG_SEARCH_URL+'?page=1&query='+keyword
+    puts 'Extracting ' + limit.to_s + 'images from: ' + url
+
+    escaped = URI.escape(url)
+    xml = agent.get(escaped)
+
+    # http://seiga.nicovideo.jp/seiga/im3858537
+    # imageタグ（イラスト）ごとに処理
+    count = 0
+    xml.search('image').map do |item|
+      title = item.css('title').first.content
+      page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
+      self.get_contents(page_url, agent, title, validation)
+
+      count += 1
+      break if count >= limit
+    end
+    puts 'COUNT'+count.to_s
   end
 
 end

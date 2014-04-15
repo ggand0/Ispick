@@ -2,6 +2,8 @@ describe "feature:face_targets" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -19,6 +21,7 @@ end
 describe "feature:face_images" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }

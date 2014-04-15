@@ -44,22 +44,6 @@ namespace :scrape do
     puts 'Current image count: ' + Image.count.to_s
   end
 
-  desc "DB内Imagesテーブルをリセット後、抽出スクリプトを走らせる"
-  task :rescrape_all => :environment do
-    # Imageモデルを全消去
-    puts 'Deleting Image model...'
-    Image.delete_all
-
-    # 対象サイトから画像抽出
-    puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape/scrape"
-    Scrape.scrape_all()
-
-    # 全Imageに対して顔の特徴抽出処理を行う
-    puts 'Extracting face feature to all images...'
-    Rake::Task['feature:face_images'].invoke
-  end
-
   desc "画像を対象webサイト全てから抽出する"
   task images: :environment do
     # 対象サイトから画像抽出
@@ -67,6 +51,15 @@ namespace :scrape do
     require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_all()
   end
+
+  desc "タグ検索による抽出を行う"
+  task :keyword, [:keyword] =>  :environment do |t, args|
+    puts 'Scraping images from target websites...'
+    require "#{Rails.root}/script/scrape/scrape"
+    puts args[:keyword]
+    Scrape.scrape_keyword(args[:keyword])
+  end
+
 
 
   # 以下、whenever用タスク

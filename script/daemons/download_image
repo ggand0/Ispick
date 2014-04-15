@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../../config/application', __FILE__)
+Rails.application.require_environment!
+
+require "#{Rails.root}/app/workers/download_image"
+
+class DownloadImageDaemon < DaemonSpawn::Base
+  def start(args)
+    @worker = Resque::Worker.new('download_image')
+    @worker.verbose = true
+    @worker.work
+  end
+
+  def stop
+    @worker.try(:shutdown)
+  end
+end
+
+DownloadImageDaemon.spawn!({
+  processes: 3,
+  working_dir: Rails.root,
+  pid_file: File.join(Rails.root, 'tmp', 'pids', 'download_image.pid'),
+  log_file: File.join(Rails.root, 'log', 'download_image.log'),
+  sync_log: true,
+  singleton: true,
+  signal: 'QUIT'
+})

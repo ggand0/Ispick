@@ -14,7 +14,7 @@ class Image < ActiveRecord::Base
     use_timestamp: false
 
   validates_uniqueness_of :src_url
-  validates_uniqueness_of :md5_checksum
+  #validates_uniqueness_of :md5_checksum
 
   def generate_md5_checksum(file)
     self.md5_checksum = Digest::MD5.hexdigest(file.read)

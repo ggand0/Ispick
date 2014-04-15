@@ -17,4 +17,10 @@ class DeliveredImage < ActiveRecord::Base
 
   # Imageモデルで一度validateされているはずだが、一応定義
   validates_uniqueness_of :src_url
+
+  # 後でmodule化する
+  def image_from_url(url)
+    require 'open-uri'
+    self.data = open(url)
+  end
 end

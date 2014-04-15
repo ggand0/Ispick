@@ -2,6 +2,7 @@
 require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
+require "#{Rails.root}/app/workers/copy_image"
 
 module Deliver
   # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
@@ -16,7 +17,7 @@ module Deliver
     count_all = user.target_images.length
 
     user.target_words.each do |t|
-      Deliver.deliver_from_word(user, t) if t.enabled
+      Deliver.deliver_from_word(user, t, true) if t.enabled
     end
     user.target_images.each do |t|
       Deliver.deliver_from_image(user, t, count_all, count) if t.enabled
@@ -28,6 +29,35 @@ module Deliver
     puts 'Remain delivered_images:' + user.delivered_images.count.to_s
   end
 
+  def self.deliver_keyword(user_id, target_word_id)
+    user = User.find(user_id)
+    self.deliver_from_word(user, TargetWord.find(target_word_id), false)
+
+    # １ユーザーの最大容量を超えていたら古い順に削除
+    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
+    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
+  end
+  def self.deliver_one(user_id, target_word_id, image_id)
+    user = User.find(user_id)
+    target_word = TargetWord.find(target_word_id)
+    image = Image.find(image_id)
+    delivered_image = self.create_delivered_image(image)
+
+    if delivered_image.save
+      target_word.delivered_images << delivered_image
+      user.delivered_images << delivered_image
+      user.save
+      Resque.enqueue(DownloadImage, delivered_image.class.name,
+        delivered_image.id, delivered_image.src_url)
+    end
+
+    # １ユーザーの最大容量を超えていたら古い順に削除
+    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
+    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
+  end
+
+
+
   def self.contains_word(image, target_word)
     word = target_word.person ? target_word.person.name : target_word.word
     image.tags.each do |tag|
@@ -36,12 +66,12 @@ module Deliver
     image.title.include?(word) or image.caption.include?(word)
   end
 
-  def self.create_delivered_image(image)
-    DeliveredImage.create(
+  def self.create_delivered_image(image, copy)
+    delivered_image = DeliveredImage.create(
       title: image.title,
       caption: image.caption,
       src_url: image.src_url,
-      data: image.data,
+      #data: image.data,
       posted_at: image.posted_at,
       views: image.views,
       favorites: image.favorites,
@@ -50,21 +80,29 @@ module Deliver
       module_name: image.module_name,
       is_illust: image.is_illust
     )
+
+    delivered_image.data = image.data if copy
+    delivered_image
   end
 
   # User.delivered_imagesへ追加
-  def self.deliver_images(user, images, target)
+  def self.deliver_images(user, images, target, copy)
     c = 0
-    images.each do |im|
-      image = self.create_delivered_image(im)
-      target.delivered_images << image
-      if image
+    images.each do |image|
+      delivered_image = self.create_delivered_image(image, copy)
+
+      if delivered_image.save
+        target.delivered_images << delivered_image
         # file.close出来てもuser.delivered_imagesはclose出来ない
         # (userがglobalから参照される限りuser.delivered_images[i].dataも参照される)ので、
         # ファイルへの参照数がタスク終了するまで増加していくことに注意。
         # 開いているファイル数がulimitで設定されている数を超えると'Too many open files...'エラー
-        user.delivered_images << image# ここがcritical
+        user.delivered_images << delivered_image# ここがcritical
         user.save
+
+        #Resque.enqueue(CopyImage, delivered_image.id, image.id)
+        Resque.enqueue(DownloadImage, delivered_image.class.name,
+          delivered_image.id, delivered_image.src_url) if not copy
       end
       c += 1
       puts '- Creating delivered_images:' + c.to_s + ' / ' +
@@ -76,6 +114,7 @@ module Deliver
     # 既に配信済みの画像である場合はskip
     images.reject! do |x|
       #puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
+      puts x.src_url
       user.delivered_images.any?{ |d| d.src_url == x.src_url }
     end
     puts 'Unique images: ' + images.count.to_s
@@ -89,9 +128,17 @@ module Deliver
     images
   end
 
-  def self.deliver_from_word(user, target_word)
+  def self.deliver_from_word(user, target_word, copy)
     # 単純に、title, caption, tagに文字列が含まれているかどうか調べる
-    images = Image.joins(:tags).where.not(title: nil, caption: nil, tags: { name: nil })
+    # イラスト判定が終わっていないものは飛ばす
+    if copy
+      images = Image.includes(:tags).where.not(
+        title: nil, caption: nil, tags: { name: nil }).where.not(is_illust: nil).references(:tags)
+    else
+      # 即座に配信するときは、イラスト判定を後で行う事が確定しているので：
+      images = Image.includes(:tags).where.not(
+        title: nil, caption: nil, tags: { name: nil }).references(:tags)
+    end
     puts images.count
 
     # target_wordに、何らかの文字情報が部分一致するimageがあれば残す
@@ -105,7 +152,7 @@ module Deliver
     images = self.limit_images(user, images)
 
     # User.delivered_imagesへ追加する
-    self.deliver_images(user, images, target_word)
+    self.deliver_images(user, images, target_word, copy)
 
     # 最終配信日時を記録
     target_word.last_delivered_at = DateTime.now

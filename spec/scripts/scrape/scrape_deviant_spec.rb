@@ -5,6 +5,8 @@ describe Scrape::Deviant do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
 
   # R18コンテンツを判定する関数について

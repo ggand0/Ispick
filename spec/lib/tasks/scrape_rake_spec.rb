@@ -5,6 +5,8 @@ describe "scrape:reset" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -37,6 +39,7 @@ end
 describe "scrape:delete_excess" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -55,27 +58,10 @@ describe "scrape:delete_excess" do
 end
 
 # Scraping tasks
-describe "scrape:rescrape_all" do
-  before do
-    IO.any_instance.stub(:puts)
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-
-  it "should call valid methods" do
-    Image.stub(:delete_all).and_return
-    Image.should_receive(:delete_all)
-    Scrape.stub(:scrape_all).and_return
-    Scrape.should_receive(:scrape_all)
-    Rake::Task['feature:face_images'].should_receive(:invoke)
-
-    subject.invoke
-  end
-end
-
 describe "scrape:images" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -86,11 +72,29 @@ describe "scrape:images" do
     subject.invoke
   end
 end
+
+describe "scrape:keyword" do
+  before do
+    IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
+  end
+  include_context 'rake'
+  its(:prerequisites) { should include('environment') }
+
+  it "should call valid methods" do
+    Scrape.stub(:scrape_keyword).and_return
+    Scrape.should_receive(:scrape_keyword)
+    subject.invoke
+  end
+end
+
+
 
 # Misc tasks
 describe "scrape:min5" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -104,6 +108,7 @@ end
 describe "scrape:min15" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -116,6 +121,7 @@ end
 describe "scrape:min30" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -128,6 +134,7 @@ end
 describe "scrape:min60" do
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }

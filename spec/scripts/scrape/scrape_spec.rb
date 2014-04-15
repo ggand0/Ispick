@@ -5,6 +5,8 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
 
   describe "scrape_all method" do
@@ -23,9 +25,9 @@ describe Scrape do
       Scrape::Piapro.should_receive(:scrape)
       #Scrape::Pixiv.should_receive(:scrape)
       Scrape::Deviant.should_receive(:scrape)
-      Scrape::Futaba.should_receive(:scrape)
-      Scrape::Nichan.should_receive(:scrape)
-      Scrape::Fourchan.should_receive(:scrape)
+      #Scrape::Futaba.should_receive(:scrape)
+      #Scrape::Nichan.should_receive(:scrape)
+      #Scrape::Fourchan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
       Scrape::Tumblr.should_receive(:scrape)
 
@@ -38,7 +40,7 @@ describe Scrape do
       Scrape::Nico.stub(:scrape).and_return()
       Scrape::Futaba.stub(:scrape).and_return()
       Scrape::Nico.should_receive(:scrape)
-      Scrape::Futaba.should_receive(:scrape)
+      #Scrape::Futaba.should_receive(:scrape)
       Scrape.scrape_5min()
     end
     it "runs all scraping script in _15min function" do
@@ -47,14 +49,14 @@ describe Scrape do
       Scrape::Twitter.stub(:scrape).and_return()
       Scrape::Tumblr.stub(:scrape).and_return()
       Scrape::Piapro.should_receive(:scrape)
-      Scrape::Nichan.should_receive(:scrape)
+      #Scrape::Nichan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
       Scrape::Tumblr.should_receive(:scrape)
       Scrape.scrape_15min()
     end
     it "runs all scraping script in _30min function" do
       Scrape::Fourchan.stub(:scrape).and_return()
-      Scrape::Fourchan.should_receive(:scrape)
+      #Scrape::Fourchan.should_receive(:scrape)
       Scrape.scrape_30min()
     end
     it "runs all scraping script in _60min function" do
@@ -91,7 +93,7 @@ describe Scrape do
         it "should write a log" do
           Image.any_instance.stub(:save).and_return(false)
           Image.any_instance.stub(:image_from_url).and_return()
-          Rails.logger.should_receive(:info).with('Image model saving failed.')
+          #Rails.logger.should_receive(:info).with('Image model saving failed.')
 
           Scrape::save_image({ title: 'title', src_url: 'src_url' })
         end
@@ -110,9 +112,9 @@ describe Scrape do
     end
 
     describe "with invalid attributes" do
-      it "should not save the image" do
+      it "should not save the image with validation" do
         count = Image.count
-        Scrape::save_image({ title: 'title', src_url: 'url with no images' })
+        Scrape::save_image({ title: 'title', src_url: 'url with no images' }, nil, true)
         Image.count.should eq(count)
       end
 

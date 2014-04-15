@@ -4,6 +4,8 @@ describe "deliver:all" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -20,6 +22,7 @@ describe "deliver:user" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -37,6 +40,7 @@ describe "deliver:update" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }

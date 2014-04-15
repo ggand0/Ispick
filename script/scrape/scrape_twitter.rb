@@ -29,8 +29,14 @@ module Scrape::Twitter
     puts 'Scraped: '+(Image.count-count).to_s
   end
 
+  def self.scrape_keyword(keyword)
+    limit   = 200        # 取得するツイートの上限数
+    self.scrape_with_keyword(keyword, limit, false)
+  end
+
+
   # 対象のハッシュタグを持つツイートの画像を抽出する
-  def self.scrape_with_keyword(keyword, limit)
+  def self.scrape_with_keyword(keyword, limit, validation=true)
     client = self.get_client
 
     # キーワードを含むハッシュタグの検索
@@ -46,7 +52,7 @@ module Scrape::Twitter
       puts 'ツイートを取得できませんでした'
     end
 
-    self.save(image_data, keyword)
+    self.save(image_data, keyword, validation)
   end
 
   def self.get_client
@@ -95,13 +101,13 @@ module Scrape::Twitter
     image_data
   end
 
-  def self.save(image_data, keyword)
+  def self.save(image_data, keyword, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
       puts "#{value[:title]} : #{value[:src_url]}"
 
       if not Scrape::is_duplicate(value[:src_url])
-        Scrape.save_image(value, [ Tag.new(name: keyword) ])
+        Scrape.save_image(value, [ Tag.new(name: keyword) ], validation)
       else
         puts 'Skipping a duplicate image...'
       end
