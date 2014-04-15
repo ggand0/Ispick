@@ -85,7 +85,7 @@ gem 'omniauth-twitter'
 gem 'less-rails'
 #gem 'less-rails-bootstrap'
 gem 'twitter-bootstrap-rails'
-#end
+gem 'puma'
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page

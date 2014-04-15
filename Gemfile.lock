@@ -265,6 +265,8 @@ GEM
       slop (~> 3.4)
     pry-rails (0.3.2)
       pry (>= 0.9.10)
+    puma (2.8.2)
+      rack (>= 1.1, < 2.0)
     rack (1.5.2)
     rack-protection (1.5.2)
       rack
@@ -453,6 +455,7 @@ DEPENDENCIES
   paperclip (~> 3.0)
   phantomjs (>= 1.8.1.1)
   pry-rails
+  puma
   rails (= 4.0.2)
   rails-erd
   rake_shared_context
