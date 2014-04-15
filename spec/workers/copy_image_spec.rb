@@ -4,7 +4,7 @@ require "#{Rails.root}/app/workers/copy_image"
 
 describe CopyImage do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "perform method" do
