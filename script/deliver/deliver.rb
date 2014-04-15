@@ -17,7 +17,7 @@ module Deliver
     count_all = user.target_images.length
 
     user.target_words.each do |t|
-      Deliver.deliver_from_word(user, t) if t.enabled
+      Deliver.deliver_from_word(user, t, true) if t.enabled
     end
     user.target_images.each do |t|
       Deliver.deliver_from_image(user, t, count_all, count) if t.enabled
@@ -31,7 +31,7 @@ module Deliver
 
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
-    self.deliver_from_word(user, TargetWord.find(target_word_id))
+    self.deliver_from_word(user, TargetWord.find(target_word_id), false)
 
     # １ユーザーの最大容量を超えていたら古い順に削除
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
@@ -66,8 +66,8 @@ module Deliver
     image.title.include?(word) or image.caption.include?(word)
   end
 
-  def self.create_delivered_image(image)
-    DeliveredImage.create(
+  def self.create_delivered_image(image, copy)
+    delivered_image = DeliveredImage.create(
       title: image.title,
       caption: image.caption,
       src_url: image.src_url,
@@ -80,13 +80,16 @@ module Deliver
       module_name: image.module_name,
       is_illust: image.is_illust
     )
+
+    delivered_image.data = image.data if copy
+    delivered_image
   end
 
   # User.delivered_imagesへ追加
-  def self.deliver_images(user, images, target)
+  def self.deliver_images(user, images, target, copy)
     c = 0
     images.each do |image|
-      delivered_image = self.create_delivered_image(image)
+      delivered_image = self.create_delivered_image(image, copy)
 
       if delivered_image.save
         target.delivered_images << delivered_image
@@ -98,7 +101,8 @@ module Deliver
         user.save
 
         #Resque.enqueue(CopyImage, delivered_image.id, image.id)
-        Resque.enqueue(DownloadImage, delivered_image.class.name, delivered_image.id, delivered_image.src_url)
+        Resque.enqueue(DownloadImage, delivered_image.class.name,
+          delivered_image.id, delivered_image.src_url) if not copy
       end
       c += 1
       puts '- Creating delivered_images:' + c.to_s + ' / ' +
@@ -124,9 +128,17 @@ module Deliver
     images
   end
 
-  def self.deliver_from_word(user, target_word)
+  def self.deliver_from_word(user, target_word, copy)
     # 単純に、title, caption, tagに文字列が含まれているかどうか調べる
-    images = Image.includes(:tags).where.not(title: nil, caption: nil, tags: { name: nil }).references(:tags)
+    # イラスト判定が終わっていないものは飛ばす
+    if copy
+      images = Image.includes(:tags).where.not(
+        title: nil, caption: nil, tags: { name: nil }).where.not(is_illust: nil).references(:tags)
+    else
+      # 即座に配信するときは、イラスト判定を後で行う事が確定しているので：
+      images = Image.includes(:tags).where.not(
+        title: nil, caption: nil, tags: { name: nil }).references(:tags)
+    end
     puts images.count
 
     # target_wordに、何らかの文字情報が部分一致するimageがあれば残す
@@ -140,7 +152,7 @@ module Deliver
     images = self.limit_images(user, images)
 
     # User.delivered_imagesへ追加する
-    self.deliver_images(user, images, target_word)
+    self.deliver_images(user, images, target_word, copy)
 
     # 最終配信日時を記録
     target_word.last_delivered_at = DateTime.now

@@ -18,7 +18,7 @@ class DownloadImageDaemon < DaemonSpawn::Base
 end
 
 DownloadImageDaemon.spawn!({
-  processes: 1,
+  processes: 3,
   working_dir: Rails.root,
   pid_file: File.join(Rails.root, 'tmp', 'pids', 'download_image.pid'),
   log_file: File.join(Rails.root, 'log', 'download_image.log'),
