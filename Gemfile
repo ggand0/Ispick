@@ -119,4 +119,5 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.0'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
+  gem 'capistrano3-puma'
 end
