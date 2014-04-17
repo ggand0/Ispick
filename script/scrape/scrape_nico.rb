@@ -131,7 +131,7 @@ module Scrape::Nico
       if target_word.enabled
         #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
         query = target_word.person ? target_word.person.name : target_word.word
-        puts query
+        puts 'query=' + query
         self.scrape_with_keyword(agent, query, limit, true)
       end
     end
@@ -148,12 +148,17 @@ module Scrape::Nico
     # imageタグ（イラスト）ごとに処理
     count = 0
     xml.search('image').map do |item|
-      title = item.css('title').first.content
-      page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
-      self.get_contents(page_url, agent, title, validation)
+      begin
+        title = item.css('title').first.content
+        page_url = 'http://seiga.nicovideo.jp/seiga/im'+item.css('id').first.content
+        self.get_contents(page_url, agent, title, validation)
 
-      count += 1
-      break if count >= limit
+        count += 1
+        break if count >= limit
+      rescue
+        # 検索結果が0の場合など
+        next
+      end
     end
     puts 'COUNT'+count.to_s
   end

@@ -51,7 +51,8 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # rails consoleを起動するために必要
-gem 'rb-readline', '0.5.0'
+#gem 'rb-readline', '0.5.0'
+gem 'rb-readline', '~> 0.4.2'
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
@@ -59,7 +60,6 @@ gem 'rmagick', require: false                    # Image processing lib. Used by
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
-#gem 'systemu'
 gem 'whenever', require: false                   # Support crontab
 
 gem 'kaminari'
@@ -71,19 +71,15 @@ gem 'simple-navigation-bootstrap'
 
 gem 'natto'
 gem 'x2ch'
-#gem 'futaba', git: 'https://github.com/co-me/futaba'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
-#gem 'tumblr_client', git: 'git@github.com:pentiumx/tumblr_client.git'
 
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-twitter'
 
-#group :assets do
 gem 'less-rails'
-#gem 'less-rails-bootstrap'
 gem 'twitter-bootstrap-rails'
 gem 'puma'
 
