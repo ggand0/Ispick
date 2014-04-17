@@ -120,4 +120,5 @@ group :development, :test do
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
   gem 'capistrano3-puma'
+  gem 'capistrano-puma', require: false
 end
