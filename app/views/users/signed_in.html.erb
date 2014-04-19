@@ -4,7 +4,7 @@
 <br>
 <%= link_to 'イラストのみ表示する', request.parameters.merge({ illust: true }) %>
 <br>
-<%= link_to 'Sort by favorites', request.parameters.merge({ sort: true }) %>
+<%= link_to 'Favorites順にする', request.parameters.merge({ sort: true }) %>
 <br>
 <br>
 <p>
@@ -16,6 +16,7 @@
   <%= bytes_to_kilobytes(get_total_size(current_user.delivered_images)) %> KB<br>
   <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
 </p>
+<p>※「Lists」→「登録タグ一覧」からタグ登録すると、定期的にタグに関する画像が配信されます</p>
 <br>
 <%= render_navigation expand_all: true, renderer: :bootstrap, &date_menu_items %>
 <br>
