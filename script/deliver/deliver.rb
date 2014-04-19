@@ -81,6 +81,7 @@ module Deliver
       is_illust: image.is_illust
     )
 
+    # コピーする場合は直接attachmentに画像ファイルを設定
     delivered_image.data = image.data if copy
     delivered_image
   end
@@ -89,8 +90,13 @@ module Deliver
   def self.deliver_images(user, images, target, copy)
     c = 0
     images.each do |image|
+      # 定期配信する時に、dataが何らかの原因で存在しないImageはskip
+      next if copy and not image.data
+
+      # DeliveredImageのインスタンス作成
       delivered_image = self.create_delivered_image(image, copy)
 
+      # DB保存後にuser.delivered_imagesに追加して配信する
       if delivered_image.save
         target.delivered_images << delivered_image
         # file.close出来てもuser.delivered_imagesはclose出来ない
@@ -100,10 +106,13 @@ module Deliver
         user.delivered_images << delivered_image# ここがcritical
         user.save
 
+        # 登録直後の配信の場合はコピーせずに直接src_urlからDLする
+        # (速度向上＋まだ配信元のImageでDLが終わっていない可能性があるため)
         #Resque.enqueue(CopyImage, delivered_image.id, image.id)
         Resque.enqueue(DownloadImage, delivered_image.class.name,
           delivered_image.id, delivered_image.src_url) if not copy
       end
+
       c += 1
       puts '- Creating delivered_images:' + c.to_s + ' / ' +
         images.count.to_s if c % 10 == 0
@@ -191,7 +200,6 @@ module Deliver
     images.reorder('created_at ASC').each do |i|
       break if image_size <= max_size
       image_size -= bytes_to_megabytes(i.data.size)
-      #puts image_size
       delete_count += 1
     end
 
