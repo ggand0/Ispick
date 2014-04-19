@@ -20,7 +20,8 @@ module Deliver
       Deliver.deliver_from_word(user, t, true) if t.enabled
     end
     user.target_images.each do |t|
-      Deliver.deliver_from_image(user, t, count_all, count) if t.enabled
+      # 14/04/19現在一旦停止させてる
+      #Deliver.deliver_from_image(user, t, count_all, count) if t.enabled
       count += 1
     end
 
@@ -126,8 +127,6 @@ module Deliver
   def self.limit_images(user, images)
     # 既に配信済みの画像である場合はskip
     images.reject! do |x|
-      #puts user.delivered_images.any?{ |d| d.src_url == x.src_url }
-      puts x.src_url
       user.delivered_images.any?{ |d| d.src_url == x.src_url }
     end
     puts 'Unique images: ' + images.count.to_s

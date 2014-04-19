@@ -12,17 +12,22 @@ namespace :deliver do
   desc "Deliver images to all users"
   task all: :environment do
     User.all.each do |user|
-      Rake::Task['deliver:user'].invoke user.id
+      puts 'TEST BLOCK IS CALLED1'
+      Rake::Task['deliver:user'].invoke(user.id)
+      Rake::Task['deliver:user'].reenable
+      #puts res
+      puts 'TEST BLOCK IS CALLED2'
     end
   end
 
   desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
-    t0 = Time.now
+    puts 'Deliver to user_id: ' + args[:user_id].to_s
+    start = Time.now
     Deliver.deliver(args[:user_id])
-    t1 = Time.now
+
     puts '-----------------------------------'# 35 chars
-    puts 'Elapsed time: ' + (t1-t0).to_s
+    puts 'Elapsed time: ' + (Time.now - start).to_s
     puts 'DONE!'
   end
 
