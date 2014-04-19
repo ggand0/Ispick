@@ -82,7 +82,11 @@ module Deliver
     )
 
     # コピーする場合は直接attachmentに画像ファイルを設定
-    delivered_image.data = image.data if copy
+    begin
+      delivered_image.data = image.data if copy and image.data
+    rescue => e
+      puts e
+    end
     delivered_image
   end
 
@@ -91,7 +95,7 @@ module Deliver
     c = 0
     images.each do |image|
       # 定期配信する時に、dataが何らかの原因で存在しないImageはskip
-      next if copy and not image.data
+      next if copy and image.data == nil
 
       # DeliveredImageのインスタンス作成
       delivered_image = self.create_delivered_image(image, copy)
