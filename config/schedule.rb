@@ -21,7 +21,7 @@
 
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
-every 5.minutes do
+every 30.minutes do
   rake 'scrape:min5'
 end
 
