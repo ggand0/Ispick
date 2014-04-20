@@ -51,8 +51,8 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # rails consoleを起動するために必要
-#gem 'rb-readline', '0.5.0'
-gem 'rb-readline', '~> 0.4.2'
+gem 'rb-readline', '0.5.0'
+gem 'pry-rails'                                  # Improve the console
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
@@ -86,7 +86,7 @@ gem 'puma'
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'pry-rails'                                   # Improve the console
+
   gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
@@ -95,7 +95,7 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'guard-coffeescript'
   gem 'guard-teaspoon'
-  gem 'rb-fsevent'                                  # Used by guard and spring
+  #gem 'rb-fsevent', require: false                 # Used by guard and spring
 
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
