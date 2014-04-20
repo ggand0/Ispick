@@ -12,6 +12,7 @@ guard :teaspoon do
   watch(%r{spec/javascripts/(.*)})
 end
 
+ignore([%r{^bin/*}, %r{^config/*}, %r{^db/*}, %r{^lib/*}, %r{^log/*}, %r{^public/*}, %r{^tmp/*}])
 guard :rspec, cmd: 'spring rspec' do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
