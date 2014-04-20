@@ -29,6 +29,9 @@ module UsersHelper
     end
     total_size
   end
+  def get_enabled_html(enabled)
+    '<strong>' + (enabled ? 'on' : 'off') + '</strong>'
+  end
 
   def list_menu_items
     Proc.new do |primary|

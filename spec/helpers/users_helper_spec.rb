@@ -31,4 +31,15 @@ describe UsersHelper do
         '<span style="color: #02C293;">Clipped</span>')
     end
   end
+  describe "get_enabled_html" do
+    it "returns valida html string" do
+      target_word = FactoryGirl.create(:target_word)
+      result = helper.get_enabled_html(target_word.enabled)
+      expect(raw result).to eql('<strong>on</strong>')
+
+      target_word.enabled = false
+      result = helper.get_enabled_html(target_word.enabled)
+      expect(raw result).to eql('<strong>off</strong>')
+    end
+  end
 end
