@@ -8,11 +8,9 @@ class TargetWord < ActiveRecord::Base
   has_many :delivered_images, as: :targetable
 
   after_create :search_keyword
+  validates :word, uniqueness: { scope: :user_id }
 
   def search_keyword
-    #query = self.person ? self.person.name : self.word
-    #Scrape.scrape_keyword(query)
-    #Deliver.deliver_keyword(self.user_id, self.id)
     Resque.enqueue(SearchImages, self.id)
   end
 end
