@@ -18,7 +18,7 @@
 </p>
 <p>※「Lists」→「登録ワード一覧」からタグ登録すると、定期的にタグに関する画像が配信されます</p>
 <br>
-<%= render_navigation expand_all: true, renderer: :bootstrap, &date_menu_items %>
+<%= render_navigation expand_all: true, renderer: :bootstrap, items: get_menu_items %>
 <br>
 <%= paginate @delivered_images %>
 <div class="wrap">

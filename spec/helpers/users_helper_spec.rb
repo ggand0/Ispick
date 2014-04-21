@@ -42,4 +42,54 @@ describe UsersHelper do
       expect(raw result).to eql('<strong>off</strong>')
     end
   end
+
+  # simple-navigation methods
+  # タブの仕様が決まったら細かく書く：
+  describe "simple-navigation methods" do
+    before do
+      user = FactoryGirl.create(:user_with_delivered_images)
+      view.stub(:current_user).and_return(user)
+    end
+
+    describe "get_menu_items method" do
+      it "returns an array contains valid items" do
+        items = helper.get_menu_items
+        expect(items).to be_an(Array)
+
+        expect(items.count).to eql(2)
+        expect(items.first[:key]).to eql(:date)
+        expect(items.second[:key]).to eql(:list)
+      end
+    end
+
+    describe "get_date_submenu method" do
+      it "returns an array contains valid items" do
+        items = helper.get_date_submenu
+
+        expect(items).to be_an(Array)
+        expect(items.count).to be > 0    # 最低限今日の日付はあるはず
+      end
+    end
+
+    describe "date_menu_items method" do
+      it "returns an array object" do
+        items = helper.date_menu_items
+
+        expect(items).to be_an(Array)
+        expect(items.count).to eql(1)
+        expect(items.first[:key]).to eql(:date)
+      end
+    end
+
+    describe "list_menu_items method" do
+      it "returns an array contains valid items" do
+        items = helper.list_menu_items
+
+        expect(items).to be_an(Array)
+        expect(items.count).to eql(1)
+        expect(items.first[:key]).to eql(:list)
+      end
+    end
+  end
+
 end
