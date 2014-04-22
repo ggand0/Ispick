@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: git@github.com:pentiumx/twitter.git
-  revision: b74effc4c5d7c804931652f046998ac8bf27157f
+  revision: 1fed387104cb0c84bf7d058559f83c393ed5eb8b
   specs:
     twitter (5.8.0)
       addressable (~> 2.3)
@@ -152,8 +152,8 @@ GEM
       railties (>= 3.0.0)
     faraday (0.8.9)
       multipart-post (~> 1.2.0)
-    faraday_middleware (0.9.0)
-      faraday (>= 0.7.4, < 0.9)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
     ffi (1.9.3)
     formatador (0.2.4)
     fuubar (1.3.2)
