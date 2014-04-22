@@ -93,7 +93,7 @@ group :development, :test do
   gem 'spring-commands-rspec'
   gem 'guard'
   gem 'guard-rspec', require: false
-  gem 'guard-coffeescript'
+  #gem 'guard-coffeescript'
   gem 'guard-teaspoon'
   #gem 'rb-fsevent', require: false                 # Used by guard and spring
 
