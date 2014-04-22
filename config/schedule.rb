@@ -44,12 +44,10 @@ every 30.minutes do
 
   # 全てのユーザーに推薦イラストを配信
   rake 'deliver:all'
-
-  # 配信画像の統計情報を更新する
-  rake 'deliver:update'
 end
 
-
-every 1.hours do
-
+# 少し長めに設定
+every 6.hours do
+  # 配信画像の統計情報を更新する
+  rake 'deliver:update'
 end
