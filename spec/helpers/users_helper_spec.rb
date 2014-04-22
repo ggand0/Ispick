@@ -32,7 +32,7 @@ describe UsersHelper do
     end
   end
   describe "get_enabled_html" do
-    it "returns valida html string" do
+    it "returns valid html string" do
       target_word = FactoryGirl.create(:target_word)
       result = helper.get_enabled_html(target_word.enabled)
       expect(raw result).to eql('<strong>on</strong>')
@@ -40,6 +40,14 @@ describe UsersHelper do
       target_word.enabled = false
       result = helper.get_enabled_html(target_word.enabled)
       expect(raw result).to eql('<strong>off</strong>')
+    end
+  end
+  describe "get_illust_html method" do
+    it "returns valid html" do
+      delivered_image = FactoryGirl.create(:delivered_image)
+      result = helper.get_illust_html(delivered_image)
+      #expect(result).to eql('Illust: <span style="color:#3598FF">true</span>')
+      expect(result).to eql('Illust: <span>true</span>')
     end
   end
 
