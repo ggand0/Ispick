@@ -108,11 +108,16 @@ module Scrape::Twitter
       puts "#{value[:title]} : #{value[:src_url]}"
 
       if not Scrape::is_duplicate(value[:src_url])
-        Scrape.save_image(value, [ Tag.new(name: keyword) ], validation)
+        Scrape.save_image(value, self.get_tags(keyword), validation)
       else
         puts 'Skipping a duplicate image...'
       end
     end
+  end
+
+  def self.get_tags(keyword)
+    tag = Tag.where(name: keyword)
+    [ (tag.empty? ? Tag.new(name: keyword) : tag.first) ]
   end
 
   def self.get_stats(page_url)

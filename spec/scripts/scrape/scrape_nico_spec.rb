@@ -5,7 +5,7 @@ describe Scrape::Nico do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     # コンソールに出力しないようにしておく
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
 
     # resqueにenqueueしないように
     Resque.stub(:enqueue).and_return
@@ -39,8 +39,18 @@ describe Scrape::Nico do
   end
 
   describe "get_tags function" do
-    it "returns a tag object array" do
+    it "returns an array of tags" do
+      tags = Scrape::Nico.get_tags(['Madoka'])
+      expect(tags).to be_an(Array)
+      expect(tags.first.name).to eql('Madoka')
+    end
+    it "uses existing tags if tags are duplicate" do
+      image = FactoryGirl.create(:image)
+      tag = FactoryGirl.create(:tag)
+      image.tags << tag
 
+      tags = Scrape::Nico.get_tags(['鹿目まどか'])
+      expect(tags.first.images.first.id).to eql(tag.images.first.id)
     end
   end
 

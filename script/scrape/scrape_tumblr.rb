@@ -83,9 +83,18 @@ module Scrape::Tumblr
       site_name: 'tumblr',
       module_name: 'Scrape::Tumblr',
     }
-    tags = image['tags'].map { |tag| Tag.new(name: tag) }
+    #tags = image['tags'].map { |tag| Tag.new(name: tag) }
+    tags = self.get_tags(image['tags'])
 
     { data: hash, tags: tags }
+  end
+
+  # @tag : Array of strings
+  def self.get_tags(tags)
+    tags.map do |tag|
+      t = Tag.where(name: tag)
+      t.empty? ? Tag.new(name: tag) : t.first
+    end
   end
 
   def self.get_images(client, keyword, limit)

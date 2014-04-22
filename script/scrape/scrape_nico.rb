@@ -38,7 +38,8 @@ module Scrape::Nico
     puts src_url
 
     # 画像の文字情報を取得
-    tags = self.get_tags(page)
+    tag_string = page.at("meta[@name='keywords']").attr('content')
+    tags = self.get_tags(tag_string.split(','))
     caption = page.at("meta[name='description']").attr('content')
 
     # 追加情報を取得
@@ -73,6 +74,14 @@ module Scrape::Nico
     Scrape::save_image(image_data, tags, validation)
   end
 
+
+  def self.get_tags(tags)
+    tags.map do |tag|
+      t = Tag.where(name: tag)
+      t.empty? ? Tag.new(name: tag) : t.first
+    end
+  end
+
   # delivered_images update用に、
   # ログインしてstats情報だけ返す関数
   def self.get_stats(page_url)
@@ -90,12 +99,6 @@ module Scrape::Nico
     end
 
     { views: views, favorites: clips}
-  end
-
-  def self.get_tags(page)
-    tag_string = page.at("meta[@name='keywords']").attr('content')
-    tags = tag_string.split(',')
-    tags.map { |tag| Tag.new(name: tag) }
   end
 
   def self.login()

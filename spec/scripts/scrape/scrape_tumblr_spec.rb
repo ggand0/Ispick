@@ -45,6 +45,22 @@ describe Scrape::Tumblr do
     end
   end
 
+  describe "get_tags function" do
+    it "returns an array of tags" do
+      tags = Scrape::Tumblr.get_tags(['Madoka'])
+      expect(tags).to be_an(Array)
+      expect(tags.first.name).to eql('Madoka')
+    end
+    it "uses existing tags if tags are duplicate" do
+      image = FactoryGirl.create(:image)
+      tag = FactoryGirl.create(:tag)
+      image.tags << tag
+
+      tags = Scrape::Tumblr.get_tags(['鹿目まどか'])
+      expect(tags.first.images.first.id).to eql(tag.images.first.id)
+    end
+  end
+
   describe "get_stats function" do
     it "returns a hash with favorites value" do
       page_url = 'http://zan66.tumblr.com/post/74921850483'
