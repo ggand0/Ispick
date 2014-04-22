@@ -22,9 +22,9 @@ describe Scrape do
       Scrape::Tumblr.stub(:scrape).and_return()
 
       Scrape::Nico.should_receive(:scrape)
-      Scrape::Piapro.should_receive(:scrape)
+      #Scrape::Piapro.should_receive(:scrape)
       #Scrape::Pixiv.should_receive(:scrape)
-      Scrape::Deviant.should_receive(:scrape)
+      #Scrape::Deviant.should_receive(:scrape)
       #Scrape::Futaba.should_receive(:scrape)
       #Scrape::Nichan.should_receive(:scrape)
       #Scrape::Fourchan.should_receive(:scrape)
@@ -48,7 +48,7 @@ describe Scrape do
       Scrape::Nichan.stub(:scrape).and_return()
       Scrape::Twitter.stub(:scrape).and_return()
       Scrape::Tumblr.stub(:scrape).and_return()
-      Scrape::Piapro.should_receive(:scrape)
+      #Scrape::Piapro.should_receive(:scrape)
       #Scrape::Nichan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
       Scrape::Tumblr.should_receive(:scrape)
@@ -63,7 +63,7 @@ describe Scrape do
       #Scrape::Pixiv.stub(:scrape).and_return()
       Scrape::Deviant.stub(:scrape).and_return()
       #Scrape::Pixiv.should_receive(:scrape)
-      Scrape::Deviant.should_receive(:scrape)
+      #Scrape::Deviant.should_receive(:scrape)
       Scrape.scrape_60min()
     end
   end

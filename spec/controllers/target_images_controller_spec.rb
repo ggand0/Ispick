@@ -30,7 +30,10 @@ describe TargetImagesController do
   # TargetImagesController. Be sure to keep this updated too.
   let(:valid_session) { {} }
   let(:user) { FactoryGirl.create(:user) }
-  before { sign_in user }
+  before do
+    Resque.stub(:enqueue).and_return
+    sign_in user
+  end
 
   describe "GET index" do
     it "assigns all target_images as @target_images" do

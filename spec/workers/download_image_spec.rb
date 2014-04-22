@@ -13,7 +13,7 @@ describe DownloadImage do
       image = FactoryGirl.create(:image)
       Image.any_instance.should_receive(:save!)
 
-      DownloadImage.perform(image.id, url)
+      DownloadImage.perform(image.class.name, image.id, url)
     end
   end
 end

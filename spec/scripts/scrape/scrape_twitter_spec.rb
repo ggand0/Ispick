@@ -5,7 +5,7 @@ require "#{Rails.root}/script/scrape/scrape_twitter"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    #IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
   end
 
@@ -103,7 +103,7 @@ describe Scrape::Twitter do
       image.tags << tag
 
       tags = Scrape::Twitter.get_tags('鹿目まどか')
-      expect(tags.first.first.images.first.id).to eql(tag.images.first.id)
+      expect(tags.first.images.first.id).to eql(tag.images.first.id)
     end
   end
 

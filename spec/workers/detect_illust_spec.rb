@@ -25,7 +25,7 @@ describe DetectIllust do
       DetectIllust.stub(:get_result).and_return('1')
 
       detect = DetectIllust.new
-      DetectIllust::perform(image.id)
+      DetectIllust::perform(image.class.name, image.id)
 
       expect(Image.find(image.id).is_illust).to eq(true)
     end
@@ -35,7 +35,7 @@ describe DetectIllust do
       DetectIllust.stub(:get_result).and_return('0')
 
       detect = DetectIllust.new
-      DetectIllust::perform(image.id)
+      DetectIllust::perform(image.class.name, image.id)
 
       expect(Image.find(image.id).is_illust).to eq(false)
     end
@@ -45,7 +45,7 @@ describe DetectIllust do
       DetectIllust.stub(:get_result).and_return('invalid return value')
 
       detect = DetectIllust.new
-      DetectIllust::perform(image.id)
+      DetectIllust::perform(image.class.name, image.id)
 
       expect(Image.find(image.id).is_illust).to eq(false)
     end

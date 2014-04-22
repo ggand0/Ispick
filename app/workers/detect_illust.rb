@@ -4,12 +4,11 @@ class DetectIllust
 
   # イラスト判定ツールを実行し結果を得る
   def self.get_result(tool_path, image)
-    %x(#{tool_path} #{image.data.path})#2>&1
+    %x(#{tool_path} #{image.data.path})
   end
 
   # イラストかどうか判定する
   def self.perform(image_type, image_id)
-    #image = Image.find(image_id)
     image = Object::const_get(image_type).find(image_id)
     tool_path = CONFIG['illust_detection_path']
     illust = self.get_result(tool_path, image).to_i
