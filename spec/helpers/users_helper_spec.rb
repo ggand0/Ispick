@@ -69,6 +69,15 @@ describe UsersHelper do
         expect(items).to be_an(Array)
         expect(items.count).to be > 0    # 最低限今日の日付はあるはず
       end
+
+      # 配信画像が無い時は当日の日付リンクのみ
+      it "returns only one item(that represent today) when current_user has no delivered_images" do
+        user_with_no_delivered_images = FactoryGirl.create(:user)
+        view.stub(:current_user).and_return(user_with_no_delivered_images)
+
+        items = helper.get_date_submenu
+        expect(items.count).to eql(1)
+      end
     end
 
     describe "date_menu_items method" do

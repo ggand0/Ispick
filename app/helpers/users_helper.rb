@@ -50,8 +50,12 @@ module UsersHelper
   # 日付系menu
   def get_date_submenu
     # 動的に日付メニューを追加する：oldest delivered_image.created_atからtodayまで
-    start = current_user.delivered_images.reorder('created_at ASC').first.created_at.to_date
     today = Time.now.in_time_zone('Asia/Tokyo').to_date
+    if current_user.delivered_images.empty?
+      start = today
+    else
+      start = current_user.delivered_images.reorder('created_at ASC').first.created_at.to_date
+    end
     array = []
 
     range = (start..today).map{ |date| { date: date, str: date.strftime("%b %d") } }
