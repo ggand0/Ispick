@@ -132,13 +132,13 @@ namespace :resque do
   desc "restart resque daemons"
   task :restart do
     on roles(:all) do
-      execute "cd #{current_path} && ./script/restart_all_daemons.sh"
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ./script/restart_all_daemons.sh"
     end
   end
   desc "start resque daemons"
   task :start do
     on roles(:all) do
-      execute "cd #{current_path} && ./script/start_all_daemons.sh"
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ./script/start_all_daemons.sh"
     end
   end
   desc "stop resque daemons"
@@ -179,4 +179,4 @@ after 'deploy:start', 'resque:start'
 after 'deploy:start', 'whenever:update'
 # restart
 after 'deploy:restart', 'resque:restart'
-#after 'deploy:restart', 'whenever:update'
+after 'deploy:restart', 'whenever:update'
