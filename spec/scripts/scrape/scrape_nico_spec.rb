@@ -39,7 +39,9 @@ describe Scrape::Nico do
   end
 
   describe "get_tags function" do
+    it "returns a tag object array" do
 
+    end
   end
 
   describe "get_stats function" do
@@ -91,6 +93,14 @@ describe Scrape::Nico do
       Scrape::Nico.should_receive(:get_contents).at_least(limit).times
 
       Scrape::Nico.scrape()
+    end
+  end
+
+
+  describe "scrape_with_keyword function" do
+    it "skip if keyword arg is nil" do
+      Scrape::Nico.should_not_receive(:get_contents)
+      Scrape::Nico.scrape_with_keyword(@agent, nil, 5, false)
     end
   end
 end

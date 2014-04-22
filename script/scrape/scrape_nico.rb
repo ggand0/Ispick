@@ -133,7 +133,6 @@ module Scrape::Nico
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
-        #http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=%E5%BC%A6%E5%B7%BB%E3%83%9E%E3%82%AD
         query = target_word.person ? target_word.person.name : target_word.word
         puts 'query=' + query
         self.scrape_with_keyword(agent, query, limit, true)
@@ -141,9 +140,13 @@ module Scrape::Nico
     end
   end
 
+  # キーワードからタグ検索してlimit分の画像を保存する
   def self.scrape_with_keyword(agent, keyword, limit, validation)
+    # nilのクエリを送らないようにする
+    return if keyword.nil? or keyword.empty?
+
     begin
-      url = TAG_SEARCH_URL+'?page=1&query='+keyword
+      url = "#{TAG_SEARCH_URL}?page=1&query=#{keyword}"
       puts 'Extracting ' + limit.to_s + 'images from: ' + url
 
       escaped = URI.escape(url)
@@ -171,5 +174,4 @@ module Scrape::Nico
       Rails.logger.info('Scraping from nicoseiga has failed!')
     end
   end
-
 end

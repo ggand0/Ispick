@@ -6,7 +6,6 @@ require 'securerandom'
 
 # Tumblrから画像抽出する
 module Scrape::Tumblr
-
   ROOT_URL = 'https://tumblr.com'
 
   # 関数定義
@@ -22,8 +21,9 @@ module Scrape::Tumblr
       # Person.nameで検索（e.g. "鹿目まどか"）
       # エイリアスも含めるならkeywords.eachする
       if target_word.enabled
-        query = target_word.person ? target_word.person.name : target_word.word
-        puts query
+        puts query = target_word.person ? target_word.person.name : target_word.word
+        next if query.nil? or query.empty?
+
         self.scrape_with_keyword(query, limit)
       end
     end

@@ -20,8 +20,9 @@ module Scrape::Twitter
     TargetWord.all.each do |target_word|
       # Person.nameで検索（e.g. '鹿目まどか'）
       if target_word.enabled
-        query = target_word.person ? target_word.person.name : target_word.word
-        puts query
+        puts query = target_word.person ? target_word.person.name : target_word.word
+        next if query.nil? or query.empty?
+
         self.scrape_with_keyword(query, limit)
       end
     end
@@ -121,7 +122,7 @@ module Scrape::Twitter
       tweet = client.status(id)
     rescue => e                   # Twitter::Error::Forbidden:など
       puts e
-      return false
+      return {}
     end
 
     { views: nil, favorites: tweet.favorite_count }

@@ -5,17 +5,30 @@ require "#{Rails.root}/script/scrape/scrape_tumblr"
 describe Scrape::Tumblr do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    # コンソールに出力しないようにしておく
-    IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
     @client = Scrape::Tumblr.get_client()
   end
 
   describe "scrape method" do
-    it "should call scrape_with_keyword function" do
+    it "calls scrape_with_keyword function" do
       FactoryGirl.create(:person_madoka)
       Scrape::Tumblr.should_receive(:scrape_with_keyword)
+      Scrape::Tumblr.scrape()
+    end
+    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
+      FactoryGirl.create(:target_word_not_enabled)
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
+
+      Scrape::Tumblr.scrape()
+    end
+    it "skips keywords with nil or empty value" do
+      nil_word = TargetWord.new
+      nil_word.save!
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
+
       Scrape::Tumblr.scrape()
     end
   end

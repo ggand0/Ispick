@@ -5,10 +5,8 @@ require "#{Rails.root}/script/scrape/scrape_twitter"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    # コンソールに出力しないようにしておく
-    IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
   end
 
   describe "scrape_with_keyword function" do
@@ -55,9 +53,20 @@ describe Scrape::Twitter do
   describe "get_contents function" do
     before do
       client = Scrape::Twitter.get_client
-      @tweet = client.status('454783931636670464')
+      #@tweet = client.status('454783931636670464')
+      @tweet = Twitter::Tweet.new({id:1})
     end
     it "returns image_data array" do
+      # APIアクセスしないようにstubしている
+      Twitter::Tweet.any_instance.stub(:media?).and_return(true)
+      Twitter::Tweet.any_instance.stub(:text).and_return('大佐、会議室でよく使うハンドサイン発見しました☆パァ')
+      Twitter::Tweet.any_instance.stub(:url).and_return(
+        'https://twitter.com/wycejezevix/status/454783931636670464')
+      Twitter::Tweet.any_instance.stub(:retweet_count).and_return(0)
+      Twitter::Tweet.any_instance.stub(:favorite_count).and_return(0)
+      Twitter::Tweet.any_instance.stub(:created_at).and_return(DateTime.now)
+      Twitter::Tweet.any_instance.stub(:media).and_return([Twitter::Media::Photo.new({id:1})])
+      Twitter::Media::Photo.any_instance.stub(:media_uri).and_return('src_url_of_media.png')
       image_data = Scrape::Twitter.get_contents(@tweet)
 
       expect(image_data).to be_an(Array)
@@ -97,11 +106,21 @@ describe Scrape::Twitter do
 
       Scrape::Twitter.scrape()
     end
-    it "calls scrape_with_keyword function when targetable is NOT enabled" do
+    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
       FactoryGirl.create(:target_word_not_enabled)
+      Scrape::Twitter.stub(:scrape_with_keyword).and_return
       Scrape::Twitter.should_not_receive(:scrape_with_keyword)
 
       Scrape::Twitter.scrape()
     end
+    it "skips keywords with nil or empty value" do
+      nil_word = TargetWord.new
+      nil_word.save!
+      Scrape::Twitter.stub(:scrape_with_keyword).and_return
+      Scrape::Twitter.should_not_receive(:scrape_with_keyword)
+
+      Scrape::Twitter.scrape()
+    end
+
   end
 end
