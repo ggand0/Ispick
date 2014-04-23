@@ -184,10 +184,31 @@ describe "Deliver" do
 
       Deliver.update()
     end
-
     it "ignores empty relation in user.delivered_images" do
       user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 5)
       user.delivered_images << DeliveredImage.none  # 空のrelationを追加
+
+      Deliver.update()
+    end
+    it "updates delivered_image which is delivered in the day" do
+      user = FactoryGirl.create(:twitter_user)
+      delivered_image = FactoryGirl.create(:delivered_image_no_association)
+      delivered_image.created_at = Time.now + 1.day
+      user.delivered_images << delivered_image
+
+      Object.const_get(delivered_image.module_name).should_receive(:get_stats).exactly(1).times
+
+      Deliver.update()
+    end
+    it "ignore delivered_image which is delivered in the other days" do
+      user = FactoryGirl.create(:twitter_user)
+      delivered_image = FactoryGirl.create(:delivered_image_no_association)
+      delivered_image.created_at = Time.now - 1.day
+      user.delivered_images << delivered_image
+
+      Scrape::Twitter.should_not_receive(:get_stats)
+      Scrape::Tumblr.should_not_receive(:get_stats)
+      Scrape::Nico.should_not_receive(:get_stats)
 
       Deliver.update()
     end

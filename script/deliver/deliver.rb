@@ -40,6 +40,7 @@ module Deliver
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
     puts 'Remain delivered_images:' + user.delivered_images.count.to_s
   end
+
   def self.deliver_one(user_id, target_word_id, image_id)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
@@ -226,10 +227,15 @@ module Deliver
 
   # User.all.delivered_imagesをupdateする
   def self.update()
+    today = Time.now.in_time_zone('Asia/Tokyo').to_date
+
     User.all.each do |user|
       user.delivered_images.each do |delivered_image|
         # DeliveredImageに存在しない場合はnext
         next if DeliveredImage.where(id: delivered_image.id).empty?
+
+        # 当日配信された画像のみ更新する
+        next if delivered_image.created_at.in_time_zone('Asia/Tokyo').to_date < today
 
         # 統計情報を取得出来なかった時もnext
         stats = Object.const_get(delivered_image.module_name).get_stats(delivered_image.page_url)
