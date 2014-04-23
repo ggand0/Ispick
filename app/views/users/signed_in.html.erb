@@ -32,7 +32,6 @@
           <div class="id"><%= image.id %></div>
           <%= raw get_clip_string_styled(image) %>
         </div>
-        <%= get_illust_html image %>
 
         <%= link_to 'Hide', avoid_delivered_image_path(image), method: :put %>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>

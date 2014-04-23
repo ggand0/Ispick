@@ -33,8 +33,7 @@ module UsersHelper
     '<strong>' + (enabled ? 'on' : 'off') + '</strong>'
   end
   def get_illust_html(image)
-    # "Illust: <span style=\"color:#3598FF\">#{image.is_illust.to_s}</span>".html_safe if image.is_illust
-    "Illust: <span>#{image.is_illust.to_s}</span>".html_safe if image.is_illust
+    "Illust: <span>#{image.is_illust.to_s}</span>".html_safe
   end
 
   # simple-navigation関連
