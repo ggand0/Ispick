@@ -34,7 +34,7 @@ module Scrape
   end
 
   def self.scrape_5min
-    Scrape::Nico.scrape()
+
     #Scrape::Futaba.scrape()
     puts 'DONE!!'
   end
@@ -43,7 +43,7 @@ module Scrape
     #Scrape::Piapro.scrape()
     #Scrape::Nichan.scrape()
     Scrape::Twitter.scrape()
-    Scrape::Tumblr.scrape()
+
     puts 'DONE!!'
   end
 
@@ -53,8 +53,14 @@ module Scrape
   end
 
   def self.scrape_60min()
+    Scrape::Nico.scrape()
     #Scrape::Pixiv.scrape()
     #Scrape::Deviant.scrape()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_3h()
+    Scrape::Tumblr.scrape()
     puts 'DONE!!'
   end
 

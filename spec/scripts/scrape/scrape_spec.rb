@@ -39,7 +39,7 @@ describe Scrape do
     it "runs all scraping script in _5min function" do
       Scrape::Nico.stub(:scrape).and_return()
       Scrape::Futaba.stub(:scrape).and_return()
-      Scrape::Nico.should_receive(:scrape)
+      #Scrape::Nico.should_receive(:scrape)
       #Scrape::Futaba.should_receive(:scrape)
       Scrape.scrape_5min()
     end
@@ -51,7 +51,7 @@ describe Scrape do
       #Scrape::Piapro.should_receive(:scrape)
       #Scrape::Nichan.should_receive(:scrape)
       Scrape::Twitter.should_receive(:scrape)
-      Scrape::Tumblr.should_receive(:scrape)
+      #Scrape::Tumblr.should_receive(:scrape)
       Scrape.scrape_15min()
     end
     it "runs all scraping script in _30min function" do

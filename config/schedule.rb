@@ -21,20 +21,17 @@
 
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
-every 30.minutes do
-  rake 'scrape:min5'
-end
 
 every 15.minutes do
-  rake 'scrape:min15'
-end
-
-every 30.minutes do
-  rake 'scrape:min30'
+  rake 'scrape:twitter'
 end
 
 every 60.minutes do
-  rake 'scrape:min60'
+  rake 'scrape:nico'
+end
+
+every 3.hours do
+  rake 'scrape:tumblr'
 end
 
 # 配信システム系
