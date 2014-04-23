@@ -32,6 +32,7 @@ describe TargetWordsController do
   let(:user) { FactoryGirl.create(:user) }
   before do
     sign_in user
+    Resque.stub(:enqueue).and_return
   end
 
   describe "GET index" do
@@ -163,7 +164,7 @@ describe TargetWordsController do
     it "redirects to the target_words list" do
       target_word = TargetWord.create! valid_attributes
       delete :destroy, {:id => target_word.to_param}, valid_session
-      response.should redirect_to(target_words_url)
+      response.should redirect_to(show_target_words_users_path)
     end
   end
 

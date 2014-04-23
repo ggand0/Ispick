@@ -130,7 +130,7 @@ module Scrape::Nico
   end
 
   # タグ検索バージョンをデフォルトで使う事にする
-  def self.scrape()
+  def self.scrape
     agent = self.login()
     limit = 50
 

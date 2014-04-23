@@ -190,6 +190,7 @@ describe "Deliver" do
 
       Deliver.update()
     end
+    # 当日配信された画像のみ更新する
     it "updates delivered_image which is delivered in the day" do
       user = FactoryGirl.create(:twitter_user)
       delivered_image = FactoryGirl.create(:delivered_image_no_association)
