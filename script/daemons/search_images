@@ -8,7 +8,7 @@ require "#{Rails.root}/app/workers/search_images"
 class SearchImagesDaemon < DaemonSpawn::Base
   def start(args)
     @worker = Resque::Worker.new('search_images')
-    @worker.verbose = true
+    #@worker.verbose = true
     @worker.work
   end
 

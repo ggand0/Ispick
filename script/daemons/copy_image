@@ -8,7 +8,6 @@ require "#{Rails.root}/app/workers/copy_image"
 class CopyImageDaemon < DaemonSpawn::Base
   def start(args)
     @worker = Resque::Worker.new('copy_image')
-    @worker.verbose = true
     @worker.work
   end
 
