@@ -10,32 +10,29 @@ module Scrape::Nico
 
   # @page : Mechanize::Page
   def self.is_adult(page)
-    puts page
-    puts page.at("meta[@property='og:site_name']")
     site_name = page.at("meta[@property='og:site_name']").attr('content')
     site_name == 'ニコニコ春画'
   end
 
   def self.get_contents(page_url, agent, title, validation=true)
-    t0 = Time.now
+    start = Time.now
     # 元ページを開く
     begin
       page = agent.get(page_url)
     rescue Exception => e
       # ログイン求められて失敗した時用
+      puts "Failed to open page_url: #{page_url}"
       puts e
-      puts 'PAGE_URL:'
-      puts page_url
-      Rails.logger.info('Could not open the page.')
+      Rails.logger.info('Could not open a page.')
       return
     end
 
-    # 春画画像なら抽出を断念する
+    # 春画画像なら抽出を中止する
     return if is_adult(page)
+
 
     # 画像のソースurlを探して格納
     src_url = page.at("meta[@property='og:image']").attr('content')
-    puts src_url
 
     # 画像の文字情報を取得
     tag_string = page.at("meta[@name='keywords']").attr('content')
@@ -47,7 +44,6 @@ module Scrape::Nico
     views = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
     comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
     clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
-    puts views.to_s+' '+comments.to_s+' '+clips.to_s
 
     posted_at_string = page.at("span[@class='created']").content#2014年03月27日 19:56
     year = posted_at_string.match(/\d{4}/).to_s.to_i
@@ -69,7 +65,8 @@ module Scrape::Nico
       site_name: 'nicoseiga',
       module_name: 'Scrape::Nico',
     }
-    puts (Time.now - t0).to_s + 'sec'
+    puts "Scraped from #{src_url} in #{(Time.now - start).to_s} sec"
+
     # Imageモデル生成＆DB保存
     Scrape::save_image(image_data, tags, validation)
   end
@@ -114,7 +111,7 @@ module Scrape::Nico
     agent = self.login()
 
     xml = Nokogiri::XML(open(RSS_URL))
-    puts 'Extracting : ' + RSS_URL
+    puts "Extracting :  #{RSS_URL}"
 
     # itemタグ（イラスト）ごとに処理
     xml.css('item').map do |item|
@@ -137,7 +134,7 @@ module Scrape::Nico
     TargetWord.all.each do |target_word|
       if target_word.enabled
         query = target_word.person ? target_word.person.name : target_word.word
-        puts 'query=' + query
+        puts "query = #{query}"
         self.scrape_with_keyword(agent, query, limit, true)
       end
     end
@@ -150,7 +147,7 @@ module Scrape::Nico
 
     begin
       url = "#{TAG_SEARCH_URL}?page=1&query=#{keyword}"
-      puts 'Extracting ' + limit.to_s + 'images from: ' + url
+      puts "Extracting #{limit.to_s} images from: #{url}"
 
       escaped = URI.escape(url)
       xml = agent.get(escaped)
@@ -171,7 +168,7 @@ module Scrape::Nico
           next
         end
       end
-      puts 'COUNT'+count.to_s
+      puts "Extracted: #{count.to_s}"
     rescue => e
       puts e
       Rails.logger.info('Scraping from nicoseiga has failed!')

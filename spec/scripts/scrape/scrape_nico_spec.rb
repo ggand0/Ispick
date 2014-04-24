@@ -65,21 +65,18 @@ describe Scrape::Nico do
   describe "get_contents method" do
     # itemタグを参照するオブジェクトを渡した時に、新規Imageが保存されること
     it "should create an image model from image source" do
-      count = Image.count
       xml = Nokogiri::XML(open('http://seiga.nicovideo.jp/rss/illust/new'))
 
       Scrape.should_receive(:save_image)
       Scrape::Nico.get_contents(@page_url, @agent, @title)
-      #Image.count.should eq(count+1)
     end
 
     # 対象の画像URLを開けなかった時、ログに書き出すこと
     it "should write a log when it fails to open the image page" do
       count = Image.count
       url = 'An invalid page url'
-      #xml = Nokogiri::XML(open(url))# 例えば、画像と無関係なURL
 
-      Rails.logger.should_receive(:info).with('Could not open the page.')
+      Rails.logger.should_receive(:info)
       Scrape.should_not_receive(:save_image)
 
       Scrape::Nico.get_contents(url, @agent, @title)
@@ -94,8 +91,8 @@ describe Scrape::Nico do
   end
 
   describe "scrape method" do
-    # 少なくとも20回はget_contentsメソッドを呼び出すこと
-    it "should call get_contents method at least 50 time" do
+    # 少なくともlimit回はget_contentsメソッドを呼び出すこと
+    it "should call get_contents method at least 'limit' times" do
       limit = 50
       FactoryGirl.create(:person_madoka)
 
