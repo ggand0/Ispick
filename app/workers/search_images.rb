@@ -9,8 +9,8 @@ class SearchImages
     start = Time.now
     target_word = TargetWord.find(target_word_id)
     query = target_word.person ? target_word.person.name : target_word.word
-    Scrape.scrape_keyword(query)
-    Deliver.deliver_keyword(target_word.user_id, target_word.id)
+    Scrape.scrape_keyword query
+    Deliver.deliver_keyword target_word.user_id, target_word.id
 
     puts 'TIME: ' + (Time.now - start).to_s
     puts 'SEARCH IMAGES DONE!'
