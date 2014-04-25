@@ -6,12 +6,11 @@ require 'securerandom'
 
 # Tumblrから画像抽出する
 module Scrape::Tumblr
-
   ROOT_URL = 'https://tumblr.com'
 
   # 関数定義
   def self.scrape()
-    puts 'Extracting : ' + ROOT_URL
+    puts "Extracting: #{ROOT_URL}"
 
     limit   = 100        # 取得するPostの上限数
     count = Image.count
@@ -22,15 +21,17 @@ module Scrape::Tumblr
       # Person.nameで検索（e.g. "鹿目まどか"）
       # エイリアスも含めるならkeywords.eachする
       if target_word.enabled
-        query = target_word.person ? target_word.person.name : target_word.word
-        puts query
+        puts query = target_word.person ? target_word.person.name : target_word.word
+        next if query.nil? or query.empty?
+
         self.scrape_with_keyword(query, limit)
       end
     end
 
-    puts 'Scraped: '+(Image.count-count).to_s
+    puts "Extracted: #{(Image.count-count).to_s}"
   end
 
+  # キーワードによる抽出処理を行う
   def self.scrape_keyword(keyword)
     limit   = 10        # 取得するPostの上限数
     self.scrape_with_keyword(keyword, limit, false)
@@ -69,7 +70,7 @@ module Scrape::Tumblr
     suki = html.css("ol[class='notes']").first.content.to_s.scan(/「スキ!」/)
 
     fav = likes.count+suki.count
-    puts fav
+    #puts fav
 
     # photo以外だとここで落ちるはず
     hash = {
@@ -83,9 +84,17 @@ module Scrape::Tumblr
       site_name: 'tumblr',
       module_name: 'Scrape::Tumblr',
     }
-    tags = image['tags'].map { |tag| Tag.new(name: tag) }
+    tags = self.get_tags(image['tags'])
 
     { data: hash, tags: tags }
+  end
+
+  # @tag : Array of strings
+  def self.get_tags(tags)
+    tags.map do |tag|
+      t = Tag.where(name: tag)
+      t.empty? ? Tag.new(name: tag) : t.first
+    end
   end
 
   def self.get_images(client, keyword, limit)
@@ -94,8 +103,7 @@ module Scrape::Tumblr
     # limitで指定された数だけ画像を取得
     images = client.tagged(keyword)
     #images.each.take(limit) do |image|
-    count=0
-    images.each do |image|
+    images.each_with_index do |image, count|
       puts url = image['post_url']
       html = Nokogiri::HTML(open(url))
       begin
@@ -105,8 +113,9 @@ module Scrape::Tumblr
         puts e
         next
       end
-      count+=1
-      break if count >= limit
+
+      # 個数なのでindex+1する
+      break if count+1 >= limit
     end
     image_data
   end
@@ -115,7 +124,7 @@ module Scrape::Tumblr
   def self.save(image_data, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
-      puts "#{value[:data][:src_url]}"
+      puts "Scraped from #{value[:data][:src_url]}"
       Scrape.save_image(value[:data], value[:tags], validation)
     end
   end

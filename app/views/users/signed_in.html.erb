@@ -4,7 +4,7 @@
 <br>
 <%= link_to 'イラストのみ表示する', request.parameters.merge({ illust: true }) %>
 <br>
-<%= link_to 'Sort by favorites', request.parameters.merge({ sort: true }) %>
+<%= link_to 'Favorites順にする', request.parameters.merge({ sort: true }) %>
 <br>
 <br>
 <p>
@@ -16,8 +16,9 @@
   <%= bytes_to_kilobytes(get_total_size(current_user.delivered_images)) %> KB<br>
   <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
 </p>
+<p>※「Lists」→「登録ワード一覧」からタグ登録すると、定期的にタグに関する画像が配信されます</p>
 <br>
-<%= render_navigation expand_all: true, renderer: :bootstrap, &date_menu_items %>
+<%= render_navigation expand_all: true, renderer: :bootstrap, items: get_menu_items %>
 <br>
 <%= paginate @delivered_images %>
 <div class="wrap">
@@ -35,6 +36,7 @@
         <%= link_to 'Hide', avoid_delivered_image_path(image), method: :put %>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
+        <%= get_illust_html image %>
 
         <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>

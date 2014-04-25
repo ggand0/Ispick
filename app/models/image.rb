@@ -1,6 +1,6 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
-  has_many :tags
+  has_and_belongs_to_many :tags
 
   # 明示的にテーブル名を指定することでエラー回避
   default_scope { order("#{table_name}.created_at DESC") }

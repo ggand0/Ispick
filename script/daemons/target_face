@@ -8,7 +8,6 @@ require "#{Rails.root}/app/workers/target_images_face"
 class TargetFaceDaemon < DaemonSpawn::Base
   def start(args)
     @worker = Resque::Worker.new('target_face')
-    @worker.verbose = true
     @worker.work
   end
 

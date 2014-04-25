@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140327034657) do
+ActiveRecord::Schema.define(version: 20140422033323) do
 
   create_table "delivered_images", force: true do |t|
     t.text     "title"
@@ -77,6 +77,11 @@ ActiveRecord::Schema.define(version: 20140327034657) do
     t.datetime "posted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "images_tags", id: false, force: true do |t|
+    t.integer "image_id", null: false
+    t.integer "tag_id",   null: false
   end
 
   create_table "keywords", force: true do |t|

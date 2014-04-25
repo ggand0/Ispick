@@ -17,6 +17,8 @@ FactoryGirl.define do
 
   factory :delivered_image_no_association, class: DeliveredImage do
     sequence(:src_url) { |n| "test#{n}@example.com"}
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
+    sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count ]}
   end
 
   factory :delivered_image_with_targetable, class: DeliveredImage do

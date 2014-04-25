@@ -5,17 +5,17 @@ class DownloadImage
 
   # 画像をDLする
   def self.perform(image_type, image_id, src_url)
-    #image = Image.find(image_id)
     image = Object::const_get(image_type).find(image_id)
 
     begin
       # 画像ダウンロード
       image.image_from_url src_url
 
-      # DeliveredImageの場合はskip
-      # 全く同一のファイルを持つレコードが既にDBに存在する場合は削除する
+      # DeliveredImageの場合はそのままイラスト判定へ
+      # Imageオブジェクトの場合、全く同一のファイルを持つレコードが既にDBに存在すれば削除する
       if image.kind_of? Image and Image.where(md5_checksum: image.md5_checksum).count > 0
         Image.destroy(image_id)
+        puts "Destroyed duplicates : #{image_type}/#{image_id}"
       else
         # それ以外はmd5_checksumを保存した後イラスト判定処理を行う
         image.save!
@@ -27,6 +27,6 @@ class DownloadImage
       return
     end
 
-    puts 'DOWNLOAD IMAGE DONE!'
+    puts "Downloaded : #{image_type}/#{image_id}"
   end
 end

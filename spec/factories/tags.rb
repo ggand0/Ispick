@@ -4,4 +4,7 @@ FactoryGirl.define do
   factory :tag do
     name '鹿目まどか'
   end
+  factory :tags, class: Tag do
+    sequence(:name) { |n| "鹿目まどか#{n}" }
+  end
 end

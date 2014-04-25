@@ -5,17 +5,30 @@ require "#{Rails.root}/script/scrape/scrape_tumblr"
 describe Scrape::Tumblr do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    # コンソールに出力しないようにしておく
-    IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
     @client = Scrape::Tumblr.get_client()
   end
 
   describe "scrape method" do
-    it "should call scrape_with_keyword function" do
+    it "calls scrape_with_keyword function" do
       FactoryGirl.create(:person_madoka)
       Scrape::Tumblr.should_receive(:scrape_with_keyword)
+      Scrape::Tumblr.scrape()
+    end
+    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
+      FactoryGirl.create(:target_word_not_enabled)
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
+
+      Scrape::Tumblr.scrape()
+    end
+    it "skips keywords with nil or empty value" do
+      nil_word = TargetWord.new
+      nil_word.save!
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
+
       Scrape::Tumblr.scrape()
     end
   end
@@ -29,6 +42,22 @@ describe Scrape::Tumblr do
       Scrape::Tumblr.stub(:save).and_return()
 
       Scrape::Tumblr.scrape_with_keyword('madoka', 5)
+    end
+  end
+
+  describe "get_tags function" do
+    it "returns an array of tags" do
+      tags = Scrape::Tumblr.get_tags(['Madoka'])
+      expect(tags).to be_an(Array)
+      expect(tags.first.name).to eql('Madoka')
+    end
+    it "uses existing tags if tags are duplicate" do
+      image = FactoryGirl.create(:image)
+      tag = FactoryGirl.create(:tag)
+      image.tags << tag
+
+      tags = Scrape::Tumblr.get_tags(['鹿目まどか'])
+      expect(tags.first.images.first.id).to eql(tag.images.first.id)
     end
   end
 
@@ -95,6 +124,21 @@ describe Scrape::Tumblr do
 
       image_data = Scrape::Tumblr.get_images(@client, 'madoka', 1)
       expect(image_data).to be_an(Array)
+    end
+    it "return if limit is exceeded" do
+      Tumblr::Client.any_instance.stub(:tagged).and_return([
+        { 'post_url' => 'http://realotakuman.tumblr.com/post/80263089672/pixiv' },
+        { 'post_url' => 'http://realotakuman.tumblr.com/post/80263089672/pixiv' }
+      ])
+      Tumblr::Client.any_instance.should_receive(:tagged)
+      Scrape::Tumblr.stub(:get_contents).and_return(
+        { data: { page_url: 'blog post url'}, tags: 'a tag' }
+      )
+      Scrape::Tumblr.should_receive(:get_contents)
+
+      image_data = Scrape::Tumblr.get_images(@client, 'madoka', 1)
+      expect(image_data).to be_an(Array)
+      expect(image_data.count).to eql(1)
     end
   end
 

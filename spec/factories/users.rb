@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :user do
-    sequence(:email) { |n| "test#{n}@example.com" }
+    sequence(:email) { |n| "test_user#{n}@example.com" }
     sequence(:password) { |n| "#{n}2345678" }
   end
   factory :twitter_user, class: User do
@@ -43,7 +43,7 @@ FactoryGirl.define do
         words_count 5
       end
       after(:create) do |user, evaluator|
-        create_list(:target_word, evaluator.words_count, user: user)
+        create_list(:target_words, evaluator.words_count, user: user)
       end
     end
 

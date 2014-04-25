@@ -8,7 +8,7 @@ require "#{Rails.root}/app/workers/detect_illust"
 class DetectIllustDaemon < DaemonSpawn::Base
   def start(args)
     @worker = Resque::Worker.new('detect_illust')
-    @worker.verbose = true
+    #@worker.verbose = true
     @worker.work
   end
 

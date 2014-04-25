@@ -51,7 +51,8 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # rails consoleを起動するために必要
-gem 'rb-readline', '0.5.0'
+gem 'rb-readline', '0.5.0', require: false
+gem 'pry-rails'                                  # Improve the console
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
@@ -59,7 +60,6 @@ gem 'rmagick', require: false                    # Image processing lib. Used by
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
-#gem 'systemu'
 gem 'whenever', require: false                   # Support crontab
 
 gem 'kaminari'
@@ -71,35 +71,31 @@ gem 'simple-navigation-bootstrap'
 
 gem 'natto'
 gem 'x2ch'
-#gem 'futaba', git: 'https://github.com/co-me/futaba'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
-#gem 'tumblr_client', git: 'git@github.com:pentiumx/tumblr_client.git'
 
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-twitter'
 
-#group :assets do
 gem 'less-rails'
-#gem 'less-rails-bootstrap'
 gem 'twitter-bootstrap-rails'
-#end
+gem 'puma'
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'pry-rails'                                   # Improve the console
+
   gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'guard'
   gem 'guard-rspec', require: false
-  gem 'guard-coffeescript'
+  #gem 'guard-coffeescript'
   gem 'guard-teaspoon'
-  gem 'rb-fsevent'                                  # Used by guard and spring
+  #gem 'rb-fsevent', require: false                 # Used by guard and spring
 
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
@@ -119,4 +115,6 @@ group :development, :test do
   gem 'capistrano-rbenv', '~> 2.0'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
+  gem 'capistrano3-puma'
+  gem 'capistrano-puma', require: false
 end

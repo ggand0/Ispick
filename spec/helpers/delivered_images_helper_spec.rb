@@ -16,15 +16,27 @@ describe DeliveredImagesHelper do
       delivered_image = FactoryGirl.create(:delivered_image_from_image)
       expect(helper.show_targetable(delivered_image)).to include('img')
     end
+    it "returns valid string when target_word is not found" do
+      delivered_image = FactoryGirl.create(:delivered_image_from_image)
+      TargetImage.stub(:where).and_return([])
+      # [TargetImage id=xx]
+      expect(helper.show_targetable(delivered_image)).to include("[TargetImage id=#{delivered_image.targetable_id}]")
+    end
 
     it "show target_word with text" do
       delivered_image = FactoryGirl.create(:delivered_image_from_word)
       expect(helper.show_targetable(delivered_image)).to include('まどか')
     end
+    it "returns valid string when target_word is not found" do
+      delivered_image = FactoryGirl.create(:delivered_image_from_word)
+      TargetWord.stub(:where).and_return([])
+      # [TargetWord id=xx]
+      expect(helper.show_targetable(delivered_image)).to include("[TargetWord id=#{delivered_image.targetable_id}]")
+    end
 
-    it "show nothing when no targetable objects are given" do
+    it "returns empty string when no targetable objects are given" do
       delivered_image = FactoryGirl.create(:delivered_image_no_association)
-      expect(helper.show_targetable(delivered_image)).to eq(nil)
+      expect(helper.show_targetable(delivered_image)).to eq('')
     end
   end
 end

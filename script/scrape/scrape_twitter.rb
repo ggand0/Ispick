@@ -20,13 +20,14 @@ module Scrape::Twitter
     TargetWord.all.each do |target_word|
       # Person.nameで検索（e.g. '鹿目まどか'）
       if target_word.enabled
-        query = target_word.person ? target_word.person.name : target_word.word
-        puts query
+        puts query = target_word.person ? target_word.person.name : target_word.word
+        next if query.nil? or query.empty?
+
         self.scrape_with_keyword(query, limit)
       end
     end
 
-    puts 'Scraped: '+(Image.count-count).to_s
+    puts "Extracted: #{(Image.count-count).to_s}"
   end
 
   def self.scrape_keyword(keyword)
@@ -44,7 +45,7 @@ module Scrape::Twitter
       image_data = self.get_tweets(client, keyword, limit)
     # リクエストが多すぎる場合の例外処理
     rescue Twitter::Error::TooManyRequests => error
-      #puts 'Too many requests to twitter'
+      puts 'Too many requests to twitter'
       #sleep error.rate_limit.reset_in
       #retry
     # 検索ワードでツイートを取得できなかった場合の例外処理
@@ -68,9 +69,9 @@ module Scrape::Twitter
 
   def self.get_contents(tweet)
     image_data = []
+
     # entities内にメディア(画像等)を含む場合の処理
-    if tweet.media? then      # v5.8.0
-    #if tweet.entities? then  # v5.5.1
+    if tweet.media? then
       tweet.media.each do |value|
         url = value.media_uri.to_s
         data = {
@@ -104,14 +105,14 @@ module Scrape::Twitter
   def self.save(image_data, keyword, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
-      puts "#{value[:title]} : #{value[:src_url]}"
-
-      if not Scrape::is_duplicate(value[:src_url])
-        Scrape.save_image(value, [ Tag.new(name: keyword) ], validation)
-      else
-        puts 'Skipping a duplicate image...'
-      end
+      puts "Scraped from #{value[:src_url]} : #{value[:title]}"
+      Scrape.save_image(value, self.get_tags(keyword), validation)
     end
+  end
+
+  def self.get_tags(keyword)
+    tag = Tag.where(name: keyword)
+    [ (tag.empty? ? Tag.new(name: keyword) : tag.first) ]
   end
 
   def self.get_stats(page_url)
@@ -121,7 +122,7 @@ module Scrape::Twitter
       tweet = client.status(id)
     rescue => e                   # Twitter::Error::Forbidden:など
       puts e
-      return false
+      return {}
     end
 
     { views: nil, favorites: tweet.favorite_count }

@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe "target_words/show" do
   before(:each) do
-    @target_word = FactoryGirl.create(:word_with_delivered_images, images_count: 5)
-    @target_word.person = FactoryGirl.create(:person_madoka)
+    @target_word = FactoryGirl.create(:target_word)
+    delivered_image = FactoryGirl.create(:delivered_image)
+    @target_word.delivered_images << delivered_image
+    @target_word.person = FactoryGirl.create(:person)
     @delivered_images = @target_word.delivered_images.page(params[:page]).per(25)
   end
 

@@ -10,7 +10,7 @@ describe "Default feature" do
 
       # 登録イラスト一覧へのページへ進む
       visit show_target_images_users_path
-      expect(page).to have_content('YOUR target_Images')
+      expect(page).to have_content('YOUR Target Images')
     end
 
     it "Watch target images list" do
@@ -23,10 +23,11 @@ describe "Default feature" do
 
       fill_in 'Title', with: 'This is an integration test'
       attach_file 'Data', "#{Rails.root}/spec/files/target_images/madoka0.jpg"
+      Resque.stub(:enqueue).and_return
       click_on 'Create Target image'
 
       #save_and_open_page
-      expect(page).to have_content 'YOUR target_Images'
+      expect(page).to have_content 'YOUR Target Images'
       expect(page.all('.box').count).to eq(2)
       expect(page.all('.boxInner').count).to eq(2)
     end

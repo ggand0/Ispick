@@ -21,20 +21,17 @@
 
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
-every 5.minutes do
-  rake 'scrape:min5'
-end
 
 every 15.minutes do
-  rake 'scrape:min15'
-end
-
-every 30.minutes do
-  rake 'scrape:min30'
+  rake 'scrape:twitter'
 end
 
 every 60.minutes do
-  rake 'scrape:min60'
+  rake 'scrape:nico'
+end
+
+every 3.hours do
+  rake 'scrape:tumblr'
 end
 
 # 配信システム系
@@ -44,12 +41,10 @@ every 30.minutes do
 
   # 全てのユーザーに推薦イラストを配信
   rake 'deliver:all'
-
-  # 配信画像の統計情報を更新する
-  rake 'deliver:update'
 end
 
-
-every 1.hours do
-
+# 少し長めに設定
+every 6.hours do
+  # 配信画像の統計情報を更新する
+  rake 'deliver:update'
 end
