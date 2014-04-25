@@ -1,0 +1,9 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Word:</strong>
+  <%= @target_word.word %>
+</p>
+
+<%= link_to 'Edit', edit_target_word_path(@target_word) %> |
+<%= link_to 'Back', show_target_words_users_path %>

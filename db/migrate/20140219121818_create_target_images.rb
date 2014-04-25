@@ -1,8 +1,11 @@
 class CreateTargetImages < ActiveRecord::Migration
   def change
     create_table :target_images do |t|
-      t.string :title
-      t.string :face_feature
+      t.text :title
+      t.attachment :data
+      t.integer :user_id
+      t.datetime :last_delivered_at
+      t.boolean :enabled
 
       t.timestamps
     end

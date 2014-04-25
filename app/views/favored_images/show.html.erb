@@ -1,0 +1,26 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @favored_image.title %>
+</p>
+
+<p>
+  <strong>Caption:</strong>
+  <%= @favored_image.caption %>
+</p>
+
+<p>
+  <strong>Source URL:</strong>
+  <%= link_to 'source image URL', @favored_image.src_url %>
+</p>
+<p>
+  <strong>Size in bytes:</strong><br>
+  <%= bytes_to_kilobytes(@favored_image.data.size) %> KB<br>
+  <%= bytes_to_megabytes(@favored_image.data.size) %> MB<br>
+</p>
+
+<br>
+<%= image_tag @favored_image.data.url %>
+<br>
+<%= link_to 'Back', show_favored_images_users_path %>

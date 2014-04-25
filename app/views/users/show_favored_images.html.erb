@@ -1,0 +1,29 @@
+<h1>Clipped Images</h1>
+<%= link_to 'Back', controller: 'users', action: 'home' %>
+<br>
+<%= link_to 'Download zip', controller: 'users', action: 'download_favored_images' %>
+<br>
+<p>
+  <strong>Clipped images count:</strong>
+  <%= @images.count %>
+</p>
+<p>
+  <strong>Total size of clipped images in bytes:</strong><br>
+  <%= bytes_to_kilobytes(get_total_size(@images)) %> KB<br>
+  <%= bytes_to_megabytes(get_total_size(@images)) %> MB<br>
+</p>
+<br>
+
+<div class="wrap">
+  <% @images.each do |image| %>
+    <div class="box">
+      <div class="boxInner">
+        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s }) %>
+        <div class="titleBox"><%= image.title.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate @images %>

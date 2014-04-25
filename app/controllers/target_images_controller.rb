@@ -2,7 +2,7 @@ require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/workers/target_images_face"
 
 class TargetImagesController < ApplicationController
-  before_action :set_target_image, only: [:show, :edit, :update, :destroy]
+  before_action :set_target_image, only: [:show, :edit, :update, :destroy, :show_delivered, :switch]
 
   # GET /target_images
   # GET /target_images.json
@@ -35,14 +35,16 @@ class TargetImagesController < ApplicationController
   # POST /target_images
   # POST /target_images.json
   def create
-    @target_image = TargetImage.new(target_image_params)
+    #@target_image = TargetImage.new(target_image_params)
+    @target_image = current_user.target_images.build(target_image_params)
 
     respond_to do |format|
       if @target_image.save
         # 顔特徴抽出処理をbackground jobに投げる
-        Resque.enqueue(Face, @target_image.id)
+        Resque.enqueue(TargetFace, @target_image.id)
 
-        format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
+        #format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
+        format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
         format.html { render action: 'new' }
@@ -60,7 +62,8 @@ class TargetImagesController < ApplicationController
     respond_to do |format|
       #if @target_image.update(target_image_params)
       if @target_image.update_attributes(hash)
-        format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        #format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+        format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -74,7 +77,7 @@ class TargetImagesController < ApplicationController
   def destroy
     @target_image.destroy
     respond_to do |format|
-      format.html { redirect_to target_images_url }
+      format.html { redirect_to show_target_images_users_path }
       format.json { head :no_content }
     end
   end
@@ -96,34 +99,25 @@ class TargetImagesController < ApplicationController
       return @message = 'Could not get face feature from this image. 抽出できませんでした。'
     end
 
-    face_feature = JSON.parse(target_image.feature.face)
-    target_r = face_feature[0]['hair_color']['red'].to_i
-    target_g = face_feature[0]['hair_color']['green'].to_i
-    target_b = face_feature[0]['hair_color']['blue'].to_i
-    @target_rgb = ["%.2f" % target_r, "%.2f" % target_g, "%.2f" % target_b]
-    @target_hsv = Utility::rgb_to_hsv(target_r, target_g, target_b, false)
-
-    Image.all.each do |image|
-      # 抽出されていないか、抽出出来ていないImageは飛ばす
-      if (not image.feature.nil? and image.feature.face == '[]' or
-        image.feature.nil?)
-        next
-      end
-
-      image_face = JSON.parse(image.feature.face)
-      r = image_face[0]['hair_color']['red'].to_i
-      g = image_face[0]['hair_color']['green'].to_i
-      b = image_face[0]['hair_color']['blue'].to_i
-      hsv = Utility::rgb_to_hsv(r, g, b, false)
-
-      if (@target_hsv[0] - hsv[0]).abs < 20
-        hsv = Utility::round_array(hsv)
-        @preferred.push({image: image, hsv: hsv})
-      end
-    end
+    # Get preferred images array
+    service = TargetImagesService.new
+    result = service.get_preferred_images(target_image)
+    @preferred = result[:images]
+    @target_colors = result[:target_colors]
+    @debug = result[:debug]
 
     # Pagenate the array
     @preferred = Kaminari.paginate_array(@preferred).page(params[:page]).per(100)
+  end
+
+  def show_delivered
+    @delivered_images = @target_image.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
+  end
+
+  def switch
+    enabled = @target_image.enabled ? false : true
+    @target_image.update_attributes(enabled: enabled)
+    redirect_to :back
   end
 
   private

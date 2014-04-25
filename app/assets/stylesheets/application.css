@@ -10,10 +10,21 @@
  *
  *= require_self
  *= require_tree .
+ *
  */
 #footer {
   clear:  left;
   bottom: 0;
   width:  100%;
   height: 100px;
+}
+
+a.logo{
+  float:left;
+  display:block;
+  height:40px;
+  width:160px;
+}
+a.logo:hover{
+  background-color: #fff;
 }

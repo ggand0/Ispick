@@ -29,6 +29,11 @@ describe TargetImagesController do
   # in order to pass any filters (e.g. authentication) defined in
   # TargetImagesController. Be sure to keep this updated too.
   let(:valid_session) { {} }
+  let(:user) { FactoryGirl.create(:user) }
+  before do
+    Resque.stub(:enqueue).and_return
+    sign_in user
+  end
 
   describe "GET index" do
     it "assigns all target_images as @target_images" do
@@ -41,7 +46,7 @@ describe TargetImagesController do
   describe "GET show" do
     it "assigns the requested target_image as @target_image" do
       target_image = TargetImage.create! valid_attributes
-      get :show, {:id => target_image.to_param}, valid_session
+      get :show, {id: target_image.to_param}, valid_session
       assigns(:target_image).should eq(target_image)
     end
 
@@ -50,7 +55,7 @@ describe TargetImagesController do
         FactoryGirl.create(:feature_test1)
         target_image = TargetImage.first
 
-        get :show, {:id => target_image.to_param}, valid_session
+        get :show, {id: target_image.to_param}, valid_session
         assigns(:face_feature).should eq('[{"zero value": 0}]')
       end
     end
@@ -58,7 +63,7 @@ describe TargetImagesController do
       it "assigns the face-feature json as @face_feature" do
         target_image = FactoryGirl.create(:target_image)
 
-        get :show, {:id => target_image.to_param}, valid_session
+        get :show, {id: target_image.to_param}, valid_session
         assigns(:face_feature).should eq('Not extracted.')
       end
     end
@@ -74,7 +79,7 @@ describe TargetImagesController do
   describe "GET edit" do
     it "assigns the requested target_image as @target_image" do
       target_image = TargetImage.create! valid_attributes
-      get :edit, {:id => target_image.to_param}, valid_session
+      get :edit, {id: target_image.to_param}, valid_session
       assigns(:target_image).should eq(target_image)
     end
   end
@@ -83,20 +88,21 @@ describe TargetImagesController do
     describe "with valid params" do
       it "creates a new TargetImage" do
         expect {
-          post :create, {:target_image => valid_attributes}, valid_session
+          post :create, {target_image: valid_attributes}, valid_session
         }.to change(TargetImage, :count).by(1)
       end
 
       it "assigns a newly created target_image as @target_image" do
-        post :create, {:target_image => valid_attributes}, valid_session
+        post :create, {target_image: valid_attributes}, valid_session
         #puts :target_image# => target_image
         assigns(:target_image).should be_a(TargetImage)
         assigns(:target_image).should be_persisted
       end
 
       it "redirects to the created target_image" do
-        post :create, {:target_image => valid_attributes}, valid_session
-        response.should redirect_to(TargetImage.last)
+        post :create, {target_image: valid_attributes}, valid_session
+        #response.should redirect_to(TargetImage.last)
+        response.should redirect_to('/users/show_target_images')
       end
     end
 
@@ -150,7 +156,8 @@ describe TargetImagesController do
       it "redirects to the target_image" do
         target_image = TargetImage.create! valid_attributes
         put :update, {:id => target_image.to_param, :target_image => valid_attributes}, valid_session
-        response.should redirect_to(target_image)
+        #response.should redirect_to(target_image)
+        response.should redirect_to('/users/show_target_images')
       end
     end
 
@@ -184,7 +191,7 @@ describe TargetImagesController do
     it "redirects to the target_images list" do
       target_image = TargetImage.create! valid_attributes
       delete :destroy, {:id => target_image.to_param}, valid_session
-      response.should redirect_to(target_images_url)
+      response.should redirect_to(show_target_images_users_path)
     end
   end
 
@@ -211,13 +218,13 @@ describe TargetImagesController do
       describe "with resemble image" do
         # 似てる画像を正しく判定する
         it "returns proper preferred images array" do
-          target_image = FactoryGirl.create(:feature_madoka)
+          face_feature = FactoryGirl.create(:feature_madoka)
           FactoryGirl.create(:feature_madoka1)# 似てる
           FactoryGirl.create(:feature_madoka2)# 似てない
           FactoryGirl.create(:feature_test2)  # 抽出出来てない
           FactoryGirl.create(:image)          # 抽出してない
 
-          get :prefer, {id: target_image.id}, valid_session
+          get :prefer, {id: face_feature.featurable_id}, valid_session
           assigns(:preferred).count.should eq(1)
         end
       end
@@ -243,5 +250,32 @@ describe TargetImagesController do
       end
     end
 
+  end
+
+
+  describe "show_delivered action" do
+    it "assigns delivered_images" do
+      target_image = FactoryGirl.create(:image_with_delivered_images, images_count: 5)
+      get :show_delivered, { id: target_image.to_param }, valid_session
+
+      expect(assigns(:delivered_images).count).to eq(target_image.delivered_images.count)
+    end
+  end
+  describe "switch action" do
+    before(:each) do
+      request.env['HTTP_REFERER'] = '/'
+    end
+    it "Set 'enabled' attribute to false when it's true" do
+      target_image = FactoryGirl.create(:target_image_enabled)
+
+      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: false})
+      get :switch, { id: target_image.id }, valid_session
+    end
+    it "Set 'enabled' attribute to true when it's false" do
+      target_image = FactoryGirl.create(:target_image_nofile)
+
+      expect_any_instance_of(TargetImage).to receive(:update_attributes).with({enabled: true})
+      get :switch, { id: target_image.to_param }, valid_session
+    end
   end
 end

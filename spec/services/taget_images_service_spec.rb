@@ -25,4 +25,85 @@ describe TargetImagesService do
       list.should be_an(Hash)
     end
   end
+
+  describe "get_preferred_images" do
+    # 正しい型の値を返すこと
+    it "returns a valid data" do
+      face_feature = FactoryGirl.create(:feature_madoka)
+      target_image = TargetImage.find(face_feature.featurable_id)
+
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      result.should be_a(Hash)
+      result[:images].should be_an(Array)
+      result[:target_colors].should be_a(Hash)
+
+      # check unique
+      result[:images].uniq.length.should eq(result[:images].length)
+    end
+
+    it "returns if target_image.feature is nil or '[]'" do
+      target_image = FactoryGirl.create(:target_image)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+
+      face_feature = FactoryGirl.create(:feature_test2)
+      target_image = TargetImage.find(face_feature.featurable_id)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+
+      face_feature = FactoryGirl.create(:feature_test3)
+      target_image = TargetImage.find(face_feature.featurable_id)
+      service = TargetImagesService.new
+      result = service.get_preferred_images(target_image)
+      expect(result).to eq('Feature of the target_image is invalid!')
+    end
+
+    describe "with single face" do
+      # 似た髪色を持つイラストを推薦すること
+      it "returns a precise preferred image" do
+        face_feature = FactoryGirl.create(:feature_madoka)
+        target_image = TargetImage.find(face_feature.featurable_id)
+
+        # 似てるImageが存在している場合
+        FactoryGirl.create(:feature_madoka1)
+        service = TargetImagesService.new
+
+        # そのImageが推薦される
+        result = service.get_preferred_images(target_image)
+        result[:images].length.should eq(1)
+      end
+    end
+
+    describe "with multiple faces" do
+      # 全ての顔に対して似た特徴量を持つイラストを推薦すること
+      it "returns precise preferred images to ALL target_images" do
+        FactoryGirl.create(:feature_madoka_multi)
+        FactoryGirl.create(:feature_homura_multi)
+        face_feature = FactoryGirl.create(:feature_madoka_homura)
+        target_image = TargetImage.find(face_feature.featurable_id)
+        service = TargetImagesService.new
+
+        # 両方推薦される
+        result = service.get_preferred_images(target_image)
+        result[:images].length.should eq(2)
+      end
+    end
+
+    describe "with already delivered target_image" do
+      it "should ignore old images before last_delivered_at datetime" do
+        FactoryGirl.create(:feature_image_old)
+        FactoryGirl.create(:feature_image_new)
+        face_feature = FactoryGirl.create(:feature_target_delivered)
+        target_image = TargetImage.find(face_feature.featurable_id)
+
+        service = TargetImagesService.new
+        result = service.get_preferred_images(target_image)
+        result[:images].length.should eq(1)
+      end
+    end
+  end
+
 end

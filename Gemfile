@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.2'
 
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+gem 'mysql2'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
@@ -51,45 +51,70 @@ end
 # gem 'debugger', group: [:development, :test]
 
 # rails consoleを起動するために必要
-gem 'rb-readline', '~> 0.4.2'
+gem 'rb-readline', '0.5.0', require: false
+gem 'pry-rails'                                  # Improve the console
 
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
-gem 'rmagick', :require => false                 # Image processing lib. Used by AnimeFace
+gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
-#gem 'systemu'
-gem 'whenever', :require => false                # Support crontab
+gem 'whenever', require: false                   # Support crontab
+
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
+gem 'rubyzip'
+gem 'ransack'
+gem 'simple-navigation'
+gem 'simple-navigation-bootstrap'
+
+gem 'natto'
+gem 'x2ch'
+gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
+gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
+gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
+
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-twitter'
+
+gem 'less-rails'
+gem 'twitter-bootstrap-rails'
+gem 'puma'
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
 
+  gem 'rails-erd'                                   # モデル関連図生成
+
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'guard'
-  gem 'guard-coffeescript'
+  gem 'guard-rspec', require: false
+  #gem 'guard-coffeescript'
   gem 'guard-teaspoon'
-  gem 'rb-fsevent'                                  # Used by guard and spring
+  #gem 'rb-fsevent', require: false                 # Used by guard and spring
+
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'
   #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
 
-  gem 'rspec-rails', '>= 2.6.0'                    # Testing framework
-  gem 'guard-rspec', :require => false
+  gem 'rspec-rails', '>= 2.6.0'                     # Testing framework
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化
+  gem 'rake_shared_context'                         # Enable rake task testing
+  gem 'capybara'
+  gem 'launchy'
 
-  gem 'pry-rails'                                   # Improve the console
-  gem 'rails-erd'                                   # モデル関連図生成
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-rails'
   gem 'capistrano-rbenv', '~> 2.0'
   gem 'capistrano-bundler', '~> 1.1.2'
   gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
+  gem 'capistrano3-puma'
+  gem 'capistrano-puma', require: false
 end

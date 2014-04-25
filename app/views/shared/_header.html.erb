@@ -1,2 +1,9 @@
-<h3><%= link_to('Ispic prototype', '/') %></h3>
+<div class='logo'>
+  <%= link_to image_tag(asset_path('test_logo.png')), '/', class: 'logo' %>
+</div>
+<br>
+<%= link_to('User Home', { controller: 'users', action: 'home' }) %>
+<%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
+<%= link_to('うpされた嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
+<br>
 <hr>

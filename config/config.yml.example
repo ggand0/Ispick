@@ -1,10 +1,25 @@
 development:
   perform_authentication: false
+  twitter_consumer_key: consumer_key
+  twitter_consumer_secret: consumer_secret
+  nico_email: test@example.com
+  nico_password: some_password
+  illust_detection_path: /Users/pentiumx/Projects/Ispic/lib/detect_illust.exe
 
 test:
   perform_authentication: false
+  twitter_consumer_key: consumer_key
+  twitter_consumer_secret: consumer_secret
+  nico_email: test@example.com
+  nico_password: some_password
+  illust_detection_path: /Users/pentiumx/Projects/Ispic/lib/detect_illust.exe
 
 production:
   perform_authentication: true
   username: admin
   password: secret
+  twitter_consumer_key: consumer_key
+  twitter_consumer_secret: consumer_secret
+  nico_email: test@example.com
+  nico_password: some_password
+  illust_detection_path: /Users/pentiumx/Projects/Ispic/lib/detect_illust.exe

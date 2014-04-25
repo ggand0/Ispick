@@ -1,14 +1,65 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  resources :target_words do
+    collection do
+      match 'search' => 'target_words#search', via: [:get, :post], as: :search
+    end
+    member do
+      get 'prefer'
+      get 'show_delivered'
+      get 'switch'
+    end
+  end
+
   get "welcome/index"
+
+  # Devise
+  devise_for :users, controllers: {
+    #:sessions      => "users/sessions",
+    #:registrations => "users/registrations",
+    passwords:          "users/passwords",
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
+  resources :users do
+    collection do
+      get 'home'
+      get 'show_illusts'
+      get 'show_target_images'
+      get 'show_target_words'
+      get 'show_favored_images'
+      get 'sort_delivered_images'
+      get 'download_favored_images'
+      get "/home/:year/:month/:day" => "users#home",
+        constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[012][0-9]/ }
+    end
+  end
+
+  resources :delivered_images do
+    collection do
+      get 'show_user_image'
+    end
+    member do
+      put 'favor'
+      put 'avoid'
+    end
+  end
+
   resources :target_images do
     member do
       get 'prefer'
+      get 'show_delivered'
+      get 'switch'
     end
   end
 
   resources :images, only: [:index, :show, :destroy]
+  resources :favored_images, only: [:show, :destroy]
+  resources :people do
+    collection do
+      match 'search' => 'people#search', via: [:get, :post], as: :search
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -16,6 +67,7 @@ Ispic::Application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'welcome#index'
   mount ResqueWeb::Engine => '/resque_web'
+  ResqueWeb::Engine.eager_load!
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

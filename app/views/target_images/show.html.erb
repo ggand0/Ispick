@@ -5,13 +5,17 @@
   <%= @target_image.title %>
 </p>
 <%= link_to 'Edit', edit_target_image_path(@target_image) %> |
-<%= link_to 'Back', target_images_path %>
+<%= link_to 'Back', show_target_images_users_path %>
 <br>
 
 <p>
   <strong>Face feature:</strong>
   <%= @face_feature %>
 </p>
-
+<p>
+  <strong>Size in bytes:</strong><br>
+  <%= bytes_to_kilobytes(@target_image.data.size) %> KB<br>
+  <%= bytes_to_megabytes(@target_image.data.size) %> MB<br>
+</p>
 <br>
 <%= image_tag @target_image.data.url %>

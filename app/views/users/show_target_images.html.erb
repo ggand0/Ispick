@@ -1,0 +1,23 @@
+<h1>YOUR Target Images</h1>
+<%= link_to 'New Target image', new_target_image_path %>
+<br>
+<%= link_to 'Back', controller: 'users', action: 'home' %>
+<br>
+
+<div class="wrap">
+  <% @target_images.each do |target_image| %>
+    <div class="box">
+      <div class="boxInner">
+        <%= link_to 'Show', target_image %>
+        <td><%= link_to 'ShowDelivered', show_delivered_target_image_path(target_image) %></td>
+        <%= link_to 'Prefer', prefer_target_image_path(target_image) %>
+        <%= link_to 'Edit', edit_target_image_path(target_image) %>
+        <%= link_to 'Destroy', target_image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= link_to(image_tag(target_image.data.url), { controller: 'target_images', action: 'show', id: target_image.id.to_s }) %>
+        <div class="titleBox"><%= target_image.title.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate_target_images(@message, @target_images) %>

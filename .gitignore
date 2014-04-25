@@ -24,6 +24,7 @@ dump.rdb
 
 # Ignore secret files
 config.yml
+database.yml
 
 *.rbc
 *.sassc

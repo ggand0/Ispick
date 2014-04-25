@@ -1,0 +1,25 @@
+// Place all the styles related to the users controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.id {
+  display: none;
+}
+.favored {
+  float: left;
+  margin-right: 5px;
+}
+.favored span {
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+.favored a {
+  color: #02C293;//#02C25E;
+  float: left;
+  margin-right: 5px;
+  &:hover {
+    background-color: #fff;
+  }
+}

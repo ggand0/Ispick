@@ -1,0 +1,16 @@
+<%= debug @debug %>
+<h1>Listing preferred images with WORDS</h1>
+
+<div class="wrap">
+  <% @preferred.each do |image| %>
+    <div class="box">
+      <div class="boxInner">
+        <%= image.caption %>
+        <%= link_to(image_tag(image.data.url), { controller: 'images', action: 'show', id: image.id.to_s }) %>
+        <div class="titleBox"><%= image.title.to_s %></div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate_target_images(@message, @preferred) %>
