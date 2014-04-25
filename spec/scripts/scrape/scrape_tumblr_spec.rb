@@ -125,6 +125,21 @@ describe Scrape::Tumblr do
       image_data = Scrape::Tumblr.get_images(@client, 'madoka', 1)
       expect(image_data).to be_an(Array)
     end
+    it "return if limit is exceeded" do
+      Tumblr::Client.any_instance.stub(:tagged).and_return([
+        { 'post_url' => 'http://realotakuman.tumblr.com/post/80263089672/pixiv' },
+        { 'post_url' => 'http://realotakuman.tumblr.com/post/80263089672/pixiv' }
+      ])
+      Tumblr::Client.any_instance.should_receive(:tagged)
+      Scrape::Tumblr.stub(:get_contents).and_return(
+        { data: { page_url: 'blog post url'}, tags: 'a tag' }
+      )
+      Scrape::Tumblr.should_receive(:get_contents)
+
+      image_data = Scrape::Tumblr.get_images(@client, 'madoka', 1)
+      expect(image_data).to be_an(Array)
+      expect(image_data.count).to eql(1)
+    end
   end
 
   describe "save function" do

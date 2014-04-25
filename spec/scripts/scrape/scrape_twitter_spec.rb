@@ -44,6 +44,7 @@ describe Scrape::Twitter do
     it "returns tweet array" do
       Twitter::REST::Client
       client = Scrape::Twitter.get_client
+      Twitter::REST::Client.any_instance.stub(:search).and_return([])
       image_data = Scrape::Twitter.get_tweets(client, 'test', 50)
 
       expect(image_data).to be_an(Array)

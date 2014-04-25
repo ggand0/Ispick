@@ -27,7 +27,7 @@ module Scrape::Twitter
       end
     end
 
-    puts 'Scraped: '+(Image.count-count).to_s
+    puts "Extracted: #{(Image.count-count).to_s}"
   end
 
   def self.scrape_keyword(keyword)
@@ -45,7 +45,7 @@ module Scrape::Twitter
       image_data = self.get_tweets(client, keyword, limit)
     # リクエストが多すぎる場合の例外処理
     rescue Twitter::Error::TooManyRequests => error
-      #puts 'Too many requests to twitter'
+      puts 'Too many requests to twitter'
       #sleep error.rate_limit.reset_in
       #retry
     # 検索ワードでツイートを取得できなかった場合の例外処理
@@ -69,9 +69,9 @@ module Scrape::Twitter
 
   def self.get_contents(tweet)
     image_data = []
+
     # entities内にメディア(画像等)を含む場合の処理
-    if tweet.media? then      # v5.8.0
-    #if tweet.entities? then  # v5.5.1
+    if tweet.media? then
       tweet.media.each do |value|
         url = value.media_uri.to_s
         data = {
@@ -105,13 +105,8 @@ module Scrape::Twitter
   def self.save(image_data, keyword, validation=true)
     # Imageモデル生成＆DB保存
     image_data.each do |value|
-      puts "#{value[:title]} : #{value[:src_url]}"
-
-      if not Scrape::is_duplicate(value[:src_url])
-        Scrape.save_image(value, self.get_tags(keyword), validation)
-      else
-        puts 'Skipping a duplicate image...'
-      end
+      puts "Scraped from #{value[:src_url]} : #{value[:title]}"
+      Scrape.save_image(value, self.get_tags(keyword), validation)
     end
   end
 
