@@ -70,7 +70,7 @@ module Scrape::Tumblr
       posted_at: image['date'],
       views: nil,
       #favorites: self.get_favorites(image['post_url']),
-      favorites: nil,
+      favorites: image['note_count'],# reblog+likesされた数の合計値。別々には取得不可
       site_name: 'tumblr',
       module_name: 'Scrape::Tumblr',
     }
@@ -110,19 +110,13 @@ module Scrape::Tumblr
 
   # 統計情報(likes_count)を更新する
   def self.get_stats(page_url)
-    html = Nokogiri::HTML(open(page_url))
+    client = self.get_client
+    blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
+    puts id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
+    posts = client.posts(blog_name)
 
-    # 抽出してきた時点でlikes数が取れている画像のはずだが、一応rescue
-    begin
-      # show:likesを設定しているページのみget
-      likes = self.get_favorites(html)
-    rescue => e
-      puts e
-      Rails.logger.fail('Updating likes value has been failed: ' + page_url)
-      return
-    end
+    puts post = posts['posts'].find { |h| h['id'] == id.to_i }
 
-    puts page_url if not likes# debug
-    { views: nil, favorites: likes }
+    { views: nil, favorites: post ? post['note_count'] : nil }
   end
 end
