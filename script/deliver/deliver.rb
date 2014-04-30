@@ -238,7 +238,8 @@ module Deliver
         next if delivered_image.created_at.in_time_zone('Asia/Tokyo').to_date < today
 
         # 統計情報を取得出来なかった時もnext
-        stats = Object.const_get(delivered_image.module_name).get_stats(delivered_image.page_url)
+        obj = Object.const_get(delivered_image.module_name)
+        stats = obj.get_stats(obj.get_client, delivered_image.page_url)
         next if not stats
 
         # favorites値を更新する

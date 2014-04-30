@@ -95,7 +95,7 @@ describe Scrape::Tumblr do
       post = FactoryGirl.build(:tumblr_api_response)
       Tumblr::Client.any_instance.stub(:posts).and_return(post[:response])
       page_url = 'http://realotakuman.tumblr.com/post/84103502875/twitter-kiya-si-http-t-co-mq1t'
-      stats = Scrape::Tumblr.get_stats(page_url)
+      stats = Scrape::Tumblr.get_stats(@client, page_url)
 
       expect(stats).to be_a(Hash)
       expect(stats[:favorites]).to eql(post[:response]['posts'][0]['note_count'])

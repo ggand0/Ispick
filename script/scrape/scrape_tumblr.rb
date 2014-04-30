@@ -49,12 +49,12 @@ module Scrape::Tumblr
       # API responseから画像情報を取得してDBへ保存する
       start = Time.now
       image_data = Scrape::Tumblr.get_data(image)
-      res = Scrape.save_image(image_data, [], validation)
+      res = Scrape.save_image(image_data,self.get_tags(image['tags']), validation)
       duplicates += res ? 0 : 1
-      puts "Scraped from #{image_data[:src_url]} in #{Time.now - start} sec"
+      puts "Scraped from #{image_data[:src_url]} in #{Time.now - start} sec" if res
 
-      # limit枚抽出、もしくは重複が出現し始めたら終了
-      #break if duplicates >= 3
+      # limit枚抽出したら終了
+      #break if duplicates >= 3 # 検討中
       break if count+1-skipped >= limit
     end
   end
@@ -109,13 +109,12 @@ module Scrape::Tumblr
   end
 
   # 統計情報(likes_count)を更新する
-  def self.get_stats(page_url)
-    client = self.get_client
+  def self.get_stats(client, page_url)
+    #client = self.get_client
     blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
-    puts id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
+    id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
     posts = client.posts(blog_name)
-
-    puts post = posts['posts'].find { |h| h['id'] == id.to_i }
+    post = posts['posts'].find { |h| h['id'] == id.to_i } if posts['posts']
 
     { views: nil, favorites: post ? post['note_count'] : nil }
   end

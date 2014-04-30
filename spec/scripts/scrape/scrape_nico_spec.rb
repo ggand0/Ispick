@@ -112,10 +112,10 @@ describe Scrape::Nico do
   describe "get_stats function" do
     it "returns stats of the image" do
       image = FactoryGirl.create(:image_nicoseiga)
-      puts res = Scrape::Nico.get_stats(@agent, image.page_url)
-      expect(res).to be_a(Hash)
-      expect(res[:views]).to be_a(String)
-      expect(res[:favorites]).to be_a(String)
+      puts result = Scrape::Nico.get_stats(@agent, image.page_url)
+      expect(result).to be_a(Hash)
+      expect(result[:views]).to be_a(String)
+      expect(result[:favorites]).to be_a(String)
     end
   end
 
