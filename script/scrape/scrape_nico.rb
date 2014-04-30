@@ -7,7 +7,7 @@ module Scrape::Nico
   ROOT_URL = ''
 
   def self.scrape
-    agent = self.login
+    agent = self.get_client
     limit = 50
 
     TargetWord.all.each do |target_word|
@@ -27,7 +27,7 @@ module Scrape::Nico
 
   # キーワードによる検索
   def self.scrape_keyword(keyword)
-    agent = self.login()
+    agent = self.get_client
     limit = 10
     self.scrape_with_keyword(agent, keyword, limit, false)
   end
@@ -41,6 +41,7 @@ module Scrape::Nico
     escaped = URI.escape(url)
     xml = agent.get(escaped)
     duplicates = 0
+    id_array = []
 
     # 画像情報を取得してlimit枚DBヘ保存する
     puts "Extracting #{limit.to_s} images from: #{url}"
@@ -52,18 +53,19 @@ module Scrape::Nico
         image_data = self.get_data(item)                        # APIの結果から画像情報取得
         #self.get_contents(page_url, agent, image_data, validation)# hashを渡して残りを抽出
         # 抽出した画像を保存
-        res = Scrape::save_image(image_data, [], validation)
+        #res = Scrape::save_image(image_data, [], validation)
+        res = Scrape::save_image(image_data, [self.get_tag(keyword)] , validation)
         duplicates += res ? 0 : 1
-        puts "Scraped from #{src_url} in #{(Time.now - start).to_s} sec" if res
+        id_array.push(res)
+        puts "Scraped from #{image_data[:src_url]} in #{(Time.now - start).to_s} sec" if res
 
         break if duplicates >= 3
-
       rescue
         next  # 検索結果が0の場合など
       end
-      #break if count+1 >= limit
+      break if count+1 >= limit
     end
-
+    id_array
   end
 
   def self.get_data(item)
@@ -103,7 +105,7 @@ module Scrape::Nico
   end
 
   # Mechanizeによるログイン
-  def self.login()
+  def self.get_client
     agent = Mechanize.new
     agent.ssl_version = 'SSLv3'
     agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
@@ -111,11 +113,37 @@ module Scrape::Nico
     agent
   end
 
+  def self.get_tag(tag)
+    t = Tag.where(name: tag)
+    t.empty? ? Tag.new(name: tag) : t.first
+  end
   # タグを取得する。DBに既にある場合はそのレコードを返す
   def self.get_tags(tags)
     tags.map do |tag|
       t = Tag.where(name: tag)
       t.empty? ? Tag.new(name: tag) : t.first
     end
+  end
+
+  # delivered_images update用に、
+  # ログインしてstats情報だけ返す関数
+  def self.get_stats(agent, image_id)
+    image = Image.find(image_id)
+    puts id = image.src_url.match(/thumb\/.*i/).to_s.gsub(/thumb\//,'').gsub(/i/,'')
+    puts image.tags
+    url = "#{TAG_SEARCH_URL}?query=#{image.tags.first.name}"
+    xml = agent.get(URI.escape(url))
+
+    puts xml.search('image_count')
+    puts xml.search('image').count
+
+    xml.search('image').each do |item|
+      if item.css('id').first.content == id.to_s
+        return { views: item.css('view_count').first.content,
+          favorites: item.css('clip_count').first.content }
+      end
+    end
+
+    { views: nil, favorites: nil }
   end
 end

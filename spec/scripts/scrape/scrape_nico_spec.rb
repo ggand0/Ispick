@@ -6,9 +6,9 @@ describe Scrape::Nico do
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
 
   before do
-    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    #IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
-    @agent = Scrape::Nico.login       # Mechanize agentの作成
+    @agent = Scrape::Nico.get_client       # Mechanize agentの作成
 
     url = 'http://seiga.nicovideo.jp/rss/illust/new'
     xml = Nokogiri::XML(open(url))
@@ -106,6 +106,16 @@ describe Scrape::Nico do
 
       Scrape.should_not_receive(:save_image)
       Scrape::Nico.get_contents(page_url, @agent, @title)
+    end
+  end
+
+  describe "get_stats function" do
+    it "returns stats of the image" do
+      image = FactoryGirl.create(:image_nicoseiga)
+      puts res = Scrape::Nico.get_stats(@agent, image.id)
+      expect(res).to be_a(Hash)
+      expect(res[:views]).to be_a(String)
+      expect(res[:favorites]).to be_a(String)
     end
   end
 
