@@ -127,23 +127,17 @@ module Scrape::Nico
 
   # delivered_images update用に、
   # ログインしてstats情報だけ返す関数
-  def self.get_stats(agent, image_id)
-    image = Image.find(image_id)
-    puts id = image.src_url.match(/thumb\/.*i/).to_s.gsub(/thumb\//,'').gsub(/i/,'')
-    puts image.tags
-    url = "#{TAG_SEARCH_URL}?query=#{image.tags.first.name}"
-    xml = agent.get(URI.escape(url))
-
-    puts xml.search('image_count')
-    puts xml.search('image').count
-
-    xml.search('image').each do |item|
-      if item.css('id').first.content == id.to_s
-        return { views: item.css('view_count').first.content,
-          favorites: item.css('clip_count').first.content }
-      end
+  def self.get_stats(agent, page_url)
+    begin
+      page = agent.get(page_url)
+      info_elements = page.at("ul[@class='illust_count']")
+      views = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
+      comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
+      clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
+    rescue => e
+      return false
     end
 
-    { views: nil, favorites: nil }
+    { views: views, favorites: clips}
   end
 end

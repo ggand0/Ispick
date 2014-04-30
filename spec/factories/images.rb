@@ -76,4 +76,19 @@ FactoryGirl.define do
       instance.save validate: false
     end
   end
+
+  factory :image_tag do
+    image_id
+    tag_id
+  end
+
+  factory :image_nicoseiga, class: Image do
+    src_url 'http://lohas.nicoseiga.jp/thumb/3932299i'
+    page_url 'http://seiga.nicovideo.jp/seiga/im3932299'
+    #association :tags, [ factory: :tag ]
+    after(:create) do |image|
+      #create(:image_tag, image_id: image.id, tag_id: create(:tag).id)
+      image.tags = [ create(:tag) ]
+    end
+  end
 end

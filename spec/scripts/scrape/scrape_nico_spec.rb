@@ -6,7 +6,7 @@ describe Scrape::Nico do
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
 
   before do
-    #IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
     @agent = Scrape::Nico.get_client       # Mechanize agentの作成
 
@@ -112,7 +112,7 @@ describe Scrape::Nico do
   describe "get_stats function" do
     it "returns stats of the image" do
       image = FactoryGirl.create(:image_nicoseiga)
-      puts res = Scrape::Nico.get_stats(@agent, image.id)
+      puts res = Scrape::Nico.get_stats(@agent, image.page_url)
       expect(res).to be_a(Hash)
       expect(res[:views]).to be_a(String)
       expect(res[:favorites]).to be_a(String)
