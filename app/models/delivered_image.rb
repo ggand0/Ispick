@@ -10,9 +10,8 @@ class DeliveredImage < ActiveRecord::Base
 
   has_attached_file :data,
     styles: {
-      thumb: "100x100#",
-      small: "150x150>",
-      medium: "200x200" },
+      thumb: "300x300#"
+    },
     use_timestamp: false
 
   # Imageモデルで一度validateされているはずだが、一応定義
