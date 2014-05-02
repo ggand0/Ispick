@@ -1,11 +1,14 @@
+require "#{Rails.root}/spec/support/consts"
+
 FactoryGirl.define do
-  factory :image do
+  factory :image, class: Image do
     title 'test'
     caption 'test'
     sequence(:src_url) { |n| "test#{n}@example.com" }
     sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
-    site_name 'some_site'
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
+    sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
     views 10000
     posted_at DateTime.now
     is_illust true
@@ -18,6 +21,24 @@ FactoryGirl.define do
         create_list(:tags, evaluator.tags_count, images: [image])
       end
     end
+
+    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
+  end
+
+  factory :image_for_delivered_image, class: Image do
+    title 'test'
+    caption 'test'
+    sequence(:src_url) { |n| "test#{n}@example.com" }
+    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
+    sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
+    sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
+    views 10000
+    posted_at DateTime.now
+    is_illust true
 
     # save時にvalidationをスキップする
     to_create do |instance|
