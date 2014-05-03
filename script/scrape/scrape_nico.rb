@@ -29,7 +29,7 @@ module Scrape::Nico
   def self.scrape_keyword(keyword)
     agent = self.get_client
     limit = 10
-    self.scrape_with_keyword(agent, keyword, limit, false)
+    self.scrape_with_keyword(agent, keyword, limit, true)
   end
 
   # キーワードからタグ検索してlimit分の画像を保存する
