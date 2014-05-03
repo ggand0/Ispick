@@ -1,7 +1,6 @@
 #-*- coding: utf-8 -*-
 require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
-require "#{Rails.root}/app/workers/copy_image"
 include ApplicationHelper
 
 module Deliver
