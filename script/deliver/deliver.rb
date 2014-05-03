@@ -54,8 +54,8 @@ module Deliver
   end
 
   # 登録タグから配信する
-  def self.deliver_from_word(user, target_word, copy)
-    images = self.get_images(copy)
+  def self.deliver_from_word(user, target_word, is_periodic)
+    images = self.get_images(is_periodic)
     puts 'Processing: ' + images.count.to_s
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
@@ -65,23 +65,24 @@ module Deliver
     images.compact!
     puts 'Matches: ' + images.count.to_s
 
-    images = self.limit_images(user, images)              # 配信画像を制限する
-    self.deliver_images(user, images, target_word, copy)  # User.delivered_imagesへ追加する
-    target_word.last_delivered_at = DateTime.now          # 最終配信日時を記録
+    images = self.limit_images(user, images)                      # 配信画像を制限する
+    self.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
+    target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
   end
 
   # 文字情報が存在するImageレコードを検索して返す
-  # @param [Boolean] is_illustカラムがnilであるレコードを許容するかどうか
+  # @param [Boolean] 定時配信で呼ばれたのかどうか
   # @return [ActiveRecord_Relation_Image]
-  def self.get_images(includes_nil)
-    if includes_nil
-      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      images = Image.includes(:tags).where.not(
-        title: nil, caption: nil, tags: { name: nil }).references(:tags)
-    else
+  def self.get_images(is_periodic)
+    puts Image.count
+    if is_periodic
       # 定時配信の場合は、イラスト判定が終了しているもののみ配信
       images = Image.includes(:tags).where.not(title: nil, caption: nil, tags: { name: nil }).
         where.not(is_illust: nil).references(:tags)
+    else
+      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
+      images = Image.includes(:tags).where.not(
+        title: nil, caption: nil, tags: { name: nil }).references(:tags)
     end
     images
   end
@@ -99,21 +100,22 @@ module Deliver
   # @return [DeliveredImage]
   def self.create_delivered_image(image)
     delivered_image = DeliveredImage.new
-    delivered_image.image = image
+    image.delivered_images << delivered_image
     delivered_image
   end
 
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
-  def self.deliver_images(user, images, target, copy)
+  def self.deliver_images(user, images, target, is_periodic)
     images.each_with_index do |image, count|
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
-      next if copy and image.data.url == MISSING_URL
+      next if is_periodic and image.data.url == MISSING_URL
 
       # DeliveredImageのインスタンス生成
-      delivered_image = self.create_delivered_image(image)
+      #delivered_image = self.create_delivered_image(image)
+      delivered_image = DeliveredImage.new
 
       # DB保存後にuser.delivered_imagesに追加して配信する
-      if delivered_image.save
+      if image.delivered_images << delivered_image
         target.delivered_images << delivered_image
         user.delivered_images << delivered_image
         user.save

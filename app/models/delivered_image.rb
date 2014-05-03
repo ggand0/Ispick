@@ -1,9 +1,9 @@
 class DeliveredImage < ActiveRecord::Base
   belongs_to :user
+  belongs_to :image
   belongs_to :favored_image
   belongs_to :targetable, polymorphic: true
   has_one :feature, as: :featurable
-  has_one :image
 
   # 明示的にテーブル名を指定することでエラー回避している
   default_scope { order("#{table_name}.created_at DESC") }

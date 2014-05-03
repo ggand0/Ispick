@@ -30,7 +30,7 @@ module Scrape::Twitter
 
   def self.scrape_keyword(keyword)
     limit   = 200        # 取得するツイートの上限数
-    self.scrape_with_keyword(keyword, limit, false)
+    self.scrape_with_keyword(keyword, limit, true)
   end
 
 

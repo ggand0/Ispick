@@ -34,7 +34,7 @@ describe Scrape::Twitter do
   end
   describe "scrape_keyword function" do
     it "calls scrape_with_keyword function" do
-      Scrape::Twitter.should_receive(:scrape_with_keyword).with('madoka', 200, false)
+      Scrape::Twitter.should_receive(:scrape_with_keyword).with('madoka', 200, true)
       Scrape::Twitter.scrape_keyword('madoka')
     end
   end

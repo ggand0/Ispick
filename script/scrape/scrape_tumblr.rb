@@ -29,7 +29,7 @@ module Scrape::Tumblr
 
   # キーワードによる抽出処理を行う
   def self.scrape_keyword(keyword)
-    self.scrape_with_keyword(keyword, 10, false)
+    self.scrape_with_keyword(keyword, 10, true)
   end
 
   # 対象のタグを持つPostの画像を抽出する

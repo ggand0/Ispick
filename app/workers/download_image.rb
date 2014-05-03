@@ -17,7 +17,7 @@ class DownloadImage
         Image.destroy(image_id)
         puts "Destroyed duplicates : #{image_type}/#{image_id}"
       else
-        # それ以外はmd5_checksumを保存した後イラスト判定処理を行う
+        # それ以外(含Image)はmd5_checksumを保存した後イラスト判定処理を行う
         image.save!
         Resque.enqueue(DetectIllust, image_type, image.id)
       end

@@ -1,7 +1,7 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
   has_and_belongs_to_many :tags
-  belongs_to :delivered_image
+  has_many :delivered_images, dependent: :destroy
 
   # 明示的にテーブル名を指定することでエラー回避
   default_scope { order("#{table_name}.created_at DESC") }
@@ -9,7 +9,8 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: {
-      thumb: "100x100#",
+      #thumb: "100x100#",
+      thumb: "300x300#"
     },
     use_timestamp: false
 
