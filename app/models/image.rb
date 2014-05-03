@@ -9,7 +9,8 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: {
-      thumb: "100x100#",
+      #thumb: "100x100#",
+      thumb: "300x300#"
     },
     use_timestamp: false
 

@@ -36,7 +36,7 @@ describe Scrape::Tumblr do
   end
   describe "scrape_keyword function" do
     it "calls scrape_with_keyword function" do
-      Scrape::Tumblr.should_receive(:scrape_with_keyword).with('madoka', 10, false)
+      Scrape::Tumblr.should_receive(:scrape_with_keyword).with('madoka', 10, true)
       Scrape::Tumblr.scrape_keyword('madoka')
     end
   end
