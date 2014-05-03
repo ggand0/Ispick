@@ -1,8 +1,6 @@
 class CreateImages < ActiveRecord::Migration
   def change
     create_table :images do |t|
-      t.integer :delivered_image_id
-
       # 基本的な情報
       t.text :title
       t.text :caption
