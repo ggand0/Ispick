@@ -11,6 +11,7 @@ class UsersController < ApplicationController
         date = Date.today.to_datetime
       end
 
+      # その日員配信されたdelivered_imagesに限定する
       start_day = date.change(offset: '+0900')
       end_day = (date+1).change(offset: '+0900')
 
@@ -18,10 +19,11 @@ class UsersController < ApplicationController
         where('avoided IS NULL or avoided = false').
         where(created_at: start_day.utc..end_day.utc)
 
-      # イラスト判定リクエストがあれば：
-      delivered_images = delivered_images.where(is_illust: true) if params[:illust]
+      # イラスト判定リクエストがある場合：
+      delivered_images = delivered_images.includes(:image).
+        where(images: { is_illust: true }).references(:images) if params[:illust]
 
-      # ソートリクエストがあれば：
+      # ソートリクエストがある場合：
       delivered_images = delivered_images.reorder('favorites desc') if params[:sort]
 
       @delivered_images = delivered_images.page(params[:page]).per(25)
@@ -45,7 +47,11 @@ class UsersController < ApplicationController
     if signed_in?
       # paginationについては調整中。数が固定されたらモデルに表示数を定義する
       delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').where(is_illust: true)
+        includes(:image).
+        where('avoided IS NULL or avoided = false').
+        where('images.is_illust=?', true).
+        references(:images)
+      #delivered_images = current_user.delivered_images.joins(:image).merge(Image.where(is_illust: true))
 
       @delivered_images = delivered_images.page(params[:page]).per(25)
       render action: 'signed_in'
@@ -54,18 +60,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def show_illusts
-    if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').where(is_illust: true)
-
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
-    end
-  end
 
   def show_target_images
     if signed_in?
