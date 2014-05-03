@@ -4,13 +4,11 @@ require "#{Rails.root}/script/scrape/scrape"
 describe TargetWord do
   describe "after_create callback" do
     it "enqueues a resque job" do
-      Resque.should_receive(:enqueue).exactly(1).times
       Resque.stub(:enqueue).and_return
+      TargetWord.stub(:search_keyword).and_return
+      TargetWord.any_instance.should_receive(:search_keyword)
 
-      target_word = FactoryGirl.build(:target_word_with_callback)
-      person = FactoryGirl.create(:person)
-      target_word.person = person
-      target_word.save!
+      FactoryGirl.create(:target_words)
     end
   end
 

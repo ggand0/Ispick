@@ -27,12 +27,19 @@ describe UsersController do
 
     it "assigns delivered_images with records that have true value in its 'is_illust' column" do
       login_user
+      user = User.first
+      user.delivered_images << FactoryGirl.create(:delivered_image_photo)
+      user.delivered_images << FactoryGirl.create(:delivered_image)
+      #user = FactoryGirl.create(:user_with_delivered_images)
 
-      #user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
-      #puts controller.current_user.delivered_images.count
-      controller.current_user.delivered_images << FactoryGirl.create(:delivered_image_photo)
-      controller.current_user.delivered_images << FactoryGirl.create(:delivered_image_illust)
-      #puts controller.current_user.delivered_images.count
+=begin
+      user.delivered_images.each { |n| puts n.image.is_illust }
+      puts Image.count
+      puts DeliveredImage.count
+      puts Image.where(is_illust: true).count
+      puts user.delivered_images.joins(:image).where(images: { is_illust: true }).count
+      #puts controller.current_user.delivered_images.scope().includes(:image).where('images.is_illust=?', true).references(:images).count
+=end
 
       get :show_illusts, {}, valid_session
       expect(assigns(:delivered_images).count).to eq(1)

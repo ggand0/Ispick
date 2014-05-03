@@ -12,6 +12,7 @@ describe ApplicationHelper do
       image2 = FactoryGirl.create(:image)
       Image.any_instance.stub(:data).and_return(100)
       #puts image1.data.size # => 8(100が3bitだから？)
+
       expect(helper.get_total_size(Image.all)).to eq(image1.data.size+image2.data.size)
     end
   end

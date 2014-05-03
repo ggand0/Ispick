@@ -1,6 +1,7 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
   has_and_belongs_to_many :tags
+  belongs_to :delivered_image
 
   # 明示的にテーブル名を指定することでエラー回避
   default_scope { order("#{table_name}.created_at DESC") }
@@ -9,8 +10,7 @@ class Image < ActiveRecord::Base
 	has_attached_file :data,
     styles: {
       thumb: "100x100#",
-      small: "150x150>",
-      medium: "200x200" },
+    },
     use_timestamp: false
 
   validates_uniqueness_of :src_url

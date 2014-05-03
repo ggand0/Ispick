@@ -45,7 +45,7 @@ describe UsersHelper do
   describe "get_illust_html method" do
     it "returns valid html" do
       delivered_image = FactoryGirl.create(:delivered_image)
-      result = helper.get_illust_html(delivered_image)
+      result = helper.get_illust_html(delivered_image.image)
       #expect(result).to eql('Illust: <span style="color:#3598FF">true</span>')
       expect(result).to eql('Illust: <span>true</span>')
     end

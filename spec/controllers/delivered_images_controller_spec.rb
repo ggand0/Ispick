@@ -23,7 +23,7 @@ describe DeliveredImagesController do
   # This should return the minimal set of attributes required to create a valid
   # DeliveredImage. As you add validations to DeliveredImage, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "title" => "MyText" } }
+  let(:valid_attributes) { { "avoided" => false } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -85,14 +85,14 @@ describe DeliveredImagesController do
       it "assigns a newly created but unsaved delivered_image as @delivered_image" do
         # Trigger the behavior that occurs when invalid params are submitted
         DeliveredImage.any_instance.stub(:save).and_return(false)
-        post :create, {:delivered_image => { "title" => "invalid value" }}, valid_session
+        post :create, {:delivered_image => { "avoided" => "invalid value" }}, valid_session
         assigns(:delivered_image).should be_a_new(DeliveredImage)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         DeliveredImage.any_instance.stub(:save).and_return(false)
-        post :create, {:delivered_image => { "title" => "invalid value" }}, valid_session
+        post :create, {:delivered_image => { "avoided" => "invalid value" }}, valid_session
         response.should render_template("new")
       end
     end
@@ -106,8 +106,8 @@ describe DeliveredImagesController do
         # specifies that the DeliveredImage created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        DeliveredImage.any_instance.should_receive(:update).with({ "title" => "MyText" })
-        put :update, {:id => delivered_image.to_param, :delivered_image => { "title" => "MyText" }}, valid_session
+        DeliveredImage.any_instance.should_receive(:update).with({ "avoided" => true })
+        put :update, {:id => delivered_image.to_param, :delivered_image => { "avoided" => true }}, valid_session
       end
 
       it "assigns the requested delivered_image as @delivered_image" do
@@ -128,7 +128,7 @@ describe DeliveredImagesController do
         delivered_image = DeliveredImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         DeliveredImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => delivered_image.to_param, :delivered_image => { "title" => "invalid value" }}, valid_session
+        put :update, {:id => delivered_image.to_param, :delivered_image => { "avoided" => "invalid value" }}, valid_session
         assigns(:delivered_image).should eq(delivered_image)
       end
 
@@ -136,7 +136,7 @@ describe DeliveredImagesController do
         delivered_image = DeliveredImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         DeliveredImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => delivered_image.to_param, :delivered_image => { "title" => "invalid value" }}, valid_session
+        put :update, {:id => delivered_image.to_param, :delivered_image => { "avoided" => "invalid value" }}, valid_session
         response.should render_template("edit")
       end
     end
@@ -162,10 +162,10 @@ describe DeliveredImagesController do
       login_user
     end
     it "Add delivered_image to User.favored_images" do
-      delivered_image = FactoryGirl.create(:delivered_image_unfavored_light)
+      delivered_image = FactoryGirl.create(:delivered_image_unfavored)
       put :favor, {
         id: delivered_image.id,
-        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored_light),
+        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored),
         render: 'true'
       }, valid_session
 

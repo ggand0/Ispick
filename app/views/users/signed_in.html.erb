@@ -22,23 +22,24 @@
 <br>
 <%= paginate @delivered_images %>
 <div class="wrap">
-  <% @delivered_images.each do |image| %>
-    <% next if image.avoided %>
+  <% @delivered_images.each do |delivered_image| %>
+    <% image = delivered_image.image %>
+    <% next if delivered_image.avoided %>
     <div class="box">
       <div class="boxInner">
-        <%= get_jst_string(image.created_at) + '配信' %>
+        <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
         <div class="favored">
-          <div class="id"><%= image.id %></div>
-          <%= raw get_clip_string_styled(image) %>
+          <div class="id"><%= delivered_image.id %></div>
+          <%= raw get_clip_string_styled(delivered_image) %>
         </div>
 
-        <%= link_to 'Hide', avoid_delivered_image_path(image), method: :put %>
+        <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
         <%= get_illust_html image %>
 
-        <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
+        <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>
