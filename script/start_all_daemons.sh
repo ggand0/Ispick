@@ -5,5 +5,4 @@
 #script/daemons/target_face start
 script/daemons/detect_illust start
 script/daemons/download_image start
-script/daemons/copy_image start
 script/daemons/search_images start
