@@ -18,9 +18,7 @@ module Scrape::Deviant
     # page = 'http://ecchi-enzo.deviantart.com/art/Top-Heavy-ft-Sui-Feng-FREE-435076127'
     # mature画像はクリックをsimulateしないと抽出出来ないくさいので飛ばす
     mature = html.css("div[class='dev-content-mature mzone-main']").first
-    if not mature.nil?
-      return true
-    end
+    return true if not mature.nil?
     false
   end
 
