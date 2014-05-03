@@ -45,7 +45,7 @@ describe "Deliver" do
 
   describe "delete_excessed_records" do
     it "delete images properly" do
-      user = FactoryGirl.create(:user_with_delivered_images, images_count: 5)
+      user = FactoryGirl.create(:user_with_delivered_images_file, images_count: 5)
       images = user.delivered_images
       size = ApplicationHelper.bytes_to_megabytes(images.first.image.data.size)*2 + 1
 
@@ -102,7 +102,7 @@ describe "Deliver" do
 
   describe "limit_images function" do
     it "rejects an image when it already exists" do
-      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
+      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
       images = [ FactoryGirl.create(:image_for_delivered_image) ]
 
       images = Deliver.limit_images(user, images)
@@ -112,7 +112,7 @@ describe "Deliver" do
     it "limits images when its count excess max num" do
       stub_const('Deliver::MAX_DELIVER_NUM', 1)
       images = FactoryGirl.create_list(:image, 3)
-      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 1)
+      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
 
       images = Deliver.limit_images(user, images)
       expect(images.count).to eq(1)
@@ -175,7 +175,7 @@ describe "Deliver" do
       require "#{Rails.root}/script/scrape/scrape_tumblr"
       require "#{Rails.root}/script/scrape/scrape_nico"
 
-      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 5)
+      user = FactoryGirl.create(:user_with_delivered_images_file, images_count: 5)
       user.delivered_images.each { |d| puts d.image.page_url }
 
       Scrape::Twitter.should_receive(:get_stats)
@@ -185,7 +185,7 @@ describe "Deliver" do
       Deliver.update()
     end
     it "ignores empty relation in user.delivered_images" do
-      user = FactoryGirl.create(:user_with_delivered_images_nofile, images_count: 5)
+      user = FactoryGirl.create(:user_with_delivered_images_file, images_count: 5)
       user.delivered_images << DeliveredImage.none  # 空のrelationを追加
 
       Deliver.update()

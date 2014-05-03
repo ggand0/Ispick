@@ -70,11 +70,12 @@ class DeliveredImagesController < ApplicationController
     end
 
     # src_urlが被ってたらvalidationでfalseが返る
+    image = @delivered_image.image
     favored_image = current_user.favored_images.build(
-      title: @delivered_image.title,
-      caption: @delivered_image.caption,
-      data: @delivered_image.data,
-      src_url: @delivered_image.src_url
+      title: image.title,
+      caption: image.caption,
+      data: image.data,
+      src_url: image.src_url
     )
     # User.favored_imagesに追加
     if favored_image.save
@@ -109,6 +110,6 @@ class DeliveredImagesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def delivered_image_params
-      params.require(:delivered_image).permit(:title, :caption, :src_url)
+      params.require(:delivered_image).permit(:avoided)
     end
 end
