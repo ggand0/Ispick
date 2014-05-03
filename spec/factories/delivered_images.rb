@@ -4,7 +4,12 @@ require "#{Rails.root}/spec/support/consts"
 FactoryGirl.define do
   factory :delivered_image, class: DeliveredImage do
     avoided false
-    association :user, factory: :twitter_user, strategy: :build
+    favored false
+
+    # Skip validation when saving
+    to_create do |instance|
+      instance.save validate: false
+    end
     association :targetable, factory: :target_word, strategy: :build
     association :image, factory: :image
   end
@@ -20,12 +25,11 @@ FactoryGirl.define do
   end
 
   factory :delivered_image_photo, class: DeliveredImage do
-    association :image, factory: :image
     avoided false
-  end
-  factory :delivered_image_illust, class: DeliveredImage do
-    association :image, factory: :image
-    avoided false
+    to_create do |instance|
+      instance.save validate: false
+    end
+    association :image, factory: :image_photo
   end
 
   factory :delivered_image_from_word, class: DeliveredImage do
@@ -43,12 +47,10 @@ FactoryGirl.define do
   factory :delivered_image_file, class: DeliveredImage do
     favored false
 
-    # save時にvalidationをスキップする
     to_create do |instance|
       instance.save validate: false
     end
 
-    association :user, factory: :twitter_user, strategy: :build
     association :targetable, factory: :target_word, strategy: :build
     association :image, factory: :image_file
   end
@@ -58,11 +60,8 @@ FactoryGirl.define do
     association :user
     association :image, factory: :image
   end
-  #factory :delivered_image_favored_light, class: DeliveredImage do
-  #  favored true
-  #  association :image, factory: :image
-  #end
-  factory :delivered_image_unfavored_light, class: DeliveredImage do
+
+  factory :delivered_image_unfavored, class: DeliveredImage do
     favored false
     association :image, factory: :image
   end

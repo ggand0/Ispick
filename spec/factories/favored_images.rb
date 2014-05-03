@@ -27,6 +27,6 @@ FactoryGirl.define do
     caption "MyText"
     src_url "MyText"
     user_id 1
-    association :delivered_image, factory: :delivered_image_favored_light
+    association :delivered_image, factory: :delivered_image_favored
   end
 end

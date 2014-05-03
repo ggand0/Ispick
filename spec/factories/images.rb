@@ -22,7 +22,7 @@ FactoryGirl.define do
       end
     end
 
-    # save時にvalidationをスキップする
+    # Skip validation when saving
     to_create do |instance|
       instance.save validate: false
     end
@@ -40,7 +40,6 @@ FactoryGirl.define do
     posted_at DateTime.now
     is_illust true
 
-    # save時にvalidationをスキップする
     to_create do |instance|
       instance.save validate: false
     end
@@ -66,10 +65,16 @@ FactoryGirl.define do
 
   factory :image_file, class: Image do
     title 'madoka'
-    sequence(:src_url) { |n| "test#{n}.com" }
+    caption 'madoka dayo!'
+    sequence(:src_url) { |n| "test#{n}@example.com" }
+    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }
+    sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
+    sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
+    sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
+    views 10000
+    posted_at DateTime.now
+    is_illust true
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
-
-    # save時にvalidationをスキップする
     to_create do |instance|
       instance.save validate: false
     end
@@ -92,7 +97,15 @@ FactoryGirl.define do
     title 'test'
     sequence(:src_url) { |n| "test_new#{n}.com" }
     created_at  Time.utc(2014, 2, 1, 0, 0, 0)
-    # save時にvalidationをスキップする
+    to_create do |instance|
+      instance.save validate: false
+    end
+  end
+
+  factory :image_photo, class: Image do
+    sequence(:src_url) { |n| "test_photo#{n}@example.com" }
+    is_illust false
+
     to_create do |instance|
       instance.save validate: false
     end
@@ -106,9 +119,7 @@ FactoryGirl.define do
   factory :image_nicoseiga, class: Image do
     src_url 'http://lohas.nicoseiga.jp/thumb/3932299i'
     page_url 'http://seiga.nicovideo.jp/seiga/im3932299'
-    #association :tags, [ factory: :tag ]
     after(:create) do |image|
-      #create(:image_tag, image_id: image.id, tag_id: create(:tag).id)
       image.tags = [ create(:tag) ]
     end
   end
