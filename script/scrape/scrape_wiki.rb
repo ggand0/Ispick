@@ -194,8 +194,6 @@ module Scrape::Wiki
       end
     end
 
-    puts anime_character_page_url
-    puts anime_character_page_url.sort.class
     anime_character_page_url.sort # Hash
   end
 
@@ -310,10 +308,15 @@ module Scrape::Wiki
         next if tmp.nil?
         name_display = tmp.first.gsub(/\s/, '')
 
-        person = Person.create(name: tmp, name_display: name_display, name_type: 'Character')
+        person = Person.create(name: tmp.first, name_display: name_display, name_type: 'Character')
 
         # 関連キーワードとしてアニメタイトルを追加
         person.keywords.create(word: anime, is_alias: false)
+
+        # Titleレコード追加
+        title = Title.create(name: anime)
+        title.people << person
+        person.titles << title
 
         # ひらがなもしくは英名をaliasとして追加
         if not array.size == 0
