@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140422033323) do
+ActiveRecord::Schema.define(version: 20140505152023) do
 
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
@@ -88,6 +88,11 @@ ActiveRecord::Schema.define(version: 20140422033323) do
     t.datetime "updated_at"
   end
 
+  create_table "people_titles", id: false, force: true do |t|
+    t.integer "title_id",  null: false
+    t.integer "person_id", null: false
+  end
+
   create_table "tags", force: true do |t|
     t.string   "name"
     t.integer  "image_id"
@@ -113,6 +118,12 @@ ActiveRecord::Schema.define(version: 20140422033323) do
     t.integer  "user_id"
     t.datetime "last_delivered_at"
     t.boolean  "enabled"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "titles", force: true do |t|
+    t.text     "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
