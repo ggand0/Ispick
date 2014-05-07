@@ -79,10 +79,12 @@ describe "Scrape" do
 
     it "save valid values to database" do
       Scrape::Wiki.save_to_database(hash)
-      #Person.first.keywords.each { |n| puts n.word }
 
       expect(Person.count).to eq(4)
       expect(Person.first.keywords.count).to eq(2)
+      expect(Person.first.titles.count).to eq(1)
+      expect(Person.second.titles.count).to eq(1)
+      expect(Title.count).to eq(2)
     end
   end
 end
