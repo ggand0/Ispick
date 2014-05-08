@@ -27,6 +27,14 @@ describe "Scrape" do
       expect(result).to be_a(Hash)
     end
   end
+  describe "get_english_anime_page" do
+    it "returns a Hash value" do
+      # まどかのアニメ概要ページ
+      url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
+      result = Scrape::Wiki.get_english_anime_page url
+      expect(result).to eql('http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica')
+    end
+  end
 
   describe "get_category_anime_page function" do
     it "returns a String value" do
@@ -62,6 +70,30 @@ describe "Scrape" do
 
       puts result = Scrape::Wiki::Character.get_anime_character_name(array)
       expect(result).to be_a(Hash)
+    end
+  end
+
+  describe "open_html function" do
+    let(:url) { 'http://www.google.co.jp/' }
+
+    it "returns a Nokogiri::HTML object" do
+      result = Scrape::Wiki.open_html url
+      expect(result).to be_a(Nokogiri::HTML::Document)
+    end
+    it "returns nil if it has an Errno::ENOENT exception" do
+      stub_request(:any, url).to_raise(Errno::ENOENT)
+      #stub_request(:get, "http://www.google.co.jp/").
+      #   with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+      #   to_raise(Errno::ENOENT)
+
+      result = Scrape::Wiki.open_html url
+      expect(result).to eql(nil)
+    end
+    it "returns nil if it has an Errno::ENOENT exception" do
+      stub_request(:any, url).to_raise(SocketError)
+
+      result = Scrape::Wiki.open_html url
+      expect(result).to eql(nil)
     end
   end
 

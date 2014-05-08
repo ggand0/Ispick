@@ -96,6 +96,19 @@ module Scrape::Wiki
     anime_page  # Hash
   end
 
+  # 英語版ページへのリンクがある場合そのページurlを返す
+  # @param [String] 日本語版ページのurl
+  # @return [String] 英語版ページのurl
+  def self.get_english_anime_page(anime_page)
+    html = open_html anime_page
+    puts item = html.css("li[class='interlanguage-link interwiki-en']").first
+    puts item.count
+
+    # liタグ内のaタグのリンクを調べる
+    url = item.css('a').first.attr('href')
+    "http:#{url}"
+  end
+
 
   # カテゴリページ内からアニメのページURLを取得する
   # @param anime_title : String アニメのタイトル
@@ -103,14 +116,13 @@ module Scrape::Wiki
   def self.get_category_anime_page(anime_title, category_url)
     anime_page_url = ''
 
-    # HTMLページの取得
+    # カテゴリページの取得
     begin
       if not category_url == ''
         html = Nokogiri::HTML(open(category_url))
       else
         return
       end
-    # 例外処理
     rescue OpenURI::HTTPError => e
       if e.message == '404 Not Found'
         puts '次のURLを開けませんでした'
@@ -134,6 +146,27 @@ module Scrape::Wiki
     end
 
     anime_page_url  # String
+  end
+
+  # HTMLページを開いてNokogiriのHTMLオブジェクトを返す。
+  # 例外が発生した場合はnilを返す
+  # @param [String] 対象url
+  # @return [Nokogiri::HTML] NokogiriでパースされたHTMLオブジェクト
+  def self.open_html(url)
+    begin
+      html = Nokogiri::HTML(open(url))
+    rescue OpenURI::HTTPError => e
+      if e.message == '404 Not Found'
+        puts '次のURLを開けませんでした'
+        puts "URL : #{url}"
+      else
+        raise e
+      end
+    rescue Errno::ENOENT => e
+      return puts e
+    rescue SocketError => e
+      return puts e
+    end
   end
 
 
