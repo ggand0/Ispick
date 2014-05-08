@@ -87,6 +87,7 @@ group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
   gem 'fakeweb', '~> 1.3'
+  gem 'webmock'
 
   gem 'rails-erd'                                   # モデル関連図生成
 
