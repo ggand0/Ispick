@@ -7,12 +7,12 @@ describe "Scrape" do
   describe "scrape function" do
     it "calls proper functions" do
       Scrape::Wiki.stub(:get_anime_page).and_return
-      Scrape::Wiki.stub(:get_anime_character_page).and_return
-      Scrape::Wiki.stub(:get_anime_character_name).and_return
+      Scrape::Wiki::Character.stub(:get_anime_character_page).and_return
+      Scrape::Wiki::Character.stub(:get_anime_character_name).and_return
       Scrape::Wiki.stub(:save_to_database).and_return
       expect(Scrape::Wiki).to receive(:get_anime_page).exactly(5).times
-      expect(Scrape::Wiki).to receive(:get_anime_character_page).exactly(5).times
-      expect(Scrape::Wiki).to receive(:get_anime_character_name).exactly(5).times
+      expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(5).times
+      expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(5).times
       expect(Scrape::Wiki).to receive(:save_to_database).exactly(5).times
 
       Scrape::Wiki.scrape
@@ -43,7 +43,7 @@ describe "Scrape" do
       url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
       hash = { 'けいおん！' => url }
 
-      result_hash = Scrape::Wiki.get_anime_character_page(hash)
+      result_hash = Scrape::Wiki::Character.get_anime_character_page(hash)
       #expect(result_hash).to be_a(Hash)
       expect(result_hash).to be_a(Array)
     end
@@ -54,13 +54,13 @@ describe "Scrape" do
       wiki_url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
       hash = { 'けいおん！' => wiki_url }
 
-      puts result = Scrape::Wiki.get_anime_character_name(hash)
+      puts result = Scrape::Wiki::Character.get_anime_character_name(hash)
       expect(result).to be_a(Hash)
     end
     it "can include an array argument" do
       array = [["けいおん！", "http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9"]]
 
-      puts result = Scrape::Wiki.get_anime_character_name(array)
+      puts result = Scrape::Wiki::Character.get_anime_character_name(array)
       expect(result).to be_a(Hash)
     end
   end
