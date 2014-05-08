@@ -44,21 +44,7 @@ module Scrape::Wiki
   # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
   def self.get_anime_page(url)
     anime_page = {}
-
-    begin
-      html = Nokogiri::HTML(open(url))
-    rescue OpenURI::HTTPError => e
-      if e.message == '404 Not Found'
-        puts '次のURLを開けませんでした'
-        puts "URL : #{url}"
-      else
-        raise e
-      end
-    rescue Errno::ENOENT => e
-      return
-    rescue SocketError => e
-      return
-    end
+    html = self.open_html url
 
     # アニメ名:アニメのページURLのハッシュを取得
     # カテゴリに分かれたページのURLを取得
@@ -78,8 +64,9 @@ module Scrape::Wiki
         next
       end
       if not item.inner_text == '' and not anime_page.has_key?(item.inner_text)
-        page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = page_url
+        page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
+        page_url_en = self.get_english_anime_page page_url_ja
+        anime_page[item.inner_text] = page_url_ja
       end
     end
 
@@ -88,19 +75,23 @@ module Scrape::Wiki
         next
       end
       if not item.inner_text == '' and not anime_page.has_key?(item.inner_text)
-        page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = page_url
+        page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
+        page_url_en = self.get_english_anime_page page_url_ja
+        anime_page[item.inner_text] = page_url_ja
       end
     end
 
     anime_page  # Hash
   end
 
+  def self.add_links_to_hash
+  end
+
   # 英語版ページへのリンクがある場合そのページurlを返す
   # @param [String] 日本語版ページのurl
   # @return [String] 英語版ページのurl
   def self.get_english_anime_page(anime_page)
-    html = open_html anime_page
+    html = self.open_html anime_page
     puts item = html.css("li[class='interlanguage-link interwiki-en']").first
     puts item.count
 
@@ -115,27 +106,10 @@ module Scrape::Wiki
   # @param category_url : String カテゴリページのURL
   def self.get_category_anime_page(anime_title, category_url)
     anime_page_url = ''
+    return if category_url.empty?
 
     # カテゴリページの取得
-    begin
-      if not category_url == ''
-        html = Nokogiri::HTML(open(category_url))
-      else
-        return
-      end
-    rescue OpenURI::HTTPError => e
-      if e.message == '404 Not Found'
-        puts '次のURLを開けませんでした'
-        puts "URL : #{catergory_url}"
-        return
-      else
-        raise e
-      end
-    rescue Errno::ENOENT => e
-      return
-    rescue SocketError => e
-      return
-    end
+    html = self.open_html category_url
 
     # aタグの取得
     html.css('a').each do |item|
