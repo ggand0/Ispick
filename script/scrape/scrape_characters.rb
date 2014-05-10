@@ -4,6 +4,52 @@ require 'open-uri'
 require 'natto'
 
 module Scrape::Wiki::Character
+  def self.get_character_page_en(anime_title, url, html)
+    # aタグの取得
+    html.css('a').each do |item|
+      if /(characters|Characters)/ =~ item.inner_text
+        if /(List of |list of )(.*)( characters| Characters)/ =~ item.inner_text
+          match_string = $2
+          match_string.gsub!(/\(.*/, '')
+          character_page_url = "http://.wikipedia.org%s" % [item['href']]
+          if /#{match_string}/ =~ anime_title
+            return { title: match_string, url: character_page_url }
+          elsif /#{anime}/ =~ match_string
+            return { title: anime_title, url: character_page_url }
+          end
+          break
+        end
+      end
+    end
+
+    # Matchしなかった場合は、同ページに一覧があると判断
+    { title: anime_title, url: url }
+  end
+
+  def self.get_character_page_ja(anime_title, url, html)
+    # aタグの取得
+    html.css('a').each do |item|
+      if /(人物|キャラクター)/ =~ item.inner_text
+        if /(.*)(の|#)(登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text
+          match_string = $1
+          match_string.gsub!(/\(.*/, '')
+          character_page_url = "http://ja.wikipedia.org%s" % [item['href']]
+          if /#{match_string}/ =~ anime_title
+            #anime_character_page_url[match_string] = character_page_url
+            return { title: match_string, url: character_page_url  }
+          elsif /#{anime_title}/ =~ match_string
+            #anime_character_page_url[anime] = character_page_url
+            return { title: anime_title, url: character_page_url }
+          end
+          break
+        end
+      end
+    end
+
+    # Matchしなかった場合は、同ページに一覧があると判断
+    { title: anime_title, url: url }
+  end
+
   # アニメの登場人物ページを取得する
   # @param page_url : Hash {アニメタイトル => ページURL}
   def self.get_anime_character_page(page_url)
@@ -11,56 +57,22 @@ module Scrape::Wiki::Character
 
     # 登場人物・キャラクターページのURLを取得
     page_url.each do |anime, url|
-      # HTMLページの取得
-      begin
-        if not url == ''
-          html = Nokogiri::HTML(open(url))
-        else
-          next
-        end
-      # 例外処理
-      rescue OpenURI::HTTPError => e
-        if e.message == '404 Not Found'
-          puts '次のURLを開けませんでした'
-          puts "URL : #{url}"
-          next
-        else
-          raise e
-        end
-      rescue Errno::ENOENT => e
-        puts '次のURLを開けませんでした'
-        puts "URL : #{url}"
-        next
-      rescue SocketError => e
-        puts '次のURLを開けませんでした'
-        puts "URL : #{url}"
-        next
-      end
+      next if url.empty?
 
-      page_title = html.css('h1[class="firstHeading"] > span')[0].inner_text
-      anime = page_title if /#{page_title}/ =~ anime
+      # 日本語タイトルをkeyとする
+      html_ja = Scrape::Wiki.open_html url[:ja]
+      html_en = Scrape::Wiki.open_html url[:en]
+      page_title = html_ja.css('h1[class="firstHeading"] > span')[0].inner_text
+      anime_title = page_title if /#{page_title}/ =~ anime_title
 
-      # aタグの取得
-      html.css('a').each do |item|
-        if /(人物|キャラクター)/ =~ item.inner_text
-          if /(.*)(の|#)(登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text
-            match_string = $1
-            match_string.gsub!(/\(.*/, '')
-            character_page_url = "http://ja.wikipedia.org%s" % [item['href']]
-            if /#{match_string}/ =~ anime
-              anime_character_page_url[match_string] = character_page_url
-            elsif /#{anime}/ =~ match_string
-              anime_character_page_url[anime] = character_page_url
-            end
-            break
-          end
-        end
-      end
+      page_url_ja = self.get_character_page_ja anime_title, url, html_ja
+      page_url_en = self.get_character_page_en anime_title, url, html_en
+      anime_character_page_url[anime_title] = { ja: page_url_ja, en: page_url_en }
 
       # まだハッシュに要素が追加されていない場合の処理
-      unless anime_character_page_url.has_key?(anime)
-        anime_character_page_url[anime] = url
-      end
+      #unless anime_character_page_url.has_key?(anime_title)
+      #  anime_character_page_url[anime_title] = url
+      #end
     end
 
     anime_character_page_url.sort # Hash
@@ -76,21 +88,7 @@ module Scrape::Wiki::Character
     # 与えられたWikiのURLから登場人物の詳細ページを抜き出す
     wiki_url.each do |anime, url|
       name_array = []
-      begin
-        html = Nokogiri::HTML(open(url))
-      rescue OpenURI::HTTPError => e
-        if e.message == '404 Not Found'
-          puts '次のURLを開けませんでした'
-          puts "URL : #{url}"
-          next
-        else
-          raise e
-        end
-      rescue Errno::ENOENT => e
-        next
-      rescue SocketError => e
-        next
-      end
+      html = Scrape::Wiki.open_html url
 
       # h2タグを抜き出す
       html.css('h2').each do |item|
