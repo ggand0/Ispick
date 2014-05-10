@@ -64,9 +64,9 @@ module Scrape::Wiki
         next
       end
       if not item.inner_text == '' and not anime_page.has_key?(item.inner_text)
-        page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
+        puts page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
         page_url_en = self.get_english_anime_page page_url_ja
-        anime_page[item.inner_text] = page_url_ja
+        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
 
@@ -77,7 +77,7 @@ module Scrape::Wiki
       if not item.inner_text == '' and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
         page_url_en = self.get_english_anime_page page_url_ja
-        anime_page[item.inner_text] = page_url_ja
+        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
 
@@ -92,12 +92,17 @@ module Scrape::Wiki
   # @return [String] 英語版ページのurl
   def self.get_english_anime_page(anime_page)
     html = self.open_html anime_page
-    puts item = html.css("li[class='interlanguage-link interwiki-en']").first
-    puts item.count
+    return if html.nil?
+
+    item = html.css("li[class='interlanguage-link interwiki-en']").first
 
     # liタグ内のaタグのリンクを調べる
-    url = item.css('a').first.attr('href')
-    "http:#{url}"
+    if item.nil?
+      return ''
+    else
+      url = item.css('a').first.attr('href')
+      return "http:#{url}"
+    end
   end
 
 
@@ -180,7 +185,7 @@ module Scrape::Wiki
         # Titleレコード追加
         title = Title.create(name: anime)
         title.people << person
-        person.titles << title
+        #person.titles << title
 
         # ひらがなもしくは英名をaliasとして追加
         if not array.size == 0

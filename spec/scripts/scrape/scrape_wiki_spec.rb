@@ -21,6 +21,8 @@ describe "Scrape" do
 
   describe "get_anime_page function" do
     it "returns a hash" do
+      Scrape::Wiki.stub(:get_english_anime_page).and_return ''
+
       url = 'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
       result = Scrape::Wiki.get_anime_page(url)
 
@@ -49,7 +51,7 @@ describe "Scrape" do
   describe "get_anime_character_page function" do
     it "returns a hash" do
       url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
-      hash = { 'けいおん！' => url }
+      hash = { 'けいおん！' => { ja: url, en: url } }
 
       result_hash = Scrape::Wiki::Character.get_anime_character_page(hash)
       #expect(result_hash).to be_a(Hash)
@@ -97,6 +99,10 @@ describe "Scrape" do
     end
   end
 
+  describe "hash_output function" do
+
+  end
+
   describe "save_to_database function" do
     let(:hash) {{
       Prisma_Illya:[
@@ -115,8 +121,8 @@ describe "Scrape" do
       expect(Person.count).to eq(4)
       expect(Person.first.keywords.count).to eq(2)
       expect(Person.first.titles.count).to eq(1)
-      expect(Person.second.titles.count).to eq(1)
-      expect(Title.count).to eq(2)
+      expect(Person.last.titles.count).to eq(1)
+      expect(Title.count).to eq(4)
     end
   end
 end
