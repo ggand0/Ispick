@@ -84,8 +84,6 @@ module Scrape::Wiki
     anime_page  # Hash
   end
 
-  def self.add_links_to_hash
-  end
 
   # 英語版ページへのリンクがある場合そのページurlを返す
   # @param [String] 日本語版ページのurl
@@ -171,13 +169,14 @@ module Scrape::Wiki
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
     input_hash.each do |anime, characters|
-      characters.each do |array|
-        #array => [鹿目 まどか, かなめ まどか]
-        tmp = array.shift(1)                   # tmp => [鹿目 まどか], array => [かなめ まどか]
-        next if tmp.nil?
-        name_display = tmp.first.gsub(/\s/, '')
-
-        person = Person.create(name: tmp.first, name_display: name_display, name_type: 'Character')
+      characters.each do |name_hash|
+        # {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
+        person = Person.create(
+          name: name_hash[:query],
+          name_display: name_hash[:name],
+          name_english: name_hash[:en],
+          name_type: 'Character'
+        )
 
         # 関連キーワードとしてアニメタイトルを追加
         person.keywords.create(word: anime, is_alias: false)
@@ -185,15 +184,9 @@ module Scrape::Wiki
         # Titleレコード追加
         title = Title.create(name: anime)
         title.people << person
-        #person.titles << title
 
-        # ひらがなもしくは英名をaliasとして追加
-        if not array.size == 0
-          array.each do |value|
-            other_name = value.gsub(/\s/, '')     # => 'かなめまどか'
-            person.keywords.create(word: other_name, is_alias: true)
-          end
-        end
+        # よみがなをaliasとして追加
+        person.keywords.create(word: name_hash[:_alias], is_alias: true)
 
         # keywords保存の例
         #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される

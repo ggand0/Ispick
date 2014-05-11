@@ -275,14 +275,13 @@ module Scrape::Wiki::Character
 
     # 与えられたWikipediaのURLから登場人物の詳細ページを抜き出す
     wiki_url.each do |anime_title, url|
-      name_array = []
       html_ja = Scrape::Wiki.open_html url[:ja]
       html_en = Scrape::Wiki.open_html url[:en]
 
       name_ja = self.get_character_name_ja anime_title, html_ja# [ ['鹿目 まどか', 'かなめ まどか'], ... ]
-      name_hash = self.get_character_name_en anime_title, html_en, name_ja# 英名追加後のHashが返される
+      name_array = self.get_character_name_en anime_title, html_en, name_ja# 英名追加後のHashのArrayが返される
 
-      anime_character[anime_title] = name_hash
+      anime_character[anime_title] = name_array
     end
 
     anime_character

@@ -10,10 +10,10 @@ describe "Scrape" do
       Scrape::Wiki::Character.stub(:get_anime_character_page).and_return
       Scrape::Wiki::Character.stub(:get_anime_character_name).and_return
       Scrape::Wiki.stub(:save_to_database).and_return
-      expect(Scrape::Wiki).to receive(:get_anime_page).exactly(5).times
-      expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(5).times
-      expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(5).times
-      expect(Scrape::Wiki).to receive(:save_to_database).exactly(5).times
+      expect(Scrape::Wiki).to receive(:get_anime_page).exactly(1).times
+      expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(1).times
+      expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(1).times
+      expect(Scrape::Wiki).to receive(:save_to_database).exactly(1).times
 
       Scrape::Wiki.scrape
     end
@@ -106,12 +106,18 @@ describe "Scrape" do
   describe "save_to_database function" do
     let(:hash) {{
       Prisma_Illya:[
-          ['イリヤスフィール・フォン・アインツベルン', 'Illyasviel von Einzbern'],
-          ['美遊・エーデルフェルト', 'Miyu Edelfelt'],
+          { name: 'イリヤスフィール・フォン・アインツベルン',
+            query: 'イリヤスフィール',
+            _alias: 'イリヤ',
+            en: 'Illyasviel von Einzbern'},
+          { name: '美遊・エーデルフェルト',
+            query: '美遊',
+            _alias: 'ミユ',
+            en: 'Miyu Edelfelt'},
         ],
       Madoka: [
-        ['鹿目 まどか', 'かなめ まどか'],
-        ['美樹 さやか', 'みき さやか']
+        {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"},
+        {:name=>"美樹 さやか", :query=>"美樹さやか", :_alias=>"みき さやか", :en=>"Sayaka Miki"}
       ]
     }}
 
