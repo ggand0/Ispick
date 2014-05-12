@@ -53,6 +53,7 @@ module Scrape::Wiki::Character
   # アニメの登場人物ページを取得する
   # @param page_hash : Hash {アニメタイトル => ページURL}
   def self.get_anime_character_page(page_hash)
+    puts 'Extracting character pages...'
     anime_character_page_url = {}
 
     # 登場人物・キャラクターページのURLを取得
@@ -61,18 +62,24 @@ module Scrape::Wiki::Character
 
       # 日本語タイトルをkeyとする
       html_ja = Scrape::Wiki.open_html url[:ja]
+      next if html_ja.nil?
+
       page_title = html_ja.css('h1[class="firstHeading"] > span')[0].inner_text
       anime_title = page_title if /#{page_title}/ =~ anime_title
 
-      page_url_ja = self.get_character_page_ja anime_title, url, html_ja
+      page_url_ja = self.get_character_page_ja anime_title, url[:ja], html_ja
 
       if not url[:en].empty?
+        #puts url[:en]
         html_en = Scrape::Wiki.open_html url[:en]
-        page_url_en = self.get_character_page_en anime_title, url, html_en
+        page_url_en = self.get_character_page_en anime_title, url[:en], html_en
       else
-        page_url_en = ''
+        #page_url_en = ''
+        page_url_en = { title: anime_title, url: '' }
       end
-      anime_character_page_url[anime_title] = { ja: page_url_ja, en: page_url_en }
+
+      anime_character_page_url[anime_title] = { ja: page_url_ja[:url], en: page_url_en[:url] }
+      puts anime_character_page_url[anime_title]
     end
 
     #anime_character_page_url.sort # Hash
@@ -271,16 +278,27 @@ module Scrape::Wiki::Character
   # @param [Hash] { 'An anime title' => { ja: url, en: url } }
   # @return [Hash] キャラクタ一覧
   def self.get_anime_character_name(wiki_url)
+    puts 'Extracting character names...'
     anime_character = {}
 
     # 与えられたWikipediaのURLから登場人物の詳細ページを抜き出す
     wiki_url.each do |anime_title, url|
       html_ja = Scrape::Wiki.open_html url[:ja]
+      next if html_ja.nil?
+
       html_en = Scrape::Wiki.open_html url[:en]
 
-      name_ja = self.get_character_name_ja anime_title, html_ja# [ ['鹿目 まどか', 'かなめ まどか'], ... ]
-      name_array = self.get_character_name_en anime_title, html_en, name_ja# 英名追加後のHashのArrayが返される
+      # => [ ['鹿目 まどか', 'かなめ まどか'], ... ]
+      name_ja = self.get_character_name_ja anime_title, html_ja if html_ja
 
+      # 英名追加後のHashのArrayが返される
+      if html_en
+        name_array = self.get_character_name_en anime_title, html_en, name_ja
+      else
+        name_array = name_ja
+      end
+
+      puts name_array
       anime_character[anime_title] = name_array
     end
 

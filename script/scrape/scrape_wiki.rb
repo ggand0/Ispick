@@ -51,7 +51,10 @@ module Scrape::Wiki
     html.css('a').each do |item|
       if /Category/ =~ item['class']  or /CategoryTreeLabel/ =~ item['class']
         category_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = self.get_category_anime_page(item.inner_text, category_url)
+        #anime_page[item.inner_text] = self.get_category_anime_page(item.inner_text, category_url)
+        page_url_ja = self.get_category_anime_page(item.inner_text, category_url)
+        page_url_en = self.get_english_anime_page page_url_ja
+        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
 
@@ -169,6 +172,8 @@ module Scrape::Wiki
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
     input_hash.each do |anime, characters|
+      next if characters.nil?
+
       characters.each do |name_hash|
         # {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
         person = Person.create(
