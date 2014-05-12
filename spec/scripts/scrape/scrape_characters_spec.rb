@@ -12,6 +12,7 @@ describe "Scrape::Wiki::Character" do
       wiki_url = { '魔法少女まどか☆マギカ' => { ja: url_ja, en: url_en } }
 
       puts result = Scrape::Wiki::Character.get_anime_character_name(wiki_url)
+      expect(result).to be_a(Hash)
     end
   end
 
@@ -45,15 +46,16 @@ describe "Scrape::Wiki::Character" do
       puts result = Scrape::Wiki::Character.get_character_name_en(
         '魔法少女まどか☆マギカ', html, characters_list)
       #result.each { |n| puts "#{n.count}, #{n}" }
+      expect(result).to be_a(Hash)
     end
   end
 
   describe "match_character_name function" do
     it "returns a valid hash" do
       name_string = '(鹿目 まどか, Kaname Madoka)'
-      characters_list =['鹿目 まどか', '美樹 さやか']
+      characters_list =[{ name: '鹿目 まどか' }, { name: '美樹 さやか' }]
       puts result = Scrape::Wiki::Character.match_character_name(name_string, characters_list)
-      expect(result).to eq({ match: true, list: ['美樹 さやか']})
+      expect(result).to eq({ name: '鹿目 まどか' })
     end
   end
 

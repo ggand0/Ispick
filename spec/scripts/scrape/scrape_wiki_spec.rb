@@ -24,7 +24,7 @@ describe "Scrape" do
       Scrape::Wiki.stub(:get_english_anime_page).and_return ''
 
       url = 'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
-      result = Scrape::Wiki.get_anime_page(url)
+      puts result = Scrape::Wiki.get_anime_page(url)
 
       expect(result).to be_a(Hash)
     end
@@ -48,32 +48,6 @@ describe "Scrape" do
     end
   end
 
-  describe "get_anime_character_page function" do
-    it "returns a hash" do
-      url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
-      hash = { 'けいおん！' => { ja: url, en: url } }
-
-      result_hash = Scrape::Wiki::Character.get_anime_character_page(hash)
-      #expect(result_hash).to be_a(Hash)
-      expect(result_hash).to be_a(Array)
-    end
-  end
-
-  describe "get_anime_character_name function" do
-    it "returns a Hash value" do
-      wiki_url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
-      hash = { 'けいおん！' => wiki_url }
-
-      puts result = Scrape::Wiki::Character.get_anime_character_name(hash)
-      expect(result).to be_a(Hash)
-    end
-    it "can include an array argument" do
-      array = [["けいおん！", "http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9"]]
-
-      puts result = Scrape::Wiki::Character.get_anime_character_name(array)
-      expect(result).to be_a(Hash)
-    end
-  end
 
   describe "open_html function" do
     let(:url) { 'http://www.google.co.jp/' }
@@ -116,7 +90,7 @@ describe "Scrape" do
             en: 'Miyu Edelfelt'},
         ],
       Madoka: [
-        {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"},
+        { name: '鹿目 まどか', query: '鹿目まどか', _alias: 'かなめ まどか', en: 'Madoka Kaname' },
         {:name=>"美樹 さやか", :query=>"美樹さやか", :_alias=>"みき さやか", :en=>"Sayaka Miki"}
       ]
     }}

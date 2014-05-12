@@ -12,6 +12,7 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Name_en</th>
       <th>Title</th>
     </tr>
   </thead>
@@ -20,6 +21,7 @@
     <% @people.each do |person| %>
       <tr>
         <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { word: person.name_display }}, method: :post %></td>
+        <td><%= person.name_english %></td>
         <td><%= person.titles.first.name if not person.titles.empty? %></td>
       </tr>
     <% end %>

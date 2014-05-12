@@ -20,9 +20,9 @@ module Scrape::Wiki
     # 起点となるWikipediaカテゴリページのURL
     # URLはハードコードされているので、修正が必要
     url = [
-      'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      #'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       #'http://ja.wikipedia.org/wiki/Category:2010%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      #'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       #'http://ja.wikipedia.org/wiki/Category:2012%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       #'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
     ]
@@ -77,7 +77,7 @@ module Scrape::Wiki
       if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
         next
       end
-      if not item.inner_text == '' and not anime_page.has_key?(item.inner_text)
+      if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
         page_url_en = self.get_english_anime_page page_url_ja
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }

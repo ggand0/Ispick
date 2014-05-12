@@ -114,14 +114,6 @@ module Scrape::Wiki::Character
                 # '(', '（'のどれかで括られているキャラクタ名の場合
                 # 鹿目 まどか （かなめ まどか）などの表記が該当
                 if /(.*?)[\(（](.*?)[\)）]/ =~ tmp
-=begin
-                  first_array = $1.split('/')#／／/
-                  second_array = $2.split('/')
-                  first_array.map! { |value| value.strip }
-                  second_array.map! { |value| value.strip }
-                  tmp_array += first_array
-                  tmp_array += second_array
-=end
                   name = $1
                   _alias = $2
                   tmp_hash = { name: name, query: name.gsub(/\s/, ''), _alias: _alias }
@@ -129,10 +121,8 @@ module Scrape::Wiki::Character
                 # それ以外：「キュウべえ」など
                 else
                   tmp_hash = { name: tmp, query: tmp.strip, _alias: '' }
-                  #tmp_array.push(tmp.strip)
                   name_array.push(tmp_hash)
                 end
-                #name_array.push(tmp_array)
               end
             end
           elsif current.respond_to?(:name) and (current.name == 'h2' or current.name == 'script')
@@ -151,8 +141,7 @@ module Scrape::Wiki::Character
     end
 
     # 条件を満たした場合、ハッシュに値を追加
-    if not anime_title == '' and not name_array.size == 0
-      #anime_character[anime] = name_array
+    if not anime_title.empty? and not name_array.size == 0
       return name_array
     end
   end
@@ -165,8 +154,6 @@ module Scrape::Wiki::Character
 
     characters_list.each do |character_name|
       if /#{character_name[:name]}/ =~ name_string
-        #characters_list.delete(character_name)
-        #return { match: true, list: characters_list }
         return character_name
       end
     end
@@ -179,6 +166,11 @@ module Scrape::Wiki::Character
     name.gsub!(/ū/, 'uu')
     name.gsub!(/ē/, 'ei')
     name.gsub!(/ō/, 'ou')
+    name.gsub!(/Ā/, 'Aa')
+    name.gsub!(/Ī/, 'Ii')
+    name.gsub!(/Ū/, 'Uu')
+    name.gsub!(/Ē/, 'Ei')
+    name.gsub!(/Ō/, 'Ou')
     name
   end
 
