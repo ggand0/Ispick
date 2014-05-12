@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "name_display"
+    t.string   "name_english"
     t.string   "name_type"
     t.integer  "target_word_id"
     t.datetime "created_at"
