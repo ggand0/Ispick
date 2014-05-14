@@ -15,16 +15,18 @@ class DetectIllust
       tool_path = CONFIG['illust_detection_path']
 
       # 結果をtrue/falseにparse
-      illust = self.get_result(tool_path, image).to_i
+      result = self.get_result(tool_path, image).split(' ')
+      illust = result.first.to_i
+      quality = result.second.to_f
       is_illust = (illust == 1 ? true : false)
 
       # 対象attributeをupdate
-      image.update_attributes({is_illust: is_illust})
+      image.update_attributes({ is_illust: is_illust, quality: quality })
     rescue => e
       puts e
       Rails.logger.error('Illust detection failed!')
     end
 
-    puts "Tool result: #{illust} with #{image_type}/#{image_id}"
+    puts "Tool result: #{illust},#{quality} with #{image_type}/#{image_id}"
   end
 end

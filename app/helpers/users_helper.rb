@@ -35,6 +35,9 @@ module UsersHelper
   def get_illust_html(image)
     "Illust: <span>#{image.is_illust.to_s}</span>".html_safe
   end
+  def get_quality_html(image)
+    "Quality: <span>#{image.quality.to_s}</span>".html_safe
+  end
 
   # simple-navigation関連
   def get_menu_items

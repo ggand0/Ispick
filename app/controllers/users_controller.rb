@@ -24,7 +24,8 @@ class UsersController < ApplicationController
         where(images: { is_illust: true }).references(:images) if params[:illust]
 
       # ソートリクエストがある場合：
-      delivered_images = delivered_images.reorder('favorites desc') if params[:sort]
+      delivered_images = sort_delivered_images if params[:sort]
+      delivered_images = sort_by_quality if params[:sort_quality]
 
       @delivered_images = delivered_images.page(params[:page]).per(25)
       render action: 'signed_in'
@@ -34,13 +35,14 @@ class UsersController < ApplicationController
   end
 
   def sort_delivered_images
-    if signed_in?
-      delivered_images = current_user.delivered_images.reorder('favorites desc')
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
-    end
+    delivered_images = current_user.delivered_images.includes(:image).
+      reorder('images.favorites desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
+  end
+  def sort_by_quality
+    delivered_images = current_user.delivered_images.includes(:image).
+      reorder('images.quality desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
   end
 
   def show_illusts
