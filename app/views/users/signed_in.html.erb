@@ -6,6 +6,8 @@
 <br>
 <%= link_to 'Favorites順にする', request.parameters.merge({ sort: true }) %>
 <br>
+<%= link_to 'べた塗り度順にする', request.parameters.merge({ sort_quality: true }) %>
+<br>
 <br>
 <p>
   <strong>Delivered images count:</strong>
@@ -38,6 +40,7 @@
         <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
         <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
         <%= get_illust_html image %>
+        <%= get_quality_html image %>
 
         <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
