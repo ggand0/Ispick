@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
     t.text     "caption"
     t.text     "src_url"
     t.boolean  "is_illust"
+    t.float    "quality"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
