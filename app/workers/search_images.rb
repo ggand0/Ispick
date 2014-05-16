@@ -8,8 +8,9 @@ class SearchImages
   def self.perform(target_word_id)
     start = Time.now
     target_word = TargetWord.find(target_word_id)
-    query = target_word.person ? target_word.person.name : target_word.word
-    Scrape.scrape_keyword query
+    #query = target_word.person ? target_word.person.name : target_word.word
+    #Scrape.scrape_keyword query
+    Scrape.scrape_keyword target_word
     Deliver.deliver_keyword target_word.user_id, target_word.id
 
     puts 'TIME: ' + (Time.now - start).to_s

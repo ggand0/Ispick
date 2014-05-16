@@ -25,11 +25,20 @@ module Scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_keyword(keyword)
-    puts keyword
-    Scrape::Nico.scrape_keyword(keyword)
-    Scrape::Twitter.scrape_keyword(keyword)
-    Scrape::Tumblr.scrape_keyword(keyword)
+  def self.scrape_keyword(target_word)
+    puts query = target_word.person ? target_word.person.name : target_word.word
+    Scrape::Nico.scrape_keyword(query)
+    #Scrape::Twitter.scrape_keyword(query)
+    Scrape::Tumblr.scrape_keyword(query)
+
+    # 英名が存在する場合はさらに検索
+    puts "name_english:#{ target_word.person.name_english}"
+    #if target_word.person.name_english
+    if target_word.person and not target_word.person.name_english.empty?
+      query = target_word.person.name_english
+      puts "name_english:#{query}"
+      Scrape::Tumblr.scrape_keyword(query)
+    end
     puts 'DONE!!'
   end
 
