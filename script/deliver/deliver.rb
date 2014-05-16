@@ -77,12 +77,11 @@ module Deliver
     puts Image.count
     if is_periodic
       # 定時配信の場合は、イラスト判定が終了しているもののみ配信
-      images = Image.includes(:tags).where.not(title: nil, caption: nil, tags: { name: nil }).
-        where.not(is_illust: nil).references(:tags)
+      images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
+        references(:tags)
     else
       # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      images = Image.includes(:tags).where.not(
-        title: nil, caption: nil, tags: { name: nil }).references(:tags)
+      images = Image.includes(:tags).where.not(tags: {name: nil}).references(:tags)
     end
     images
   end
@@ -90,9 +89,14 @@ module Deliver
   # 特定のImageオブジェクトがtarget_wordにマッチするか判定する
   def self.contains_word(image, target_word)
     word = target_word.person ? target_word.person.name : target_word.word
+    word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+
+    # まず、Imageに紐づけられているTagがマッチするかどうかチェック
     image.tags.each do |tag|
-      return true if tag.name.include?(word)
+      return true if tag.name.include?(word) or tag.name.include?(word_en)
     end
+
+    # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
     image.title.include?(word) or image.caption.include?(word)
   end
 

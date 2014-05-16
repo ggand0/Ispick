@@ -5,7 +5,7 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return  # resqueのjobを実際に実行しないように
   end
 
@@ -56,12 +56,22 @@ describe "Deliver" do
   end
 
   describe "contains_word function" do
-    it "returns true if some column matches" do
+    it "returns true if the original name matches" do
       # タグに「鹿目まどか」という名前を持つものがあるimageを作成する
       image = FactoryGirl.create(:image_with_tags, tags_count: 5)
       person = FactoryGirl.create(:person_madoka)
 
       # 鹿目まどか」なるtarget_word
+      target_word = TargetWord.find(person.target_word_id)
+
+      contains = Deliver.contains_word(image, target_word)
+      expect(contains).to eq(true)
+    end
+    it "returns true if the name_english matches" do
+      image = FactoryGirl.create(:image)
+      tag = FactoryGirl.create(:tag_en)
+      image.tags << tag
+      person = FactoryGirl.create(:person_madoka)
       target_word = TargetWord.find(person.target_word_id)
 
       contains = Deliver.contains_word(image, target_word)
