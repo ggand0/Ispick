@@ -53,11 +53,10 @@ namespace :scrape do
   end
 
   desc "タグ検索による抽出を行う"
-  task :keyword, [:keyword] =>  :environment do |t, args|
+  task keyword: :environment do
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrape/scrape"
-    puts args[:keyword]
-    Scrape.scrape_keyword(args[:keyword])
+    Scrape.scrape_keyword(TargetWord.last)
   end
 
 
