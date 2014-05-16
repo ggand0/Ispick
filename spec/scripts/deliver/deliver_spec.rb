@@ -5,7 +5,7 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return  # resqueのjobを実際に実行しないように
   end
 
@@ -158,16 +158,17 @@ describe "Deliver" do
       expect(Deliver.get_images(true).count).to eql(1)
     end
     it "includes images which have nil value in is_illust column with true flag" do
+      # Imageを２レコード作成
       FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
       FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
 
-      expect(Deliver.get_images(true).count).to eql(2)
+      expect(Deliver.get_images(true).count).to eql(1)
     end
     it "ignores images which have nil value in is_illust column with false flag" do
       FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
       FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
 
-      expect(Deliver.get_images(false).count).to eql(1)
+      expect(Deliver.get_images(false).count).to eql(2)
     end
   end
 

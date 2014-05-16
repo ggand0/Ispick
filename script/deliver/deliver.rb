@@ -76,7 +76,7 @@ module Deliver
   def self.get_images(is_periodic)
     puts Image.count
     if is_periodic
-      # 定時配信の場合は、イラスト判定が終了しているもののみ配信
+      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
       images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
         references(:tags)
     else
@@ -97,7 +97,8 @@ module Deliver
     end
 
     # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
-    image.title.include?(word) or image.caption.include?(word)
+    return true if image.title.include?(word) or image.caption.include?(word)
+    return true if image.title.include?(word_en) or image.caption.include?(word_en)
   end
 
   # @param [Image]
