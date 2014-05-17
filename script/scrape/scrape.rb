@@ -11,6 +11,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_twitter"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
+  require "#{Rails.root}/script/scrape/scrape_giphy"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
@@ -38,6 +39,7 @@ module Scrape
       query = target_word.person.name_english
       puts "name_english:#{query}"
       Scrape::Tumblr.scrape_keyword(query)
+      Scrape::Giphy.scrape_keyword(query)
     end
     puts 'DONE!!'
   end
