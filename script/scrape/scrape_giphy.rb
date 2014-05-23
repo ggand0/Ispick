@@ -11,16 +11,7 @@ module Scrape::Giphy
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
-        # 和名タグでのhitは期待出来ない
-        # Person.name_englishで検索（e.g. "Madoka Kaname"）
-        if target_word.person and not target_word.person.name_english.empty?
-          puts query = target_word.person.name_english
-        else
-          next
-        end
-        next if query.nil? or query.empty?
-
-        self.scrape_with_keyword(query, limit)
+        self.scrape_with_keyword(target_word, limit)
       end
     end
 
@@ -32,8 +23,20 @@ module Scrape::Giphy
     self.scrape_with_keyword(keyword, 10, true)
   end
 
+  def self.get_query(target_word)
+    # 和名タグでのhitは期待出来ない
+    # Person.name_englishで検索（e.g. "Madoka Kaname"）
+    if target_word.person and not target_word.person.name_english.empty?
+      return target_word.person.name_english
+    else
+      return nil
+    end
+  end
+
   # 対象のタグを持つPostの画像を抽出する
-  def self.scrape_with_keyword(keyword, limit, validation=true)
+  def self.scrape_with_keyword(target_word, limit, validation=true)
+    keyword = self.get_query(target_word)
+    tag = target_word.person ? target_word.person.name : target_word.word
     client = self.get_client
     duplicates = 0
     skipped = 0
@@ -43,7 +46,9 @@ module Scrape::Giphy
       # API responseから画像情報を取得してDBへ保存する
       start = Time.now
       image_data = self.get_data(image)
-      res = Scrape.save_image(image_data, self.get_tag(keyword), validation)
+
+      # タグは和名を使用
+      res = Scrape.save_image(image_data, self.get_tag(tag), validation)
       duplicates += res ? 0 : 1
       puts "Scraped from #{image_data[:src_url]} in #{Time.now - start} sec" if res
 
