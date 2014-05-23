@@ -87,6 +87,15 @@ describe "Deliver" do
       contains = Deliver.contains_word(image, target_word)
       expect(contains).to eq(false)
     end
+
+    it "returns true if its title or caption contains the keyword" do
+      image = FactoryGirl.create(:image_madoka)
+      person = FactoryGirl.create(:person_madoka)
+      target_word = TargetWord.find(person.target_word_id)
+
+      contains = Deliver.contains_word(image, target_word)
+      expect(contains).to eq(true)
+    end
   end
 
   describe "create_delivered_image function" do
