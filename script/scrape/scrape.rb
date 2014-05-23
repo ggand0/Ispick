@@ -11,6 +11,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_twitter"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
+  require "#{Rails.root}/script/scrape/scrape_giphy"
 
   # 対象webサイト全てから画像抽出を行う。
   def self.scrape_all()
@@ -25,11 +26,21 @@ module Scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_keyword(keyword)
-    puts keyword
-    Scrape::Nico.scrape_keyword(keyword)
-    Scrape::Twitter.scrape_keyword(keyword)
-    Scrape::Tumblr.scrape_keyword(keyword)
+  def self.scrape_keyword(target_word)
+    puts query = target_word.person ? target_word.person.name : target_word.word
+    Scrape::Nico.scrape_keyword(query)
+    #Scrape::Twitter.scrape_keyword(query)
+    Scrape::Tumblr.scrape_keyword(query)
+
+    # 英名が存在する場合はさらに検索
+    puts "name_english:#{ target_word.person.name_english}"
+    #if target_word.person.name_english
+    if target_word.person and not target_word.person.name_english.empty?
+      query = target_word.person.name_english
+      puts "name_english:#{query}"
+      Scrape::Tumblr.scrape_keyword(query)
+      Scrape::Giphy.scrape_keyword(query)
+    end
     puts 'DONE!!'
   end
 
@@ -75,7 +86,7 @@ module Scrape
   end
 
   # Imageモデル生成＆DB保存
-  def self.save_image(attributes, tags=[], validation=true)
+  def self.save_image(attributes, tags=[], validation=true, large=false)
     # 重複を確認
     if validation and self.is_duplicate(attributes[:src_url])
       puts 'Skipping a duplicate image...'
@@ -98,9 +109,11 @@ module Scrape
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
       if image.save(validate: validation)
         # 特徴抽出処理をresqueに投げる
-        #Resque.enqueue(ImageFace, image.id)    # 一旦止める
-        #Resque.enqueue(DetectIllust, image.id) # DLした後にやる
-        Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
+        if large
+          Resque.enqueue(DownloadImageLarge, image.class.name, image.id, attributes[:src_url])
+        else
+          Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
+        end
       else
         Rails.logger.info('Image model saving failed. (maybe due to duplication)')
         puts 'Image model saving failed. (maybe due to duplication)'

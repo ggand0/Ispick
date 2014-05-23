@@ -56,12 +56,22 @@ describe "Deliver" do
   end
 
   describe "contains_word function" do
-    it "returns true if some column matches" do
+    it "returns true if the original name matches" do
       # タグに「鹿目まどか」という名前を持つものがあるimageを作成する
       image = FactoryGirl.create(:image_with_tags, tags_count: 5)
       person = FactoryGirl.create(:person_madoka)
 
       # 鹿目まどか」なるtarget_word
+      target_word = TargetWord.find(person.target_word_id)
+
+      contains = Deliver.contains_word(image, target_word)
+      expect(contains).to eq(true)
+    end
+    it "returns true if the name_english matches" do
+      image = FactoryGirl.create(:image)
+      tag = FactoryGirl.create(:tag_en)
+      image.tags << tag
+      person = FactoryGirl.create(:person_madoka)
       target_word = TargetWord.find(person.target_word_id)
 
       contains = Deliver.contains_word(image, target_word)
@@ -76,6 +86,15 @@ describe "Deliver" do
 
       contains = Deliver.contains_word(image, target_word)
       expect(contains).to eq(false)
+    end
+
+    it "returns true if its title or caption contains the keyword" do
+      image = FactoryGirl.create(:image_madoka)
+      person = FactoryGirl.create(:person_madoka)
+      target_word = TargetWord.find(person.target_word_id)
+
+      contains = Deliver.contains_word(image, target_word)
+      expect(contains).to eq(true)
     end
   end
 
@@ -148,16 +167,17 @@ describe "Deliver" do
       expect(Deliver.get_images(true).count).to eql(1)
     end
     it "includes images which have nil value in is_illust column with true flag" do
+      # Imageを２レコード作成
       FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
       FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
 
-      expect(Deliver.get_images(true).count).to eql(2)
+      expect(Deliver.get_images(true).count).to eql(1)
     end
     it "ignores images which have nil value in is_illust column with false flag" do
       FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
       FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
 
-      expect(Deliver.get_images(false).count).to eql(1)
+      expect(Deliver.get_images(false).count).to eql(2)
     end
   end
 

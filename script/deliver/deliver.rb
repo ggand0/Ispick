@@ -76,13 +76,15 @@ module Deliver
   def self.get_images(is_periodic)
     puts Image.count
     if is_periodic
-      # 定時配信の場合は、イラスト判定が終了しているもののみ配信
-      images = Image.includes(:tags).where.not(title: nil, caption: nil, tags: { name: nil }).
-        where.not(is_illust: nil).references(:tags)
+      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
+      #images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
+      #  references(:tags)
+      images = Image.where.not(is_illust: nil, src_url: nil)
     else
       # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      images = Image.includes(:tags).where.not(
-        title: nil, caption: nil, tags: { name: nil }).references(:tags)
+      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
+      #images = Image.includes(:tags).where.not(tags: {name: nil}).references(:tags)
+      images = Image.all
     end
     images
   end
@@ -90,10 +92,16 @@ module Deliver
   # 特定のImageオブジェクトがtarget_wordにマッチするか判定する
   def self.contains_word(image, target_word)
     word = target_word.person ? target_word.person.name : target_word.word
+    word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+
+    # まず、Imageに紐づけられているTagがマッチするかどうかチェック
     image.tags.each do |tag|
-      return true if tag.name.include?(word)
+      return true if tag.name.include?(word) or tag.name.include?(word_en)
     end
-    image.title.include?(word) or image.caption.include?(word)
+
+    # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
+    return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
+    return true if image.title and image.title.include?(word_en) or image.caption and image.caption.include?(word_en)
   end
 
   # @param [Image]
@@ -126,14 +134,15 @@ module Deliver
     end
   end
 
-  # 配信画像数を指定枚数に制限する
+  # 配信画像数を指定枚数に制限する、DL済み前提
   # @param [User] 配信対象のUserオブジェクト
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
   def self.limit_images(user, images)
     # 既に配信済みの画像を除去
+    # nilの画像もついでに除去
     images.reject! do |x|
-      user.delivered_images.any?{ |d| d.image.src_url == x.src_url }
+      user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
     end
 
     # 最大配信数に絞る（推薦度の高い順に残す）
