@@ -41,12 +41,21 @@ module UsersHelper
 
   # simple-navigation関連
   def get_menu_items
-    date_menu_items + list_menu_items
+    #date_menu_items + list_menu_items
+    debug_menu_items + list_menu_items
+  end
+
+  def debug_menu_items
+    [
+      { key: :image_list, name: 'Users Home', url: home_users_path },
+      { key: :image_list, name: '抽出画像一覧', url: images_path },
+      { key: :target_image_list, name: 'うpされた嗜好画像一覧', url: target_images_path }
+    ]
   end
 
   # リスト系のmenu
   def list_menu_items
-    [{ key: :list, name: 'Lists', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
+    [{ key: :list, name: 'Menu', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
         { key: :list_word, name: '登録ワード一覧', url: show_target_words_users_path },
         { key: :list_image, name: '登録イラスト一覧', url: show_target_images_users_path },
         { key: :list_clip, name: 'クリップイラスト一覧', url: show_favored_images_users_path }

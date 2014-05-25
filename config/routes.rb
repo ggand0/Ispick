@@ -28,8 +28,6 @@ Ispic::Application.routes.draw do
       get 'show_target_images'
       get 'show_target_words'
       get 'show_favored_images'
-      get 'sort_delivered_images'
-      get 'sort_by_quality'
       get 'download_favored_images'
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
