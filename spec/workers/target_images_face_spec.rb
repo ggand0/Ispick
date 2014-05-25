@@ -6,7 +6,16 @@ describe TargetFace do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
+  end
+
+  describe "get_categories function" do
+    it "returns hash of image_net categories" do
+      target_image = TargetImage.create! valid_attributes
+      hash = TargetFace.get_categories target_image
+      expect(hash).to be_a(Hash)
+      expect(hash['butcher shop']).to eq(0.141260)
+    end
   end
 
   describe "perform method" do
