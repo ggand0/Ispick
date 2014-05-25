@@ -4,20 +4,8 @@ require 'zip'
 class UsersController < ApplicationController
   def home
     if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      if params[:year] and params[:month] and params[:day]
-        date = Date.new(params[:year].to_i, params[:month].to_i, params[:day].to_i).to_datetime
-      else
-        date = Date.today.to_datetime
-      end
 
-      # その日員配信されたdelivered_imagesに限定する
-      start_day = date.change(offset: '+0900')
-      end_day = (date+1).change(offset: '+0900')
-
-      delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').
-        where(created_at: start_day.utc..end_day.utc)
+      delivered_images = current_user.delivered_images.joins(:image).order('images.posted_at')
 
       # イラスト判定リクエストがある場合：
       delivered_images = delivered_images.includes(:image).
