@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
 
   create_table "features", force: true do |t|
     t.text     "face"
+    t.text     "categ_imagenet"
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
