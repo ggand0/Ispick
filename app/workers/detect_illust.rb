@@ -1,10 +1,11 @@
 class DetectIllust
   # Woeker起動時に指定するQUEUE名
   @queue = :detect_illust
+  QUALITY_SIZE = 1
 
   # イラスト判定ツールを実行し結果を得る
   def self.get_result(tool_path, image)
-    %x(#{tool_path} #{image.data.path})
+    %x(#{tool_path} #{image.data.path} #{QUALITY_SIZE})
   end
 
   # イラストかどうか判定する
