@@ -28,6 +28,11 @@
   <%= show_targetable(@delivered_image) + ' / ' + image.site_name %>
 </p>
 
+<p>
+  <strong>ImageNet categories:</strong>
+  <%= image.feature.categ_imagenet %>
+</p>
+
 <h2>Detail:</h2>
 <table>
   <thead>
