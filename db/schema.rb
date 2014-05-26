@@ -104,7 +104,6 @@ ActiveRecord::Schema.define(version: 20140505152023) do
   end
 
   create_table "target_images", force: true do |t|
-    t.text     "title"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
