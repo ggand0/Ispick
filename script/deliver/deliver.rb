@@ -96,12 +96,30 @@ module Deliver
 
     # まず、Imageに紐づけられているTagがマッチするかどうかチェック
     image.tags.each do |tag|
-      return true if tag.name.include?(word) or tag.name.include?(word_en)
+      return true if tag.name.include?(word)
+      return true if word_en and tag.name.include?(word_en)
     end
 
     # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
     return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
-    return true if image.title and image.title.include?(word_en) or image.caption and image.caption.include?(word_en)
+    return true if word_en and (image.title and image.title.include?(word_en) or image.caption and image.caption.include?(word_en))
+  end
+  def self.close_image(image, target_image)
+    hash1 = JSON.parse(image.feature.categ_imagenet)
+    hash2 = JSON.parse(target_image.feature.categ_imagenet)
+    keys1 = hash1.keys
+    keys2 = hash2.keys
+
+    # 共通するkeyを抽出する
+    common = (keys1 & keys2)
+
+    # keyから類似度を計算
+    similarity = 0
+    common.each do |key|
+      similarity += [hash1[key], hash2[key]].min
+    end
+    puts similarity
+    similarity > 0.1
   end
 
   # @param [Image]
