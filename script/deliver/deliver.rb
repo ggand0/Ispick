@@ -18,8 +18,7 @@ module Deliver
       Deliver.deliver_from_word(user, t, true) if t.enabled
     end
     user.target_images.each do |t|
-      # 14/04/19現在停止させている
-      #Deliver.deliver_from_image(user, t) if t.enabled
+      Deliver.deliver_from_image(user, t) if t.enabled
     end
 
     # １ユーザーの最大容量を超えていたら古い順に削除
@@ -40,16 +39,30 @@ module Deliver
 
 
   # 登録イラストから配信する
+  # @param [User] 配信するUserレコードのインスタンス
+  # @param [TargetImage] 保存済みのTargetImageレコード
   def self.deliver_from_image(user, target_image)
+    puts 'Delivering from a target_image...'
     # 推薦イラストを取得
-    service = TargetImagesService.new
-    result = service.get_preferred_images(target_image)
-    images = result[:images]
-    puts 'Preferred images: ' + images.count.to_s
+    #service = TargetImagesService.new
+    #result = service.get_preferred_images(target_image)
+    #images = result[:images]
+    images = Image.joins(:feature).
+      where.not(features: { categ_imagenet: nil }).
+      where.not(features: { categ_imagenet: '{}' }).
+      includes(:feature)
 
-    images = images.map{ |image| image[:image] }    # Hashのarrayではなく単純なImageのarrayにする
+    # 類似度が一定値以上であるimageがあれば残す
+    # 類似度が遠いimageをnilに置き換えた後全て削除
+    images = images.map do |image|
+      self.close_image(image, target_image) ? image : nil
+    end
+    images.compact!
+    puts 'Matched images: ' + images.count.to_s
+
+    #images = images.map{ |image| image[:image] }    # Hashのarrayではなく単純なImageのarrayにする
     images = self.limit_images(user, images)        # 配信画像を制限する
-    self.deliver_images(user, images, target_image) # User.delivered_imagesへ追加
+    self.deliver_images(user, images, target_image, true) # User.delivered_imagesへ追加
     target_image.last_delivered_at = DateTime.now   # 最終配信日時を記録
   end
 
@@ -118,8 +131,7 @@ module Deliver
     common.each do |key|
       similarity += [hash1[key], hash2[key]].min
     end
-    puts similarity
-    similarity > 0.1
+    similarity > 0.2
   end
 
   # @param [Image]
@@ -131,6 +143,10 @@ module Deliver
   end
 
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
+  # @param [User]
+  #
+  # @param [TargetWord/TargetImage]
+  # @param [Boolean] 定時配信かどうか
   def self.deliver_images(user, images, target, is_periodic)
     images.each_with_index do |image, count|
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip

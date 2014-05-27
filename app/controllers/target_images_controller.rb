@@ -38,6 +38,7 @@ class TargetImagesController < ApplicationController
   def create
     #@target_image = TargetImage.new(target_image_params)
     @target_image = current_user.target_images.build(target_image_params)
+    @target_image.enabled = true
 
     respond_to do |format|
       if @target_image.save

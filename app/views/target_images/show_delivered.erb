@@ -2,7 +2,7 @@
 
 <h1>Listing delivered_images of <%= image_tag @target_image.data.url(:thumb) %></h1>
 <br>
-<%= link_to 'Back', show_favored_images_users_path %>
+<%= link_to 'Back', :back %>
 <br>
 <br>
 <div class="wrap">
@@ -16,8 +16,8 @@
 
         <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
         <%= link_to 'Destroy', delivered_image, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <%= link_to(image_tag(delivered_image.data.url), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
-        <div class="titleBox"><%= delivered_image.title.to_s %></div>
+        <%= link_to(image_tag(delivered_image.image.data.url), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
+        <div class="titleBox"><%= delivered_image.image.title.to_s %></div>
       </div>
     </div>
   <% end %>
