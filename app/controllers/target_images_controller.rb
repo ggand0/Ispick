@@ -19,7 +19,8 @@ class TargetImagesController < ApplicationController
       @face_feature = 'Not extracted.'
     else
       #@face_feature = JSON.parse(@target_image.feature.face)
-      @face_feature = @target_image.feature.face
+      #@face_feature = @target_image.feature.face
+      @face_feature = @target_image.feature.categ_imagenet
     end
   end
 
@@ -37,11 +38,13 @@ class TargetImagesController < ApplicationController
   def create
     #@target_image = TargetImage.new(target_image_params)
     @target_image = current_user.target_images.build(target_image_params)
+    @target_image.enabled = true
 
     respond_to do |format|
       if @target_image.save
-        # 顔特徴抽出処理をbackground jobに投げる
+        # 特徴抽出処理をresqueで非同期的に行う
         Resque.enqueue(TargetFace, @target_image.id)
+        #Resque.enqueue(ImageFace, @target_image.class.name, @target_image.id)
 
         #format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.html { redirect_to controller: 'users', action: 'show_target_images' }

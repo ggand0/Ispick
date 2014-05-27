@@ -11,8 +11,8 @@ class DownloadImage
       # 画像ダウンロード
       image.image_from_url src_url
 
-      # DeliveredImageの場合はそのままイラスト判定へ
-      # Imageオブジェクトの場合、全く同一のファイルを持つレコードが既にDBに存在すれば削除する
+      # DeliveredImageの場合は、そのままイラスト判定へ
+      # Imageオブジェクトの場合は、全く同一のファイルを持つレコードが既にDBに存在すれば削除する
       if image.kind_of? Image and Image.where(md5_checksum: image.md5_checksum).count > 0
         Image.destroy(image_id)
         puts "Destroyed duplicates : #{image_type}/#{image_id}"
@@ -20,6 +20,7 @@ class DownloadImage
         # それ以外(含Image)はmd5_checksumを保存した後イラスト判定処理を行う
         image.save!
         Resque.enqueue(DetectIllust, image_type, image.id)
+        Resque.enqueue(ImageFace, image_type, image.id)
       end
     rescue => e
       puts e

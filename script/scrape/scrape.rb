@@ -39,7 +39,7 @@ module Scrape
       query = target_word.person.name_english
       puts "name_english:#{query}"
       Scrape::Tumblr.scrape_keyword(query)
-      Scrape::Giphy.scrape_keyword(query)
+      Scrape::Giphy.scrape_keyword(target_word)
     end
     puts 'DONE!!'
   end
@@ -86,6 +86,7 @@ module Scrape
   end
 
   # Imageモデル生成＆DB保存
+  # @param [Hash] Imageレコードに与える属性のHash
   def self.save_image(attributes, tags=[], validation=true, large=false)
     # 重複を確認
     if validation and self.is_duplicate(attributes[:src_url])

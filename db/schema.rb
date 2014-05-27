@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
 
   create_table "features", force: true do |t|
     t.text     "face"
+    t.text     "categ_imagenet"
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -103,7 +104,6 @@ ActiveRecord::Schema.define(version: 20140505152023) do
   end
 
   create_table "target_images", force: true do |t|
-    t.text     "title"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"

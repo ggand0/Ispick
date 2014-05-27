@@ -14,7 +14,8 @@ class ImagesController < ApplicationController
     if @image.feature.nil?
       @face_feature = 'Not extracted.'
     else
-      @face_feature = @image.feature.face
+      #@face_feature = @image.feature.face
+      @face_feature = @image.feature.categ_imagenet
     end
   end
 

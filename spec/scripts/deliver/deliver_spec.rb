@@ -5,7 +5,7 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return  # resqueのjobを実際に実行しないように
   end
 
@@ -97,6 +97,19 @@ describe "Deliver" do
       expect(contains).to eq(true)
     end
   end
+  describe "close_image function" do
+    it "test" do
+      #image = FactoryGirl.create(:image_madoka)
+      #target_image = FactoryGirl.create(:target_image)
+      f_image = FactoryGirl.create(:feature_madoka1)
+      f_target_image = FactoryGirl.create(:feature_madoka)
+      image = Image.find(f_image.featurable_id)
+      target_image = TargetImage.find(f_target_image.featurable_id)
+
+      puts res = Deliver.close_image(image, target_image)
+    end
+  end
+
 
   describe "create_delivered_image function" do
     it "sets all basic image attributes necessary to new delivered_image" do
