@@ -144,4 +144,10 @@ namespace :scrape do
     require "#{Rails.root}/script/scrape/scrape_deviant.rb"
     Scrape::Deviant.scrape()
   end
+
+   desc "Giphyから画像抽出する"
+  task giphy: :environment do
+    require "#{Rails.root}/script/scrape/scrape_giphy.rb"
+    Scrape::Giphy.scrape
+  end
 end
