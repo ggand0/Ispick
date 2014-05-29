@@ -5,6 +5,10 @@ require "#{Rails.root}/script/scrape/scrape_characters"
 include Scrape::Wiki::Character
 
 describe "Scrape::Wiki::Character" do
+  before do
+    IO.any_instance.stub(:puts)
+  end
+
   describe "get_anime_character_name function" do
     it "returns a valid Hash value" do
       url_ja = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7'
@@ -46,7 +50,7 @@ describe "Scrape::Wiki::Character" do
       puts result = Scrape::Wiki::Character.get_character_name_en(
         '魔法少女まどか☆マギカ', html, characters_list)
       #result.each { |n| puts "#{n.count}, #{n}" }
-      expect(result).to be_a(Hash)
+      expect(result).to be_a(Array)
     end
   end
 
