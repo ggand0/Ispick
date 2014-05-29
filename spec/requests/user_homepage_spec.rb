@@ -25,21 +25,12 @@ describe "Default feature" do
       expect(page).to have_content("TODAY's Delivered Images")
       find(:xpath, "//a/img[@alt='Madoka']/..").click
       #save_and_open_page
-      expect(page).to have_content('Title')
+      expect(page).to have_content('Detail')
     end
 
     it "Go to target_images page" do
       click_link '登録イラスト一覧'
       expect(page).to have_content('YOUR Target Images')
-    end
-
-    it "Filter by dates" do
-      click_link 'Dates'
-
-      # 今日の日付のメニューitemをクリック
-      today = Time.now.in_time_zone('Asia/Tokyo').to_date
-      click_link today.strftime("%b %d")
-      expect(page).to have_content("TODAY's Delivered Images")
     end
 
   end

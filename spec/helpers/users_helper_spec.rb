@@ -64,8 +64,8 @@ describe UsersHelper do
         items = helper.get_menu_items
         expect(items).to be_an(Array)
 
-        expect(items.count).to eql(2)
-        expect(items.first[:key]).to eql(:date)
+        expect(items.count).to eql(4)
+        #expect(items.first[:key]).to eql(:date)
         expect(items.second[:key]).to eql(:list)
       end
     end

@@ -21,7 +21,6 @@ describe "Default feature" do
       click_link 'New Target image'
       expect(page).to have_content('New target_image')
 
-      fill_in 'Title', with: 'This is an integration test'
       attach_file 'Data', "#{Rails.root}/spec/files/target_images/madoka0.jpg"
       Resque.stub(:enqueue).and_return
       click_on 'Create Target image'
