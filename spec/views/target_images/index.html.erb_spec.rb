@@ -4,10 +4,10 @@ describe "target_images/index" do
   before(:each) do
     assign(:target_images, Kaminari.paginate_array([
       stub_model(TargetImage,
-        :title => "Title"
+        #:title => "Title"
       ),
       stub_model(TargetImage,
-        :title => "Title"
+        #:title => "Title"
       )
     ]).page(1))
   end

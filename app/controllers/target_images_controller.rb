@@ -13,15 +13,6 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1
   # GET /target_images/1.json
   def show
-    @target_image = TargetImage.find(params[:id])
-    # 顔の特徴量を、JSON文字列からJSON Arrayへ変換する
-    if @target_image.feature.nil?
-      @face_feature = 'Not extracted.'
-    else
-      #@face_feature = JSON.parse(@target_image.feature.face)
-      #@face_feature = @target_image.feature.face
-      @face_feature = @target_image.feature.categ_imagenet
-    end
   end
 
   # GET /target_images/new
@@ -60,7 +51,7 @@ class TargetImagesController < ApplicationController
   # PATCH/PUT /target_images/1.json
   def update
     target = TargetImage.find(params[:id])
-    hash = { title: params[:target_image][:title], data: params[:target_image][:data]}
+    hash = { data: params[:target_image][:data]}
 
     respond_to do |format|
       #if @target_image.update(target_image_params)

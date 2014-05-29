@@ -5,8 +5,10 @@
 <br>
 
 <p>
-  <strong>Face feature:</strong>
-  <%= @face_feature %>
+  <strong>Features:</strong>
+  <%= @target_image.feature.face if not @target_image.feature.nil? %>
+  <br>
+  <%= @target_image.feature.categ_imagenet if not @target_image.feature.nil? %>
 </p>
 <p>
   <strong>Size in bytes:</strong><br>
