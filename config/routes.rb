@@ -28,9 +28,13 @@ Ispic::Application.routes.draw do
       get 'show_target_images'
       get 'show_target_words'
       get 'show_favored_images'
-      get 'download_favored_images'
+
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
+
+      # routes for debug
+      get 'download_favored_images'
+      get 'debug_illust_detection'
     end
   end
 
