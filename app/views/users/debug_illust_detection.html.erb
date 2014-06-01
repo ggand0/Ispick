@@ -1,5 +1,11 @@
 <%= javascript_include_tag 'users_home' %>
 
+<%= link_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', all: true } %>
+/
+<%= link_to 'Favorites順にする', { controller: 'users', action: 'debug_illust_detection', sort: true } %>
+/
+<%= link_to '書き込み度順にする', { controller: 'users', action: 'debug_illust_detection', sort_quality: true }  %>
+
 <p>
   <strong>Delivered images count:</strong>
   <%= current_user.delivered_images.count %>
@@ -14,14 +20,12 @@
       <div class="boxInner">
         <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
-        <%= get_jst_string(image.posted_at) + '投稿' %>
-        <br>
-        <div class="favored">
-          <div class="id"><%= delivered_image.id %></div>
-          <%= raw get_clip_string_styled(delivered_image) %>
-        </div>
-
         <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
+        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
+        <%= get_illust_html image if image %>
+        <%= get_quality_html image if image %>
+        <br>
+        <%= "Favorites: #{image.favorites.to_s}" if image %>
 
         <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>

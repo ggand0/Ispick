@@ -30,16 +30,6 @@ describe UsersController do
       user = User.first
       user.delivered_images << FactoryGirl.create(:delivered_image_photo)
       user.delivered_images << FactoryGirl.create(:delivered_image)
-      #user = FactoryGirl.create(:user_with_delivered_images)
-
-=begin
-      user.delivered_images.each { |n| puts n.image.is_illust }
-      puts Image.count
-      puts DeliveredImage.count
-      puts Image.where(is_illust: true).count
-      puts user.delivered_images.joins(:image).where(images: { is_illust: true }).count
-      #puts controller.current_user.delivered_images.scope().includes(:image).where('images.is_illust=?', true).references(:images).count
-=end
 
       get :show_illusts, {}, valid_session
       expect(assigns(:delivered_images).count).to eq(1)
@@ -105,8 +95,18 @@ describe UsersController do
       # rootにいたと仮定
       request.env['HTTP_REFERER'] = '/'
       get :download_favored_images, {}, valid_session
+
       # redirect_to :backされるはず
       expect(response).to redirect_to '/'
+    end
+  end
+
+  # Debug用
+  describe "GET debug_illust_detection" do
+    it "renders valid template" do
+      login_user
+      get :debug_illust_detection, {}, valid_session
+      response.should render_template('debug_illust_detection')
     end
   end
 end

@@ -33,35 +33,44 @@ module UsersHelper
     '<strong>' + (enabled ? 'on' : 'off') + '</strong>'
   end
   def get_illust_html(image)
-    "Illust: <span>#{image.is_illust.to_s}</span>".html_safe
+    return 'Illust: nil' if image.nil?
+    "Illust: <span><strong>#{image.is_illust.to_s}</strong></span>".html_safe
   end
   def get_quality_html(image)
-    "Quality: <span>#{image.quality.to_s}</span>".html_safe
+    return 'Quality: nil' if image.nil?
+    "Quality: <span><strong>#{image.quality.to_s}</strong></span>".html_safe
   end
 
   # simple-navigation関連
   def get_menu_items
-    #date_menu_items + list_menu_items
-    debug_menu_items + list_menu_items
+    main_menu_items + config_menu_items + debug_menu_items
   end
 
-  def debug_menu_items
+  def main_menu_items
     [
       { key: :image_list, name: 'Users Home', url: home_users_path },
-      { key: :image_list, name: '抽出画像一覧', url: images_path },
-      { key: :target_image_list, name: 'うpされた嗜好画像一覧', url: target_images_path }
+      { key: :list_clip, name: 'クリップイラスト一覧', url: show_favored_images_users_path }
     ]
   end
 
-  # リスト系のmenu
-  def list_menu_items
-    [{ key: :list, name: 'Menu', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
-        { key: :list_word, name: '登録ワード一覧', url: show_target_words_users_path },
-        { key: :list_image, name: '登録イラスト一覧', url: show_target_images_users_path },
-        { key: :list_clip, name: 'クリップイラスト一覧', url: show_favored_images_users_path }
+  def config_menu_items
+    [{ key: :config, name: '好みの設定', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
+        { key: :config_word, name: '登録ワード一覧', url: show_target_words_users_path },
+        { key: :config_image, name: '登録イラスト一覧', url: show_target_images_users_path }
       ]
     }]
   end
+
+  def debug_menu_items
+    [{ key: :list, name: 'DEBUG', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
+        { key: :image_list, name: '抽出画像一覧', url: images_path },
+        { key: :target_image_list, name: 'うpされた嗜好画像一覧', url: target_images_path },
+        { key: :debug_illust_detection, name: 'イラスト判定のデバッグを行う', url: debug_illust_detection_users_path },
+        { key: :top, name: 'トップページ', url: '/' },
+      ]
+    }]
+  end
+
   # 日付系menu
   def get_date_submenu
     # 動的に日付メニューを追加する：oldest delivered_image.created_atからtodayまで

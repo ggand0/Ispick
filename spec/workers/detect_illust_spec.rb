@@ -13,7 +13,7 @@ describe DetectIllust do
       tool_path = CONFIG['illust_detection_path']
       image = Image.create! valid_attributes
 
-      DetectIllust.should_receive(:`).once.with("#{tool_path} #{image.data.path} DetectIllust::QUALITY_SIZE")
+      DetectIllust.should_receive(:`).once.with("#{tool_path} #{image.data.path} #{DetectIllust::QUALITY_SIZE}")
 
       DetectIllust.get_result(tool_path, image)
     end
