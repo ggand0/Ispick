@@ -17,18 +17,13 @@ describe "favored_images page" do
   end
 
   it "Destroy an image" do
-    click_link 'Destroy'
-    #save_and_open_page
+    click_link 'Unclip'
     expect(page.all('.box').count).to eq(0)
   end
 
+  # Debug route
   it "Download all images" do
     click_link 'Download zip'
     expect(page.response_headers['Content-Type']).to eq('application/zip')
-  end
-
-  it "Go back to user home" do
-    click_link 'Back'
-    expect(page).to have_content("TODAY's Delivered Images")
   end
 end
