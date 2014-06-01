@@ -56,7 +56,8 @@ describe TargetImagesController do
         target_image = TargetImage.first
 
         get :show, {id: target_image.to_param}, valid_session
-        assigns(:face_feature).should eq('[{"zero value": 0}]')
+        #assigns(:face_feature).should eq('[{"zero value": 0}]')
+        assigns(:target_image).feature.face.should eq('[{"zero value": 0}]')
       end
     end
     describe "with NOT extracted model" do
@@ -64,7 +65,9 @@ describe TargetImagesController do
         target_image = FactoryGirl.create(:target_image)
 
         get :show, {id: target_image.to_param}, valid_session
-        assigns(:face_feature).should eq('Not extracted.')
+        #assigns(:target_image).feature.face.should eq('Not extracted.')
+        #expect(assigns(:target_image).feature.face).to eq(nil)
+        expect(assigns(:target_image).feature).to eq(nil)
       end
     end
   end
@@ -110,14 +113,14 @@ describe TargetImagesController do
       it "assigns a newly created but unsaved target_image as @target_image" do
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        post :create, { target_image: { title: "invalid value", data: nil }}, valid_session
+        post :create, { target_image: { data: nil }}, valid_session
         assigns(:target_image).should be_a_new(TargetImage)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        post :create, { target_image: { title: "invalid value", data: nil }}, valid_session
+        post :create, { target_image: { data: nil }}, valid_session
         response.should render_template("new")
       end
     end
@@ -126,11 +129,9 @@ describe TargetImagesController do
   describe "PUT update" do
     before :each do
       @updated_attr = {
-        title: "updated",
         data: fixture_file_upload('files/madoka.png')
       }
       @updated = {
-        title: "invalid updated",
         data: fixture_file_upload('files/madoka.png')
       }
     end
@@ -166,7 +167,7 @@ describe TargetImagesController do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value", data: nil }}, valid_session
+        put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
         assigns(:target_image).should eq(target_image)
       end
 
@@ -174,7 +175,7 @@ describe TargetImagesController do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetImage.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_image.to_param, :target_image => { "title" => "invalid value", data: nil }}, valid_session
+        put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
         response.should render_template("edit")
       end
     end

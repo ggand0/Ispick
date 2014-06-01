@@ -5,10 +5,11 @@ describe TargetWord do
   describe "after_create callback" do
     it "enqueues a resque job" do
       Resque.stub(:enqueue).and_return
-      TargetWord.stub(:search_keyword).and_return
-      TargetWord.any_instance.should_receive(:search_keyword)
+      Resque.should_receive(:enqueue)
+      #TargetWord.any_instance.stub(:search_keyword).and_return
+      #TargetWord.any_instance.should_receive(:search_keyword)
 
-      FactoryGirl.create(:target_words)
+      FactoryGirl.create(:word_with_run_callback)
     end
   end
 
