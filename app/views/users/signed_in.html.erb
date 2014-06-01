@@ -1,12 +1,5 @@
 <%= javascript_include_tag 'users_home' %>
 
-<h3>TODAY's Delivered Images</h3>
-<%= link_to 'Favorites順にする', { controller: 'users', action: 'home', sort: true } %>
-/
-<%= link_to '書き込み度順にする', { controller: 'users', action: 'home', sort_quality: true }  %>
-/
-<%= link_to 'イラスト判定のデバッグを行う', request.parameters.merge({ sort_quality: true }) %>
-
 <p>
   <strong>Delivered images count:</strong>
   <%= current_user.delivered_images.count %>
@@ -21,16 +14,14 @@
       <div class="boxInner">
         <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
+        <%= get_jst_string(image.posted_at) + '投稿' %>
+        <br>
         <div class="favored">
           <div class="id"><%= delivered_image.id %></div>
           <%= raw get_clip_string_styled(delivered_image) %>
         </div>
 
         <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
-        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
-        <%= get_illust_html image %>
-        <%= get_quality_html image %>
 
         <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
