@@ -3,7 +3,7 @@ require "#{Rails.root}/script/scrape/scrape_2ch"
 
 describe Scrape::Futaba do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
   end
 
