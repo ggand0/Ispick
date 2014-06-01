@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.0.2'
 
-# Use sqlite3 as the database for Active Record
+# Use MySQL2 as the database for Active Record
 gem 'mysql2'
 
 # Use SCSS for stylesheets
@@ -41,17 +41,10 @@ end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
-# Use unicorn as the app server
-# gem 'unicorn'
+# Use puma as the app server
+gem 'puma'
 
-# Use Capistrano for deployment
-# gem 'capistrano', group: :development
-
-# Use debugger
-# gem 'debugger', group: [:development, :test]
-
-# rails consoleを起動するために必要
-gem 'rb-readline', '0.5.0', require: false
+gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
 gem 'pry-rails'                                  # Improve the console
 
 gem 'nokogiri'                                   # For scraping
@@ -82,7 +75,7 @@ gem 'omniauth-twitter'
 
 gem 'less-rails'
 gem 'twitter-bootstrap-rails'
-gem 'puma'
+
 
 group :test do
   gem 'webmock'
@@ -91,9 +84,7 @@ end
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'fakeweb', '~> 1.3'
-
-
+  gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
