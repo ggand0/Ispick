@@ -66,7 +66,8 @@ describe TargetImagesController do
 
         get :show, {id: target_image.to_param}, valid_session
         #assigns(:target_image).feature.face.should eq('Not extracted.')
-        expect(assigns(:target_image).feature.face) eq(nil)
+        #expect(assigns(:target_image).feature.face).to eq(nil)
+        expect(assigns(:target_image).feature).to eq(nil)
       end
     end
   end
