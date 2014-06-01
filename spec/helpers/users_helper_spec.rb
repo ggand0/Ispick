@@ -46,8 +46,7 @@ describe UsersHelper do
     it "returns valid html" do
       delivered_image = FactoryGirl.create(:delivered_image)
       result = helper.get_illust_html(delivered_image.image)
-      #expect(result).to eql('Illust: <span style="color:#3598FF">true</span>')
-      expect(result).to eql('Illust: <span>true</span>')
+      expect(result).to eql('Illust: <span><strong>true</strong></span>')
     end
   end
 
@@ -65,8 +64,7 @@ describe UsersHelper do
         expect(items).to be_an(Array)
 
         expect(items.count).to eql(4)
-        #expect(items.first[:key]).to eql(:date)
-        expect(items.second[:key]).to eql(:list)
+        expect(items.second[:key]).to eql(:list_clip)
       end
     end
 
@@ -98,13 +96,13 @@ describe UsersHelper do
       end
     end
 
-    describe "list_menu_items method" do
+    describe "config_menu_items method" do
       it "returns an array contains valid items" do
-        items = helper.list_menu_items
+        items = helper.config_menu_items
 
         expect(items).to be_an(Array)
         expect(items.count).to eql(1)
-        expect(items.first[:key]).to eql(:list)
+        expect(items.first[:key]).to eql(:config)
       end
     end
   end

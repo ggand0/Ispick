@@ -1,7 +1,5 @@
 <div class='logo'>
   <%= link_to image_tag(asset_path('test_logo.png')), home_users_path, class: 'logo' %>
 </div>
-<%# link_to('User Home', { controller: 'users', action: 'home' }) %>
-<%# link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
-<%# link_to('うpされた嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
+
 <%= render_navigation expand_all: true, renderer: :bootstrap, items: get_menu_items %>
