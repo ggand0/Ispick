@@ -8,7 +8,14 @@ gem 'mysql2'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
-#gem 'sass-rails', '~> 3.2.3', :git => 'https://github.com/rails/sass-rails.git'
+
+# View related gems
+gem 'bootstrap-sass'
+gem 'bootstrap-datepicker-rails'
+gem 'kaminari'
+gem 'jquery-fileupload-rails'                    # Upload multiple files
+gem 'simple-navigation'
+gem 'simple-navigation-bootstrap'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -44,9 +51,16 @@ end
 # Use puma as the app server
 gem 'puma'
 
+# Console
 gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
 gem 'pry-rails'                                  # Improve the console
 
+# OAuth
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-twitter'
+
+# System
 gem 'nokogiri'                                   # For scraping
 gem 'mechanize'
 gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
@@ -54,14 +68,10 @@ gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'whenever', require: false                   # Support crontab
-
-gem 'kaminari'
-gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'rubyzip'
 gem 'ransack'
-gem 'simple-navigation'
-gem 'simple-navigation-bootstrap'
 
+# API clients
 gem 'natto'
 gem 'x2ch'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
@@ -69,22 +79,11 @@ gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
 gem 'giphy'
 
-gem 'devise'
-gem 'omniauth'
-gem 'omniauth-twitter'
-
-gem 'less-rails'
-gem 'twitter-bootstrap-rails'
-
-
-group :test do
-  gem 'webmock'
-end
-
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
   gem 'fakeweb', '~> 1.3'                           # Mock urls
+  gem 'webmock'
   gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
@@ -95,10 +94,8 @@ group :development, :test do
   gem 'guard-teaspoon'
   #gem 'rb-fsevent', require: false                 # Used by guard and spring
 
-  gem 'teaspoon'                                    # JS test runner
-  gem 'phantomjs', '>= 1.8.1.1'
-  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
 
+  # Rails testing
   gem 'rspec-rails', '>= 2.6.0'                     # Testing framework
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
@@ -106,8 +103,14 @@ group :development, :test do
   gem 'fuubar'                                      # テスト進行状況可視化
   gem 'rake_shared_context'                         # Enable rake task testing
   gem 'capybara'
-  gem 'launchy'
+  gem 'launchy'                                     # save_and_open_page
 
+  # JS testing
+  gem 'teaspoon'                                    # JS test runner
+  gem 'phantomjs', '>= 1.8.1.1'
+  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
+
+  # Deploy
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-rails'
   gem 'capistrano-rbenv', '~> 2.0'
