@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
-    t.integer  "user_id"
+    t.integer  "board_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"

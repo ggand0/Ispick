@@ -1,12 +1,9 @@
 class User < ActiveRecord::Base
   has_many :delivered_images
   has_many :target_images
-  has_many :favored_images
+  has_many :image_boards
   has_many :target_words
 
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  #devise :trackable, :omniauthable, :omniauth_providers => [:facebook, :twitter]
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
 
