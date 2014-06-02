@@ -3,5 +3,6 @@ class FavoredImage < ActiveRecord::Base
   has_one :delivered_image
   has_attached_file :data
 
-  validates :src_url, uniqueness: { scope: :user_id }
+  #validates :src_url, uniqueness: { scope: :user_id }
+  validates :src_url, uniqueness: { scope: :image_board_id }
 end
