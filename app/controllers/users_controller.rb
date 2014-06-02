@@ -72,8 +72,7 @@ class UsersController < ApplicationController
 
   def show_favored_images
     if signed_in?
-      # favored_imagesを表示するようにする
-      @images = current_user.favored_images.page(params[:page]).per(25)
+      @favored_images = current_user.image_boards.first.favored_images.page(params[:page]).per(25)
       render action: 'show_favored_images'
     else
       render action: 'not_signed_in'
