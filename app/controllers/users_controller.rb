@@ -120,8 +120,8 @@ class UsersController < ApplicationController
       end
 
       # イラスト判定リクエストがある場合：
-      delivered_images = delivered_images.includes(:image).
-        where(images: { is_illust: true }).references(:images) if params[:illust]
+      @debug = params[:illust]
+      delivered_images = filter_illust(delivered_images, params[:illust]) if params[:illust]
 
       # ソートリクエストがある場合：
       delivered_images = sort_delivered_images delivered_images if session[:sort] == 'favorites'
@@ -144,6 +144,7 @@ class UsersController < ApplicationController
     when 'photo'
       return delivered_images.includes(:image).
         where(images: { is_illust: false }).references(:images)
+    end
   end
 
 end

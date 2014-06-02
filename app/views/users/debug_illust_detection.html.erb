@@ -1,15 +1,23 @@
+<%= debug @debug %>
 <%= javascript_include_tag 'users_home' %>
+<%= javascript_include_tag 'debug_illust_detection' %>
 
-<%= link_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', all: true } %>
-/
-<%= link_to 'Favorites順にする', { controller: 'users', action: 'debug_illust_detection', sort: true } %>
-/
-<%= link_to '書き込み度順にする', { controller: 'users', action: 'debug_illust_detection', sort_quality: true }  %>
+<%= button_group do %>
+  <%= bs_button_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', toggle_site: true } %>
+  <%= bs_button_to 'Favorites順にする', { controller: 'users', action: 'debug_illust_detection', sort: 'favorites' } %>
+  <%= bs_button_to '書き込み度順にする', { controller: 'users', action: 'debug_illust_detection', sort: 'quality' } %>
+<% end %>
+<%= bs_dropdown_button_to '判定結果で絞り込む' do %>
+  <li><%= link_to '全て', { controller: 'users', action: 'debug_illust_detection', illust: 'all' } %></li>
+  <li><%= link_to 'イラストのみ', { controller: 'users', action: 'debug_illust_detection', illust: 'illust' } %></li>
+  <li><%= link_to '実写のみ', { controller: 'users', action: 'debug_illust_detection', illust: 'photo' } %></li>
+<% end %>
 
 <p>
   <strong>Delivered images count:</strong>
   <%= current_user.delivered_images.count %>
 </p>
+
 
 <%= paginate @delivered_images %>
 <div class="wrap">
