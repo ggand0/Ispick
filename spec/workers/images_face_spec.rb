@@ -13,8 +13,11 @@ describe ImageFace do
     it "returns hash of image_net categories" do
       image = Image.create! valid_attributes
       hash = ImageFace.get_categories image
+
       expect(hash).to be_a(Hash)
-      expect(hash['butcher shop']).to eq(0.141260)
+      #expect(hash['butcher shop']).to eq(0.141260)
+      expect(hash.keys.count).to eq(4096)
+      expect(hash.values.count).to eq(4096)
     end
   end
 

@@ -5,7 +5,7 @@ class ImageFace
   # @param [Image/TargetImage] A record of TargetImage model which has already saved.
   # @return [Hash] ImageNet categories included.
   def self.get_categories(image)
-    tool_path = "#{Rails.root}/lib/deep_belief"
+    tool_path = "#{Rails.root}/lib/deep_belief_-2"
     network_path = "#{Rails.root}/lib/jetpac.ntwk"
     result = %x(#{tool_path} #{image.data.path} #{network_path})
 
@@ -14,6 +14,13 @@ class ImageFace
       tmp = line.split(',')
       hash[tmp[1]] = tmp[0].to_f
     end
+
+    # 距離計算を速くするために、ラベルが無いkeyに0を設定
+    (0..4095).each do |key|
+      hash[key.to_s] = 0 if not hash.has_key?(key.to_s)
+    end
+    hash.delete(nil)
+
     hash
   end
 
