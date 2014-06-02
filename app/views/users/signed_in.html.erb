@@ -1,15 +1,27 @@
 <%= javascript_include_tag 'users_home' %>
 
 <p>
-  <strong>Delivered images count:</strong>
-  <%= current_user.delivered_images.count %>
+  <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe %>
+  <br>
+  <br><br>
+  配信日で絞り込む：
+  <div class="input-group date" style="width: 200px;" align="right">
+    <%# text_field_tag 'date', '', 'data-behaviour'=>'datepicker' %>
+    <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+  </div>
 </p>
 
+
+
+
 <%= paginate @delivered_images %>
+
 <div class="wrap">
+
   <% @delivered_images.each do |delivered_image| %>
     <% image = delivered_image.image %>
     <% next if delivered_image.avoided %>
+
     <div class="box">
       <div class="boxInner">
         <%= get_jst_string(delivered_image.created_at) + '配信' %>

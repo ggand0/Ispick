@@ -7,15 +7,15 @@ class UsersController < ApplicationController
       delivered_images = current_user.delivered_images.where.not(images: { site_name: 'twitter' }).
         joins(:image).order('images.posted_at')
 
-      # イラスト判定リクエストがある場合：
-      delivered_images = delivered_images.includes(:image).
-        where(images: { is_illust: true }).references(:images) if params[:illust]
-
-      # ソートリクエストがある場合：
-      delivered_images = sort_delivered_images delivered_images if params[:sort]
-      delivered_images = sort_by_quality delivered_images if params[:sort_quality]
+      # 配信日で絞り込む場合
+      if params[:date]
+        date = params[:date]
+        date = DateTime.parse(date).to_date
+        delivered_images = delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+      end
 
       @delivered_images = delivered_images.page(params[:page]).per(25)
+      @delivered_images_all = delivered_images
       render action: 'signed_in'
     else
       render action: 'not_signed_in'
@@ -108,8 +108,8 @@ class UsersController < ApplicationController
   # デバッグ用
   def debug_illust_detection
     if signed_in?
-      session[:all] ||= false
-      session[:all] = (not session[:all]) if params[:all]
+      session[:all] = (not session[:all]) if params[:toggle_site]
+      session[:sort] = params[:sort]
 
       if session[:all]
         delivered_images = current_user.delivered_images.
@@ -124,13 +124,26 @@ class UsersController < ApplicationController
         where(images: { is_illust: true }).references(:images) if params[:illust]
 
       # ソートリクエストがある場合：
-      delivered_images = sort_delivered_images delivered_images if params[:sort]
-      delivered_images = sort_by_quality delivered_images if params[:sort_quality]
+      delivered_images = sort_delivered_images delivered_images if session[:sort] == 'favorites'
+      delivered_images = sort_by_quality delivered_images if session[:sort] == 'quality'
 
       @delivered_images = delivered_images.page(params[:page]).per(25)
     else
       render action: 'not_signed_in'
     end
+  end
+
+  private
+  def filter_illust(delivered_images, filter)
+    case filter
+    when 'all'
+      return delivered_images
+    when 'illust'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: true }).references(:images)
+    when 'photo'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: false }).references(:images)
   end
 
 end
