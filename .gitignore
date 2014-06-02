@@ -34,6 +34,7 @@ capybara-*.html
 .rvmrc
 /.bundle
 /vendor/bundle
+/vendor/bundler
 /log/*
 /tmp/*
 /db/*.sqlite3
