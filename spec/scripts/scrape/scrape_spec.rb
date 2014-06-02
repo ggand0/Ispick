@@ -5,33 +5,16 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
   end
 
   describe "scrape_all method" do
     it "runs all scraping script" do
-      Scrape::Nico.stub(:scrape).and_return()
-      Scrape::Piapro.stub(:scrape).and_return()
-      #Scrape::Pixiv.stub(:scrape).and_return()
-      Scrape::Deviant.stub(:scrape).and_return()
-      Scrape::Futaba.stub(:scrape).and_return()
-      Scrape::Nichan.stub(:scrape).and_return()
-      Scrape::Fourchan.stub(:scrape).and_return()
-      Scrape::Twitter.stub(:scrape).and_return()
-      Scrape::Tumblr.stub(:scrape).and_return()
+      FactoryGirl.create(:target_word)
+      Scrape.stub(:scrape_keyword).and_return
+      Scrape.should_receive(:scrape_keyword).exactly(1).times
 
-      Scrape::Nico.should_receive(:scrape)
-      #Scrape::Piapro.should_receive(:scrape)
-      #Scrape::Pixiv.should_receive(:scrape)
-      #Scrape::Deviant.should_receive(:scrape)
-      #Scrape::Futaba.should_receive(:scrape)
-      #Scrape::Nichan.should_receive(:scrape)
-      #Scrape::Fourchan.should_receive(:scrape)
-      Scrape::Twitter.should_receive(:scrape)
-      Scrape::Tumblr.should_receive(:scrape)
-
-      Scrape.scrape_all()
+      Scrape.scrape_all
     end
   end
 

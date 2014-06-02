@@ -45,11 +45,18 @@ namespace :scrape do
   end
 
   desc "画像を対象webサイト全てから抽出する"
-  task images: :environment do
+  task all: :environment do
     # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
     require "#{Rails.root}/script/scrape/scrape"
-    Scrape.scrape_all()
+    Scrape.scrape_all
+  end
+  desc "画像を対象webサイト全てから抽出する"
+  task users: :environment do
+    # 対象サイトから画像抽出
+    puts 'Scraping images from target websites...'
+    require "#{Rails.root}/script/scrape/scrape"
+    Scrape.scrape_users
   end
 
   desc "タグ検索による抽出を行う"
