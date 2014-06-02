@@ -1,29 +1,35 @@
 #-*- coding: utf-8 -*-
+require 'matrix'
 require "#{Rails.root}/app/services/target_images_service"
+
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 module Deliver
-  # 1ユーザーが持つ1タグあたりの配信イラストの数
-  MAX_DELIVER_NUM = 100
-  # 配信画像の最大容量[MB]
-  MAX_DELIVER_SIZE = 200
-  # attachmentが無いレコードに割り当てられる画像url（画像ファイルの有無判定に使用）
-  MISSING_URL = '/data/original/missing.png'
+  require "#{Rails.root}/script/deliver/deliver_images"
+  require "#{Rails.root}/script/deliver/deliver_words"
 
+
+  MAX_DELIVER_NUM = 100                         # 1ユーザーが持つ1タグあたりの配信イラストの数
+  MAX_DELIVER_SIZE = 200                        # 配信画像の最大容量[MB]
+  MISSING_URL = '/data/original/missing.png'    # attachmentが無いレコードに割り当てられる画像url（画像ファイルの有無判定に使用）
+
+
+  # 全ての登録タグ/登録画像に対してImagesテーブル内のマッチした画像を配信する
+  # @param [Integer] 配信対象のUserオブジェクト
   def self.deliver(user_id)
     user = User.find(user_id)
 
     user.target_words.each do |t|
-      Deliver.deliver_from_word(user, t, true) if t.enabled
+      Deliver::Words.deliver_from_word(user, t, true) if t.enabled
     end
     user.target_images.each do |t|
-      Deliver.deliver_from_image(user, t) if t.enabled
+      Deliver::Images.deliver_from_image(user, t) if t.enabled
     end
 
     # １ユーザーの最大容量を超えていたら古い順に削除
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
+    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
 
   # @param [Integer] 配信するUserレコードのID
@@ -38,56 +44,10 @@ module Deliver
   end
 
 
-  # 登録イラストから配信する
-  # @param [User] 配信するUserレコードのインスタンス
-  # @param [TargetImage] 保存済みのTargetImageレコード
-  def self.deliver_from_image(user, target_image)
-    puts 'Delivering from a target_image...'
-    # 推薦イラストを取得
-    #service = TargetImagesService.new
-    #result = service.get_preferred_images(target_image)
-    #images = result[:images]
-    images = Image.joins(:feature).
-      where.not(features: { categ_imagenet: nil }).
-      where.not(features: { categ_imagenet: '{}' }).
-      includes(:feature)
-
-    # 類似度が一定値以上であるimageがあれば残す
-    # 類似度が遠いimageをnilに置き換えた後全て削除
-    images = images.map do |image|
-      self.close_image(image, target_image) ? image : nil
-    end
-    images.compact!
-    puts 'Matched images: ' + images.count.to_s
-
-    #images = images.map{ |image| image[:image] }    # Hashのarrayではなく単純なImageのarrayにする
-    images = self.limit_images(user, images)        # 配信画像を制限する
-    self.deliver_images(user, images, target_image, true) # User.delivered_imagesへ追加
-    target_image.last_delivered_at = DateTime.now   # 最終配信日時を記録
-  end
-
-  # 登録タグから配信する
-  def self.deliver_from_word(user, target_word, is_periodic)
-    images = self.get_images(is_periodic)
-    puts 'Processing: ' + images.count.to_s
-
-    # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
-    images = images.map do |image|
-      self.contains_word(image, target_word) ? image : nil
-    end
-    images.compact!
-    puts 'Matches: ' + images.count.to_s
-
-    images = self.limit_images(user, images)                      # 配信画像を制限する
-    self.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
-    target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
-  end
-
   # 文字情報が存在するImageレコードを検索して返す
   # @param [Boolean] 定時配信で呼ばれたのかどうか
   # @return [ActiveRecord_Relation_Image]
   def self.get_images(is_periodic)
-    puts Image.count
     if is_periodic
       # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
       #images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
@@ -102,37 +62,7 @@ module Deliver
     images
   end
 
-  # 特定のImageオブジェクトがtarget_wordにマッチするか判定する
-  def self.contains_word(image, target_word)
-    word = target_word.person ? target_word.person.name : target_word.word
-    word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
 
-    # まず、Imageに紐づけられているTagがマッチするかどうかチェック
-    image.tags.each do |tag|
-      return true if tag.name.include?(word)
-      return true if word_en and tag.name.include?(word_en)
-    end
-
-    # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
-    return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
-    return true if word_en and (image.title and image.title.include?(word_en) or image.caption and image.caption.include?(word_en))
-  end
-  def self.close_image(image, target_image)
-    hash1 = JSON.parse(image.feature.categ_imagenet)
-    hash2 = JSON.parse(target_image.feature.categ_imagenet)
-    keys1 = hash1.keys
-    keys2 = hash2.keys
-
-    # 共通するkeyを抽出する
-    common = (keys1 & keys2)
-
-    # keyから類似度を計算
-    similarity = 0
-    common.each do |key|
-      similarity += [hash1[key], hash2[key]].min
-    end
-    similarity > 0.2
-  end
 
   # @param [Image]
   # @return [DeliveredImage]
@@ -143,8 +73,8 @@ module Deliver
   end
 
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
-  # @param [User]
-  #
+  # @param [User] 配信対象のUserオブジェクト
+  # @param [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
   # @param [TargetWord/TargetImage]
   # @param [Boolean] 定時配信かどうか
   def self.deliver_images(user, images, target, is_periodic)
@@ -152,8 +82,20 @@ module Deliver
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
       next if is_periodic and image.data.url == MISSING_URL
 
+      # imagesでマッチしているが既に配信済みの場合は、
+      # target.delivered_imagesにだけ追加
+      delivered = false
+      user.delivered_images.each do |d|
+        if d.image and d.image.src_url == image.src_url
+          target.delivered_images << d
+          target.delivered_images.uniq!
+          delivered = true
+          break
+        end
+      end
+      next if delivered
+
       # DeliveredImageのインスタンス生成
-      #delivered_image = self.create_delivered_image(image)
       delivered_image = DeliveredImage.new
 
       # DB保存後にuser.delivered_imagesに追加して配信する
@@ -163,8 +105,8 @@ module Deliver
         user.save
       end
 
-      puts '- Creating delivered_images:' + count.to_s + ' / ' +
-        images.count.to_s if count % 10 == 0
+      puts "- Creating delivered_images: #{count.to_s} /
+        #{images.count.to_s}" if count % 10 == 0
     end
   end
 
@@ -173,10 +115,11 @@ module Deliver
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
   def self.limit_images(user, images)
-    # 既に配信済みの画像を除去
+
     # nilの画像もついでに除去
     images.reject! do |x|
-      user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
+      #user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
+      user.delivered_images.any?{ |d| d.image.nil? }
     end
 
     # 最大配信数に絞る（推薦度の高い順に残す）
@@ -185,7 +128,7 @@ module Deliver
       images = images.take MAX_DELIVER_NUM
     end
 
-    puts 'Final matched images: ' + images.count.to_s
+    puts "Matched: #{images.count.to_s} images"
     images
   end
 
@@ -208,7 +151,8 @@ module Deliver
     end
 
     # 古い順(created_atのASC)にdelete_count分削除
-    puts 'Deleting excessed images: ' + delete_count.to_s
+    # Callbacksを呼びたいのでdestroyを使う
+    puts "Deleting excessed images: #{delete_count.to_s}"
     delivered_images = delivered_images.reorder('created_at ASC').limit(delete_count)
     delivered_images.destroy_all
     delivered_images

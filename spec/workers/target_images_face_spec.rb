@@ -6,7 +6,7 @@ describe TargetFace do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "get_categories function" do
@@ -14,9 +14,10 @@ describe TargetFace do
       target_image = TargetImage.create! valid_attributes
       hash = TargetFace.get_categories target_image
 
-      puts hash.to_json
       expect(hash).to be_a(Hash)
-      expect(hash['butcher shop']).to eq(0.141260)
+      #expect(hash['butcher shop']).to eq(0.141260)
+      expect(hash.keys.count).to eq(4096)
+      expect(hash.values.count).to eq(4096)
     end
   end
 

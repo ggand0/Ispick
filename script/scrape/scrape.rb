@@ -14,15 +14,18 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_giphy"
 
   # 対象webサイト全てから画像抽出を行う。
-  def self.scrape_all()
-    Scrape::Nico.scrape()
-    #Scrape::Piapro.scrape()
-    #Scrape::Deviant.scrape()
-    #Scrape::Futaba.scrape()
-    #Scrape::Nichan.scrape()
-    #Scrape::Fourchan.scrape()
-    Scrape::Twitter.scrape()
-    Scrape::Tumblr.scrape()
+  def self.scrape_all
+    TargetWord.all.each do |target_word|
+      self.scrape_keyword target_word
+    end
+    puts 'DONE!!'
+  end
+  def self.scrape_users
+    User.all.each do |user|
+      user.target_words.each do |target_word|
+        self.scrape_keyword target_word if target_word.enabled
+      end
+    end
     puts 'DONE!!'
   end
 
@@ -33,7 +36,7 @@ module Scrape
     Scrape::Tumblr.scrape_keyword(query)
 
     # 英名が存在する場合はさらに検索
-    puts "name_english:#{ target_word.person.name_english}"
+    puts "name_english:#{target_word.person.name_english}" if target_word.person and target_word.person.name_english
     #if target_word.person.name_english
     if target_word.person and not target_word.person.name_english.empty?
       query = target_word.person.name_english

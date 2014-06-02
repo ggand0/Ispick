@@ -5,8 +5,7 @@ describe "scrape:reset" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -58,7 +57,7 @@ describe "scrape:delete_excess" do
 end
 
 # Scraping tasks
-describe "scrape:images" do
+describe "scrape:all" do
   before do
     IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return

@@ -98,9 +98,7 @@ describe "Deliver" do
     end
   end
   describe "close_image function" do
-    it "test" do
-      #image = FactoryGirl.create(:image_madoka)
-      #target_image = FactoryGirl.create(:target_image)
+    it "returns images that have almost equal featuress" do
       f_image = FactoryGirl.create(:feature_madoka1)
       f_target_image = FactoryGirl.create(:feature_madoka)
       image = Image.find(f_image.featurable_id)
@@ -133,14 +131,6 @@ describe "Deliver" do
   end
 
   describe "limit_images function" do
-    it "rejects an image when it already exists" do
-      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
-      images = [ FactoryGirl.create(:image_for_delivered_image) ]
-
-      images = Deliver.limit_images(user, images)
-      expect(images.count).to eq(0)
-    end
-
     it "limits images when its count excess max num" do
       stub_const('Deliver::MAX_DELIVER_NUM', 1)
       images = FactoryGirl.create_list(:image, 3)
@@ -169,6 +159,16 @@ describe "Deliver" do
       # missing画像は全てskipされるはずである
       Deliver.deliver_images(user, images, target_word, true)
       expect(user.delivered_images.count).to eq(0)
+    end
+
+    # 配信済みの場合target.delivered_imagesに追加されている事
+    it "adds to target.delivered_images when it has already delivered" do
+      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
+      target_word = TargetWord.first
+      images = [ FactoryGirl.create(:image_for_delivered_image) ]
+
+      images = Deliver.deliver_images(user, images, target_word, true)
+      expect(target_word.delivered_images.count).to eq(1)
     end
   end
 
