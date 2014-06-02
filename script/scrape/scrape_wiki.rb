@@ -12,13 +12,11 @@ module Scrape::Wiki
   # 日本版Wikipedia URL
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
 
-  # 関数定義
-  # スクレイピングを行う
   def self.scrape
     puts 'Extracting : ' + ROOT_URL
 
     # 起点となるWikipediaカテゴリページのURL
-    # URLはハードコードされているので、修正が必要
+    # アニメタイトル一覧ページの配列：
     url = [
       'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       'http://ja.wikipedia.org/wiki/Category:2010%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
@@ -29,20 +27,23 @@ module Scrape::Wiki
 
     # 各URLについて情報を取得
     url.each do |value|
-      # アニメの概要ページの配列を取得
+      # アニメの概要ページのURL/タイトルのHashを取得
       anime_page = self.get_anime_page(value)
 
-      # 登場人物の一覧ページの配列
+      # 登場人物の一覧ページの配列を取得、
       # 一覧ページが無い場合は概要ページを配列に追加
       anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page)
 
       # キャラクタ名の一覧配列を取得
       anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page)
 
-      #self.hash_output(anime_character)  # テスト用
       # キャラクタ名をDBヘ保存
+      #self.hash_output(anime_character)
       self.save_to_database(anime_character)
     end
+
+    animxxxx = Touhou.getxxxx
+    self.save_to_database(animxxxx)
 
   end
 
@@ -54,29 +55,12 @@ module Scrape::Wiki
     anime_page = {}
     html = self.open_html url
 
-    # アニメ名:アニメのページURLのハッシュを取得
-    # カテゴリに分かれたページのURLを取得
-    html.css('a').each do |item|
-      # =~は文字列と正規表現を比較する演算子、マッチしてたらtrueを返す
-      if /Category/ =~ item['class']  or /CategoryTreeLabel/ =~ item['class']
-        category_url = "http://ja.wikipedia.org%s" % [item['href']]
-        #anime_page[item.inner_text] = self.get_category_anime_page(item.inner_text, category_url)
-        page_url_ja = self.get_category_anime_page(item.inner_text, category_url)
-        page_url_en = self.get_english_anime_page page_url_ja
-
-        # keyがitem.inner_text、valueが{ ja:.., en:..}であるペアをHashに追加
-        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
-      end
-    end
-
     # ページ一覧からアニメURLを取得
+    # html.css("div[id='mw-pages']").css('a').each { |item| puts item.content }
     html.css('li > a').each do |item|
-      if /アカウント/ =~ item.inner_text
-        break
-      end
-      if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
-        next
-      end
+      break if /アカウント/ =~ item.inner_text
+      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
+
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         puts page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
         page_url_en = self.get_english_anime_page page_url_ja
@@ -85,9 +69,8 @@ module Scrape::Wiki
     end
 
     html.css('span > a').each do |item|
-      if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
-        next
-      end
+      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
+
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
         page_url_en = self.get_english_anime_page page_url_ja
@@ -95,7 +78,7 @@ module Scrape::Wiki
       end
     end
 
-    anime_page  # Hash
+    anime_page
   end
 
 
@@ -117,27 +100,6 @@ module Scrape::Wiki
     end
   end
 
-
-  # カテゴリページ内からアニメのページURLを取得する
-  # @param anime_title : String アニメのタイトル
-  # @param category_url : String カテゴリページのURL
-  def self.get_category_anime_page(anime_title, category_url)
-    anime_page_url = ''
-    return if category_url.empty?
-
-    # カテゴリページの取得
-    html = self.open_html category_url
-
-    # aタグの取得
-    html.css('a').each do |item|
-      if anime_title == item.inner_text
-        anime_page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        break
-      end
-    end
-
-    anime_page_url  # String
-  end
 
   # HTMLページを開いてNokogiriのHTMLオブジェクトを返す。
   # 例外が発生した場合はnilを返す

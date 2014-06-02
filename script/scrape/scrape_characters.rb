@@ -4,20 +4,27 @@ require 'open-uri'
 require 'natto'
 
 module Scrape::Wiki::Character
+  # 英語の概要ページから、登場人物一覧ページを取得する
+  # @param [String] アニメのタイトル
+  # @param [String] 概要ページのURL
+  # @param [Nokogiri::HTML] 概要ページを開いて生成したHTMLオブジェクト
+  # @return [Hash] アニメタイトルをkey、人物一覧ページをvalueとするHash
   def self.get_character_page_en(anime_title, url, html)
-    # aタグの取得
     html.css('a').each do |item|
+      # 'List of xxx characters'というテキストを持つaタグから判断する
       if /(characters|Characters)/ =~ item.inner_text
         if /(List of |list of )(.*)( characters| Characters)/ =~ item.inner_text
-          match_string = $2
-          match_string.gsub!(/\(.*/, '')
-          character_page_url = "http://.wikipedia.org%s" % [item['href']]
+          match_string = $2               # 正規表現内２つ目のグループ、(.*)に相当するマッチした文字列を取得、アニメタイトルに相当
+          match_string.gsub!(/\(.*/, '')  # 整形
+          character_page_url = "http://.wikipedia.org%s" % [item['href']] # 人物一覧ページURL取得
+
           if /#{match_string}/ =~ anime_title
             return { title: match_string, url: character_page_url }
           elsif /#{anime_title}/ =~ match_string
             return { title: anime_title, url: character_page_url }
           end
-          break
+
+          break # Matchしなかった場合
         end
       end
     end
@@ -26,21 +33,26 @@ module Scrape::Wiki::Character
     { title: anime_title, url: url }
   end
 
+  # 日本語の概要ページから、登場人物一覧ページを取得する
+  # @param [String] アニメのタイトル
+  # @param [String] 概要ページのURL
+  # @param [Nokogiri::HTML] 概要ページを開いて生成したHTMLオブジェクト
+  # @return [Hash] アニメタイトルをkey、人物一覧ページをvalueとするHash
   def self.get_character_page_ja(anime_title, url, html)
-    # aタグの取得
     html.css('a').each do |item|
+      # get_character_page_enと同様
       if /(人物|キャラクター)/ =~ item.inner_text
         if /(.*)(の|#)(登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text
           match_string = $1
           match_string.gsub!(/\(.*/, '')
           character_page_url = "http://ja.wikipedia.org%s" % [item['href']]
+
           if /#{match_string}/ =~ anime_title
-            #anime_character_page_url[match_string] = character_page_url
             return { title: match_string, url: character_page_url  }
           elsif /#{anime_title}/ =~ match_string
-            #anime_character_page_url[anime] = character_page_url
             return { title: anime_title, url: character_page_url }
           end
+
           break
         end
       end
@@ -51,42 +63,46 @@ module Scrape::Wiki::Character
   end
 
   # アニメの登場人物ページを取得する
-  # @param page_hash : Hash {アニメタイトル => ページURL}
+  # @param page_hash : Hash { { ja: '日本語概要ページ', en: '英語概要ページ' } => ページURL}
   def self.get_anime_character_page(page_hash)
     puts 'Extracting character pages...'
     anime_character_page_url = {}
 
     # 登場人物・キャラクターページのURLを取得
     page_hash.each do |anime_title, url|
-      next if url[:ja].empty?
+      next if url[:ja].empty?                     # str.empty?はstr=''だったらtrueを返す
 
-      # 日本語タイトルをkeyとする
-      html_ja = Scrape::Wiki.open_html url[:ja]
-      next if html_ja.nil?
+      html_ja = Scrape::Wiki.open_html url[:ja]   # まずは日本語の概要ページを開く
+      next if html_ja.nil?                        # obj.nil?はobj=nilだったらtrueを返す
 
-      page_title = html_ja.css('h1[class="firstHeading"] > span')[0].inner_text
+
+      # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
+      page_title = html_ja.css('h1[class="firstHeading"]').first.content
       anime_title = page_title if /#{page_title}/ =~ anime_title
 
-      page_url_ja = self.get_character_page_ja anime_title, url[:ja], html_ja
+      character_page_url = self.get_character_page_ja(anime_title, url[:ja], html_ja)
 
+      # 英語版の登場人物一覧ページを取得する
       if not url[:en].empty?
-        #puts url[:en]
         html_en = Scrape::Wiki.open_html url[:en]
         page_url_en = self.get_character_page_en anime_title, url[:en], html_en
       else
-        #page_url_en = ''
-        page_url_en = { title: anime_title, url: '' }
+        page_url_en = { title: anime_title, url: '' } # 日本語タイトルをkeyとする
       end
 
+      # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
       anime_character_page_url[anime_title] = { ja: page_url_ja[:url], en: page_url_en[:url] }
       puts anime_character_page_url[anime_title]
     end
 
-    #anime_character_page_url.sort # Hash
+    # 辞書順にHashをソートして返す
     Hash[ anime_character_page_url.sort_by{|k,v| k} ]
   end
 
-
+  # 日本語の登場人物一覧ページから、キャラクタ名の配列を生成する
+  # @param [String] アニメタイトル
+  # @param [Nokogiri::HTML] 人物一覧ページを開いて生成したHTMLオブジェクト
+  # @return [Array] キャラクタ情報のHashを要素とするArray
   def self.get_character_name_ja(anime_title, html)
     name_array = []
 
@@ -140,7 +156,7 @@ module Scrape::Wiki::Character
       end
     end
 
-    # 条件を満たした場合、ハッシュに値を追加
+    # 条件を満たした場合、Arrayに値を追加
     if not anime_title.empty? and not name_array.size == 0
       return name_array
     end
@@ -184,6 +200,11 @@ module Scrape::Wiki::Character
     [ name_array, characters_list ]
   end
 
+  # 英語の登場人物一覧ページから、キャラクタ名の配列を生成する
+  # @param [String] アニメタイトル（日本語）
+  # @param [Nokogiri::HTML] 人物一覧ページを開いて生成したHTMLオブジェクト
+  # @param [Array] キャラクタ情報のHashを要素とするArray（和名）
+  # @return [Array] キャラクタ情報のHashを要素とするArray
   def self.get_character_name_en(anime_title, html, characters_list)
     name_array = []
 
