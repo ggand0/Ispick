@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+require 'matrix'
 require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
@@ -58,7 +59,7 @@ module Deliver
       self.close_image(image, target_image) ? image : nil
     end
     images.compact!
-    puts 'Matched images: ' + images.count.to_s
+    puts 'Got images: ' + images.count.to_s
 
     #images = images.map{ |image| image[:image] }    # Hashのarrayではなく単純なImageのarrayにする
     images = self.limit_images(user, images)        # 配信画像を制限する
@@ -107,7 +108,7 @@ module Deliver
     word = target_word.person ? target_word.person.name : target_word.word
     word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
 
-    # まず、Imageに紐づけられているTagがマッチするかどうかチェック
+    # まず、タグがマッチするかどうかチェック
     image.tags.each do |tag|
       return true if tag.name.include?(word)
       return true if word_en and tag.name.include?(word_en)
@@ -115,23 +116,25 @@ module Deliver
 
     # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
     return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
-    return true if word_en and (image.title and image.title.include?(word_en) or image.caption and image.caption.include?(word_en))
+    return false if word_en.nil?
+    return true if ( !image.title.nil? and image.title.include?(word_en) ) or ( !image.caption.nil? and image.caption.include?(word_en))
+    false
   end
   def self.close_image(image, target_image)
+    start = Time.now
+
     hash1 = JSON.parse(image.feature.categ_imagenet)
     hash2 = JSON.parse(target_image.feature.categ_imagenet)
-    keys1 = hash1.keys
-    keys2 = hash2.keys
 
-    # 共通するkeyを抽出する
-    common = (keys1 & keys2)
+    # 0層の場合：keyから類似度を計算
+    # -2層の場合：vectorのnormを計算して距離を比較する
+    subtracted = hash1.values.zip(hash2.values).map { |x, y| y - x }
+    norm = Vector.elements(subtracted, true).norm
 
-    # keyから類似度を計算
-    similarity = 0
-    common.each do |key|
-      similarity += [hash1[key], hash2[key]].min
-    end
-    similarity > 0.2
+    puts norm.abs
+    puts "Elapsed: #{Time.now - start}"
+
+    norm.abs < 60
   end
 
   # @param [Image]
@@ -152,8 +155,20 @@ module Deliver
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
       next if is_periodic and image.data.url == MISSING_URL
 
+      # imagesでマッチしているが既に配信済みの場合は、
+      # target.delivered_imagesにだけ追加
+      delivered = false
+      user.delivered_images.each do |d|
+        if d.image and d.image.src_url == image.src_url
+          target.delivered_images << d
+          target.delivered_images.uniq!
+          delivered = true
+          break
+        end
+      end
+      next if delivered
+
       # DeliveredImageのインスタンス生成
-      #delivered_image = self.create_delivered_image(image)
       delivered_image = DeliveredImage.new
 
       # DB保存後にuser.delivered_imagesに追加して配信する
@@ -163,8 +178,8 @@ module Deliver
         user.save
       end
 
-      puts '- Creating delivered_images:' + count.to_s + ' / ' +
-        images.count.to_s if count % 10 == 0
+      puts "- Creating delivered_images: #{count.to_s} /
+        #{images.count.to_s}" if count % 10 == 0
     end
   end
 
@@ -173,10 +188,11 @@ module Deliver
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
   def self.limit_images(user, images)
-    # 既に配信済みの画像を除去
+
     # nilの画像もついでに除去
     images.reject! do |x|
-      user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
+      #user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
+      user.delivered_images.any?{ |d| d.image.nil? }
     end
 
     # 最大配信数に絞る（推薦度の高い順に残す）
