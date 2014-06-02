@@ -1,6 +1,5 @@
 <%= debug @debug %>
 <%= javascript_include_tag 'users_home' %>
-<%= javascript_include_tag 'debug_illust_detection' %>
 
 <%= button_group do %>
   <%= bs_button_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', toggle_site: true } %>

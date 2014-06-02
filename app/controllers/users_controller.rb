@@ -105,11 +105,14 @@ class UsersController < ApplicationController
     end
   end
 
-  # デバッグ用
+
+  # デバッグ用page
   def debug_illust_detection
     if signed_in?
       session[:all] = (not session[:all]) if params[:toggle_site]
-      session[:sort] = params[:sort]
+      session[:sort] = params[:sort] if params[:sort]
+      session[:illust] ||= 'all'
+      session[:illust] = params[:illust] if params[:illust]
 
       if session[:all]
         delivered_images = current_user.delivered_images.
@@ -119,11 +122,15 @@ class UsersController < ApplicationController
           joins(:image).order('images.posted_at')
       end
 
-      # イラスト判定リクエストがある場合：
-      @debug = params[:illust]
-      delivered_images = filter_illust(delivered_images, params[:illust]) if params[:illust]
+      # イラスト判定情報で絞り込む
+      @debug = [
+        "filter_illust: #{session[:illust]}",
+        "sort_type: #{session[:sort]}",
+        "filter_site: #{session[:all]}",
+      ]
+      delivered_images = filter_illust(delivered_images)
 
-      # ソートリクエストがある場合：
+      # リクエストがある場合はソート
       delivered_images = sort_delivered_images delivered_images if session[:sort] == 'favorites'
       delivered_images = sort_by_quality delivered_images if session[:sort] == 'quality'
 
@@ -133,9 +140,11 @@ class UsersController < ApplicationController
     end
   end
 
+
   private
-  def filter_illust(delivered_images, filter)
-    case filter
+
+  def filter_illust(delivered_images)
+    case session[:illust]
     when 'all'
       return delivered_images
     when 'illust'
