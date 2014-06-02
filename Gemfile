@@ -12,6 +12,7 @@ gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 # View related gems
 gem 'bootstrap-sass'
 gem 'bootstrap-datepicker-rails'
+gem "rails-bootstrap-helpers"
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
 gem 'simple-navigation'
