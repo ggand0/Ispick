@@ -10,8 +10,14 @@
  *
  *= require_self
  *= require_tree .
+ *= require bootstrap-datepicker3
+ *= require bootstrap_navbar_split_dropdowns
  *
  */
+
+@import "bootstrap";
+
+
 #footer {
   clear:  left;
   bottom: 0;

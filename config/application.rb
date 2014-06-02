@@ -11,10 +11,11 @@ module Ispic
     # http://goo.gl/RPV0p4
     config.i18n.enforce_available_locales = true
 
-    config.autoload_paths += Dir["#{config.root}/lib/"]
-    config.autoload_paths += Dir["#{config.root}/app/services/"]
-    #config.eager_load_paths += ["#{Rails.root}/app/services"]
-    #config.eager_load_paths += ["#{Rails.root}/lib"]
+    config.eager_load_paths += ["#{Rails.root}/app/services"]
+    config.eager_load_paths += ["#{Rails.root}/lib"]
+
+    # for bootsrap-sass
+    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
