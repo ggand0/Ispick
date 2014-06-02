@@ -80,11 +80,14 @@ gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
 gem 'giphy'
 
+group :test do
+  gem 'webmock'                                     # developmentからは外す必要有り
+end
+
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
   gem 'fakeweb', '~> 1.3'                           # Mock urls
-  gem 'webmock'
   gem 'rails-erd'                                   # モデル関連図生成
 
   gem 'spring'
