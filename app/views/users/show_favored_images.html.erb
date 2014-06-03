@@ -1,3 +1,4 @@
+<%= javascript_include_tag 'show_favored_images' %>
 <h1>Clipped Images</h1>
 <br>
 <p>
@@ -11,6 +12,11 @@
 </p>
 <%= link_to 'Download zip(Debug)', controller: 'users', action: 'download_favored_images' %>
 <br>
+<%= bs_dropdown_button_to 'Board選択' do %>
+  <% current_user.image_boards.each do |board| %>
+  <li><%= bs_button_to board.name, { controller: 'users', action: 'show_favored_images', board: board.name } %></li>
+  <% end %>
+<% end %>
 
 <div class="wrap">
   <% @favored_images.each do |image| %>

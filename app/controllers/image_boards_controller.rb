@@ -22,19 +22,14 @@ class ImageBoardsController < ApplicationController
   end
 
   # POST /image_boards
-  # POST /image_boards.json
   def create
-    @image_board = ImageBoard.new(image_board_params)
-
-    respond_to do |format|
-      if @image_board.save
-        format.html { redirect_to @image_board, notice: 'Image board was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @image_board }
-      else
-        format.html { render action: 'new' }
-        format.json { render json: @image_board.errors, status: :unprocessable_entity }
-      end
-    end
+    puts image_board_params
+    puts params
+    #@image_board = ImageBoard.new(image_board_params)
+    #@image_board = ImageBoard.new(name: params['image_board']['name'])
+    @image_board = ImageBoard.new(name: params['name'])
+    @image_board.save!
+    current_user.image_boards << @image_board
   end
 
   # PATCH/PUT /image_boards/1
@@ -69,6 +64,7 @@ class ImageBoardsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def image_board_params
-      params[:image_board]
+      #params[:image_board]
+      params['image_board']
     end
 end

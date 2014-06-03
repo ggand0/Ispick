@@ -61,7 +61,6 @@ class UsersController < ApplicationController
   end
 
   def show_target_words
-    # Test commit
     if signed_in?
       @words = current_user.target_words
       render action: 'show_target_words'
@@ -72,7 +71,15 @@ class UsersController < ApplicationController
 
   def show_favored_images
     if signed_in?
-      @favored_images = current_user.image_boards.first.favored_images.page(params[:page]).per(25)
+      board_name = params[:board]
+
+      if board_name.nil?
+        board = current_user.image_boards.first
+      else
+        board = current_user.image_boards.where(name: board_name).first
+      end
+      @favored_images = board.favored_images.page(params[:page]).per(25)
+
       render action: 'show_favored_images'
     else
       render action: 'not_signed_in'
