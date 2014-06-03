@@ -65,11 +65,14 @@ class DeliveredImagesController < ApplicationController
   # delivered_imageをお気に入り画像として追加する。
   # Ajax callで呼ばれることを想定
   def favor
+    board_name = params[:board]
     @delivered_image.update_attributes!(favored: true) unless @delivered_image.favored
 
-    # src_urlが被ってたらvalidationでfalseが返る
+    # FavoredImageオブジェクト作成
+    # src_urlが重複していた場合はvalidationでfalseが返る
     image = @delivered_image.image
-    favored_image = current_user.image_boards.first.favored_images.build(
+    board = current_user.image_boards.where(name: board_name).first
+    favored_image = board.favored_images.build(
       title: image.title,
       caption: image.caption,
       data: image.data,

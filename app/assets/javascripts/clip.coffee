@@ -2,24 +2,33 @@ window.Clip = {}
 
 Clip.addClipEvents = (do_render) ->
   console.log('Adding events...')
-  $favored = $('.favored')
+  $favored = $('.clip_button')
+
   $favored.click((e) ->
-    id = $(this).children('.id').html()
+    id = $(this).parentsUntil('.boxInner').children('.id').html()
+    board_name = $(this).text()
+    console.log(id)
+    console.log(board_name)
+
     url = '/delivered_images/' + id + '/favor'
-    $target = $(this).children('span')
+    $target = $(this).parentsUntil('.boxInner').children('.dropdown-toggle')
+    console.log($target)
+
     $.ajax({
       url: url,
       type: 'PUT',
-      data: { render: do_render }
+      data: { render: do_render, board: board_name }
       success: (result) ->
-        # css変更
-        is_favored = (result is 'true')
-        color = if is_favored then '#02C293' else '#000'
-        text = if is_favored then 'Clipped' else 'Clip'
-        $target.css('color', color)
-        $target.text(text)
+        # Class変更
+        $target.attr('class', "dropdown-toggle btn-info btn btn-info")
 
         if not do_render
           document.location.reload(true)
     })
+
+    e.preventDefault()
   )
+
+Clip.removeClipEvents = () ->
+  $favored = $('.clip_button')
+  $favored.off('click')
