@@ -1,14 +1,7 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
-  get "image_boards/new"
-  get "image_boards/create"
-  get "image_boards/update"
-  get "image_boards/edit"
-  get "image_boards/destroy"
-  get "image_boards/index"
-  get "image_boards/show"
-  resources :boards
+  resources :image_boards
 
   resources :target_words do
     collection do
