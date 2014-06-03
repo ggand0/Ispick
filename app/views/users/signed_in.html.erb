@@ -30,18 +30,18 @@
         <div class="favored">
           <div class="id"><%= delivered_image.id %></div>
           <%= bs_dropdown_button_to 'Clip', style: delivered_image.favored ? "info" : "" , autoclose: false do %>
-            <li>
+
               <%= bootstrap_form_tag url: { controller: 'image_boards', action: 'create' }, class: 'new_board_form' do |f| %>
                 <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
                 <%= f.button 'New board', class: "new_board btn btn-primary", type: 'button' %>
               <% end %>
-            </li>
+
             <% current_user.image_boards.each do |board| %>
-              <li class="clip_button" ><%= board.name %></li>
+              <li class="clip_button btn btn-default btn-group-justified" ><%= board.name %></li>
             <% end %>
           <% end %>
         </div>
-        <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
+        <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
 
         <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
