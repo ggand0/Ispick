@@ -94,14 +94,14 @@ group :development, :test do
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'guard'
-  gem 'guard-rspec', require: false
+  gem 'guard-rspec', '4.2.0', require: false
   #gem 'guard-coffeescript'
   gem 'guard-teaspoon'
   #gem 'rb-fsevent', require: false                 # Used by guard and spring
 
 
   # Rails testing
-  gem 'rspec-rails', '>= 2.6.0'                     # Testing framework
+  gem 'rspec-rails', '~> 2.99.0'                     # Testing framework
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
