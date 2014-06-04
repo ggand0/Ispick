@@ -34,6 +34,10 @@ every 3.hours do
   rake 'scrape:tumblr'
 end
 
+every 6.hours do
+  rake 'scrape:fchan'
+end
+
 # 配信システム系
 every 30.minutes do
   # 指定枚数を超えたらその分Imagesから削除
@@ -43,7 +47,7 @@ every 30.minutes do
   rake 'deliver:all'
 end
 
-# 少し長めに設定
+# パフォーマンスの関係で凍結中
 every 6.hours do
   # 配信画像の統計情報を更新する
   #rake 'deliver:update'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140505152023) do
+ActiveRecord::Schema.define(version: 20140602154729) do
 
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20140505152023) do
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
-    t.integer  "board_id"
+    t.integer  "image_board_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
@@ -43,6 +43,13 @@ ActiveRecord::Schema.define(version: 20140505152023) do
     t.text     "categ_imagenet"
     t.integer  "featurable_id"
     t.string   "featurable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "image_boards", force: true do |t|
+    t.string   "name"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
