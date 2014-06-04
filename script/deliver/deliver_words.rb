@@ -3,7 +3,7 @@ module Deliver::Words
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
   def self.deliver_from_word(user, target_word, is_periodic)
-    images = self.get_images(is_periodic)
+    images = Deliver.get_images(is_periodic)
     puts "Processing: #{images.count.to_s} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
@@ -13,8 +13,8 @@ module Deliver::Words
     images.compact!
     puts "Matched: #{images.count.to_s} images"
 
-    images = self.limit_images(user, images)                      # 配信画像を制限する
-    self.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
+    images = Deliver.limit_images(user, images)                      # 配信画像を制限する
+    Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
     target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
   end
 

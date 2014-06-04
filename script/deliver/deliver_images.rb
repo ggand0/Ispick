@@ -9,7 +9,7 @@ module Deliver::Images
 
     # 推薦イラストを取得
     puts 'Delivering from a target_image...'
-    images = self.get_images true
+    images = Deliver.get_images true
 
     # 類似度が一定値以上であるimageがあれば残す
     # 類似度が遠いimageをnilに置き換えた後全て削除

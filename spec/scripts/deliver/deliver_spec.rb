@@ -5,7 +5,7 @@ include ApplicationHelper
 
 describe "Deliver" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return  # resqueのjobを実際に実行しないように
   end
 
@@ -14,7 +14,7 @@ describe "Deliver" do
       user = FactoryGirl.create(:user_with_target_words)
       Deliver.stub(:deliver_from_word).and_return
       Deliver.stub(:delete_excessed_records).and_return
-      expect(Deliver).to receive(:deliver_from_word).exactly(user.target_words.count).times
+      expect(Deliver::Words).to receive(:deliver_from_word).exactly(user.target_words.count).times
       expect(Deliver).to receive(:delete_excessed_records).exactly(1).times
 
       Deliver.deliver(user.id)
@@ -39,7 +39,7 @@ describe "Deliver" do
       Deliver.should_receive(:limit_images).exactly(1).times
       Deliver.should_receive(:deliver_images).exactly(1).times
 
-      Deliver.deliver_from_word(1, User.first.target_words.first, true)
+      Deliver::Words.deliver_from_word(1, User.first.target_words.first, true)
     end
   end
 
@@ -64,7 +64,7 @@ describe "Deliver" do
       # 鹿目まどか」なるtarget_word
       target_word = TargetWord.find(person.target_word_id)
 
-      contains = Deliver.contains_word(image, target_word)
+      contains = Deliver::Words.contains_word(image, target_word)
       expect(contains).to eq(true)
     end
     it "returns true if the name_english matches" do
@@ -74,7 +74,7 @@ describe "Deliver" do
       person = FactoryGirl.create(:person_madoka)
       target_word = TargetWord.find(person.target_word_id)
 
-      contains = Deliver.contains_word(image, target_word)
+      contains = Deliver::Words.contains_word(image, target_word)
       expect(contains).to eq(true)
     end
 
@@ -84,7 +84,7 @@ describe "Deliver" do
       person = FactoryGirl.create(:person_madoka)
       target_word = TargetWord.find(person.target_word_id)
 
-      contains = Deliver.contains_word(image, target_word)
+      contains = Deliver::Words.contains_word(image, target_word)
       expect(contains).to eq(false)
     end
 
@@ -93,7 +93,7 @@ describe "Deliver" do
       person = FactoryGirl.create(:person_madoka)
       target_word = TargetWord.find(person.target_word_id)
 
-      contains = Deliver.contains_word(image, target_word)
+      contains = Deliver::Words.contains_word(image, target_word)
       expect(contains).to eq(true)
     end
   end
@@ -104,7 +104,7 @@ describe "Deliver" do
       image = Image.find(f_image.featurable_id)
       target_image = TargetImage.find(f_target_image.featurable_id)
 
-      puts res = Deliver.close_image(image, target_image)
+      puts res = Deliver::Images.close_image(image, target_image, 80)
     end
   end
 
