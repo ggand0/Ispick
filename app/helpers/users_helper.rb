@@ -43,12 +43,19 @@ module UsersHelper
 
   # simple-navigation関連
   def get_menu_items
-    main_menu_items + config_menu_items + debug_menu_items
+    user_menu_items + main_menu_items + config_menu_items + debug_menu_items
   end
 
+  def user_menu_items
+    [ { key: :list, name: 'User', url: '#', options: { container_class: 'nav nav-tabs' }, items: [
+      { key: :avatar, name: 'プロフィール画像を変更', url: '#' },
+      { key: :logout, name: 'ログアウト', url: destroy_user_session_path(protocol: 'https'), method: :delete }
+      ]
+    }]
+  end
   def main_menu_items
     [
-      { key: :image_list, name: 'Users Home', url: home_users_path },
+      { key: :image_list, name: 'Home', url: home_users_path },
       { key: :list_clip, name: 'Boards', url: show_favored_images_users_path },
     ]
   end
