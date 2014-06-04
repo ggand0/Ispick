@@ -1,6 +1,8 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  resources :image_boards
+
   resources :target_words do
     collection do
       match 'search' => 'target_words#search', via: [:get, :post], as: :search

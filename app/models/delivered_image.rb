@@ -15,10 +15,10 @@ class DeliveredImage < ActiveRecord::Base
     },
     use_timestamp: false
 
-  # Imageモデルで一度validateされているはずだが、一応定義
-  #validates_uniqueness_of :src_url
 
+  # URLから画像をDLして、attachmentに設定する
   # 後でmodule化する
+  # @param [String] 画像のソースURL
   def image_from_url(url)
     require 'open-uri'
     self.data = open(url)

@@ -22,35 +22,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def sort_delivered_images(delivered_images)
-    delivered_images = delivered_images.includes(:image).
-      reorder('images.favorites desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
-  end
-  def sort_by_quality(delivered_images)
-    delivered_images = delivered_images.includes(:image).
-      reorder('images.quality desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
-  end
-
-  def show_illusts
-    if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      delivered_images = current_user.delivered_images.
-        includes(:image).
-        where('avoided IS NULL or avoided = false').
-        where('images.is_illust=?', true).
-        references(:images)
-      #delivered_images = current_user.delivered_images.joins(:image).merge(Image.where(is_illust: true))
-
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
-    end
-  end
-
-
   def show_target_images
     if signed_in?
       @target_images = current_user.target_images
@@ -61,7 +32,6 @@ class UsersController < ApplicationController
   end
 
   def show_target_words
-    # Test commit
     if signed_in?
       @words = current_user.target_words
       render action: 'show_target_words'
@@ -72,19 +42,24 @@ class UsersController < ApplicationController
 
   def show_favored_images
     if signed_in?
-      # favored_imagesを表示するようにする
-      @images = current_user.favored_images.page(params[:page]).per(25)
+      board_name = params[:board]
+      if board_name.nil?
+        board = current_user.image_boards.first
+      else
+        board = current_user.image_boards.where(name: board_name).first
+      end
+      @favored_images = board.favored_images.page(params[:page]).per(25)
+
       render action: 'show_favored_images'
     else
       render action: 'not_signed_in'
     end
   end
 
-
   # デバッグ用
   def download_favored_images
     if signed_in?
-      @images = current_user.favored_images
+      @images = current_user.image_boards.first.favored_images
       file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
@@ -154,6 +129,17 @@ class UsersController < ApplicationController
       return delivered_images.includes(:image).
         where(images: { is_illust: false }).references(:images)
     end
+  end
+
+  def sort_delivered_images(delivered_images)
+    delivered_images = delivered_images.includes(:image).
+      reorder('images.favorites desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
+  end
+  def sort_by_quality(delivered_images)
+    delivered_images = delivered_images.includes(:image).
+      reorder('images.quality desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
   end
 
 end

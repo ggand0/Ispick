@@ -80,7 +80,7 @@ module Scrape::Wiki::Character
       page_title = html_ja.css('h1[class="firstHeading"]').first.content
       anime_title = page_title if /#{page_title}/ =~ anime_title
 
-      character_page_url = self.get_character_page_ja(anime_title, url[:ja], html_ja)
+      page_url_ja = self.get_character_page_ja(anime_title, url[:ja], html_ja)
 
       # 英語版の登場人物一覧ページを取得する
       if not url[:en].empty?

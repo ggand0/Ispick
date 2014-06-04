@@ -9,10 +9,15 @@ $ ->
 
   # 無限スクロール
   $('.pagination').hide()
-  $(".wrap").infinitescroll
+  $(".wrap").infinitescroll({
     navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
     nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
     itemSelector: ".box"                        # selector for all items you'll retrieve
+  },
+  (arrayOfNewElems) ->
+    window.Clip.removeClipEvents(true)
+    window.Clip.addClipEvents(true)
+  )
 
   # カレンダー(Datepicker)
   #selector = "[data-behaviour~=datepicker]"
@@ -27,8 +32,27 @@ $ ->
     url = url.split('?')[0]+'?date='+date
     window.location.href = url
   )
-
   $("body").on("click", ".filter-button", () ->
     $(selector).datepicker('show')
   )
+
+  # Dropdowns
+  $('.dropdown-menu').click (e) ->
+    e.stopPropagation()
+
+  # Board追加
+  $('.new_board').on('click', (e) ->
+    input = $(this).parent().children('.form-group').children('.new_board_input')
+    e.preventDefault()
+
+    $.ajax({
+      url: '/image_boards',
+      type: 'post',
+      data: { image_board: { name: input.val() }},
+      success: () ->
+        console.log('success new board')
+      error: () ->
+    })
+  )
+
 

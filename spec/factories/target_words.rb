@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :target_word do
-    word '鹿目 まどか（かなめ まどか）'
+    sequence(:word) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
     enabled true
 
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
@@ -29,6 +29,7 @@ FactoryGirl.define do
       end
       after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     end
+
   end
   factory :target_words, class: TargetWord do
     sequence(:word) { |n| "鹿目 まどか#{n}" }

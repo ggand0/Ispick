@@ -44,16 +44,6 @@ describe "Scrape" do
     end
   end
 
-  describe "get_category_anime_page function" do
-    it "returns a String value" do
-      anime_title = 'けいおん！'
-      category_url = 'http://ja.wikipedia.org/wiki/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93!%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9'
-
-      result = Scrape::Wiki.get_category_anime_page(anime_title, category_url)
-      expect(result).to be_a(String)
-    end
-  end
-
 
   describe "open_html function" do
     let(:url) { 'http://www.google.co.jp/' }

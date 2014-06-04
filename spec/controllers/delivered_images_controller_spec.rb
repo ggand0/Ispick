@@ -162,22 +162,26 @@ describe DeliveredImagesController do
       login_user
     end
     it "Add delivered_image to User.favored_images" do
-      delivered_image = FactoryGirl.create(:delivered_image_unfavored)
+      delivered_image = FactoryGirl.create(:delivered_image)
+      current_user = User.first
+
       put :favor, {
         id: delivered_image.id,
-        delivered_image: FactoryGirl.attributes_for(:delivered_image_unfavored),
+        board: 'Default',
+        delivered_image: delivered_image.as_json,
         render: 'true'
       }, valid_session
 
-      expect(User.first.favored_images.count).to eq(1)
+      # ImageBoardはデフォルトで１枚持っているので、追加されているはず
+      expect(current_user.image_boards.first.favored_images.count).to eq(2)
       expect(response.body).to eq('true')
     end
 
     it "return true if it's already favored" do
-      #delivered_image = FactoryGirl.create(:delivered_image_favored_light)
       favored_image = FactoryGirl.create(:favored_image_with_delivered)
       put :favor, {
         id: favored_image.delivered_image.id,
+        board: 'Default',
         delivered_image: favored_image.delivered_image,
         render: 'true'
       }, valid_session

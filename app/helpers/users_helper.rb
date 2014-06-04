@@ -49,7 +49,7 @@ module UsersHelper
   def main_menu_items
     [
       { key: :image_list, name: 'Users Home', url: home_users_path },
-      { key: :list_clip, name: 'クリップイラスト一覧', url: show_favored_images_users_path }
+      { key: :list_clip, name: 'Boards', url: show_favored_images_users_path },
     ]
   end
 

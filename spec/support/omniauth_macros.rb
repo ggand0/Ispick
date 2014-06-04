@@ -7,7 +7,6 @@ module OmniauthMacros
       provider: 'twitter',
       uid: '12345678',
       info: { nickname: 'pentiumx' }
-      # etc.
     })
     #OmniAuth.config.add_mock(:twitter, {:uid => '1234'})
   end

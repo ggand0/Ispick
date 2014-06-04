@@ -42,9 +42,6 @@ module Scrape::Wiki
       self.save_to_database(anime_character)
     end
 
-    animxxxx = Touhou.getxxxx
-    self.save_to_database(animxxxx)
-
   end
 
 
