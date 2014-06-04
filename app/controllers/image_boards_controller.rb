@@ -23,13 +23,11 @@ class ImageBoardsController < ApplicationController
 
   # POST /image_boards
   def create
-    puts image_board_params
-    puts params
-    #@image_board = ImageBoard.new(image_board_params)
-    #@image_board = ImageBoard.new(name: params['image_board']['name'])
-    @image_board = ImageBoard.new(name: params['name'])
+    @image_board = ImageBoard.new(image_board_params)
     @image_board.save!
     current_user.image_boards << @image_board
+
+    render nothing: true
   end
 
   # PATCH/PUT /image_boards/1
@@ -64,7 +62,6 @@ class ImageBoardsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def image_board_params
-      #params[:image_board]
-      params['image_board']
+      params.require(:image_board).permit(:name)
     end
 end
