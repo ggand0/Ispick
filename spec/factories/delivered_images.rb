@@ -60,9 +60,4 @@ FactoryGirl.define do
     association :user
     association :image, factory: :image
   end
-
-  factory :delivered_image_unfavored, class: DeliveredImage do
-    favored false
-    association :image, factory: :image
-  end
 end

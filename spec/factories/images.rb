@@ -124,11 +124,11 @@ FactoryGirl.define do
     end
   end
 
+  # Image with no tags
   factory :image_madoka, class: Image do
     title 'Madoka Kaname'
     caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
     src_url 'http://i.4cdn.org/c/1399620027799.jpg'
     page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
-    # No tags
   end
 end
