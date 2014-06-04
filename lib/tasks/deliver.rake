@@ -42,7 +42,7 @@ namespace :deliver do
   desc "全てのdelivered_imagesのfavoritesをupdateする"
   task :update, [:user_id] =>  :environment do |t, args|
     t0 = Time.now
-    Deliver.update()
+    Deliver.update
     t1 = Time.now
     puts '-----------------------------------'# 35 chars
     puts 'Elapsed time: ' + (t1-t0).to_s
