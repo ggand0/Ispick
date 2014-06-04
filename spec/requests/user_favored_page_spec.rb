@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "favored_images page" do
   before do
-    FactoryGirl.create(:user_with_favored_images, images_count: 1)
+    FactoryGirl.create(:twitter_user)
     visit root_path
     mock_auth_hash
     click_link 'twitterでログイン'
