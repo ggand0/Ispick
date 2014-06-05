@@ -7,6 +7,14 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
 
+  has_attached_file :avatar,
+    styles: { thumb: "x50" },
+    use_timestamp: false
+  #after_create :create_default_board
+  #def create_default_board
+
+  #end
+
   def self.new_with_session(params, session)
     super.tap do |user|
       if data = session['devise.facebook_data'] && session['devise.facebook_data']['extra']['raw_info']

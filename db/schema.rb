@@ -138,6 +138,10 @@ ActiveRecord::Schema.define(version: 20140602154729) do
   end
 
   create_table "users", force: true do |t|
+    t.string   "avatar_file_name"
+    t.string   "avatar_content_type"
+    t.integer  "avatar_file_size"
+    t.datetime "avatar_updated_at"
     t.string   "email",                            default: "", null: false
     t.string   "encrypted_password",               default: "", null: false
     t.string   "reset_password_token"
