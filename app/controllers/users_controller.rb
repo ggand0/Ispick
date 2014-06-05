@@ -22,6 +22,15 @@ class UsersController < ApplicationController
     end
   end
 
+  # POST
+  def set_avatar
+    user = User.find(params[:id])
+    user.avatar = params[:avatar]
+    user.save!
+
+    redirect_to home_users_path
+  end
+
   def show_target_images
     if signed_in?
       @target_images = current_user.target_images
