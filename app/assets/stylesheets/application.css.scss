@@ -38,8 +38,9 @@ a.logo:hover{
 
 .modal-backdrop { background: none; }
 .modal {
+  // ハードコーディング
   position: fixed;
-  top:10%;
-  left:-50%;
+  top: 5%;
+  left: -56.7%;
 }
 .modal .modal-dialog { width: 300px; }
