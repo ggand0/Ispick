@@ -35,3 +35,11 @@ a.logo{
 a.logo:hover{
   background-color: #fff;
 }
+
+.modal-backdrop { background: none; }
+.modal {
+  position: fixed;
+  top:10%;
+  left:-50%;
+}
+.modal .modal-dialog { width: 300px; }
