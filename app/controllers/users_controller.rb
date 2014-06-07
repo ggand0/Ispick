@@ -29,6 +29,12 @@ class UsersController < ApplicationController
       format.js { render partial: 'new_avatar' }
     end
   end
+  # GET
+  def current_avatar
+    respond_to do |format|
+      format.js { render json: { url: current_user.avatar.url }.to_json }
+    end
+  end
 
   # POST
   def create_avatar
