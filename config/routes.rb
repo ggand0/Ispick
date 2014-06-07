@@ -26,6 +26,8 @@ Ispic::Application.routes.draw do
   resources :users do
     collection do
       get 'home'
+      get 'new_avatar'
+      post 'create_avatar'
       get 'show_illusts'
       get 'show_target_images'
       get 'show_target_words'

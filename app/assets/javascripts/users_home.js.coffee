@@ -36,10 +36,6 @@ $ ->
     $(selector).datepicker('show')
   )
 
-  # Dropdowns
-  $('.dropdown-menu').click (e) ->
-    e.stopPropagation()
-
   # Board追加
   $('.new_board').on('click', (e) ->
     input = $(this).parent().children('.form-group').children('.new_board_input')
@@ -50,7 +46,7 @@ $ ->
       type: 'post',
       data: { image_board: { name: input.val() }},
       success: () ->
-        console.log('success new board')
+        console.log('Successfully created a new board.')
       error: () ->
     })
   )

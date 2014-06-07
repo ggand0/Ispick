@@ -14,8 +14,11 @@ gem 'bootstrap-sass'
 gem 'bootstrap-datepicker-rails'
 gem "rails-bootstrap-helpers"
 gem 'bootstrap_form'
+gem 'rails_bootstrap_navbar'
+
 gem 'kaminari'
 gem 'jquery-fileupload-rails'                    # Upload multiple files
+gem 'remotipart', '~> 1.2'
 gem 'simple-navigation'
 gem 'simple-navigation-bootstrap'
 

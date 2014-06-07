@@ -1,7 +1,7 @@
 <%= javascript_include_tag 'users_home' %>
 
 <p>
-  <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe %>
+  <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @deliver %>
   <br>
   <br>
   <br>

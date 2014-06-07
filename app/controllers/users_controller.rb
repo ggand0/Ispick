@@ -22,6 +22,32 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET
+  def new_avatar
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'new_avatar' }
+    end
+  end
+  # GET
+  def current_avatar
+    respond_to do |format|
+      format.js { render json: { url: current_user.avatar.url }.to_json }
+    end
+  end
+
+  # POST
+  def create_avatar
+    user = User.find(params[:id])
+    user.avatar = params[:avatar]
+    user.save!
+
+    respond_to do |format|
+      format.html { redirect_to home_users_path }
+      format.js { render nothing: true }
+    end
+  end
+
   def show_target_images
     if signed_in?
       @target_images = current_user.target_images
