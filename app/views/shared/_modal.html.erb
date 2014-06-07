@@ -2,15 +2,10 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-body">
-        <!--<%= bootstrap_form_tag url: { controller: 'users', action: 'create_avatar', id: current_user.id }, remote: true, authenticity_token: true, 'class'=> 'change-avatar-form' do |f| %>
+        <%= bootstrap_form_tag url: { controller: 'users', action: 'create_avatar', id: current_user.id } do |f| %>
           <%= f.file_field :avatar, layout: :default %>
           <%= f.submit '決定' %>
-        <% end %>-->
-
-        <form class="change-avatar-form" accept-charset="UTF-8" action="/users/create_avatar?id=1" data-remote="true" enctype="multipart/form-data" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="A+JWCClmszECkrgGTRxOmbA0w82nGb6NTBT9n4yyV1c=" /></div>
-          <div class="form-group"><label class="control-label" for="avatar">Avatar</label><input id="_avatar" layout="default" name="[avatar]" type="file" /></div>
-          <input class="btn btn-default change-avatar-button" name="commit" type="submit" value="決定" />
-        </form>
+        <% end %>
       </div>
     </div>
   </div>

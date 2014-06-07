@@ -6,16 +6,13 @@
   <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: '/home', class: 'logo' %>
   <%= navbar_collapse do %>
     <%= navbar_group class: 'User', id: 'menu' do %>
-      <%# navbar_dropdown 'User' do %>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle toggle-user" data-toggle="dropdown">User <b class="caret"></b></a>
-        <ul class="dropdown-menu"><!---->
+      <%= navbar_dropdown 'User' do %>
         <li>
           <%= link_to 'プロフィール画像を変更する', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window', class: 'dropdown-user' } %>
         </li>
         <%= navbar_dropdown_divider %>
         <%= navbar_item 'ログアウト', destroy_user_session_path %>
-      <%# end %></ul></li>
+      <% end %>
 
       <%= navbar_item 'Home', home_users_path %>
       <%= navbar_item 'Boards', show_favored_images_users_path %>
