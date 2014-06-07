@@ -12,15 +12,14 @@ gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 # View related gems
 gem 'bootstrap-sass'
 gem 'bootstrap-datepicker-rails'
-gem "rails-bootstrap-helpers"
+gem 'rails-bootstrap-helpers'
 gem 'bootstrap_form'
 gem 'rails_bootstrap_navbar'
 
-gem 'kaminari'
-gem 'jquery-fileupload-rails'                    # Upload multiple files
-gem 'remotipart', '~> 1.2'
-gem 'simple-navigation'
-gem 'simple-navigation-bootstrap'
+gem 'kaminari'                                    # Enable pagination
+gem 'jquery-fileupload-rails'                     # Upload multiple files
+gem 'remotipart', '~> 1.2'                        # Enable ajax request with form_tag
+gem 'high_voltage', '~> 2.1.0'                    # Handles static pages
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
