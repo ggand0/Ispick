@@ -29,21 +29,17 @@ class UsersController < ApplicationController
       format.js { render partial: 'new_avatar' }
     end
   end
-  # GET
-  def current_avatar
-    respond_to do |format|
-      format.js { render json: { url: current_user.avatar.url }.to_json }
-    end
-  end
 
   # POST
   def create_avatar
+    session[:return_to] ||= request.referer
+
     user = User.find(params[:id])
     user.avatar = params[:avatar]
     user.save!
 
     respond_to do |format|
-      format.html { redirect_to home_users_path }
+      format.html { redirect_to session.delete(:return_to) }
       format.js { render nothing: true }
     end
   end
