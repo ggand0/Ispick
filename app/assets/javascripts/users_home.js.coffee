@@ -37,8 +37,8 @@ $ ->
   )
 
   # Dropdowns
-  $('.dropdown-menu').click (e) ->
-    e.stopPropagation()
+  #$('.dropdown-menu').click (e) ->
+  #  e.stopPropagation()
 
   # Board追加
   $('.new_board').on('click', (e) ->

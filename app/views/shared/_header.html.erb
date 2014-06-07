@@ -1,18 +1,22 @@
+<%# javascript_include_tag 'core' %>
+<%= render 'shared/modal' %>
 
 <%# navbar fixed: :top, role: "navigation" do navbar-fixed-top %>
 <nav class="navbar navbar-default" role="navigation">
   <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: '/home', class: 'logo' %>
-
   <%= navbar_collapse do %>
     <%= navbar_group class: 'User', id: 'menu' do %>
       <%= navbar_dropdown 'User' do %>
-        <%# navbar_item 'プロフィール画像を変更する', '#' %>
         <li>
-          <%= bootstrap_form_tag url: { controller: 'users', action: 'set_avatar', id: current_user.id } do |f| %>
+          <%= bootstrap_form_tag url: { controller: 'users', action: 'create_avatar', id: current_user.id } do |f| %>
             <%= f.file_field :avatar, layout: :default %>
             <%= f.submit '決定' %>
           <% end %>
         </li>
+        <li>
+          <%= link_to 'プロフィール画像を変更する', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window'} %>
+        </li>
+
         <%= navbar_dropdown_divider %>
         <%= navbar_item 'ログアウト', destroy_user_session_path %>
       <% end %>
@@ -29,8 +33,11 @@
         <%= navbar_item 'トップページ', '/' %>
         <%= navbar_item 'Resque', '/resque_web/overview#show' %>
       <% end %>
+    <% end %>
 
     <%= image_tag(current_user.avatar.url(:thumb), align: 'right') %>
 
   <% end %>
 </nav><%# end %>
+
+<%# render 'shared/modal' %>
