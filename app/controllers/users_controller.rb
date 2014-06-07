@@ -22,8 +22,16 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET
+  def new_avatar
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'new_avatar' }
+    end
+  end
+
   # POST
-  def set_avatar
+  def create_avatar
     user = User.find(params[:id])
     user.avatar = params[:avatar]
     user.save!
