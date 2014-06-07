@@ -3,7 +3,7 @@
 
 <%# navbar fixed: :top, role: "navigation" do navbar-fixed-top %>
 <nav class="navbar navbar-default" role="navigation">
-  <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: '/home', class: 'logo' %>
+  <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: home_users_path, class: 'logo' %>
   <%= navbar_collapse do %>
     <%= navbar_group class: 'User', id: 'menu' do %>
       <%= navbar_dropdown 'User' do %>
