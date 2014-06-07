@@ -36,7 +36,10 @@ class UsersController < ApplicationController
     user.avatar = params[:avatar]
     user.save!
 
-    redirect_to home_users_path
+    respond_to do |format|
+      format.html { redirect_to home_users_path }
+      format.js { render nothing: true }
+    end
   end
 
   def show_target_images

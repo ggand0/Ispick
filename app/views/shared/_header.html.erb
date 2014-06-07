@@ -7,19 +7,19 @@
   <%= navbar_collapse do %>
     <%= navbar_group class: 'User', id: 'menu' do %>
       <%= navbar_dropdown 'User' do %>
-        <li>
-          <%= bootstrap_form_tag url: { controller: 'users', action: 'create_avatar', id: current_user.id } do |f| %>
+        <!--<li>
+          <%= bootstrap_form_tag url: { controller: 'users', action: 'create_avatar', id: current_user.id }, remote: true do |f| %>
             <%= f.file_field :avatar, layout: :default %>
             <%= f.submit '決定' %>
           <% end %>
-        </li>
+        </li>-->
         <li>
           <%= link_to 'プロフィール画像を変更する', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window'} %>
         </li>
-
         <%= navbar_dropdown_divider %>
         <%= navbar_item 'ログアウト', destroy_user_session_path %>
       <% end %>
+
       <%= navbar_item 'Home', home_users_path %>
       <%= navbar_item 'Boards', show_favored_images_users_path %>
       <%= navbar_dropdown '好みの設定' do %>
