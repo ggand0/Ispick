@@ -1,6 +1,7 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
+  # RequeWeb
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
 
@@ -9,12 +10,15 @@ Ispic::Application.routes.draw do
 
   # Devise
   devise_for :users, controllers: {
-    passwords:          "users/passwords",
     omniauth_callbacks: "users/omniauth_callbacks"
   }, path: '', path_names: {
-    sign_in: 'signin_with_password',
+    sign_in: 'signin_with_password'
   }
+  devise_scope :user do
+    get 'reset_password' => 'devise/passwords#new'
+  end
 
+  # Resources
   resources :users do
     collection do
       get 'home'

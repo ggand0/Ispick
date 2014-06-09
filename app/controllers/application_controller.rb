@@ -3,9 +3,10 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  # production環境のみ認証するように
-  #http_basic_authenticate_with :name => ENV['BASIC_AUTH_NAME'], :password => ENV['BASIC_AUTH_PW'] if Rails.env.production?
+  # production環境のみBASIC認証する
   before_filter :authenticate
+  # Sign up時にname attributeを関連づける
+  before_filter :configure_permitted_parameters, if: :devise_controller?
 
   protected
 
@@ -20,10 +21,11 @@ class ApplicationController < ActionController::Base
   def after_sign_out_path_for(resource)
     root_path
   end
-
   def after_sign_in_path_for(resource)
-    #user = current_user
-    #"/delivered_images?user_id=#{user.id}"
     '/users/home'
+  end
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.for(:sign_up) << :name
   end
 end
