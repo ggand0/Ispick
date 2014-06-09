@@ -1,28 +1,20 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
-  resources :image_boards
+  mount ResqueWeb::Engine => '/resque_web'
+  ResqueWeb::Engine.eager_load!
 
-  resources :target_words do
-    collection do
-      match 'search' => 'target_words#search', via: [:get, :post], as: :search
-    end
-    member do
-      get 'prefer'
-      get 'show_delivered'
-      get 'switch'
-    end
-  end
-
-  get "welcome/index"
+  # Root path
+  root 'welcome#index'
 
   # Devise
   devise_for :users, controllers: {
-    #:sessions      => "users/sessions",
-    #:registrations => "users/registrations",
     passwords:          "users/passwords",
     omniauth_callbacks: "users/omniauth_callbacks"
+  }, path: '', path_names: {
+    sign_in: 'signin_with_password',
   }
+
   resources :users do
     collection do
       get 'home'
@@ -59,22 +51,26 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
+  resources :target_words do
+    collection do
+      match 'search' => 'target_words#search', via: [:get, :post], as: :search
+    end
+    member do
+      get 'prefer'
+      get 'show_delivered'
+      get 'switch'
+    end
+  end
+  resources :image_boards
+  resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
-  resources :favored_images, only: [:show, :destroy]
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search
     end
   end
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-  # You can have the root of your site routed with "root"
-  root 'welcome#index'
-  mount ResqueWeb::Engine => '/resque_web'
-  ResqueWeb::Engine.eager_load!
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
