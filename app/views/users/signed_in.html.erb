@@ -1,4 +1,5 @@
 <%= javascript_include_tag 'users_home' %>
+<%= render 'shared/modal_image' %>
 
 <p>
   <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @delivered_images_all %>
@@ -43,7 +44,8 @@
         </div>
         <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
 
-        <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
+        <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
+
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>
