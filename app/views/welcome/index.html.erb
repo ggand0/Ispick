@@ -8,7 +8,7 @@
 <div class="wrapper-oauth">
   <div class="btn-group-vertical btn-group-oauth">
     <%= bs_button_to 'Facebookでアカウント作成', '/', class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Twitterでアカウント作成', 'user_omniauth_authorize_path(:twitter)', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Twitterでアカウント作成', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
     <%= bs_button_to 'Pinterestでアカウント作成', '/', class: "btn btn-default btn-block" %><br>
     <%= bs_button_to 'メールアドレスでアカウント作成', '/sign_up', class: "btn btn-default btn-block" %><br>
   </div>
@@ -16,14 +16,15 @@
     <%= link_to '既にアカウントをお持ちの方はこちら', '/signin_with_password' %>
   </div>
 </div>
-
 <br>
 <br>
 <div>
+  <!-- デバッグ用OAuthログイン -->
   <h3>Debug</h3>
   <% if user_signed_in? %>
     <%= link_to 'ログアウト', destroy_user_session_path %>
   <% else %>
-    <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter)  %>
+    <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter) %><br>
+    <%= link_to "facebookでログイン", '/' %>
   <% end %>
 </div>

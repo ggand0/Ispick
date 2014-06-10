@@ -3,13 +3,12 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  # production環境のみBASIC認証する
   before_filter :authenticate
-  # Sign up時にname attributeを関連づける
   before_filter :configure_permitted_parameters, if: :devise_controller?
 
   protected
 
+  # production環境のみBASIC認証する
   def authenticate
     if CONFIG['perform_authentication']
       authenticate_or_request_with_http_basic do |username, password|
@@ -18,13 +17,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # ログアウト後のリダイレクト先を指定する
   def after_sign_out_path_for(resource)
     root_path
   end
+
+  # ログイン後のリダイレクト先を指定する
   def after_sign_in_path_for(resource)
     '/users/home'
   end
 
+  # Sign up時にname attributeを関連づける
   def configure_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) << :name
   end
