@@ -12,8 +12,9 @@ class User < ActiveRecord::Base
     use_timestamp: false
   #after_create :create_default_board
   #def create_default_board
-
   #end
+
+  validates :name, presence: true
 
   def self.new_with_session(params, session)
     super.tap do |user|
@@ -24,6 +25,7 @@ class User < ActiveRecord::Base
   end
 
 
+  #emailを取得したい場合は、migrationにemailを追加する
   def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
     user = User.where(provider: auth.provider, uid: auth.uid).first
     unless user
@@ -31,7 +33,7 @@ class User < ActiveRecord::Base
         name:auth.extra.raw_info.name,
         provider:auth.provider,
         uid:auth.uid,
-        email:auth.info.email, #emailを取得したい場合は、migrationにemailを追加してください。
+        email:auth.info.email,
         password:Devise.friendly_token[0,20]
       )
     end
