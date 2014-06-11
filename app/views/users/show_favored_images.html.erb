@@ -1,3 +1,4 @@
+<%= render 'shared/modal_image' %>
 <h1>Clipped Images</h1>
 <br>
 <p>
@@ -23,7 +24,7 @@
       <div class="boxInner">
         <%= link_to 'Unclip', image, method: :delete %>
 
-        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s }) %>
+        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>

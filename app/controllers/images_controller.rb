@@ -10,12 +10,9 @@ class ImagesController < ApplicationController
   # GET /images/1
   # GET /images/1.json
   def show
-    @image = Image.find(params[:id])
-    if @image.feature.nil?
-      @face_feature = 'Not extracted.'
-    else
-      #@face_feature = @image.feature.face
-      @face_feature = @image.feature.categ_imagenet
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'show' }
     end
   end
 

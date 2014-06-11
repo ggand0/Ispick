@@ -1,0 +1,17 @@
+// 配信画像の詳細表示用の背景色
+.modal-backdrop {
+  background-color: #E4E1E3
+}
+// Avatar設定ダイアログを表示する際など、背景無しのモーダルに使用
+.modal-color-none .modal-backdrop {
+  background: none;
+}
+.modal.modal-avatar {
+  // ハードコーディング
+  position: fixed;
+  top: 3%;
+  left: -68.2%;//-56.7%;
+}
+.modal.modal-avatar .modal-dialog { width: 250px; }
+
+.modal.modal-images .modal-dialog { width: 640px; }

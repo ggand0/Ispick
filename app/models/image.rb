@@ -8,7 +8,7 @@ class Image < ActiveRecord::Base
   paginates_per 100
 
 	has_attached_file :data,
-    styles: { thumb: "300x300#" },
+    styles: { thumb: "300x300#", medium: "600x800>" },
     use_timestamp: false
 
   validates_uniqueness_of :src_url
