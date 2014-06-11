@@ -9,7 +9,10 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
- *= require_tree .
+ *= require images
+ *= require scaffolds
+ *= require users
+ *= require core
  *= require bootstrap-datepicker3
  *= require rails_bootstrap_forms
  *
@@ -34,12 +37,3 @@ a.logo{
 a.logo:hover{
   background-color: #fff;
 }
-
-.modal-backdrop { background: none; }
-.modal {
-  // ハードコーディング
-  position: fixed;
-  top: 5%;
-  left: -56.7%;
-}
-.modal .modal-dialog { width: 300px; }
