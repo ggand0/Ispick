@@ -1,5 +1,4 @@
 <p id="notice"><%= notice %></p>
-<%= link_to 'Back', :back %>
 
 <p>
   <strong>Title:</strong>
@@ -8,7 +7,7 @@
 
 <p>
   <strong>Caption:</strong>
-  <%= image.caption %>
+  <%= image.caption.html_safe %>
 </p>
 
 <p>
@@ -71,16 +70,10 @@
 
   <tbody>
     <tr>
-
-
-
-
-
-
-
-
     </tr>
   </tbody>
 </table>
 <br>
-<%= image_tag image.data.url(:medium) %>
+<div align="center">
+  <%= image_tag image.data.url(:medium) %>
+</div>
