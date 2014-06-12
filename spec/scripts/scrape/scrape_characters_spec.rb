@@ -99,6 +99,14 @@ describe "Scrape::Wiki::Character" do
       puts result['魔法少女まどか☆マギカ']
       expect(result['魔法少女まどか☆マギカ'].first[:en]).to eq('Madoka Kaname')
     end
+
+    it "test" do
+     hash = {'FF10' => {ja:"http://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%8A%E3%83%AB%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BCX",
+      en:"http://en.wikipedia.org/wiki/Characters_of_Final_Fantasy_X_and_X-2"}}
+     puts(hash)
+     result = Scrape::Wiki::Character.get_anime_character_name(hash)
+     puts(result)
+    end
   end
 
   describe "get_character_name_ja funciton" do

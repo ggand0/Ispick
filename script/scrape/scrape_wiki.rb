@@ -127,7 +127,7 @@ module Scrape::Wiki
   end
 
 
-  # ハッシュ内容のファイル出力
+  # ハッシュ内容のファイル出力(未使用)
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.hash_output(input_hash)
     f = open("sample.txt", "a")

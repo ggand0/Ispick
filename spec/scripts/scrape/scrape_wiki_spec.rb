@@ -9,6 +9,15 @@ describe "Scrape" do
     #IO.any_instance.stub(:puts)
   end
 
+  describe "point test" do
+    it "point test" do
+      hash = {"toho" => {ja:'http://ja.wikipedia.org/wiki/STEINS;GATE%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9',
+        en:''}}
+      name = Scrape::Wiki::Character.get_anime_character_name(hash)
+      #puts("name:"+name.to_s)
+    end
+  end
+
   describe "scrape function" do
     it "calls proper functions" do
       years = 5
@@ -47,7 +56,6 @@ describe "Scrape" do
       expect(result).to eql('http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica')
     end
   end
-
 
   describe "open_html function" do
     let(:url) { 'http://www.google.co.jp/' }

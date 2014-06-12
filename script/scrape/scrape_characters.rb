@@ -106,8 +106,6 @@ module Scrape::Wiki::Character
     { title: anime_title, url: url }
   end
 
-
-
   # アニメの登場人物を取得する
   # @param [Hash] { 'An anime title' => { ja: url, en: url } }
   # @return [Hash] キャラクタ一覧
@@ -144,6 +142,30 @@ module Scrape::Wiki::Character
   # @return [Array] キャラクタ情報のHashを要素とするArray
   def self.get_character_name_ja(anime_title, html)
     name_array = []
+
+    # 専用ページ
+    if /(人物|キャラクター)/ =~ html.css("title").first.content
+      html.css("dt").each do |item|
+          #()書きなどの除去　~ ()やカンマ
+        name = item.content.gsub(/(\(|（).*(\)|）)|((,|、).*)/,"")
+          #スペースの除去
+        query = name.gsub(/ |　/,"")
+          #()書きがあればaliasに
+        if( /(\(|（).*(\)|）)/ =~ item.content ) then
+          _alias = item.content.gsub(/.*(\(|（)/,"")
+          _alias = _alias.gsub(/\)|）/,"")
+          _alias = _alias.gsub(/(,|、).*/,"")
+        else
+          _alias = ""
+        end
+        #puts("name:"+name.to_s+"  query:"+query.to_s+"  alias:"+_alias.to_s)
+
+        #hashにしてname_array
+        name_hash = { name: name, query: query, _alias: _alias }
+        name_array.push(name_hash)
+      end
+
+    else
 
     # h2タグを抜き出す
     html.css('h2').each do |item|
@@ -193,6 +215,7 @@ module Scrape::Wiki::Character
         end
 
       end
+    end
     end
 
     # 条件を満たした場合、Arrayに値を追加
@@ -249,9 +272,8 @@ module Scrape::Wiki::Character
 
     # h2タグを抜き出す
     html.css('h2').each do |item|
-      if /(main|Main)*(characters|Characters)/ =~ item.inner_text
+      if /((main|Main)*(characters|Characters))|((characters|Characters)*(of).*)/ =~ item.inner_text
         current = item.next_element
-
         # dtタグの抽出
         while true
           if current.respond_to?(:name) and current.name == 'dl'
@@ -367,5 +389,3 @@ module Scrape::Wiki::Character
     end
   end
 
-
-end
