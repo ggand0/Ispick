@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 require 'spec_helper'
 require "#{Rails.root}/script/scrape/scrape"
 require "#{Rails.root}/script/scrape/scrape_wiki"
@@ -5,16 +6,16 @@ include Scrape::Wiki
 
 describe "Scrape" do
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
   end
 
   describe "scrape function" do
     it "calls proper functions" do
       years = 5
-      Scrape::Wiki.stub(:get_anime_page).and_return
-      Scrape::Wiki::Character.stub(:get_anime_character_page).and_return
-      Scrape::Wiki::Character.stub(:get_anime_character_name).and_return
-      Scrape::Wiki.stub(:save_to_database).and_return
+      Scrape::Wiki.stub(:get_anime_page).and_return nil
+      Scrape::Wiki::Character.stub(:get_anime_character_page).and_return nil
+      Scrape::Wiki::Character.stub(:get_anime_character_name).and_return nil
+      Scrape::Wiki.stub(:save_to_database).and_return nil
 
       expect(Scrape::Wiki).to receive(:get_anime_page).exactly(years).times
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(years).times
@@ -29,17 +30,20 @@ describe "Scrape" do
     it "returns a hash" do
       Scrape::Wiki.stub(:get_english_anime_page).and_return ''
 
-      url = 'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
-      puts result = Scrape::Wiki.get_anime_page(url)
+      #url = 'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      url = 'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      puts result = Scrape::Wiki.get_anime_page(url, false)
+      #result = Scrape::Wiki.get_anime_page(url, true)
 
       expect(result).to be_a(Hash)
     end
   end
-  describe "get_english_anime_page" do
+
+  describe "get_anime_page_en" do
     it "returns a Hash value" do
       # まどかのアニメ概要ページ
       url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      result = Scrape::Wiki.get_english_anime_page url
+      puts result = Scrape::Wiki.get_anime_page_en(url)
       expect(result).to eql('http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica')
     end
   end

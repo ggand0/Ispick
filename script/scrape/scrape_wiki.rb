@@ -48,29 +48,35 @@ module Scrape::Wiki
   # アニメ名のハッシュを取得する
   # @param [String] 「20xx年のアニメ一覧」ページのurl
   # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
-  def self.get_anime_page(url)
+  def self.get_anime_page(url, logging=true)
     anime_page = {}
     html = self.open_html url
 
     # ページ一覧からアニメURLを取得
     # html.css("div[id='mw-pages']").css('a').each { |item| puts item.content }
+    # liタグ->aタグの順にネストされているパターン
     html.css('li > a').each do |item|
       break if /アカウント/ =~ item.inner_text
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
 
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
-        puts page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
-        page_url_en = self.get_english_anime_page page_url_ja
+        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
+        page_url_en = self.get_anime_page_en page_url_ja
+        puts page_url_ja if logging
+
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
 
+    # spanタグ->aタグの順にネストされているパターン
     html.css('span > a').each do |item|
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
 
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
-        page_url_ja = "http://ja.wikipedia.org%s" % [item['href']]
-        page_url_en = self.get_english_anime_page page_url_ja
+        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
+        page_url_en = self.get_anime_page_en page_url_ja
+        puts page_url_ja if logging
+
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
@@ -82,7 +88,8 @@ module Scrape::Wiki
   # 英語版ページへのリンクがある場合そのページurlを返す
   # @param [String] 日本語版ページのurl
   # @return [String] 英語版ページのurl
-  def self.get_english_anime_page(anime_page)
+  def self.get_anime_page_en(anime_page)
+    #puts 'DEBUG2'
     html = self.open_html anime_page
     return if html.nil?
 

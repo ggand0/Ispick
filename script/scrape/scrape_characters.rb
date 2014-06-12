@@ -4,6 +4,49 @@ require 'open-uri'
 require 'natto'
 
 module Scrape::Wiki::Character
+  # アニメの登場人物ページを取得する
+  # @param page_hash : Hash { { ja: '日本語概要ページ', en: '英語概要ページ' } => ページURL}
+  def self.get_anime_character_page(page_hash, logging=true)
+    puts 'Extracting character pages...'
+    anime_character_page_url = {}
+
+    # 登場人物・キャラクターページのURLを取得
+    page_hash.each do |anime_title, url|
+      next if url[:ja].empty?                     # str.empty?はstr=''だったらtrueを返す
+
+      html_ja = Scrape::Wiki.open_html url[:ja]   # まずは日本語の概要ページを開く
+      next if html_ja.nil?                        # obj.nil?はobj=nilだったらtrueを返すメソッド
+      html_en = Scrape::Wiki.open_html url[:en]
+
+
+      # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
+      page_title = html_ja.css('h1[class="firstHeading"]').first.content
+      title_ja = page_title if /#{page_title}/ =~ anime_title
+      page_url_ja = self.get_character_page_ja(title_ja, url[:ja], html_ja)
+
+      # 英語版の登場人物一覧ページを取得する
+      if (not url[:en].empty?) and (not html_en.nil?)
+        title_en = html_en.css('h1[class="firstHeading"]').first.content
+        page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
+      else
+        page_url_en = { title: title_ja, url: '' } # 日本語タイトルをkeyとする
+      end
+
+      # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
+      anime_character_page_url[title_ja] = { ja: page_url_ja[:url], en: page_url_en[:url] }#anime_title
+      #puts anime_character_page_url[title_ja] if logging
+      puts anime_character_page_url.to_a.last if logging
+    end
+
+    # 辞書順にHashをソートして返す
+    puts '-----------------------------------'
+    puts anime_character_page_url
+    anime_character_page_url.delete_if { |k, v| v.empty? or v.nil? or k.empty? or k.nil? }
+    puts '-----------------------------------'
+    Hash[ anime_character_page_url.sort_by{|k,v| k} ]
+  end
+
+
   # 英語の概要ページから、登場人物一覧ページを取得する
   # @param [String] アニメのタイトル
   # @param [String] 概要ページのURL
@@ -16,7 +59,7 @@ module Scrape::Wiki::Character
         if /(List of |list of )(.*)( characters| Characters)/ =~ item.inner_text
           match_string = $2               # 正規表現内２つ目のグループ、(.*)に相当するマッチした文字列を取得、アニメタイトルに相当
           match_string.gsub!(/\(.*/, '')  # 整形
-          character_page_url = "http://.wikipedia.org%s" % [item['href']] # 人物一覧ページURL取得
+          character_page_url = "http://en.wikipedia.org#{item['href']}" # 人物一覧ページURL取得
 
           if /#{match_string}/ =~ anime_title
             return { title: match_string, url: character_page_url }
@@ -27,6 +70,7 @@ module Scrape::Wiki::Character
           break # Matchしなかった場合
         end
       end
+
     end
 
     # Matchしなかった場合は、同ページに一覧があると判断
@@ -62,41 +106,36 @@ module Scrape::Wiki::Character
     { title: anime_title, url: url }
   end
 
-  # アニメの登場人物ページを取得する
-  # @param page_hash : Hash { { ja: '日本語概要ページ', en: '英語概要ページ' } => ページURL}
-  def self.get_anime_character_page(page_hash)
-    puts 'Extracting character pages...'
-    anime_character_page_url = {}
-
-    # 登場人物・キャラクターページのURLを取得
-    page_hash.each do |anime_title, url|
-      next if url[:ja].empty?                     # str.empty?はstr=''だったらtrueを返す
-
-      html_ja = Scrape::Wiki.open_html url[:ja]   # まずは日本語の概要ページを開く
-      next if html_ja.nil?                        # obj.nil?はobj=nilだったらtrueを返す
 
 
-      # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
-      page_title = html_ja.css('h1[class="firstHeading"]').first.content
-      anime_title = page_title if /#{page_title}/ =~ anime_title
+  # アニメの登場人物を取得する
+  # @param [Hash] { 'An anime title' => { ja: url, en: url } }
+  # @return [Hash] キャラクタ一覧
+  def self.get_anime_character_name(wiki_url, logging=true)
+    puts 'Extracting character names...'
+    anime_character = {}
 
-      page_url_ja = self.get_character_page_ja(anime_title, url[:ja], html_ja)
+    # 与えられたWikipediaのURLから登場人物の詳細ページを抜き出す
+    wiki_url.each do |anime_title, url|
+      html_ja = Scrape::Wiki.open_html url[:ja]
+      html_en = Scrape::Wiki.open_html url[:en]
+      next if html_ja.nil?
 
-      # 英語版の登場人物一覧ページを取得する
-      if not url[:en].empty?
-        html_en = Scrape::Wiki.open_html url[:en]
-        page_url_en = self.get_character_page_en anime_title, url[:en], html_en
+      # => [ ['鹿目 まどか', 'かなめ まどか'], ... ]
+      name_ja = self.get_character_name_ja(anime_title, html_ja) if html_ja
+
+      # 英名追加後のHashのArrayが返される
+      if html_en
+        name_array = self.get_character_name_en(anime_title, html_en, name_ja)
       else
-        page_url_en = { title: anime_title, url: '' } # 日本語タイトルをkeyとする
+        name_array = name_ja
       end
 
-      # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
-      anime_character_page_url[anime_title] = { ja: page_url_ja[:url], en: page_url_en[:url] }
-      puts anime_character_page_url[anime_title]
+      puts name_array if logging
+      anime_character[anime_title] = name_array
     end
 
-    # 辞書順にHashをソートして返す
-    Hash[ anime_character_page_url.sort_by{|k,v| k} ]
+    anime_character
   end
 
   # 日本語の登場人物一覧ページから、キャラクタ名の配列を生成する
@@ -228,6 +267,8 @@ module Scrape::Wiki::Character
                 tmp_array = tmp.split(' and ')
                 names = [ $1, $2, $3, $4 ]
 
+=begin
+
                 res = self.match_character_name(names[1], characters_list)
                 name_array, characters_list = self.add_character_name(
                   names[0], res, name_array, characters_list) if not res.empty?
@@ -235,11 +276,26 @@ module Scrape::Wiki::Character
                 res = self.match_character_name(names[3], characters_list)
                 name_array, characters_list = self.add_character_name(
                     names[2], res, name_array, characters_list) if not res.empty?
+=end
+                res = self.match_character_name(names[1], characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(names[0])
+                  name_array.push(res)
+                end
+                res = self.match_character_name(names[3], characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(names[2])
+                  name_array.push(res)
+                end
+
               # Yūri (ユウリ?) / Airi Anri (杏里 あいり Anri Airi?)
               elsif /(.*?) \((.*?)\) \/ (.*?) \((.*?)\)/ =~ tmp
                 tmp_array = tmp.split(' / ')
                 names = [ $1, $2, $3, $4 ]
 
+=begin
                 res = self.match_character_name(names[1], characters_list)
                 name_array, characters_list = self.add_character_name(
                   names[0], res, name_array, characters_list) if not res.empty?
@@ -248,6 +304,19 @@ module Scrape::Wiki::Character
                 name_array, characters_list = self.add_character_name(
                     names[2], res, name_array, characters_list) if not res.empty?
                 res = self.match_character_name(names[1], characters_list)
+=end
+                res = self.match_character_name(names[1], characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(names[0])
+                  name_array.push(res)
+                end
+                res = self.match_character_name(names[3], characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(names[2])
+                  name_array.push(res)
+                end
 
               else
                 # Madoka Kaname (鹿目 まどか Kaname Madoka?)
@@ -255,13 +324,24 @@ module Scrape::Wiki::Character
                   names = [ $1, $2 ]
 
                   res = self.match_character_name(names[1], characters_list)
-                  name_array, characters_list = self.add_character_name(
-                    names[0], res, name_array, characters_list) if not res.empty?
+                  #name_array, characters_list = self.add_character_name(
+                  #  names[0], res, name_array, characters_list) if not res.empty?
+                  if not res.empty?
+                    characters_list.delete(res)
+                    res[:en] = self.convert_macrons(names[0])
+                    name_array.push(res)
+                  end
                 else
                   res = self.match_character_name(tmp, characters_list)
-                  name_array, characters_list = self.add_character_name(
-                    tmp, res, name_array, characters_list) if not res.empty?
+                  #name_array, characters_list = self.add_character_name(
+                  #  tmp, res, name_array, characters_list) if not res.empty?
+                  if not res.empty?
+                    characters_list.delete(res)
+                    res[:en] = self.convert_macrons(tmp)
+                    name_array.push(res)
+                  end
                 end
+
               end
 
             end
@@ -282,39 +362,10 @@ module Scrape::Wiki::Character
 
     # 条件を満たした場合、ハッシュに値を追加
     if not anime_title == '' and not name_array.size == 0
-      #anime_character[anime] = name_array
+      # 英名があるキャラクタ名リスト＋和名のみのリスト
       return name_array + characters_list
     end
   end
 
-  # アニメの登場人物を取得する
-  # @param [Hash] { 'An anime title' => { ja: url, en: url } }
-  # @return [Hash] キャラクタ一覧
-  def self.get_anime_character_name(wiki_url)
-    puts 'Extracting character names...'
-    anime_character = {}
 
-    # 与えられたWikipediaのURLから登場人物の詳細ページを抜き出す
-    wiki_url.each do |anime_title, url|
-      html_ja = Scrape::Wiki.open_html url[:ja]
-      next if html_ja.nil?
-
-      html_en = Scrape::Wiki.open_html url[:en]
-
-      # => [ ['鹿目 まどか', 'かなめ まどか'], ... ]
-      name_ja = self.get_character_name_ja anime_title, html_ja if html_ja
-
-      # 英名追加後のHashのArrayが返される
-      if html_en
-        name_array = self.get_character_name_en anime_title, html_en, name_ja
-      else
-        name_array = name_ja
-      end
-
-      puts name_array
-      anime_character[anime_title] = name_array
-    end
-
-    anime_character
-  end
 end
