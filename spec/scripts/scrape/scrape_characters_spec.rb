@@ -6,7 +6,7 @@ include Scrape::Wiki::Character
 
 describe "Scrape::Wiki::Character" do
   before do
-    IO.any_instance.stub(:puts)
+  #  IO.any_instance.stub(:puts)
   end
 
   describe "get_anime_character_name function" do
@@ -17,6 +17,14 @@ describe "Scrape::Wiki::Character" do
 
       puts result = Scrape::Wiki::Character.get_anime_character_name(wiki_url)
       expect(result).to be_a(Hash)
+    end
+    
+    it "test" do
+     hash = {'FF10' => {ja:"http://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%8A%E3%83%AB%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BCX",
+      en:"http://en.wikipedia.org/wiki/Characters_of_Final_Fantasy_X_and_X-2"}}
+     puts(hash)
+     result = Scrape::Wiki::Character.get_anime_character_name(hash)
+     puts(result)
     end
   end
 

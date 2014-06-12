@@ -63,7 +63,8 @@ module Scrape::Wiki::Character
   end
 
   # アニメの登場人物ページを取得する
-  # @param page_hash : Hash { { ja: '日本語概要ページ', en: '英語概要ページ' } => ページURL}
+  # o @param page_hash : Hash {anime_title => url}
+  # x @param page_hash : Hash { { ja: '日本語概要ページ', en: '英語概要ページ' } => ページURL}
   def self.get_anime_character_page(page_hash)
     puts 'Extracting character pages...'
     anime_character_page_url = {}
@@ -80,7 +81,7 @@ module Scrape::Wiki::Character
       page_title = html_ja.css('h1[class="firstHeading"]').first.content
       anime_title = page_title if /#{page_title}/ =~ anime_title
 
-      character_page_url = self.get_character_page_ja(anime_title, url[:ja], html_ja)
+      page_url_ja = self.get_character_page_ja(anime_title, url[:ja], html_ja)
 
       # 英語版の登場人物一覧ページを取得する
       if not url[:en].empty?
@@ -105,6 +106,30 @@ module Scrape::Wiki::Character
   # @return [Array] キャラクタ情報のHashを要素とするArray
   def self.get_character_name_ja(anime_title, html)
     name_array = []
+
+    # 専用ページ
+    if /(人物|キャラクター)/ =~ html.css("title").first.content
+      html.css("dt").each do |item|
+          #()書きなどの除去　~ ()やカンマ
+        name = item.content.gsub(/(\(|（).*(\)|）)|((,|、).*)/,"")
+          #スペースの除去
+        query = name.gsub(/ |　/,"")
+          #()書きがあればaliasに
+        if( /(\(|（).*(\)|）)/ =~ item.content ) then
+          _alias = item.content.gsub(/.*(\(|（)/,"")
+          _alias = _alias.gsub(/\)|）/,"")
+          _alias = _alias.gsub(/(,|、).*/,"")
+        else
+          _alias = ""
+        end
+        #puts("name:"+name.to_s+"  query:"+query.to_s+"  alias:"+_alias.to_s)
+        
+        #hashにしてname_array
+        name_hash = { name: name, query: query, _alias: _alias }
+        name_array.push(name_hash)
+      end
+    
+    else
 
     # h2タグを抜き出す
     html.css('h2').each do |item|
@@ -154,6 +179,7 @@ module Scrape::Wiki::Character
         end
 
       end
+    end
     end
 
     # 条件を満たした場合、Arrayに値を追加
@@ -210,9 +236,8 @@ module Scrape::Wiki::Character
 
     # h2タグを抜き出す
     html.css('h2').each do |item|
-      if /(main|Main)*(characters|Characters)/ =~ item.inner_text
+      if /((main|Main)*(characters|Characters))|((characters|Characters)*(of).*)/ =~ item.inner_text
         current = item.next_element
-
         # dtタグの抽出
         while true
           if current.respond_to?(:name) and current.name == 'dl'
@@ -297,13 +322,14 @@ module Scrape::Wiki::Character
     # 与えられたWikipediaのURLから登場人物の詳細ページを抜き出す
     wiki_url.each do |anime_title, url|
       html_ja = Scrape::Wiki.open_html url[:ja]
+      
       next if html_ja.nil?
 
       html_en = Scrape::Wiki.open_html url[:en]
 
       # => [ ['鹿目 まどか', 'かなめ まどか'], ... ]
       name_ja = self.get_character_name_ja anime_title, html_ja if html_ja
-
+      
       # 英名追加後のHashのArrayが返される
       if html_en
         name_array = self.get_character_name_en anime_title, html_en, name_ja

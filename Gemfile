@@ -100,7 +100,7 @@ group :development, :test do
 
 
   # Rails testing
-  gem 'rspec-rails', '>= 2.6.0'                     # Testing framework
+  gem 'rspec-rails', '~> 2.99.0'                     # Testing framework
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
