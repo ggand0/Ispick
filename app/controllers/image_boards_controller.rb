@@ -21,12 +21,19 @@ class ImageBoardsController < ApplicationController
     end
   end
   def boards
-    puts params[:image]
-    puts params
     @image = DeliveredImage.find(params[:image])
+    @board = ImageBoard.new
     respond_to do |format|
       format.html
       format.js { render partial: 'boards' }
+    end
+  end
+  def reload
+    @image = DeliveredImage.find(params[:image])
+    @board = ImageBoard.new
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'reload' }
     end
   end
 

@@ -68,6 +68,7 @@ Ispic::Application.routes.draw do
   resources :image_boards do
     collection do
       get 'boards'
+      get 'reload'
     end
   end
   resources :favored_images, only: [:show, :destroy]

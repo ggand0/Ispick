@@ -1,17 +1,19 @@
+<%= javascript_include_tag 'modal_board' %>
 <div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-body modal-board">
-      <%= bootstrap_form_tag url: { controller: 'image_boards', action: 'create' }, class: 'new_board_form' do |f| %>
+      <div class="modal-id"><%= image.id %></div>
+      <%= bootstrap_form_for image_board, remote: true, class: 'new_board' do |f| %>
         <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
-        <%= f.submit 'New board', class: "new_board btn btn-primary" %>
+        <%= f.submit 'New board', class: "btn btn-primary" %>
       <% end %>
+      <br />
 
       <% current_user.image_boards.each do |board| %>
-        <!--<li class="clip_button btn btn-default btn-group-justified" >
-          <%# link_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name }, method: :put %>
-          <%= link_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name }, method: :put %>
-        </li>-->
-        <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name }, method: :put, class: 'btn btn-default' %>
+        <!--<li class="clip_button btn btn-default btn-group-justified" >-->
+        <%= button_group do %>
+          <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true }, method: :put, class: 'btn btn-default' %>
+        <% end %>
       <% end %>
     </div>
   </div>
