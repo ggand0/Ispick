@@ -7,6 +7,7 @@ $ ->
   # クリップ機能
   window.Clip.addClipEvents(true)
 
+
   # 無限スクロール
   $('.pagination').hide()
   $(".wrap").infinitescroll({
@@ -18,6 +19,7 @@ $ ->
     window.Clip.removeClipEvents(true)
     window.Clip.addClipEvents(true)
   )
+
 
   # カレンダー(Datepicker)
   #selector = "[data-behaviour~=datepicker]"

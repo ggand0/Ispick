@@ -9,7 +9,7 @@ $ ->
   $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
     $('body').toggleClass('modal-color-none')
   )
-  $('.modal-boards').on('show.bs.modal hide.bs.modal', (e) ->
-    console.log('modal-board toggled')
+  #$('.modal-boards').on('show.bs.modal hide.bs.modal', (e) ->
+  $('#modal-board').on('show.bs.modal hide.bs.modal', (e) ->
     $('body').toggleClass('modal-color-none')
   )

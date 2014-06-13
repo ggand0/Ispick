@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def home
     if signed_in?
       delivered_images = current_user.delivered_images.where.not(images: { site_name: 'twitter' }).
-        joins(:image).order('images.posted_at')
+        joins(:image).reorder('images.created_at')
 
       # 配信日で絞り込む場合
       if params[:date]

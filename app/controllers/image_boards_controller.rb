@@ -17,7 +17,7 @@ class ImageBoardsController < ApplicationController
     @image_board = ImageBoard.new
     respond_to do |format|
       format.html
-      format.js# { render partial: 'boards' }
+      format.js
     end
   end
   def boards
