@@ -6,12 +6,24 @@
 .modal-color-none .modal-backdrop {
   background: none;
 }
+
+
 .modal.modal-avatar {
   // ハードコーディング
   position: fixed;
   top: 3%;
   left: -68.2%;//-56.7%;
 }
+.modal.modal-board {
+  // ハードコーディング
+  position: fixed;
+  top: 3%;
+  left: -68.2%;//-56.7%;
+}
+
+
 .modal.modal-avatar .modal-dialog { width: 250px; }
 
 .modal.modal-images .modal-dialog { width: 640px; }
+
+.modal.modal-boards .modal-dialog { width: 300px; }

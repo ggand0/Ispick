@@ -67,7 +67,6 @@ class DeliveredImagesController < ApplicationController
 
   # PUT favor
   # delivered_imageをお気に入り画像として追加する。
-  # Ajax callで呼ばれることを想定
   def favor
     board_name = params[:board]
     @delivered_image.update_attributes!(favored: true) unless @delivered_image.favored
@@ -82,10 +81,12 @@ class DeliveredImagesController < ApplicationController
       data: image.data,
       src_url: image.src_url
     )
+    puts favored_image
 
     # save出来たらdelivered_imageへの参照も追加
     favored_image.delivered_image = @delivered_image if favored_image.save
 
+=begin
     # favoredが変更された結果を返す
     if params[:render] == 'true'
       # そのdelivered_imageがfavoredされているかどうかを返す
@@ -93,7 +94,11 @@ class DeliveredImagesController < ApplicationController
     else
       redirect_to show_favored_images_users_path
     end
-
+=end
+    respond_to do |format|
+      format.html { redirect_to show_favored_images_users_path }
+      format.js { render nothing: true }
+    end
   end
 
   # PUT avoid

@@ -7,6 +7,7 @@ $ ->
   # クリップ機能
   window.Clip.addClipEvents(true)
 
+
   # 無限スクロール
   $('.pagination').hide()
   $(".wrap").infinitescroll({
@@ -18,6 +19,7 @@ $ ->
     window.Clip.removeClipEvents(true)
     window.Clip.addClipEvents(true)
   )
+
 
   # カレンダー(Datepicker)
   #selector = "[data-behaviour~=datepicker]"
@@ -35,20 +37,3 @@ $ ->
   $("body").on("click", ".filter-button", () ->
     $(selector).datepicker('show')
   )
-
-  # Board追加
-  $('.new_board').on('click', (e) ->
-    input = $(this).parent().children('.form-group').children('.new_board_input')
-    e.preventDefault()
-
-    $.ajax({
-      url: '/image_boards',
-      type: 'post',
-      data: { image_board: { name: input.val() }},
-      success: () ->
-        console.log('Successfully created a new board.')
-      error: () ->
-    })
-  )
-
-

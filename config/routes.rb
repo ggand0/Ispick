@@ -65,7 +65,12 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
-  resources :image_boards
+  resources :image_boards do
+    collection do
+      get 'boards'
+      get 'reload'
+    end
+  end
   resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
