@@ -1,4 +1,6 @@
 <%= javascript_include_tag 'modal_board' %>
+<%# stylesheet_link_tag 'core' %>
+
 <div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-body modal-board">
@@ -12,7 +14,7 @@
       <% current_user.image_boards.each do |board| %>
         <!--<li class="clip_button btn btn-default btn-group-justified" >-->
         <%= button_group do %>
-          <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true }, method: :put, class: 'btn btn-default' %>
+          <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true }, method: :put, class: 'btn btn-default user_boards' %>
         <% end %>
       <% end %>
     </div>

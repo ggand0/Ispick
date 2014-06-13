@@ -32,7 +32,7 @@
         <br>
         <div class="favored">
           <div class="id"><%= delivered_image.id %></div>
-          <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', :remote => true, image: delivered_image.id, 'data-toggle' => "modal", 'data-target' => '#modal-board', style: delivered_image.favored ? "info" : "" } %>
+          <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', :remote => true, image: delivered_image.id, 'data-toggle' => "modal", 'data-target' => '#modal-board', class: 'btn-default' } %>
         </div>
         <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
 
