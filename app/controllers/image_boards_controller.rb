@@ -15,6 +15,19 @@ class ImageBoardsController < ApplicationController
   # GET /image_boards/new
   def new
     @image_board = ImageBoard.new
+    respond_to do |format|
+      format.html
+      format.js# { render partial: 'boards' }
+    end
+  end
+  def boards
+    puts params[:image]
+    puts params
+    @image = DeliveredImage.find(params[:image])
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'boards' }
+    end
   end
 
   # GET /image_boards/1/edit

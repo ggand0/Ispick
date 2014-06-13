@@ -1,5 +1,6 @@
 <%= javascript_include_tag 'users_home' %>
 <%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
 
 <p>
   <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @delivered_images_all %>
@@ -30,17 +31,19 @@
         <br>
         <div class="favored">
           <div class="id"><%= delivered_image.id %></div>
-          <%= bs_dropdown_button_to 'Clip', style: delivered_image.favored ? "info" : "" , autoclose: false do %>
 
-              <%= bootstrap_form_tag url: { controller: 'image_boards', action: 'create' }, class: 'new_board_form' do |f| %>
-                <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
-                <%= f.button 'New board', class: "new_board btn btn-primary", type: 'button' %>
-              <% end %>
-
+          <!--<%= bs_dropdown_button_to 'Clip', style: delivered_image.favored ? "info" : "" , autoclose: false do %>
+            <%= bootstrap_form_tag url: { controller: 'image_boards', action: 'create' }, class: 'new_board_form' do |f| %>
+              <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
+              <%= f.button 'New board', class: "new_board btn btn-primary", type: 'button' %>
+            <% end %>
             <% current_user.image_boards.each do |board| %>
               <li class="clip_button btn btn-default btn-group-justified" ><%= board.name %></li>
             <% end %>
-          <% end %>
+          <% end %>-->
+
+
+          <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', :remote => true, image: delivered_image.id, 'data-toggle' => "modal", 'data-target' => '#modal-board', style: delivered_image.favored ? "info" : "" } %>
         </div>
         <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
 

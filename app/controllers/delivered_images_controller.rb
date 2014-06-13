@@ -76,12 +76,14 @@ class DeliveredImagesController < ApplicationController
     # src_urlが重複していた場合はvalidationでfalseが返る
     image = @delivered_image.image
     board = current_user.image_boards.where(name: board_name).first
-    favored_image = board.favored_images.build(
+    favored_image = FavoredImage.create(
       title: image.title,
       caption: image.caption,
       data: image.data,
       src_url: image.src_url
     )
+    board.favored_images << favored_image
+    board.save!
 
     # save出来たらdelivered_imageへの参照も追加
     favored_image.delivered_image = @delivered_image if favored_image.save

@@ -1,0 +1,2 @@
+$("#modal-board").html("<%= escape_javascript(render partial: 'shared/boards', locals: { image: @image }) %>");
+$("#modal-board").modal('show');
