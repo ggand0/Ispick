@@ -9,7 +9,7 @@ module Deliver::Images
 
     # 推薦イラストを取得
     puts 'Delivering from a target_image...'
-    images = Deliver.get_images true
+    images = self.get_images true
 
     # 類似度が一定値以上であるimageがあれば残す
     # 類似度が遠いimageをnilに置き換えた後全て削除
@@ -23,6 +23,26 @@ module Deliver::Images
     images = Deliver.limit_images(user, images)               # 配信画像を制限する
     Deliver.deliver_images(user, images, target_image, true)  # User.delivered_imagesへ追加
     target_image.last_delivered_at = DateTime.now             # 最終配信日時を記録
+  end
+
+
+  # 当日抽出された画像からImageレコードを検索して返す
+  # @param [Boolean] 定時配信で呼ばれたのかどうか
+  # @return [ActiveRecord_Relation_Image]
+  def self.get_images(is_periodic)
+    date = Date.today
+
+    if is_periodic
+      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
+      images = Image.includes(:tags).
+        where.not(is_illust: nil, src_url: nil).
+        where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+    else
+      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
+      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
+      images = Image.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+    end
+    images
   end
 
   # AnimeFaceの特徴量から近い画像を探す

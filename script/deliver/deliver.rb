@@ -23,9 +23,10 @@ module Deliver
     user.target_words.each do |t|
       Deliver::Words.deliver_from_word(user, t, true) if t.enabled
     end
-    user.target_images.each do |t|
-      Deliver::Images.deliver_from_image(user, t) if t.enabled
-    end
+    # 登録画像に基づく配信処理：14/06/14現在停止中
+    #user.target_images.each do |t|
+    #  Deliver::Images.deliver_from_image(user, t) if t.enabled
+    #end
 
     # １ユーザーの最大容量を超えていたら古い順に削除
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
@@ -36,30 +37,14 @@ module Deliver
   # @param [Integer] 配信するTagレコードのID
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
-    self.deliver_from_word(user, TargetWord.find(target_word_id), false)
+    target_word = TargetWord.find(target_word_id)
+    puts "Delivering to target_word=#{target_word_id}"
+
+    Deliver::Words.deliver_from_word(user, target_word, false)
 
     # １ユーザーの最大容量を超えていたら古い順に削除
-    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
-  end
-
-
-  # 文字情報が存在するImageレコードを検索して返す
-  # @param [Boolean] 定時配信で呼ばれたのかどうか
-  # @return [ActiveRecord_Relation_Image]
-  def self.get_images(is_periodic)
-    if is_periodic
-      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
-      #images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
-      #  references(:tags)
-      images = Image.where.not(is_illust: nil, src_url: nil)
-    else
-      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
-      #images = Image.includes(:tags).where.not(tags: {name: nil}).references(:tags)
-      images = Image.all
-    end
-    images
+    Deliver::Words.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
+    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
 
 
@@ -128,7 +113,7 @@ module Deliver
       images = images.take MAX_DELIVER_NUM
     end
 
-    puts "Matched: #{images.count.to_s} images"
+    puts "Limited: #{images.count.to_s} images"
     images
   end
 

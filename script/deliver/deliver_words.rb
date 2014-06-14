@@ -3,7 +3,7 @@ module Deliver::Words
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
   def self.deliver_from_word(user, target_word, is_periodic)
-    images = Deliver.get_images(is_periodic)
+    images = self.get_images(is_periodic, target_word.word)
     puts "Processing: #{images.count.to_s} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
@@ -16,6 +16,26 @@ module Deliver::Words
     images = Deliver.limit_images(user, images)                      # 配信画像を制限する
     Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
     target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
+  end
+
+
+  # 文字情報が存在するImageレコードを検索して返す
+  # @param [Boolean] 定時配信で呼ばれたのかどうか
+  # @return [ActiveRecord_Relation_Image]
+  def self.get_images(is_periodic, tag)
+    if is_periodic
+      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
+      images = Image.includes(:tags).
+        where.not(is_illust: nil, src_url: nil).where(tags: { name: tag }).
+        references(:tags)
+    else
+      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
+      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
+      images = Image.includes(:tags).
+        where(tags: { name: tag }).
+        references(:tags)
+    end
+    images
   end
 
   # 特定のImageオブジェクトがtarget_wordにマッチするか判定する
