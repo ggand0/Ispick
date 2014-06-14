@@ -11,8 +11,13 @@ class Image < ActiveRecord::Base
     styles: { thumb: "300x300#", medium: "600x800>" },
     use_timestamp: false
 
+  before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
   #validates_uniqueness_of :md5_checksum
+
+  def destroy_attachment
+    self.data.destroy
+  end
 
   def generate_md5_checksum(file)
     self.md5_checksum = Digest::MD5.hexdigest(file.read)
