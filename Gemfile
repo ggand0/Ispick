@@ -63,6 +63,8 @@ gem 'pry-rails'                                  # Improve the console
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-twitter'
+gem 'omniauth-facebook'
+gem 'omniauth-pinterest'
 
 # System
 gem 'nokogiri'                                   # For scraping
