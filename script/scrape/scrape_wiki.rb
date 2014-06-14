@@ -90,7 +90,6 @@ module Scrape::Wiki
   # @param [String] 日本語版ページのurl
   # @return [String] 英語版ページのurl
   def self.get_anime_page_en(anime_page)
-    #puts 'DEBUG2'
     html = self.open_html anime_page
     return if html.nil?
 

@@ -35,7 +35,7 @@ every 3.hours do
 end
 
 every 6.hours do
-  rake 'scrape:fchan'
+  #rake 'scrape:fchan'
 end
 
 # 配信システム系

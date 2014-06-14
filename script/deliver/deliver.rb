@@ -63,6 +63,8 @@ module Deliver
   # @param [TargetWord/TargetImage]
   # @param [Boolean] 定時配信かどうか
   def self.deliver_images(user, images, target, is_periodic)
+    tmp_images = []
+
     images.each_with_index do |image, count|
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
       next if is_periodic and image.data.url == MISSING_URL
@@ -86,12 +88,20 @@ module Deliver
       # DB保存後にuser.delivered_imagesに追加して配信する
       if image.delivered_images << delivered_image
         target.delivered_images << delivered_image
-        user.delivered_images << delivered_image
-        user.save
+        #user.delivered_images << delivered_image
+        #user.save
+        tmp_images << delivered_image
       end
 
       puts "- Creating delivered_images: #{count.to_s} /
         #{images.count.to_s}" if count % 10 == 0
+    end
+
+
+    # 投稿日時順（posted_at）にソートしてから配信する
+    tmp_images.each do |image|
+      user.delivered_images << image
+      user.save
     end
   end
 
