@@ -3,15 +3,17 @@ module Deliver::Words
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
   def self.deliver_from_word(user, target_word, is_periodic)
+    puts "Starting: target_word=#{target_word.word}"
+
     images = self.get_images(is_periodic, target_word.word)
-    puts "Processing: #{images.count.to_s} images"
+    puts "Processing: #{images.count} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
     images = images.map do |image|
       self.contains_word(image, target_word) ? image : nil
     end
     images.compact!
-    puts "Matched: #{images.count.to_s} images"
+    puts "Matched: #{images.count} images"
 
     images = Deliver.limit_images(user, images)                      # 配信画像を制限する
     Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する

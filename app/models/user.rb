@@ -10,11 +10,14 @@ class User < ActiveRecord::Base
   has_attached_file :avatar,
     styles: { thumb: "x50" },
     use_timestamp: false
-  #after_create :create_default_board
-  #def create_default_board
-  #end
 
+  after_create :create_default_board
   validates :name, presence: true
+
+  def create_default_board
+    image_board = ImageBoard.create(name: 'Default')
+    self.image_boards << image_board
+  end
 
   def self.new_with_session(params, session)
     super.tap do |user|
