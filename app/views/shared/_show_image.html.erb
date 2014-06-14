@@ -7,7 +7,7 @@
 
 <p>
   <strong>Caption:</strong>
-  <%= image.caption.html_safe %>
+  <%= image.caption.html_safe if image.caption %>
 </p>
 
 <p>
@@ -54,9 +54,9 @@
     </tr>
     <tr>
       <th align="left">Tags</th>
-      <%# @delivered_image.tags.each do |tag| %>
-      <%# tag.name %>
-      <%# end %>
+      <td><% image.tags.each do |tag| %>
+        <%= tag.name %>
+      <% end %></td>
     </tr>
     <tr>
       <th align="left">Size in bytes[KB]</th>
