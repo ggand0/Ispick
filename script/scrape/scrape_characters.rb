@@ -41,7 +41,7 @@ module Scrape::Wiki::Character
     # 辞書順にHashをソートして返す
     puts '-----------------------------------'
     puts anime_character_page_url
-    anime_character_page_url.delete_if { |k, v| v.empty? or v.nil? or k.empty? or k.nil? }
+    anime_character_page_url.delete_if { |k, v| v.empty? or v.nil? or k.nil? or k.empty? }
     puts '-----------------------------------'
     Hash[ anime_character_page_url.sort_by{|k,v| k} ]
   end
@@ -272,113 +272,12 @@ module Scrape::Wiki::Character
 
     # h2タグを抜き出す
     html.css('h2').each do |item|
-      if /((main|Main)*(characters|Characters))|((characters|Characters)*(of).*)/ =~ item.inner_text
-        current = item.next_element
-        # dtタグの抽出
-        while true
-          if current.respond_to?(:name) and current.name == 'dl'
-            current.css('dt').each do |dt|
-              next if dt.inner_text.empty?
-
-              tmp = dt.inner_text
-              tmp.gsub!(/\?/, '')
-              tmp_array = []
-
-              # Leysritt (リーゼリット Rīzeritto?) and Sella (セラ Sera?)
-              if /(.*?) \((.*?)\) and (.*?) \((.*?)\)/ =~ tmp
-                tmp_array = tmp.split(' and ')
-                names = [ $1, $2, $3, $4 ]
-
-=begin
-
-                res = self.match_character_name(names[1], characters_list)
-                name_array, characters_list = self.add_character_name(
-                  names[0], res, name_array, characters_list) if not res.empty?
-
-                res = self.match_character_name(names[3], characters_list)
-                name_array, characters_list = self.add_character_name(
-                    names[2], res, name_array, characters_list) if not res.empty?
-=end
-                res = self.match_character_name(names[1], characters_list)
-                if not res.empty?
-                  characters_list.delete(res)
-                  res[:en] = self.convert_macrons(names[0])
-                  name_array.push(res)
-                end
-                res = self.match_character_name(names[3], characters_list)
-                if not res.empty?
-                  characters_list.delete(res)
-                  res[:en] = self.convert_macrons(names[2])
-                  name_array.push(res)
-                end
-
-              # Yūri (ユウリ?) / Airi Anri (杏里 あいり Anri Airi?)
-              elsif /(.*?) \((.*?)\) \/ (.*?) \((.*?)\)/ =~ tmp
-                tmp_array = tmp.split(' / ')
-                names = [ $1, $2, $3, $4 ]
-
-=begin
-                res = self.match_character_name(names[1], characters_list)
-                name_array, characters_list = self.add_character_name(
-                  names[0], res, name_array, characters_list) if not res.empty?
-
-                res = self.match_character_name(names[3], characters_list)
-                name_array, characters_list = self.add_character_name(
-                    names[2], res, name_array, characters_list) if not res.empty?
-                res = self.match_character_name(names[1], characters_list)
-=end
-                res = self.match_character_name(names[1], characters_list)
-                if not res.empty?
-                  characters_list.delete(res)
-                  res[:en] = self.convert_macrons(names[0])
-                  name_array.push(res)
-                end
-                res = self.match_character_name(names[3], characters_list)
-                if not res.empty?
-                  characters_list.delete(res)
-                  res[:en] = self.convert_macrons(names[2])
-                  name_array.push(res)
-                end
-
-              else
-                # Madoka Kaname (鹿目 まどか Kaname Madoka?)
-                if /(.*?) \((.*?)\)/ =~ tmp
-                  names = [ $1, $2 ]
-
-                  res = self.match_character_name(names[1], characters_list)
-                  #name_array, characters_list = self.add_character_name(
-                  #  names[0], res, name_array, characters_list) if not res.empty?
-                  if not res.empty?
-                    characters_list.delete(res)
-                    res[:en] = self.convert_macrons(names[0])
-                    name_array.push(res)
-                  end
-                else
-                  res = self.match_character_name(tmp, characters_list)
-                  #name_array, characters_list = self.add_character_name(
-                  #  tmp, res, name_array, characters_list) if not res.empty?
-                  if not res.empty?
-                    characters_list.delete(res)
-                    res[:en] = self.convert_macrons(tmp)
-                    name_array.push(res)
-                  end
-                end
-
-              end
-
-            end
-          elsif current.respond_to?(:name) and (current.name == 'h2' or current.name == 'script')
-            break
-          end
-
-          # next_elementが存在するかどうかの判定
-          if current.respond_to?(:next_element)
-            current = current.next_element
-          else
-            break
-          end
-        end
-
+      begin
+        tmp, characters_list = self.scrape_character_name_en(anime_title, html, characters_list, item)
+        name_array += tmp
+      rescue => e
+        puts "#{anime_title}: #{item}#{characters_list}"
+        puts e
       end
     end
 
@@ -389,3 +288,92 @@ module Scrape::Wiki::Character
     end
   end
 
+  def self.scrape_character_name_en(anime_title, html, characters_list, item)
+    name_array = []
+
+    if /((main|Main)*(characters|Characters))|((characters|Characters)*(of).*)/ =~ item.inner_text
+      current = item.next_element
+      # dtタグの抽出
+      while true
+        if current.respond_to?(:name) and current.name == 'dl'
+          current.css('dt').each do |dt|
+            next if dt.inner_text.empty?
+
+            tmp = dt.inner_text
+            tmp.gsub!(/\?/, '')
+            tmp_array = []
+
+            # Leysritt (リーゼリット Rīzeritto?) and Sella (セラ Sera?)
+            if /(.*?) \((.*?)\) and (.*?) \((.*?)\)/ =~ tmp
+              tmp_array = tmp.split(' and ')
+              names = [ $1, $2, $3, $4 ]
+
+              res = self.match_character_name(names[1], characters_list)
+              if not res.empty?
+                characters_list.delete(res)
+                res[:en] = self.convert_macrons(names[0])
+                name_array.push(res)
+              end
+              res = self.match_character_name(names[3], characters_list)
+              if not res.empty?
+                characters_list.delete(res)
+                res[:en] = self.convert_macrons(names[2])
+                name_array.push(res)
+              end
+
+            # Yūri (ユウリ?) / Airi Anri (杏里 あいり Anri Airi?)
+            elsif /(.*?) \((.*?)\) \/ (.*?) \((.*?)\)/ =~ tmp
+              tmp_array = tmp.split(' / ')
+              names = [ $1, $2, $3, $4 ]
+
+              res = self.match_character_name(names[1], characters_list)
+              if not res.empty?
+                characters_list.delete(res)
+                res[:en] = self.convert_macrons(names[0])
+                name_array.push(res)
+              end
+              res = self.match_character_name(names[3], characters_list)
+              if not res.empty?
+                characters_list.delete(res)
+                res[:en] = self.convert_macrons(names[2])
+                name_array.push(res)
+              end
+            else
+              # Madoka Kaname (鹿目 まどか Kaname Madoka?)
+              if /(.*?) \((.*?)\)/ =~ tmp
+                names = [ $1, $2 ]
+
+                res = self.match_character_name(names[1], characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(names[0])
+                  name_array.push(res)
+                end
+              else
+                res = self.match_character_name(tmp, characters_list)
+                if not res.empty?
+                  characters_list.delete(res)
+                  res[:en] = self.convert_macrons(tmp)
+                  name_array.push(res)
+                end
+              end
+
+            end # if /(.*?) \((.*?)\) and (.*?) \((.*?)\)/ =~ tmp
+          end # each
+        elsif current.respond_to?(:name) and (current.name == 'h2' or current.name == 'script')
+          break
+        end
+
+        # next_elementが存在するかどうかの判定
+        if current.respond_to?(:next_element)
+          current = current.next_element
+        else
+          break
+        end
+      end # while true
+    end # if
+
+    [ name_array, characters_list ]
+  end # scrape_character_name
+
+end
