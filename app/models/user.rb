@@ -1,22 +1,28 @@
 class User < ActiveRecord::Base
-  has_many :delivered_images
-  has_many :target_images
-  has_many :image_boards
-  has_many :target_words
+  has_many :delivered_images, dependent: :destroy
+  has_many :target_images, dependent: :destroy
+  has_many :image_boards, dependent: :destroy
+  has_many :target_words, dependent: :destroy
 
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
 
   has_attached_file :avatar,
     styles: { thumb: "x50" },
+    default_url: ActionController::Base.helpers.asset_path('default_image_thumb.png'),
     use_timestamp: false
 
-  after_create :create_default_board
+  after_create :create_default
   validates :name, presence: true
 
-  def create_default_board
+  def create_default
+    # generate default image_board
     image_board = ImageBoard.create(name: 'Default')
     self.image_boards << image_board
+
+    # generate default avatar
+    self.avatar = File.open("#{Rails.root}/app/assets/images/icepick.png")
+    self.save!
   end
 
   def self.new_with_session(params, session)

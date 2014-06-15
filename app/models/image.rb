@@ -9,6 +9,7 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: { thumb: "300x300#", medium: "600x800>" },
+    default_url: ActionController::Base.helpers.asset_path('default_image_thumb.png'),
     use_timestamp: false
 
   before_destroy :destroy_attachment
