@@ -8,5 +8,8 @@ FactoryGirl.create(:person_illya)
 
 File.open("#{Rails.root}/db/seeds/characters_list").read.each_line do |line|
   tmp = line.split(',')
-  Person.create(name: tmp[0], name_english: tmp[1], name_type: 'Character')
+  person = Person.create(
+    name_display: tmp[0], name: tmp[1], name_english: tmp[2], name_type: 'Character'
+  )
+  puts "Seeding #{person.name}"
 end
