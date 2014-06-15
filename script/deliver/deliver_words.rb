@@ -3,9 +3,10 @@ module Deliver::Words
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
   def self.deliver_from_word(user, target_word, is_periodic)
-    puts "Starting: target_word=#{target_word.word}"
+    query = target_word.person ? target_word.person.name : target_word.word
+    puts "Starting: target_word=#{query}"
 
-    images = self.get_images(is_periodic, target_word.word)
+    images = self.get_images(is_periodic, query)
     puts "Processing: #{images.count} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
