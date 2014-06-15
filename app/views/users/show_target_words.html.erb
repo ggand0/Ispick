@@ -30,7 +30,7 @@
         <td><%= link_to 'このタグへの配信画像を見る', show_delivered_target_word_path(target_word) %></td>
 
         <!--<td><%= link_to get_enabled_html(target_word.enabled).html_safe, switch_target_word_path(target_word) %></td>-->
-        <td><%= link_to 'Destroy', target_word, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', target_word, method: :delete %></td>
       </tr>
     <% end %>
   </tbody>

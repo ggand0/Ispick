@@ -22,8 +22,8 @@
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
 
-every 15.minutes do
-  rake 'scrape:twitter'
+every 60.minutes do
+  #rake 'scrape:twitter'
 end
 
 every 60.minutes do
