@@ -9,11 +9,15 @@ class User < ActiveRecord::Base
 
   has_attached_file :avatar,
     styles: { thumb: "x50" },
-    default_url: ActionController::Base.helpers.asset_path('default_image_thumb.png'),
+    default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
 
   after_create :create_default
   validates :name, presence: true
+
+  def set_default_url
+    ActionController::Base.helpers.asset_path('default_image_thumb.png')
+  end
 
   def create_default
     # generate default image_board

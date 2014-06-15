@@ -9,12 +9,16 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: { thumb: "300x300#", medium: "600x800>" },
-    default_url: ActionController::Base.helpers.asset_path('default_image_thumb.png'),
+    default_url: lambda { |data| data.instance.set_default_url}
     use_timestamp: false
 
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
   #validates_uniqueness_of :md5_checksum
+
+  def set_default_url
+    ActionController::Base.helpers.asset_path('default_image_thumb.png')
+  end
 
   def destroy_attachment
     self.data.destroy
