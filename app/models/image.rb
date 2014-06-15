@@ -9,7 +9,7 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: { thumb: "300x300#", medium: "600x800>" },
-    default_url: lambda { |data| data.instance.set_default_url}
+    default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
 
   before_destroy :destroy_attachment
