@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true
 
   def set_default_url
-    ActionController::Base.helpers.asset_path('default_image_thumb.png')
+    ActionController::Base.helpers.asset_path('default_user_thumb.png')
   end
 
   def create_default
