@@ -10,7 +10,7 @@ $ ->
     $("#modal-board").modal('show')###
 
     $('#modal-board').modal('hide')
-    target = $('.modal-id')
+    target = $('.id')
     $.ajax({
       url: '/image_boards/boards',
       type: 'get',
