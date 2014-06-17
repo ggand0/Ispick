@@ -30,9 +30,12 @@ module ApplicationHelper
   # @param [ActiveRecord::Relation] Image/DeliveredImageのrelationオブジェクト
   # @return [Integer] 容量の合計[byte]
   def get_total_size(images)
+    return 0 if images.nil?
+
     total_size = 0
-    images.each do |n|
-      total_size += n.data.size if n.data and n.data.size
+    images.each do |i|
+      next if i.nil?
+      total_size += i.data.size if i.data and i.data.size
     end
     total_size
   end
