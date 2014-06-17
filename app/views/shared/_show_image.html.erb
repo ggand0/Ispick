@@ -1,3 +1,4 @@
+<h2>Info:</h2>
 <p>
   <strong>Title:</strong>
   <%= image.title %>
@@ -9,13 +10,17 @@
 </p>
 
 <p>
+
   <strong>Source URL:</strong>
-  <%= link_to 'source image URL', image.src_url %>
+<!--<div style="word-wrap: break-word;">
+  <%= link_to "#{image.src_url}", image.src_url %>
+</div>-->
+<%= link_to "#{image.src_url}", image.src_url %>
 </p>
 
 <p>
-  <strong>Page URL:</strong>
-  <%= link_to 'source page URL', image.page_url.html_safe if image.page_url %>
+  <strong>Source Page URL:</strong>
+  <%= link_to "#{image.page_url}", image.page_url.html_safe if image.page_url %>
 </p>
 
 <p>
@@ -71,7 +76,21 @@
     </tr>
   </tbody>
 </table>
-<br>
-<div align="center">
-  <%= image_tag image.data.url(:medium) %>
-</div>
+
+<h2>Debug:</h2>
+<table>
+  <thead>
+    <tr>
+      <th align="left">id of image</th>
+      <td><%= image.id %></td>
+    </tr>
+    <tr>
+      <th align="left">id of displaying_image</th>
+      <td><%= displaying_image.id %></td>
+    </tr>
+    <tr>
+      <th align="left">raw image size</th>
+      <td><%= image.data.size if image.data %></td>
+    </tr>
+  </thead>
+</table>
