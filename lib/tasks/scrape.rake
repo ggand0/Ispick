@@ -1,20 +1,19 @@
 # encoding: utf-8
+require "#{Rails.root}/script/scrape/scrape"
+
 namespace :scrape do
   @DEFAULT = 10000
-  desc "Imagesテーブルリセット"
-  task reset: :environment do
-    # Imageモデルを全消去
-    puts 'Deleting all images...'
-    Image.delete_all
-  end
 
+  # ----------------------------------
+  # General
+  # ----------------------------------
   desc "指定された時期より古いImageを削除"
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
 
     # http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
-    old = DateTime.now.utc - 7.days   # rails onlyな書き方
+    old = DateTime.now.utc - 7.days                 # rails onlyな書き方
     Image.where("created_at < ?", old).destroy_all
 
     puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
@@ -39,36 +38,38 @@ namespace :scrape do
       #puts Image.limit(delete_num).order(:created_at)
       Image.limit(delete_num).order(:created_at).destroy_all
     end
-
     puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
     puts 'Current image count: ' + Image.count.to_s
   end
 
   desc "画像を対象webサイト全てから抽出する"
   task all: :environment do
-    # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_all
   end
+
   desc "画像を対象webサイト全てから抽出する"
   task users: :environment do
-    # 対象サイトから画像抽出
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_users
   end
 
   desc "タグ検索による抽出を行う"
   task keyword: :environment do
     puts 'Scraping images from target websites...'
-    require "#{Rails.root}/script/scrape/scrape"
     Scrape.scrape_keyword(TargetWord.last)
   end
 
+  desc "dataがnilのレコードにsrc_urlから再DLさせる"
+  task redownload: :environment do
+    puts 'Downloading for images with nil data...'
+    Scrape.redownload
+  end
 
 
-  # 以下、whenever用タスク
+  # ----------------------------------
+  # 以下、whenever用のタスク
+  # ----------------------------------
   require "#{Rails.root}/script/scrape/scrape"
   desc "every 5 min"
   task min5: :environment do
