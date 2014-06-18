@@ -32,7 +32,7 @@ describe TargetWordsController do
   let(:user) { FactoryGirl.create(:user) }
   before do
     sign_in user
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
 
   describe "GET index" do
@@ -186,7 +186,10 @@ describe TargetWordsController do
       target_word = FactoryGirl.create(:word_with_delivered_images, images_count: 5)
       get :show_delivered, { id: target_word.to_param }, valid_session
 
-      expect(assigns(:delivered_images).count).to eq(target_word.delivered_images.count)
+      # count = target_word.delivered_images.count
+      count = target_word.delivered_images.joins(:image).
+        where.not(images: { site_name: 'twitter' }).count
+      expect(assigns(:delivered_images).count).to eq(count)
     end
   end
 

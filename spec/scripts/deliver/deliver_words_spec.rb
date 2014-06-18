@@ -7,7 +7,7 @@ include ApplicationHelper
 
 describe "Deliver::Words" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
   end
 

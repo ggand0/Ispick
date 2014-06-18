@@ -7,7 +7,7 @@ include Scrape::Wiki::Character
 
 describe "Scrape::Wiki::Character" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "scrape character pages, then extract character names" do

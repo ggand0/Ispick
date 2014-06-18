@@ -7,7 +7,7 @@ describe "favored_images page" do
     mock_auth_hash
     click_link 'twitterでログイン'
 
-    # 登録イラスト一覧へのページへ進む
+    # クリップイラスト一覧へのページへ進む
     visit show_favored_images_users_path
     expect(page).to have_content('Clipped Images')
   end
