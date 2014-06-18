@@ -110,13 +110,6 @@ module Deliver
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
   def self.limit_images(user, images)
-
-    # nilの画像もついでに除去
-    images.reject! do |x|
-      #user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
-      user.delivered_images.any?{ |d| d.image.nil? }
-    end
-
     # 最大配信数に絞る（推薦度の高い順に残す）
     if images.count > MAX_DELIVER_NUM
       puts 'Removing excessed images...'
