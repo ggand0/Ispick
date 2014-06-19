@@ -11,6 +11,9 @@ namespace :deliver do
 
   desc "Deliver images to all users"
   task all: :environment do
+    puts '-----------------------------------'
+    puts "Delivering: start=#{DateTime.now}"
+
     User.all.each do |user|
       Rake::Task['deliver:user'].invoke(user.id)
       Rake::Task['deliver:user'].reenable
@@ -23,7 +26,7 @@ namespace :deliver do
     start = Time.now
     Deliver.deliver(args[:user_id])
 
-    puts '-----------------------------------'# 35 chars
+    puts '-----------------------------------'
     puts 'Elapsed time: ' + (Time.now - start).to_s
     puts 'DONE!'
   end
@@ -33,7 +36,7 @@ namespace :deliver do
     t0 = Time.now
     Deliver.deliver_keyword(args[:user_id], args[:target_word_id])
     t1 = Time.now
-    puts '-----------------------------------'# 35 chars
+    puts '-----------------------------------'
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end
@@ -42,9 +45,9 @@ namespace :deliver do
   desc "全てのdelivered_imagesのfavoritesをupdateする"
   task :update, [:user_id] =>  :environment do |t, args|
     t0 = Time.now
-    Deliver.update()
+    Deliver.update
     t1 = Time.now
-    puts '-----------------------------------'# 35 chars
+    puts '-----------------------------------'
     puts 'Elapsed time: ' + (t1-t0).to_s
     puts 'DONE!'
   end

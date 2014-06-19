@@ -1,37 +1,40 @@
 require 'resque_web'
 
 Ispic::Application.routes.draw do
-  resources :target_words do
-    collection do
-      match 'search' => 'target_words#search', via: [:get, :post], as: :search
-    end
-    member do
-      get 'prefer'
-      get 'show_delivered'
-      get 'switch'
-    end
-  end
+  # RequeWeb
+  mount ResqueWeb::Engine => '/resque_web'
+  ResqueWeb::Engine.eager_load!
 
-  get "welcome/index"
+  # Root path
+  root 'welcome#index'
 
   # Devise
   devise_for :users, controllers: {
-    #:sessions      => "users/sessions",
-    #:registrations => "users/registrations",
-    passwords:          "users/passwords",
     omniauth_callbacks: "users/omniauth_callbacks"
+  }, path: '', path_names: {
+    sign_in: 'signin_with_password'
   }
+  devise_scope :user do
+    get 'reset_password' => 'devise/passwords#new'
+  end
+
+  # Resources
   resources :users do
     collection do
       get 'home'
+      get 'new_avatar'
+      post 'create_avatar'
       get 'show_illusts'
       get 'show_target_images'
       get 'show_target_words'
       get 'show_favored_images'
-      get 'sort_delivered_images'
-      get 'download_favored_images'
+
       get "/home/:year/:month/:day" => "users#home",
-        constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[012][0-9]/ }
+        constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
+
+      # routes for debug
+      get 'download_favored_images'
+      get 'debug_illust_detection'
     end
   end
 
@@ -52,22 +55,31 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
+  resources :target_words do
+    collection do
+      match 'search' => 'target_words#search', via: [:get, :post], as: :search
+    end
+    member do
+      get 'prefer'
+      get 'show_delivered'
+      get 'switch'
+    end
+  end
+  resources :image_boards do
+    collection do
+      get 'boards'
+      get 'reload'
+    end
+  end
+  resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
-  resources :favored_images, only: [:show, :destroy]
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search
     end
   end
 
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
-  # You can have the root of your site routed with "root"
-  root 'welcome#index'
-  mount ResqueWeb::Engine => '/resque_web'
-  ResqueWeb::Engine.eager_load!
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

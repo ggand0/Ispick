@@ -1,29 +1,34 @@
+<%= render 'shared/modal_image' %>
 <h1>Clipped Images</h1>
-<%= link_to 'Back', controller: 'users', action: 'home' %>
-<br>
-<%= link_to 'Download zip', controller: 'users', action: 'download_favored_images' %>
 <br>
 <p>
   <strong>Clipped images count:</strong>
-  <%= @images.count %>
+  <%= @favored_images.count %>
 </p>
 <p>
   <strong>Total size of clipped images in bytes:</strong><br>
-  <%= bytes_to_kilobytes(get_total_size(@images)) %> KB<br>
-  <%= bytes_to_megabytes(get_total_size(@images)) %> MB<br>
+  <%= bytes_to_kilobytes(get_total_size(@favored_images)) %> KB<br>
+  <%= bytes_to_megabytes(get_total_size(@favored_images)) %> MB<br>
 </p>
+<%= link_to 'Download zip(Debug)', controller: 'users', action: 'download_favored_images' %>
 <br>
+<%= bs_dropdown_button_to 'Board選択' do %>
+  <% current_user.image_boards.each do |board| %>
+  <li><%= bs_button_to board.name, { controller: 'users', action: 'show_favored_images', board: board.name } %></li>
+  <% end %>
+<% end %>
 
 <div class="wrap">
-  <% @images.each do |image| %>
+  <% @favored_images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s }) %>
+        <%= link_to 'Unclip', image, method: :delete %>
+
+        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>
   <% end %>
 </div>
 
-<%= paginate @images %>
+<%= paginate @favored_images %>

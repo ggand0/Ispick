@@ -19,12 +19,14 @@ FactoryGirl.define do
   # A general target_image with face feature
   factory :feature_madoka, class: Feature do
     face  '[{"likelihood":0.9999814629554749,"face":{"x":501,"y":286,"width":286,"height":286},"skin_color":{"blue":231,"green":244,"red":249},"hair_color":{"blue":170,"green":206,"red":249},"eyes":{"left":{"x":646,"y":349,"width":95,"height":62,"colors":{"blue":122,"green":135,"red":187}},"right":{"x":511,"y":399,"width":67,"height":56,"colors":{"blue":106,"green":130,"red":190}}},"nose":{"x":599,"y":463},"chin":{"x":653,"y":549}}]'
+    categ_imagenet '{"butcher shop":0.14126,"kimono":0.014878,"crayfish":0.010015,"Dungeness crab":0.012564,"soccer ball":0.013868,"cowboy hat":0.01292,"sombrero":0.044489,"flamingo":0.080047,"American lobster":0.018999,"shoe shop":0.011779,"basketball":0.033343,"pajama":0.033731,"jigsaw puzzle":0.014154,"king crab":0.030503}'
     association :featurable, factory: :target_image
   end
 
   # feature_madokaに似た特徴量を持つ画像を仮定（hair_colorのrgb+10してる）
   factory :feature_madoka1, class: Feature do
     face  '[{"likelihood":0.9999814629554749,"face":{"x":501,"y":286,"width":286,"height":286},"skin_color":{"blue":231,"green":244,"red":249},"hair_color":{"blue":180,"green":216,"red":259},"eyes":{"left":{"x":646,"y":349,"width":95,"height":62,"colors":{"blue":122,"green":135,"red":187}},"right":{"x":511,"y":399,"width":67,"height":56,"colors":{"blue":106,"green":130,"red":190}}},"nose":{"x":599,"y":463},"chin":{"x":653,"y":549}}]'
+    categ_imagenet '{"butcher shop":0.14126,"kimono":0.014878,"crayfish":0.010015,"Dungeness crab":0.012564,"soccer ball":0.013868,"cowboy hat":0.01292,"sombrero":0.044489,"flamingo":0.080047,"American lobster":0.018999,"shoe shop":0.011779,"basketball":0.033343,"pajama":0.033731,"jigsaw puzzle":0.014154,"king crab":0.030503}'
     association :featurable, factory: :image
   end
 

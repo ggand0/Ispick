@@ -1,5 +1,6 @@
 class DeliveredImage < ActiveRecord::Base
   belongs_to :user
+  belongs_to :image
   belongs_to :favored_image
   belongs_to :targetable, polymorphic: true
   has_one :feature, as: :featurable
@@ -10,15 +11,14 @@ class DeliveredImage < ActiveRecord::Base
 
   has_attached_file :data,
     styles: {
-      thumb: "100x100#",
-      small: "150x150>",
-      medium: "200x200" },
+      thumb: "300x300#"
+    },
     use_timestamp: false
 
-  # Imageモデルで一度validateされているはずだが、一応定義
-  validates_uniqueness_of :src_url
 
+  # URLから画像をDLして、attachmentに設定する
   # 後でmodule化する
+  # @param [String] 画像のソースURL
   def image_from_url(url)
     require 'open-uri'
     self.data = open(url)

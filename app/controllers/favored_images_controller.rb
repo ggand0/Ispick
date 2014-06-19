@@ -4,6 +4,10 @@ class FavoredImagesController < ApplicationController
   # GET /favored_images/1
   # GET /favored_images/1.json
   def show
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'show' }
+    end
   end
 
   # DELETE /favored_images/1

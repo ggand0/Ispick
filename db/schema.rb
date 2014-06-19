@@ -11,24 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140422033323) do
+ActiveRecord::Schema.define(version: 20140602154729) do
 
   create_table "delivered_images", force: true do |t|
-    t.text     "title"
-    t.text     "caption"
-    t.text     "src_url"
-    t.text     "page_url"
-    t.text     "site_name"
-    t.string   "module_name"
-    t.integer  "views"
-    t.integer  "favorites"
-    t.datetime "posted_at"
-    t.boolean  "is_illust"
-    t.string   "data_file_name"
-    t.string   "data_content_type"
-    t.integer  "data_file_size"
-    t.datetime "data_updated_at"
     t.integer  "user_id"
+    t.integer  "image_id"
     t.integer  "favored_image_id"
     t.integer  "targetable_id"
     t.string   "targetable_type"
@@ -42,7 +29,7 @@ ActiveRecord::Schema.define(version: 20140422033323) do
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
-    t.integer  "user_id"
+    t.integer  "image_board_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
@@ -53,8 +40,16 @@ ActiveRecord::Schema.define(version: 20140422033323) do
 
   create_table "features", force: true do |t|
     t.text     "face"
+    t.text     "categ_imagenet"
     t.integer  "featurable_id"
     t.string   "featurable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "image_boards", force: true do |t|
+    t.string   "name"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -64,6 +59,7 @@ ActiveRecord::Schema.define(version: 20140422033323) do
     t.text     "caption"
     t.text     "src_url"
     t.boolean  "is_illust"
+    t.float    "quality"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
@@ -95,10 +91,16 @@ ActiveRecord::Schema.define(version: 20140422033323) do
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "name_display"
+    t.string   "name_english"
     t.string   "name_type"
     t.integer  "target_word_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "people_titles", id: false, force: true do |t|
+    t.integer "title_id",  null: false
+    t.integer "person_id", null: false
   end
 
   create_table "tags", force: true do |t|
@@ -109,7 +111,6 @@ ActiveRecord::Schema.define(version: 20140422033323) do
   end
 
   create_table "target_images", force: true do |t|
-    t.text     "title"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
@@ -130,7 +131,17 @@ ActiveRecord::Schema.define(version: 20140422033323) do
     t.datetime "updated_at"
   end
 
+  create_table "titles", force: true do |t|
+    t.text     "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", force: true do |t|
+    t.string   "avatar_file_name"
+    t.string   "avatar_content_type"
+    t.integer  "avatar_file_size"
+    t.datetime "avatar_updated_at"
     t.string   "email",                            default: "", null: false
     t.string   "encrypted_password",               default: "", null: false
     t.string   "reset_password_token"

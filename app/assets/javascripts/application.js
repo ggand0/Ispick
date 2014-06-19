@@ -12,5 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
+//= require jquery.infinitescroll.min
+//= require jquery.remotipart
+//= require bootstrap
+//= require bootstrap-datepicker
 //= require turbolinks

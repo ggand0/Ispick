@@ -5,15 +5,15 @@ FactoryGirl.define do
     title "MyText"
     caption "MyText"
     src_url "MyText"
-    user_id 1
+
   end
 
   factory :favored_image_file, class: FavoredImage do
     title "MyText"
     caption "MyText"
     src_url "MyText"
-    user_id 1
-    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
+
+    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存
     data { fixture_file_upload('spec/fixtures/files/madoka.png') }
 
     # save時にvalidationをスキップする
@@ -26,7 +26,7 @@ FactoryGirl.define do
     title "MyText"
     caption "MyText"
     src_url "MyText"
-    user_id 1
-    association :delivered_image, factory: :delivered_image_favored_light
+
+    association :delivered_image, factory: :delivered_image_favored
   end
 end

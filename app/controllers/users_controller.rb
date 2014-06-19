@@ -4,66 +4,44 @@ require 'zip'
 class UsersController < ApplicationController
   def home
     if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      if params[:year] and params[:month] and params[:day]
-        date = Date.new(params[:year].to_i, params[:month].to_i, params[:day].to_i).to_datetime
-      else
-        date = Date.today.to_datetime
+      delivered_images = current_user.delivered_images.where.not(images: { site_name: 'twitter' }).
+        joins(:image).#reorder('images.created_at')
+        reorder('created_at DESC')
+
+      # 配信日で絞り込む場合
+      if params[:date]
+        date = params[:date]
+        date = DateTime.parse(date).to_date
+        delivered_images = delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
       end
 
-      start_day = date.change(offset: '+0900')
-      end_day = (date+1).change(offset: '+0900')
-
-      delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').
-        where(created_at: start_day.utc..end_day.utc)
-
-      # イラスト判定リクエストがあれば：
-      delivered_images = delivered_images.where(is_illust: true) if params[:illust]
-
-      # ソートリクエストがあれば：
-      delivered_images = delivered_images.reorder('favorites desc') if params[:sort]
-
       @delivered_images = delivered_images.page(params[:page]).per(25)
+      @delivered_images_all = delivered_images
       render action: 'signed_in'
     else
       render action: 'not_signed_in'
     end
   end
 
-  def sort_delivered_images
-    if signed_in?
-      delivered_images = current_user.delivered_images.reorder('favorites desc')
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
+  # GET
+  def new_avatar
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'new_avatar' }
     end
   end
 
-  def show_illusts
-    if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').where(is_illust: true)
+  # POST
+  def create_avatar
+    session[:return_to] ||= request.referer
 
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
-    end
-  end
+    user = User.find(params[:id])
+    user.avatar = params[:avatar]
+    user.save!
 
-  def show_illusts
-    if signed_in?
-      # paginationについては調整中。数が固定されたらモデルに表示数を定義する
-      delivered_images = current_user.delivered_images.
-        where('avoided IS NULL or avoided = false').where(is_illust: true)
-
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
+    respond_to do |format|
+      format.html { redirect_to session.delete(:return_to) }
+      format.js { render nothing: true }
     end
   end
 
@@ -77,7 +55,6 @@ class UsersController < ApplicationController
   end
 
   def show_target_words
-    # Test commit
     if signed_in?
       @words = current_user.target_words
       render action: 'show_target_words'
@@ -88,17 +65,24 @@ class UsersController < ApplicationController
 
   def show_favored_images
     if signed_in?
-      # favored_imagesを表示するようにする
-      @images = current_user.favored_images.page(params[:page]).per(25)
+      board_name = params[:board]
+      if board_name.nil?
+        board = current_user.image_boards.first
+      else
+        board = current_user.image_boards.where(name: board_name).first
+      end
+      @favored_images = board.favored_images.page(params[:page]).per(25)
+
       render action: 'show_favored_images'
     else
       render action: 'not_signed_in'
     end
   end
 
+  # デバッグ用
   def download_favored_images
     if signed_in?
-      @images = current_user.favored_images
+      @images = current_user.image_boards.first.favored_images
       file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
       temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
@@ -117,6 +101,68 @@ class UsersController < ApplicationController
     else
       redirect_to :back
     end
+  end
+
+
+  # デバッグ用page
+  def debug_illust_detection
+    if signed_in?
+      session[:all] = (not session[:all]) if params[:toggle_site]
+      session[:sort] = params[:sort] if params[:sort]
+      session[:illust] ||= 'all'
+      session[:illust] = params[:illust] if params[:illust]
+
+      if session[:all]
+        delivered_images = current_user.delivered_images.
+          joins(:image).order('images.posted_at')
+      else
+        delivered_images = current_user.delivered_images.where(images: { site_name: 'twitter' }).
+          joins(:image).order('images.posted_at')
+      end
+
+      # イラスト判定情報で絞り込む
+      @debug = [
+        "filter_illust: #{session[:illust]}",
+        "sort_type: #{session[:sort]}",
+        "filter_site: #{session[:all]}",
+      ]
+      delivered_images = filter_illust(delivered_images)
+
+      # リクエストがある場合はソート
+      delivered_images = sort_delivered_images delivered_images if session[:sort] == 'favorites'
+      delivered_images = sort_by_quality delivered_images if session[:sort] == 'quality'
+
+      @delivered_images = delivered_images.page(params[:page]).per(25)
+    else
+      render action: 'not_signed_in'
+    end
+  end
+
+
+  private
+
+  def filter_illust(delivered_images)
+    case session[:illust]
+    when 'all'
+      return delivered_images
+    when 'illust'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: true }).references(:images)
+    when 'photo'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: false }).references(:images)
+    end
+  end
+
+  def sort_delivered_images(delivered_images)
+    delivered_images = delivered_images.includes(:image).
+      reorder('images.favorites desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
+  end
+  def sort_by_quality(delivered_images)
+    delivered_images = delivered_images.includes(:image).
+      reorder('images.quality desc').references(:images)
+    delivered_images.page(params[:page]).per(25)
   end
 
 end

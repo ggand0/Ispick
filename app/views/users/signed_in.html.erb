@@ -1,47 +1,49 @@
 <%= javascript_include_tag 'users_home' %>
+<%= javascript_include_tag 'core' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
 
-<h1>TODAY's Delivered Images</h1>
-<br>
-<%= link_to 'イラストのみ表示する', request.parameters.merge({ illust: true }) %>
-<br>
-<%= link_to 'Favorites順にする', request.parameters.merge({ sort: true }) %>
-<br>
-<br>
 <p>
-  <strong>Delivered images count:</strong>
-  <%= current_user.delivered_images.count %>
+  「好みの設定」=>「登録ワード一覧」からタグを登録すると１分弱で抽出画像がホーム画面に表示されます。<br>
+  <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @delivered_images_all %>
+  <br>
+  <br>
+  <br>
+  配信日で絞り込む：
+  <div class="input-group date" style="width: 200px;" align="right">
+    <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+  </div>
 </p>
-<p>
-  <strong>Total size of delivered images in bytes:</strong><br>
-  <%= bytes_to_kilobytes(get_total_size(current_user.delivered_images)) %> KB<br>
-  <%= bytes_to_megabytes(get_total_size(current_user.delivered_images)) %> MB<br>
-</p>
-<p>※「Lists」→「登録ワード一覧」からタグ登録すると、定期的にタグに関する画像が配信されます</p>
-<br>
-<%= render_navigation expand_all: true, renderer: :bootstrap, items: get_menu_items %>
-<br>
+
+
 <%= paginate @delivered_images %>
+
 <div class="wrap">
-  <% @delivered_images.each do |image| %>
-    <% next if image.avoided %>
+
+  <% @delivered_images.each do |delivered_image| %>
+    <% image = delivered_image.image %>
+    <% next if delivered_image.avoided %>
+
+
     <div class="box">
       <div class="boxInner">
-        <%= get_jst_string(image.created_at) + '配信' %>
+        <%= get_jst_string(delivered_image.created_at) + '配信' %>
+        <br>
+        <%= get_jst_string(image.posted_at) + '投稿' %>
         <br>
         <div class="favored">
-          <div class="id"><%= image.id %></div>
-          <%= raw get_clip_string_styled(image) %>
+          <div class="id"><%= delivered_image.id %></div>
+          <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', :remote => true, image: delivered_image.id, 'data-toggle' => "modal", 'data-target' => '#modal-board', class: 'btn-default' } %>
         </div>
+        <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
 
-        <%= link_to 'Hide', avoid_delivered_image_path(image), method: :put %>
-        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <%= 'Favorites: '+image.favorites.to_s if image.favorites %>
-        <%= get_illust_html image %>
+        <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
 
-        <%= link_to(image_tag(image.data.url), { controller: 'delivered_images', action: 'show', id: image.id.to_s }) %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>
+
+
   <% end %>
 </div>
 

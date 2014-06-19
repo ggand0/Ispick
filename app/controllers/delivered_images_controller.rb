@@ -10,6 +10,10 @@ class DeliveredImagesController < ApplicationController
   # GET /delivered_images/1
   # GET /delivered_images/1.json
   def show
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'show' }
+    end
   end
 
   # GET /delivered_images/new
@@ -62,33 +66,29 @@ class DeliveredImagesController < ApplicationController
   end
 
   # PUT favor
-  # Ajax callで呼ばれることを想定
+  # delivered_imageをお気に入り画像として追加する。
   def favor
-    # 一方通行
-    if not @delivered_image.favored
-      @delivered_image.update_attributes!(favored: true)
-    end
+    board_name = params[:board]
+    @delivered_image.update_attributes!(favored: true) unless @delivered_image.favored
 
-    # src_urlが被ってたらvalidationでfalseが返る
-    favored_image = current_user.favored_images.build(
-      title: @delivered_image.title,
-      caption: @delivered_image.caption,
-      data: @delivered_image.data,
-      src_url: @delivered_image.src_url
+    # FavoredImageオブジェクト作成
+    # src_urlが重複していた場合はvalidationでfalseが返る
+    image = @delivered_image.image
+    board = current_user.image_boards.where(name: board_name).first
+    favored_image = board.favored_images.build(
+      title: image.title,
+      caption: image.caption,
+      data: image.data,
+      src_url: image.src_url
     )
-    # User.favored_imagesに追加
-    if favored_image.save
-      favored_image.delivered_image = @delivered_image
-    end
 
-    # favoredが変更された結果を返す
-    if params[:render] == 'true'
-      # そのdelivered_imageがfavoredされているかどうかを返す
-      render text: @delivered_image.favored_image != nil
-    else
-      redirect_to show_favored_images_users_path
-    end
+    # save出来たらdelivered_imageへの参照も追加
+    favored_image.delivered_image = @delivered_image if favored_image.save
 
+    respond_to do |format|
+      format.html { redirect_to show_favored_images_users_path }
+      format.js { render nothing: true }
+    end
   end
 
   # PUT avoid
@@ -109,6 +109,6 @@ class DeliveredImagesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def delivered_image_params
-      params.require(:delivered_image).permit(:title, :caption, :src_url)
+      params.require(:delivered_image).permit(:avoided)
     end
 end

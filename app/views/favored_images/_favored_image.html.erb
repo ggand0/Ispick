@@ -1,0 +1,20 @@
+<%= render partial: 'shared/render_image', locals: { image: @favored_image } %>
+<p>
+  <strong>Title:</strong>
+  <%= @favored_image.title %>
+</p>
+
+<p>
+  <strong>Caption:</strong>
+  <%= @favored_image.caption.html_safe %>
+</p>
+
+<p>
+  <strong>Source URL:</strong>
+  <%= link_to 'source image URL', @favored_image.src_url %>
+</p>
+<p>
+  <strong>Size in bytes:</strong><br>
+  <%= bytes_to_kilobytes(@favored_image.data.size) %> KB<br>
+  <%= bytes_to_megabytes(@favored_image.data.size) %> MB<br>
+</p>

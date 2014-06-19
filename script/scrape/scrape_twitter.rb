@@ -2,21 +2,16 @@
 require "twitter"
 require 'securerandom'
 
-
-# Twitterから2次画像を抽出する
 module Scrape::Twitter
-  # TwitterURL
   ROOT_URL = 'https://twitter.com'
 
-  # 関数定義
-  def self.scrape()
-    puts 'Extracting : ' + ROOT_URL
-
+  # Twitterから2次画像を抽出する
+  def self.scrape
     limit   = 1000        # 取得するツイートの上限数
     count = Image.count
 
     # 全ての登録済みのTargetWordに対して新着画像を取得する
-    # TargetWord.count=10000とかになると厳しいか
+    puts 'Extracting : ' + ROOT_URL
     TargetWord.all.each do |target_word|
       # Person.nameで検索（e.g. '鹿目まどか'）
       if target_word.enabled
@@ -32,7 +27,7 @@ module Scrape::Twitter
 
   def self.scrape_keyword(keyword)
     limit   = 200        # 取得するツイートの上限数
-    self.scrape_with_keyword(keyword, limit, false)
+    self.scrape_with_keyword(keyword, limit, true)
   end
 
 
@@ -42,10 +37,11 @@ module Scrape::Twitter
 
     # キーワードを含むハッシュタグの検索
     begin
-      image_data = self.get_tweets(client, keyword, limit)
+      self.get_contents(client, keyword, limit, validation)
     # リクエストが多すぎる場合の例外処理
     rescue Twitter::Error::TooManyRequests => error
       puts 'Too many requests to twitter'
+      return
       #sleep error.rate_limit.reset_in
       #retry
     # 検索ワードでツイートを取得できなかった場合の例外処理
@@ -53,7 +49,36 @@ module Scrape::Twitter
       puts 'ツイートを取得できませんでした'
     end
 
-    self.save(image_data, keyword, validation)
+  end
+
+  def self.get_contents(client, keyword, limit, validation=true)
+    skipped = 0
+    duplicates = 0
+    count = 0
+
+    # limitで指定された数だけツイートを取得
+    client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
+      include_entity: true).take(limit).each do |tweet|
+      # API responseから画像情報を取得してDBへ保存する
+      start = Time.now
+      image_data = self.get_data(tweet)
+
+      if image_data.count > 0
+        image_data.each do |data|
+          res = Scrape.save_image(data, self.get_tags(keyword), validation)
+          duplicates += res ? 0 : 1
+          count += 1 if res
+          puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if res
+        end
+      else
+        skipped += 1
+        next
+      end
+
+      # limit枚抽出、もしくは重複が出現し始めたら終了
+      break if duplicates >= 3
+      break if count+1-skipped >= limit
+    end
   end
 
   def self.get_client
@@ -67,14 +92,13 @@ module Scrape::Twitter
     client
   end
 
-  def self.get_contents(tweet)
+  def self.get_data(tweet)
     image_data = []
-
-    # entities内にメディア(画像等)を含む場合の処理
+    # entities内にメディア(画像等)を含む場合取得
     if tweet.media? then
       tweet.media.each do |value|
         url = value.media_uri.to_s
-        data = {
+        image_data.push({
           title: self.get_image_name(url),
           src_url: url,
           caption: tweet.text,
@@ -84,39 +108,19 @@ module Scrape::Twitter
           views: tweet.retweet_count,
           favorites: tweet.favorite_count,
           posted_at: tweet.created_at
-        }
-        image_data.push(data)
+        })
       end
     end
     image_data
   end
 
-  def self.get_tweets(client, keyword, limit)
-    image_data = []
-
-    # limitで指定された数だけツイートを取得
-    client.search("#{keyword} -rt", locale: 'ja', result_type: 'recent',
-      include_entity: true).take(limit).map do |tweet|
-      image_data += self.get_contents(tweet)
-    end
-    image_data
-  end
-
-  def self.save(image_data, keyword, validation=true)
-    # Imageモデル生成＆DB保存
-    image_data.each do |value|
-      puts "Scraped from #{value[:src_url]} : #{value[:title]}"
-      Scrape.save_image(value, self.get_tags(keyword), validation)
-    end
-  end
 
   def self.get_tags(keyword)
     tag = Tag.where(name: keyword)
     [ (tag.empty? ? Tag.new(name: keyword) : tag.first) ]
   end
 
-  def self.get_stats(page_url)
-    client = self.get_client()
+  def self.get_stats(client, page_url)
     id = page_url.match(/\/\d.*\d$/).to_s
     begin
       tweet = client.status(id)
@@ -125,7 +129,7 @@ module Scrape::Twitter
       return {}
     end
 
-    { views: nil, favorites: tweet.favorite_count }
+    { views: tweet.retweet_count, favorites: tweet.favorite_count }
   end
 
   # 画像の名称を決定する

@@ -11,6 +11,7 @@ require "#{Rails.root}/app/workers/images_face"
 require "#{Rails.root}/app/workers/target_images_face"
 
 # Generate images
+=begin
 files = Dir["#{Rails.root}/spec/files/images/*"]
 count = 0
 
@@ -35,7 +36,7 @@ files = Dir["#{Rails.root}/spec/files/target_images/*"]
 count = 0
 
 files.each do |f|
-  target_image = TargetImage.new(title: 'seed data ' + count.to_s, data: fixture_file_upload(f))
+  target_image = TargetImage.new(data: fixture_file_upload(f))
   begin
     if target_image.save
       Resque.enqueue(Face, target_image.id)
@@ -50,3 +51,4 @@ files.each do |f|
 end
 
 puts 'DONE!'
+=end

@@ -8,8 +8,15 @@ FactoryGirl.define do
 
   factory :person_madoka, class: Person do
     name '鹿目まどか'
+    name_english 'Madoka Kaname'
     name_type 'Character'
     name_display '鹿目 まどか（かなめ まどか）'
+    association :target_word, factory: :target_word
+  end
+  factory :person_madoka_en, class: Person do
+    name_english 'Madoka Kaname'
+    name_type 'Character'
+    name_display 'Madoka Kaname'
     association :target_word, factory: :target_word
   end
 

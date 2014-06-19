@@ -6,227 +6,169 @@ require 'natto'
 
 # wikipediaからアニメのキャラクター名を抽出する
 module Scrape::Wiki
+  require "#{Rails.root}/script/scrape/scrape_characters"
+  include Character
 
-  # 4chanURL
+  # 日本版Wikipedia URL
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
 
-  # 関数定義
-  # スクレイピングを行う
-  def self.scrape()
+  # TEST!!!
+  def self.scrape
     puts 'Extracting : ' + ROOT_URL
 
     # 起点となるWikipediaカテゴリページのURL
-    url = 'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+    # アニメタイトル一覧ページの配列：
+    url = [
+      'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      'http://ja.wikipedia.org/wiki/Category:2010%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      'http://ja.wikipedia.org/wiki/Category:2012%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+      'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+    ]
 
-    anime_page = self.get_anime_page(url)
-    anime_character_page = self.get_anime_character_page(anime_page)
-    anime_character = self.get_anime_character_name(anime_character_page)
-    #self.hash_output(anime_character)
-    self.save_to_database(anime_character)
+    # 各URLについて情報を取得
+    url.each do |value|
+      # アニメの概要ページのURL/タイトルのHashを取得
+      anime_page = self.get_anime_page(value)
+
+      # 登場人物の一覧ページの配列を取得、
+      # 一覧ページが無い場合は概要ページを配列に追加
+      anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page)
+
+      # キャラクタ名の一覧配列を取得
+      anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page)
+
+      # キャラクタ名をDBヘ保存
+      #self.hash_output(anime_character)
+      self.save_to_database(anime_character)
+    end
+
   end
 
 
   # アニメ名のハッシュを取得する
-  def self.get_anime_page(url)
+  # @param [String] 「20xx年のアニメ一覧」ページのurl
+  # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
+  def self.get_anime_page(url, logging=true)
     anime_page = {}
+    html = self.open_html url
 
+    # ページ一覧からアニメURLを取得
+    # html.css("div[id='mw-pages']").css('a').each { |item| puts item.content }
+    # liタグ->aタグの順にネストされているパターン
+    html.css('li > a').each do |item|
+      break if /アカウント/ =~ item.inner_text
+      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
+
+      if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
+        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
+        page_url_en = self.get_anime_page_en page_url_ja
+        puts page_url_ja if logging
+
+        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
+      end
+    end
+
+    # spanタグ->aタグの順にネストされているパターン
+    html.css('span > a').each do |item|
+      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
+
+      if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
+        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
+        page_url_en = self.get_anime_page_en page_url_ja
+        puts page_url_ja if logging
+
+        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
+      end
+    end
+
+    anime_page
+  end
+
+
+  # 英語版ページへのリンクがある場合そのページurlを返す
+  # @param [String] 日本語版ページのurl
+  # @return [String] 英語版ページのurl
+  def self.get_anime_page_en(anime_page)
+    html = self.open_html anime_page
+    return if html.nil?
+
+    item = html.css("li[class='interlanguage-link interwiki-en']").first
+
+    # liタグ内のaタグのリンクを調べる
+    if item.nil?
+      return ''
+    else
+      url = item.css('a').first.attr('href')
+      return "http:#{url}"
+    end
+  end
+
+
+  # HTMLページを開いてNokogiriのHTMLオブジェクトを返す。
+  # 例外が発生した場合はnilを返す
+  # @param [String] 対象url
+  # @return [Nokogiri::HTML] NokogiriでパースされたHTMLオブジェクト
+  def self.open_html(url)
     begin
       html = Nokogiri::HTML(open(url))
     rescue OpenURI::HTTPError => e
       if e.message == '404 Not Found'
-        puts "次のURLを開けませんでした"
+        puts '次のURLを開けませんでした'
         puts "URL : #{url}"
       else
         raise e
       end
+    rescue Errno::ENOENT => e
+      return puts e
+    rescue SocketError => e
+      return puts e
     end
-
-    # アニメ名:アニメのページURLのハッシュを取得
-    # カテゴリに分かれたページのURLを取得
-    html.css('a').each do |item|
-      if /Category/ =~ item["class"]  or /CategoryTreeLabel/ =~ item["class"] then
-        category_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = self.get_category_anime_page(item.inner_text, category_url)
-      end
-    end
-
-    # ページ一覧からアニメURLを取得
-    html.css('li > a').each do |item|
-      if /アカウント/ =~ item.inner_text then
-        break
-      end
-      if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text then
-        next
-      end
-      if item.inner_text != "" and not anime_page.has_key?(item.inner_text) then
-        page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = page_url
-      end
-    end
-
-    html.css('span > a').each do |item|
-      if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text then
-        next
-      end
-      if item.inner_text != "" and not anime_page.has_key?(item.inner_text) then
-        page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        anime_page[item.inner_text] = page_url
-      end
-    end
-
-    anime_page  # Hash
   end
 
 
-  # カテゴリページ内からアニメのページURLを取得する
-  # anime_title : String アニメのタイトル
-  # category_url : String カテゴリページのURL
-  def self.get_category_anime_page(anime_title, category_url)
-    anime_page_url = ""
-
-    begin
-      html = Nokogiri::HTML(open(category_url))
-    rescue OpenURI::HTTPError => e
-        if e.message == '404 Not Found'
-          puts "次のURLを開けませんでした"
-          puts "URL : #{catergory_url}"
-          return
-        else
-          raise e
-        end
-    end
-
-    html.css('a').each do |item|
-      if anime_title == item.inner_text then
-        anime_page_url = "http://ja.wikipedia.org%s" % [item['href']]
-        break
-      end
-    end
-
-    anime_page_url  # String
-  end
-
-
-  # アニメの登場人物ページを取得する
-  # page_url : Hash {アニメタイトル => ページURL}
-  def self.get_anime_character_page(page_url)
-    anime_character_page_url = {}
-
-    # 登場人物・キャラクターページのURLを取得
-    page_url.each do |anime, url|
-
-      begin
-        html = Nokogiri::HTML(open(url))
-      rescue OpenURI::HTTPError => e
-        if e.message == '404 Not Found'
-          puts '次のURLを開けませんでした'
-          puts "URL : #{url}"
-          next
-        else
-          raise e
-        end
-      end
-
-      page_title = html.css('h1[class="firstHeading"] > span')[0].inner_text
-      anime = page_title if /#{page_title}/ =~ anime
-
-      # aタグを取得する
-      html.css('a').each do |item|
-        if /(人物|キャラクター)/ =~ item.inner_text then
-          if /(.*)(の|#)(登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text then
-            match_string = $1
-            character_page_url = "http://ja.wikipedia.org%s" % [item['href']]
-            if /#{match_string}/ =~ anime then
-              anime_character_page_url[match_string] = character_page_url
-            elsif /#{anime}/ =~ match_string then
-              anime_character_page_url[anime] = character_page_url
-            end
-            break
-          end
-        end
-      end
-
-      # まだハッシュに要素が追加されていない場合の処理
-      if not anime_character_page_url.has_key?(anime) then
-        anime_character_page_url[anime] = url
-      end
-    end
-
-    anime_character_page_url.sort # Hash
-  end
-
-
-  # アニメの登場人物を取得する
-  def self.get_anime_character_name(wiki_url)
-    anime_character = {}
-
-    wiki_url.each do |anime, url|
-      name_array = []
-
-      begin
-        html = Nokogiri::HTML(open(url))
-      rescue OpenURI::HTTPError => e
-        if e.message == '404 Not Found'
-          puts '次のURLを開けませんでした'
-          puts "URL : #{url}"
-          next
-        else
-          raise e
-        end
-      end
-
-      html.css('h2').each do |item|
-        if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text then
-          current = item.next_element
-          while true
-            if current.name == 'dl' then
-              current.css('dt').each do |dt|
-                if dt.inner_text != '' then
-                  tmp = dt.inner_text
-                  if /^\(.*\)$/ =~ tmp or /【.*】/ =~ tmp or /.+アニメ版/ =~ tmp or /.+時代/ =~ tmp or /.+設定/ =~ tmp then
-                    next
-                  end
-                  tmp.gsub!(/\[.*\]/, '')
-                  tmp.gsub!(/,/, '')
-                  name_array.push(tmp)
-                end
-              end
-            elsif current.name == 'h2' or current.name == 'script'
-              break
-            end
-            current = current.next_element
-          end
-        end
-      end
-
-      anime_character[anime] = name_array
-    end
-
-    anime_character  # Hash
-  end
-
-
-  # ハッシュ内容のファイル出力
+  # ハッシュ内容のファイル出力(未使用)
+  # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.hash_output(input_hash)
-    f = open("sample.txt", "w")
-    input_hash.each do |key, array|
-      f.write(">> #{key}\n")
-      array.each do |value|
-        f.write("#{value}\n")
+    f = open("sample.txt", "a")
+    input_hash.each do |anime, characters|
+      f.write(">> #{anime}\n")
+      characters.each do |array|
+        f.write("[")
+        array.each do |value|
+          f.write("#{value}, ")
+        end
+        f.write("]\n")
       end
       f.write("\n")
     end
   end
 
-  # Peopleテーブルへ保存
+
+  # キャラクタ情報をparseしてPeopleテーブルへ保存する
+  # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
-    input_hash.each do |key, array|
-      array.each do |value|
-        #value => 鹿目 まどか (かなめ　まどか)
-        tmp = value.gsub(/（.*/, '')
-        tmp = tmp.gsub(/ /, '')         # => 鹿目まどか
-        person = Person.create(name: tmp, name_display: value, name_type: 'Character')
-        person.keywords.create(word: key, is_alias: false)
+    input_hash.each do |anime, characters|
+      next if characters.nil?
+
+      characters.each do |name_hash|
+        # {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
+        person = Person.create(
+          name: name_hash[:query],
+          name_display: name_hash[:name],
+          name_english: name_hash[:en],
+          name_type: 'Character'
+        )
+
+        # 関連キーワードとしてアニメタイトルを追加
+        person.keywords.create(word: anime, is_alias: false)
+
+        # Titleレコード追加
+        title = Title.create(name: anime)
+        title.people << person
+
+        # よみがなをaliasとして追加
+        person.keywords.create(word: name_hash[:_alias], is_alias: true)
 
         # keywords保存の例
         #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される
@@ -244,5 +186,6 @@ module Scrape::Wiki
       end
     end
   end
+
 
 end

@@ -13,14 +13,6 @@ class TargetImagesController < ApplicationController
   # GET /target_images/1
   # GET /target_images/1.json
   def show
-    @target_image = TargetImage.find(params[:id])
-    # 顔の特徴量を、JSON文字列からJSON Arrayへ変換する
-    if @target_image.feature.nil?
-      @face_feature = 'Not extracted.'
-    else
-      #@face_feature = JSON.parse(@target_image.feature.face)
-      @face_feature = @target_image.feature.face
-    end
   end
 
   # GET /target_images/new
@@ -35,15 +27,14 @@ class TargetImagesController < ApplicationController
   # POST /target_images
   # POST /target_images.json
   def create
-    #@target_image = TargetImage.new(target_image_params)
     @target_image = current_user.target_images.build(target_image_params)
+    @target_image.enabled = true
 
     respond_to do |format|
       if @target_image.save
-        # 顔特徴抽出処理をbackground jobに投げる
+        # 特徴抽出処理をresqueで非同期的に行う
         Resque.enqueue(TargetFace, @target_image.id)
 
-        #format.html { redirect_to @target_image, notice: 'Target image was successfully created.' }
         format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { render action: 'show', status: :created, location: @target_image }
       else
@@ -56,13 +47,11 @@ class TargetImagesController < ApplicationController
   # PATCH/PUT /target_images/1
   # PATCH/PUT /target_images/1.json
   def update
-    target = TargetImage.find(params[:id])
-    hash = { title: params[:target_image][:title], data: params[:target_image][:data]}
+    #hash = { data: params[:target_image][:data]}
 
     respond_to do |format|
-      #if @target_image.update(target_image_params)
-      if @target_image.update_attributes(hash)
-        #format.html { redirect_to @target_image, notice: 'Target image was successfully updated.' }
+      if @target_image.update(target_image_params)
+      #if @target_image.update_attributes(hash)
         format.html { redirect_to controller: 'users', action: 'show_target_images' }
         format.json { head :no_content }
       else
@@ -83,8 +72,6 @@ class TargetImagesController < ApplicationController
   end
 
 
-
-
   # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
   # GET /target_images/1/prefer
   def prefer
@@ -92,7 +79,7 @@ class TargetImagesController < ApplicationController
     @message = ''
     target_image = TargetImage.find(params[:id])
 
-    # 正しい特徴値が無い場合はindexにredirectする。この後の処理は行いたくないのでreturnもする。
+    # 正しい特徴値が無い場合はindexにredirectする。この後の処理は行いたくないのでreturn。
     if target_image.feature == nil
       return @message = 'Not extracted yet. まだ抽出されていません。'
     elsif target_image.feature.face == '[]'
@@ -111,7 +98,8 @@ class TargetImagesController < ApplicationController
   end
 
   def show_delivered
-    @delivered_images = @target_image.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
+    @delivered_images = @target_image.delivered_images.
+      where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
   end
 
   def switch

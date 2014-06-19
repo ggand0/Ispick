@@ -6,6 +6,7 @@ class CreateImages < ActiveRecord::Migration
       t.text :caption
       t.text :src_url
       t.boolean :is_illust
+      t.float :quality
       t.attachment :data
       t.string :md5_checksum
 

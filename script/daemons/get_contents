@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../../config/application', __FILE__)
+Rails.application.require_environment!
+
+require "#{Rails.root}/app/workers/get_contents"
+
+class GetContentsDaemon < DaemonSpawn::Base
+  def start(args)
+    @worker = Resque::Worker.new('get_contents')
+    @worker.verbose = true
+    @worker.work
+  end
+
+  def stop
+    @worker.try(:shutdown)
+  end
+end
+
+GetContentsDaemon.spawn!({
+  processes: 1,
+  working_dir: Rails.root,
+  pid_file: File.join(Rails.root, 'tmp', 'pids', 'get_contents.pid'),
+  log_file: File.join(Rails.root, 'log', 'get_contents.log'),
+  sync_log: true,
+  singleton: true,
+  signal: 'QUIT'
+})

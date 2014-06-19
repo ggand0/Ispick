@@ -2,13 +2,13 @@
 
 FactoryGirl.define do
   factory :target_word do
-    word '鹿目 まどか（かなめ まどか）'
+    sequence(:word) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
     enabled true
 
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
-    #factory :target_word_with_callback do
-    #  after(:create) { |user| user.send(:create, :after, :search_keyword) }
-    #end
+    factory :word_with_run_callback do
+      after(:create) { |user| user.send(:search_keyword) }
+    end
 
     factory :word_with_delivered_images do
       ignore do
@@ -29,13 +29,10 @@ FactoryGirl.define do
       end
       after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     end
+
   end
   factory :target_words, class: TargetWord do
     sequence(:word) { |n| "鹿目 まどか#{n}" }
-    enabled true
-  end
-  factory :target_word_with_callback, class: TargetWord do
-    word '鹿目 まどか（かなめ まどか）'
     enabled true
   end
 

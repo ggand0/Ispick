@@ -1,24 +1,6 @@
 require 'spec_helper'
 
 # Deleting tasks
-describe "scrape:reset" do
-  # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
-  before do
-    IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-
-  # 全てのImageを削除すること
-  it "delete all images" do
-    FactoryGirl.create_list(:image, 2)
-    subject.invoke
-    Image.count.should eq(0)
-  end
-end
-
 describe "scrape:delete_old" do
   before do
     IO.any_instance.stub(:puts)
@@ -57,8 +39,9 @@ describe "scrape:delete_excess" do
   end
 end
 
+
 # Scraping tasks
-describe "scrape:images" do
+describe "scrape:all" do
   before do
     IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return

@@ -1,18 +1,30 @@
-<h1>Ispick prototype v2</h1>
+<h1><strong>Ispick prototype v3</strong></h1>
 <p>Ispick is an illustration curation service!</p>
 
-<%# image_tag asset_path('snowmiku0.jpg'), size: '600x375' %>
-<%= image_tag asset_path('icecave0.png'), size: '400x187' %>
+<div class="top-image">
+  <%= link_to (image_tag asset_path('top_madoka.jpg')), 'http://ispick.tumblr.com/', style: " z-index: 1;"%>
+</div>
+
+<div class="wrapper-oauth">
+  <div class="btn-group-vertical btn-group-oauth">
+    <%= bs_button_to 'Facebookでアカウント作成', '/', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Twitterでアカウント作成', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Pinterestでアカウント作成', '/', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'メールアドレスでアカウント作成', '/sign_up', class: "btn btn-default btn-block" %><br>
+  </div>
+  <div align="center">
+    <%= link_to '既にアカウントをお持ちの方はこちら', '/signin_with_password' %>
+  </div>
+</div>
 <br>
-<% if user_signed_in? %>
-  <%= link_to 'ログアウト', destroy_user_session_path, :method => :delete %>
-<% else %>
-  <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter)  %>
-<% end %>
 <br>
-<%= link_to('User Home', { controller: 'users', action: 'home' }) %>
-<br>
-<br>
-<%= link_to('抽出画像一覧', { controller: 'images', action: 'index' }) %>
-<br>
-<%= link_to('うpされた嗜好画像一覧', { controller: 'target_images', action: 'index' }) %>
+<div>
+  <!-- デバッグ用OAuthログイン -->
+  <h3>Debug</h3>
+  <% if user_signed_in? %>
+    <%= link_to 'ログアウト', destroy_user_session_path %>
+  <% else %>
+    <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter) %><br>
+    <%= link_to "facebookでログイン", '/' %>
+  <% end %>
+</div>

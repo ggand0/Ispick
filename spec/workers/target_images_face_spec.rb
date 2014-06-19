@@ -9,6 +9,18 @@ describe TargetFace do
     IO.any_instance.stub(:puts)
   end
 
+  describe "get_categories function" do
+    it "returns hash of image_net categories" do
+      target_image = TargetImage.create! valid_attributes
+      hash = TargetFace.get_categories target_image
+
+      expect(hash).to be_a(Hash)
+      #expect(hash['butcher shop']).to eq(0.141260)
+      expect(hash.keys.count).to eq(4096)
+      expect(hash.values.count).to eq(4096)
+    end
+  end
+
   describe "perform method" do
     it "should create a new Feature model" do
       target_image = TargetImage.create! valid_attributes

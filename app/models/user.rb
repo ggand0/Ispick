@@ -1,14 +1,33 @@
 class User < ActiveRecord::Base
-  has_many :delivered_images
-  has_many :target_images
-  has_many :favored_images
-  has_many :target_words
+  has_many :delivered_images, dependent: :destroy
+  has_many :target_images, dependent: :destroy
+  has_many :image_boards, dependent: :destroy
+  has_many :target_words, dependent: :destroy
 
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  #devise :trackable, :omniauthable, :omniauth_providers => [:facebook, :twitter]
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
+
+  has_attached_file :avatar,
+    styles: { thumb: "x50" },
+    default_url: lambda { |data| data.instance.set_default_url},
+    use_timestamp: false
+
+  after_create :create_default
+  validates :name, presence: true
+
+  def set_default_url
+    ActionController::Base.helpers.asset_path('default_user_thumb.png')
+  end
+
+  def create_default
+    # generate default image_board
+    image_board = ImageBoard.create(name: 'Default')
+    self.image_boards << image_board
+
+    # generate default avatar
+    self.avatar = File.open("#{Rails.root}/app/assets/images/icepick.png")
+    self.save!
+  end
 
   def self.new_with_session(params, session)
     super.tap do |user|
@@ -19,6 +38,7 @@ class User < ActiveRecord::Base
   end
 
 
+  #emailを取得したい場合は、migrationにemailを追加する
   def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
     user = User.where(provider: auth.provider, uid: auth.uid).first
     unless user
@@ -26,7 +46,7 @@ class User < ActiveRecord::Base
         name:auth.extra.raw_info.name,
         provider:auth.provider,
         uid:auth.uid,
-        email:auth.info.email, #emailを取得したい場合は、migrationにemailを追加してください。
+        email:auth.info.email,
         password:Devise.friendly_token[0,20]
       )
     end

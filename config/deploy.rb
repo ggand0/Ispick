@@ -5,7 +5,8 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'release-0.1'
+set :branch, 'release-0.2'
+set :rails_env, 'production'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
@@ -152,7 +153,7 @@ namespace :seed do
   desc "seeds database"
   task :people do
     on roles(:all) do
-      "cd #{current_path} && ~/.rbenv/bin/rbenv exec bundle exec rake scrape:wiki"
+      #"cd #{current_path} && ~/.rbenv/bin/rbenv exec bundle exec rake scrape:wiki"
     end
   end
 end
@@ -170,7 +171,7 @@ end
 
 after 'deploy:started', 'check:path'
 # デプロイ直後に開始
-after 'deploy:finished', 'seed:people'
+#after 'deploy:finished', 'seed:people'
 # stop
 after 'deploy:stop', 'resque:stop'
 after 'deploy:stop', 'whenever:clear'
