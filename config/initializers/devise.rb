@@ -23,14 +23,8 @@ Devise.setup do |config|
 
 
   # API key
-  if Rails.env.production?
-    #config.omniauth :facebook, "App ID", "App Secret"
-    #config.omniauth :twitter,  "Consumer key", "Consumer secret"
-    config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
-  else
-    #config.omniauth :facebook, "App ID", "App Secret"
-    config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
-  end
+  config.omniauth :facebook, CONFIG['facebook_app_id'], CONFIG['facebook_app_secret']
+  config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
 
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
