@@ -1,8 +1,8 @@
 <div class="wrapper-sign-in">
   <div class="btn-group-vertical btn-group-oauth">
     <%= button_group do %>
-      <%= bs_button_to 'Facebookでログイン', '/', class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Twitterでログイン', 'user_omniauth_authorize_path(:twitter)', class: "btn btn-default btn-block" %><br>
+      <%= bs_button_to 'Facebookでログイン', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
+      <%= bs_button_to 'Twitterでログイン', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
       <%= bs_button_to 'Pinterestでログイン', '/', class: "btn btn-default btn-block" %><br>
       <br>
 
