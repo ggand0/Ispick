@@ -4,11 +4,14 @@
 <ul class="boxline">
 <% @images.each do |image| %>
   <li>
-    <%# link_to(image_tag(image.data.url(:thumb)),
-      { controller: 'images', action: 'show', id: image.id.to_s }) %>
     <%= link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
   </li>
 <% end %>
 </ul>
 
 <%= paginate @images %>
+<br />
+<br />
+<hr>
+<h5>Debug</h5>
+<li><%= "Number of images with nil data: #{Image.where(data_file_size: nil).count}" %></li>

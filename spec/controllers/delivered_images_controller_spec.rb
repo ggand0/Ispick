@@ -172,12 +172,12 @@ describe DeliveredImagesController do
         render: 'true'
       }, valid_session
 
-      # ImageBoardはデフォルトで１枚持っているので、追加されているはず
-      expect(current_user.image_boards.first.favored_images.count).to eq(2)
-      expect(response.body).to eq('true')
+      # ImageBoardに１枚追加されているはずである
+      expect(current_user.image_boards.first.favored_images.count).to eq(1)
+      expect(response).to redirect_to show_favored_images_users_path
     end
 
-    it "return true if it's already favored" do
+    it "redirects to show_favored_images_users_path" do
       favored_image = FactoryGirl.create(:favored_image_with_delivered)
       put :favor, {
         id: favored_image.delivered_image.id,
@@ -186,7 +186,7 @@ describe DeliveredImagesController do
         render: 'true'
       }, valid_session
 
-      expect(response.body).to eq('true')
+      expect(response).to redirect_to show_favored_images_users_path
     end
   end
 

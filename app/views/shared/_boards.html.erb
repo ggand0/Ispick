@@ -1,10 +1,11 @@
 <%= javascript_include_tag 'modal_board' %>
+<%= stylesheet_link_tag 'users' %>
 <%# stylesheet_link_tag 'core' %>
 
 <div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-body modal-board">
-      <div class="modal-id"><%= image.id %></div>
+      <div class="id"><%= image.id %></div>
       <%= bootstrap_form_for image_board, remote: true, class: 'new_board' do |f| %>
         <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
         <%= f.submit 'New board', class: "btn btn-primary" %>

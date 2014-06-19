@@ -1,10 +1,12 @@
+<%= render partial: 'shared/render_image', locals: { image: @delivered_image.image } %>
+
 <p>
   <strong>Delivered from:</strong>
   <%= show_targetable(@delivered_image) + ' / ' + @delivered_image.image.site_name %>
 </p>
 <p>
   <strong>Is Favored:</strong>
-  <%= @delivered_image.favored %>
+  <%= @delivered_image.favored ? @delivered_image.favored : 'nil' %>
 </p>
 
 <%= render partial: 'shared/show_image', locals: { image: @delivered_image.image, displaying_image: @delivered_image } %>

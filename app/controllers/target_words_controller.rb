@@ -69,8 +69,28 @@ class TargetWordsController < ApplicationController
     @people = @search.result(distinct: true).page(params[:page]).per(50)
   end
 
+  # 特定のタグに配信されている画像のみを表示する
+  # UsersControllerに移動予定
   def show_delivered
-    @delivered_images = @target_word.delivered_images.where('avoided IS NULL or avoided = false').page(params[:page]).per(25)
+    if signed_in?
+      delivered_images = @target_word.delivered_images.where.not(images: { site_name: 'twitter' }).
+        where('avoided IS NULL or avoided = false').
+        joins(:image).
+        reorder('created_at DESC')
+
+      # 配信日で絞り込む場合
+      if params[:date]
+        date = params[:date]
+        date = DateTime.parse(date).to_date
+        delivered_images = delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+      end
+
+      @delivered_images = delivered_images.page(params[:page]).per(25)
+      @delivered_images_all = delivered_images
+      render action: '../users/signed_in'
+    else
+      render action: 'not_signed_in'
+    end
   end
 
   def switch

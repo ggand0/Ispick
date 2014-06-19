@@ -11,6 +11,7 @@ require "#{Rails.root}/app/workers/images_face"
 require "#{Rails.root}/app/workers/target_images_face"
 
 # Generate images
+=begin
 files = Dir["#{Rails.root}/spec/files/images/*"]
 count = 0
 
@@ -50,3 +51,4 @@ files.each do |f|
 end
 
 puts 'DONE!'
+=end

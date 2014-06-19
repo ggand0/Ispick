@@ -47,35 +47,13 @@ module Scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_5min
+  def self.redownload
+    images = Image.where(data_file_size: nil)
+    puts "number of images with nil data: #{images.count}"
 
-    #Scrape::Futaba.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_15min()
-    #Scrape::Piapro.scrape()
-    #Scrape::Nichan.scrape()
-    Scrape::Twitter.scrape()
-
-    puts 'DONE!!'
-  end
-
-  def self.scrape_30min()
-    #Scrape::Fourchan.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_60min()
-    Scrape::Nico.scrape()
-    #Scrape::Pixiv.scrape()
-    #Scrape::Deviant.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_3h()
-    Scrape::Tumblr.scrape()
-    puts 'DONE!!'
+    images.each do |image|
+      Resque.enqueue(DownloadImage, image.class.name, image.id, image.src_url)
+    end
   end
 
   # 重複したsrc_urlを持つレコードがDBにあるか調べる
@@ -87,6 +65,7 @@ module Scrape
     image_id = self.save_image(attributes, tags, validation)
     Deliver.deliver_one(user_id, target_word_id, image_id)
   end
+
 
   # Imageモデル生成＆DB保存
   # @param [Hash] Imageレコードに与える属性のHash
@@ -128,5 +107,35 @@ module Scrape
       return false
     end
     image.id
+  end
+
+
+  def self.scrape_5min
+    #Scrape::Futaba.scrape()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_15min()
+    #Scrape::Piapro.scrape()
+    #Scrape::Nichan.scrape()
+    Scrape::Twitter.scrape()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_30min()
+    #Scrape::Fourchan.scrape()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_60min()
+    Scrape::Nico.scrape()
+    #Scrape::Pixiv.scrape()
+    #Scrape::Deviant.scrape()
+    puts 'DONE!!'
+  end
+
+  def self.scrape_3h()
+    Scrape::Tumblr.scrape()
+    puts 'DONE!!'
   end
 end

@@ -1,4 +1,4 @@
-<%= form_for(@target_image) do |f| %>
+<%= bootstrap_form_for(@target_image) do |f| %>
   <% if @target_image.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@target_image.errors.count, "error") %> prohibited this target_image from being saved:</h2>
@@ -11,9 +11,10 @@
     </div>
   <% end %>
 
-  <div class="upload_field">
-    <%= f.label :data %><br>
-    <%= f.file_field :data %>
+  <div class="row">
+    <div class="col-lg-2">
+      <%= f.file_field :data %>
+    </div>
   </div>
 
   <div class="actions">

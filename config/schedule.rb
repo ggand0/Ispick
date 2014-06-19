@@ -22,8 +22,8 @@
 set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
 
-every 15.minutes do
-  rake 'scrape:twitter'
+every 60.minutes do
+  #rake 'scrape:twitter'
 end
 
 every 60.minutes do
@@ -35,7 +35,7 @@ every 3.hours do
 end
 
 every 6.hours do
-  rake 'scrape:fchan'
+  #rake 'scrape:fchan'
 end
 
 # 配信システム系

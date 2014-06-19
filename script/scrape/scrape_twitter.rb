@@ -2,13 +2,10 @@
 require "twitter"
 require 'securerandom'
 
-
-# Twitterから2次画像を抽出する
 module Scrape::Twitter
-  # TwitterURL
   ROOT_URL = 'https://twitter.com'
 
-  # 関数定義
+  # Twitterから2次画像を抽出する
   def self.scrape
     limit   = 1000        # 取得するツイートの上限数
     count = Image.count

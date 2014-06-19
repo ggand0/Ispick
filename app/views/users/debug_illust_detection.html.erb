@@ -1,5 +1,7 @@
 <%= debug @debug %>
 <%= javascript_include_tag 'users_home' %>
+<%= javascript_include_tag 'core' %>
+<%= render 'shared/modal_image' %>
 
 <%= button_group do %>
   <%= bs_button_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', toggle_site: true } %>
@@ -34,7 +36,7 @@
         <br>
         <%= "Favorites: #{image.favorites.to_s}" if image %>
 
-        <%= link_to(image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s }) %>
+        <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
         <div class="titleBox"><%= image.title.to_s %></div>
       </div>
     </div>

@@ -6,6 +6,7 @@ describe ApplicationHelper do
       expect(helper.bytes_to_megabytes(100*1024*1024)).to eq(100)
     end
   end
+
   describe "get_total_size funciton" do
     it "returns valid value" do
       image1 = FactoryGirl.create(:image)
@@ -14,6 +15,17 @@ describe ApplicationHelper do
       #puts image1.data.size # => 8(100が3bitだから？)
 
       expect(helper.get_total_size(Image.all)).to eq(image1.data.size+image2.data.size)
+    end
+    it "returns 0 if the array is nil" do
+      expect(helper.get_total_size([])).to eq(0)
+    end
+    # Image.dataがnilもしくはrelationの中にnilの要素が含まれていた場合、
+    # それらはカウントの対象としない事
+    it "ignores nil items" do
+      image1 = FactoryGirl.create(:image_file)  # data有り: size>0
+      image2 = FactoryGirl.create(:image)       # data無し: size=0
+
+      expect(helper.get_total_size([image1, image2, nil])).to eq(image1.data.size)
     end
   end
 

@@ -23,9 +23,10 @@ module Deliver
     user.target_words.each do |t|
       Deliver::Words.deliver_from_word(user, t, true) if t.enabled
     end
-    user.target_images.each do |t|
-      Deliver::Images.deliver_from_image(user, t) if t.enabled
-    end
+    # 登録画像に基づく配信処理：14/06/14現在停止中
+    #user.target_images.each do |t|
+    #  Deliver::Images.deliver_from_image(user, t) if t.enabled
+    #end
 
     # １ユーザーの最大容量を超えていたら古い順に削除
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
@@ -36,30 +37,14 @@ module Deliver
   # @param [Integer] 配信するTagレコードのID
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
-    self.deliver_from_word(user, TargetWord.find(target_word_id), false)
+    target_word = TargetWord.find(target_word_id)
+    puts "Delivering to target_word=#{target_word_id}"
+
+    Deliver::Words.deliver_from_word(user, target_word, false)
 
     # １ユーザーの最大容量を超えていたら古い順に削除
     Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts 'Remain delivered_images:' + user.delivered_images.count.to_s
-  end
-
-
-  # 文字情報が存在するImageレコードを検索して返す
-  # @param [Boolean] 定時配信で呼ばれたのかどうか
-  # @return [ActiveRecord_Relation_Image]
-  def self.get_images(is_periodic)
-    if is_periodic
-      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
-      #images = Image.includes(:tags).where.not(is_illust: nil, tags: {name: nil}).
-      #  references(:tags)
-      images = Image.where.not(is_illust: nil, src_url: nil)
-    else
-      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
-      #images = Image.includes(:tags).where.not(tags: {name: nil}).references(:tags)
-      images = Image.all
-    end
-    images
+    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
 
 
@@ -78,6 +63,8 @@ module Deliver
   # @param [TargetWord/TargetImage]
   # @param [Boolean] 定時配信かどうか
   def self.deliver_images(user, images, target, is_periodic)
+    tmp_images = []
+
     images.each_with_index do |image, count|
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
       next if is_periodic and image.data.url == MISSING_URL
@@ -101,12 +88,20 @@ module Deliver
       # DB保存後にuser.delivered_imagesに追加して配信する
       if image.delivered_images << delivered_image
         target.delivered_images << delivered_image
-        user.delivered_images << delivered_image
-        user.save
+        #user.delivered_images << delivered_image
+        #user.save
+        tmp_images << delivered_image
       end
 
       puts "- Creating delivered_images: #{count.to_s} /
         #{images.count.to_s}" if count % 10 == 0
+    end
+
+
+    # 投稿日時順（posted_at）にソートしてから配信する
+    tmp_images.each do |image|
+      user.delivered_images << image
+      user.save
     end
   end
 
@@ -115,20 +110,18 @@ module Deliver
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
   def self.limit_images(user, images)
-
-    # nilの画像もついでに除去
-    images.reject! do |x|
-      #user.delivered_images.any?{ |d| d.image.nil? or d.image and d.image.src_url == x.src_url }
-      user.delivered_images.any?{ |d| d.image.nil? }
-    end
-
     # 最大配信数に絞る（推薦度の高い順に残す）
     if images.count > MAX_DELIVER_NUM
       puts 'Removing excessed images...'
       images = images.take MAX_DELIVER_NUM
     end
 
-    puts "Matched: #{images.count.to_s} images"
+    # posted_atでソートする
+    # Homeではcreated_at順にソートするが、
+    # １回配信分の中ではposted_at順になる
+    images.sort_by! { |image| image.posted_at }
+
+    puts "Limited: #{images.count.to_s} images"
     images
   end
 

@@ -1,19 +1,21 @@
 require 'spec_helper'
 require "#{Rails.root}/script/deliver/deliver"
+require "#{Rails.root}/script/deliver/deliver_words"
+require "#{Rails.root}/script/deliver/deliver_images"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 describe "Deliver" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return  # resqueのjobを実際に実行しないように
+    Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
   end
 
   describe "deliver function" do
     it "calls proper functions" do
       user = FactoryGirl.create(:user_with_target_words)
-      Deliver.stub(:deliver_from_word).and_return
-      Deliver.stub(:delete_excessed_records).and_return
+      Deliver.stub(:deliver_from_word).and_return nil
+      Deliver.stub(:delete_excessed_records).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(user.target_words.count).times
       expect(Deliver).to receive(:delete_excessed_records).exactly(1).times
 
@@ -24,10 +26,8 @@ describe "Deliver" do
     it "calls proper functions" do
       user = FactoryGirl.create(:user_with_target_words)
       target_word = user.target_words.first
-      Deliver.stub(:deliver_from_word).and_return
-      Deliver.stub(:delete_excessed_records).and_return
-      expect(Deliver).to receive(:deliver_from_word).exactly(1).times
-      expect(Deliver).to receive(:delete_excessed_records).exactly(1).times
+      Deliver::Words.stub(:deliver_from_word).and_return nil
+      expect(Deliver::Words).to receive(:deliver_from_word).exactly(1).times
 
       Deliver.deliver_keyword(user.id, target_word.id)
     end
@@ -52,59 +52,6 @@ describe "Deliver" do
       # 2レコードのサイズ＋1を指定したので、それを下回らせるために3レコード削除されるはず
       Deliver.delete_excessed_records(images, size)
       expect(User.first.delivered_images.count).to eq(2)
-    end
-  end
-
-  describe "contains_word function" do
-    it "returns true if the original name matches" do
-      # タグに「鹿目まどか」という名前を持つものがあるimageを作成する
-      image = FactoryGirl.create(:image_with_tags, tags_count: 5)
-      person = FactoryGirl.create(:person_madoka)
-
-      # 鹿目まどか」なるtarget_word
-      target_word = TargetWord.find(person.target_word_id)
-
-      contains = Deliver::Words.contains_word(image, target_word)
-      expect(contains).to eq(true)
-    end
-    it "returns true if the name_english matches" do
-      image = FactoryGirl.create(:image)
-      tag = FactoryGirl.create(:tag_en)
-      image.tags << tag
-      person = FactoryGirl.create(:person_madoka)
-      target_word = TargetWord.find(person.target_word_id)
-
-      contains = Deliver::Words.contains_word(image, target_word)
-      expect(contains).to eq(true)
-    end
-
-    it "returns false if no matches" do
-      # 全く登録タグに関する情報が無いimage
-      image = FactoryGirl.create(:image)
-      person = FactoryGirl.create(:person_madoka)
-      target_word = TargetWord.find(person.target_word_id)
-
-      contains = Deliver::Words.contains_word(image, target_word)
-      expect(contains).to eq(false)
-    end
-
-    it "returns true if its title or caption contains the keyword" do
-      image = FactoryGirl.create(:image_madoka)
-      person = FactoryGirl.create(:person_madoka)
-      target_word = TargetWord.find(person.target_word_id)
-
-      contains = Deliver::Words.contains_word(image, target_word)
-      expect(contains).to eq(true)
-    end
-  end
-  describe "close_image function" do
-    it "returns images that have almost equal featuress" do
-      f_image = FactoryGirl.create(:feature_madoka1)
-      f_target_image = FactoryGirl.create(:feature_madoka)
-      image = Image.find(f_image.featurable_id)
-      target_image = TargetImage.find(f_target_image.featurable_id)
-
-      puts res = Deliver::Images.close_image(image, target_image, 80)
     end
   end
 
@@ -145,21 +92,24 @@ describe "Deliver" do
     it "adds images to user.delivered_images" do
       user = FactoryGirl.create(:twitter_user)
       target_word = FactoryGirl.create(:target_word)  # 仮にtarget_wordとする
-      #images = FactoryGirl.create_list(:image, 3)
       images = [ FactoryGirl.create(:image_file) ]
 
       Deliver.deliver_images(user, images, target_word, true)
       expect(user.delivered_images.count).to eq(images.count)
     end
+
+    # DLし終えたものから配信する仕様に改良するまで凍結
+=begin
     it "ignores images without paperclip attachment" do
       user = FactoryGirl.create(:twitter_user)
       target_word = FactoryGirl.create(:target_word)
       images = FactoryGirl.create_list(:image, 3)
 
-      # missing画像は全てskipされるはずである
+      # missing画像を全てskipする
       Deliver.deliver_images(user, images, target_word, true)
       expect(user.delivered_images.count).to eq(0)
     end
+=end
 
     # 配信済みの場合target.delivered_imagesに追加されている事
     it "adds to target.delivered_images when it has already delivered" do
@@ -169,28 +119,6 @@ describe "Deliver" do
 
       images = Deliver.deliver_images(user, images, target_word, true)
       expect(target_word.delivered_images.count).to eq(1)
-    end
-  end
-
-  describe "get_images function" do
-    it "get images relation which have tags" do
-      FactoryGirl.create(:image_min)                        # tag有
-      FactoryGirl.create(:image_with_tags, tags_count: 5)   # tag無
-
-      expect(Deliver.get_images(true).count).to eql(1)
-    end
-    it "includes images which have nil value in is_illust column with true flag" do
-      # Imageを２レコード作成
-      FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
-      FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
-
-      expect(Deliver.get_images(true).count).to eql(1)
-    end
-    it "ignores images which have nil value in is_illust column with false flag" do
-      FactoryGirl.create(:image_with_tags, tags_count: 5)        # is_illust: true
-      FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
-
-      expect(Deliver.get_images(false).count).to eql(2)
     end
   end
 

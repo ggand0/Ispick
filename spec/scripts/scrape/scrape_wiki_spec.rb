@@ -6,7 +6,7 @@ include Scrape::Wiki
 
 describe "Scrape" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "point test" do
