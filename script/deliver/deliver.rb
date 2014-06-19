@@ -116,7 +116,9 @@ module Deliver
       images = images.take MAX_DELIVER_NUM
     end
 
-    # posted_atでソートしておく
+    # posted_atでソートする
+    # Homeではcreated_at順にソートするが、
+    # １回配信分の中ではposted_at順になる
     images.sort_by! { |image| image.posted_at }
 
     puts "Limited: #{images.count.to_s} images"
