@@ -2,9 +2,14 @@
 
 <%= search_form_for @search, url: search_target_words_path, html: { method: :post } do |f| %>
   <%= f.label :name_display_cont, 'キャラクタ名' %>
-  <%= f.text_field :name_display_cont %>
-  <div>
-    <%= f.submit '検索する' %>
+  <div class="row">
+    <div class="col-lg-2">
+      <%= f.text_field :name_display_cont, class: "form-control" %>
+
+    </div>
+  </div>
+  <div class="actions">
+    <%= f.submit '検索する', class: "btn btn-default" %>
   </div>
 <% end %>
 
