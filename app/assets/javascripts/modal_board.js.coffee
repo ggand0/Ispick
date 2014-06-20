@@ -5,21 +5,23 @@ $ ->
   # Board追加時に描画し直す
   $('#new_image_board').on("ajax:success", (e, data, status, xhr) ->
     console.log('ajax of new_board has succeeded.')
-    ###$("#modal-board").modal('toggle')
-    $('#modal-board').removeData('bs.modal')
-    $("#modal-board").modal('show')###
+    #console.log($(this).parent())
 
     $('#modal-board').modal('hide')
     target = $('.id')
+    target_html = $('.html-id')
+    console.log('target_html:')
+    console.log(target_html.html())
     $.ajax({
       url: '/image_boards/boards',
       type: 'get',
-      data: { image: target.html() },
+      data: { image: target.html(), id: target_html.html() },
       dataType: 'script',
-      success: () ->
-        console.log("Successfully called 'image_boards/boards'")
+      #dataType: 'html',
+      success: (response) ->
+        console.log("    Successfully called 'image_boards/boards'")
       error: () ->
-        console.log("Error during calling 'image_boards/boards'")
+        console.log("    Error during calling 'image_boards/boards'")
     })
   )
 

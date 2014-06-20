@@ -21,11 +21,14 @@ class ImageBoardsController < ApplicationController
     end
   end
   def boards
+    #puts current_user.image_boards.count
+    ImageBoard.connection.clear_query_cache
+    puts @id = params[:id]
     @image = DeliveredImage.find(params[:image])
     @board = ImageBoard.new
     respond_to do |format|
-      format.html
-      format.js { render partial: 'boards' }
+      format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
+      format.js { render partial: 'boards' }  # => _boards.js.erbを描画
     end
   end
   def reload
@@ -48,6 +51,14 @@ class ImageBoardsController < ApplicationController
     current_user.image_boards << @image_board
 
     render nothing: true
+=begin
+    @id = params[:id]
+    @image = DeliveredImage.find(params[:image])
+    @board = ImageBoard.new
+    respond_to do |format|
+      format.js { render partial: 'boards' }  # => _boards.js.erbを描画
+    end
+=end
   end
 
   # PATCH/PUT /image_boards/1

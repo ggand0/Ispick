@@ -1,2 +1,19 @@
-$("#modal-board").html("<%= escape_javascript(render partial: 'shared/boards', locals: { image: @image, image_board: @board }) %>");
-$("#modal-board").modal('show');
+//= require 'modal_boards'
+
+console.log('AJAXing');
+//console.log("<%= @id %>");
+selector = "#" + "<%= @id.to_s %>";//"#popover-board"+
+//console.log(selector);
+
+//$(selector).popover('toggle');
+//$(selector).popover('destroy');//".popover-board"
+
+/*$(selector).popover({
+	html: true,
+	//content: "ajax"
+  content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>"
+});*/
+//$(selector).data('bs.popover').tip().html("<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>");
+$(selector).popover({ html: true });
+$(selector).data('bs.popover').options.content = "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>";
+$(selector).popover('show');
