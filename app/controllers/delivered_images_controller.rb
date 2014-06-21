@@ -83,7 +83,9 @@ class DeliveredImagesController < ApplicationController
     )
 
     # save出来たらdelivered_imageへの参照も追加
-    favored_image.delivered_image = @delivered_image if favored_image.save
+    if favored_image.save
+      favored_image.delivered_image = @delivered_image
+    end
 
     respond_to do |format|
       format.html { redirect_to show_favored_images_users_path }

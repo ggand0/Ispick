@@ -20,6 +20,7 @@ class ImageBoardsController < ApplicationController
       format.js
     end
   end
+
   def boards
     #puts current_user.image_boards.count
     ImageBoard.connection.clear_query_cache
@@ -31,6 +32,7 @@ class ImageBoardsController < ApplicationController
       format.js { render partial: 'boards' }  # => _boards.js.erbを描画
     end
   end
+
   def reload
     @image = DeliveredImage.find(params[:image])
     @board = ImageBoard.new
@@ -38,6 +40,18 @@ class ImageBoardsController < ApplicationController
       format.html
       format.js { render partial: 'reload' }
     end
+  end
+
+  # paramsで指定されたdelivered_imageが
+  # image_boardに既に登録されているか確認する
+  def check_existed
+    delivered_image = DeliveredImage.find(params[:image])
+
+    included = @image_board.favored_images.include? do |f|
+      f.delivered_image.id == delivered_image.id
+    end
+
+    render json: { exist: included }
   end
 
   # GET /image_boards/1/edit
@@ -51,14 +65,6 @@ class ImageBoardsController < ApplicationController
     current_user.image_boards << @image_board
 
     render nothing: true
-=begin
-    @id = params[:id]
-    @image = DeliveredImage.find(params[:image])
-    @board = ImageBoard.new
-    respond_to do |format|
-      format.js { render partial: 'boards' }  # => _boards.js.erbを描画
-    end
-=end
   end
 
   # PATCH/PUT /image_boards/1

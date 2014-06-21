@@ -1,9 +1,8 @@
 <%= javascript_include_tag 'modal_board' %>
 <%= stylesheet_link_tag 'users' %>
 
--- 'popover_board' template --
-<button id="popovercloseid" type="button" class="close">&times;</button>
 
+<button id="popovercloseid" type="button" class="close">&times;</button>
 
 <div class="id"><%= image.id %></div>
 <div class="html-id"><%= html %></div>
@@ -13,9 +12,10 @@
 <% end %>
 <br />
 
-<%= current_user.image_boards.count %>
 <% current_user.image_boards.each do |board| %>
   <!--<li class="clip_button btn btn-default btn-group-justified" >-->
+  <% existed = check_existed(board.id, image.id) %>
+  <%= existed %>
   <%= button_group do %>
     <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true }, method: :put, class: 'btn btn-default user_boards' %>
   <% end %>
