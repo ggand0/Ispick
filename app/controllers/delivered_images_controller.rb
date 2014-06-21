@@ -84,12 +84,19 @@ class DeliveredImagesController < ApplicationController
 
     # save出来たらdelivered_imageへの参照も追加
     if favored_image.save
-      favored_image.delivered_image = @delivered_image
+      #favored_image.delivered_image = @delivered_image
+      @delivered_image.favored_images << favored_image
     end
 
+    # format.jsの場合はpopoverをリロードするために'boards' templateを呼ぶ
+    @image = @delivered_image
+    @board = ImageBoard.new
+    @id = params[:html_id]
+    puts "@id = #{@id}"
     respond_to do |format|
       format.html { redirect_to show_favored_images_users_path }
-      format.js { render nothing: true }
+      #format.js { render nothing: true }
+      format.js { render partial: 'image_boards/boards' }
     end
   end
 

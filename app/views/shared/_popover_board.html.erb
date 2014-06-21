@@ -6,7 +6,7 @@
 
 <div class="id"><%= image.id %></div>
 <div class="html-id"><%= html %></div>
-<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id }, class: 'new_board' do |f| %>
+<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
   <%= f.text_field :name, layout: :default, class: 'new_board_input' %>
   <%= f.submit 'New board', class: "btn btn-primary" %>
 <% end %>
@@ -17,6 +17,6 @@
   <% existed = check_existed(board.id, image.id) %>
   <%= existed %>
   <%= button_group do %>
-    <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true }, method: :put, class: 'btn btn-default user_boards' %>
+    <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: 'btn btn-default user_boards' %>
   <% end %>
 <% end %>

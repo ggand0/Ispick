@@ -3,7 +3,7 @@ $ ->
   console.log('modal_board.js has been loaded.')
 
   # Board追加時に描画し直す
-  $('#new_image_board').on("ajax:success", (e, data, status, xhr) ->
+  ###$('#new_image_board').on("ajax:success", (e, data, status, xhr) ->
     console.log('ajax of new_board has succeeded.')
     #console.log($(this).parent())
 
@@ -17,13 +17,12 @@ $ ->
       type: 'get',
       data: { image: target.html(), id: target_html.html() },
       dataType: 'script',
-      #dataType: 'html',
       success: (response) ->
         console.log("    Successfully called 'image_boards/boards'")
       error: () ->
         console.log("    Error during calling 'image_boards/boards'")
     })
-  )
+  )###
 
 
   # お気に入り画像を既存Boardに追加した時にmodalを閉じる
