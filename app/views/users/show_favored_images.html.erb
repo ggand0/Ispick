@@ -14,7 +14,19 @@
 <br>
 <%= bs_dropdown_button_to 'Board選択' do %>
   <% current_user.image_boards.each do |board| %>
-  <li><%= bs_button_to board.name, { controller: 'users', action: 'show_favored_images', board: board.name } %></li>
+  <li>
+    <%= button_group class: 'btn-group-justified' do %>
+      <%= bs_button_to board.name, { controller: 'users', action: 'show_favored_images', board: board.name }, class: 'btn-default' %>
+      <%# bs_button_to board, method: :delete, class: 'btn-default' do %>
+      <%# bs_button_to url: { controller: 'image_boards', action: 'destroy', id: board.id, method: :delete }, class: 'btn-default' do %>
+      <%# bs_button_to 'X', board, method: :delete, class: 'btn-default' %>
+
+      <%= link_to(board, method: :delete, class: 'btn btn-default') do %>
+        <!--<li> </li><span class="add-on"><i class="icon-user icon-white"></i></span>-->
+        <i class="glyphicon glyphicon-remove"></i>
+      <% end %>
+    <% end %>
+  </li>
   <% end %>
 <% end %>
 

@@ -82,7 +82,7 @@ class ImageBoardsController < ApplicationController
   def destroy
     @image_board.destroy
     respond_to do |format|
-      format.html { redirect_to image_boards_url }
+      format.html { redirect_to show_favored_images_users_path }
       format.json { head :no_content }
     end
   end
