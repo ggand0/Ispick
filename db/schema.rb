@@ -16,7 +16,6 @@ ActiveRecord::Schema.define(version: 20140602154729) do
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
     t.integer  "image_id"
-    t.integer  "favored_image_id"
     t.integer  "targetable_id"
     t.string   "targetable_type"
     t.boolean  "favored"
@@ -30,6 +29,7 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.text     "caption"
     t.text     "src_url"
     t.integer  "image_board_id"
+    t.integer  "delivered_image_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
