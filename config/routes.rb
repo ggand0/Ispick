@@ -55,6 +55,7 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
+
   resources :target_words do
     collection do
       match 'search' => 'target_words#search', via: [:get, :post], as: :search
@@ -65,15 +66,18 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
+
   resources :image_boards do
     collection do
       get 'boards'
       get 'reload'
     end
   end
+
   resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
+
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search

@@ -42,17 +42,6 @@ class ImageBoardsController < ApplicationController
     end
   end
 
-  # paramsで指定されたdelivered_imageが
-  # image_boardに既に登録されているか確認する
-  def check_existed
-    delivered_image = DeliveredImage.find(params[:image])
-
-    included = @image_board.favored_images.include? do |f|
-      f.delivered_image.id == delivered_image.id
-    end
-
-    render json: { exist: included }
-  end
 
   # GET /image_boards/1/edit
   def edit
