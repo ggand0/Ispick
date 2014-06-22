@@ -119,7 +119,7 @@ module Deliver
     # posted_atでソートする
     # Homeではcreated_at順にソートするが、
     # １回配信分の中ではposted_at順になる
-    images.sort_by! { |image| image.posted_at }
+    #images.sort_by! { |image| image.posted_at }
 
     puts "Limited: #{images.count.to_s} images"
     images
