@@ -4,11 +4,12 @@ require 'open-uri'
 module Scrape::Nico
   RSS_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
   TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
-  ROOT_URL = ''
+  ROOT_URL = 'http://seiga.nicovideo.jp'
 
   def self.scrape
     agent = self.get_client
     limit = 50
+    puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
@@ -18,7 +19,7 @@ module Scrape::Nico
           self.scrape_with_keyword(agent, query, limit, true)
         rescue => e
           puts e
-          Rails.logger.info('Scraping from nicoseiga has failed!')
+          Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
         end
       end
     end

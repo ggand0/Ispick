@@ -11,7 +11,7 @@ module Scrape::Tumblr
   def self.scrape
     limit   = 20                  # 取得するPostの上限数。APIの仕様で20postsが限度
     count = Image.count
-    puts "Extracting: #{ROOT_URL}"
+    puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
@@ -20,7 +20,12 @@ module Scrape::Tumblr
         puts query = target_word.person ? target_word.person.name : target_word.word
         next if query.nil? or query.empty?
 
-        self.scrape_with_keyword(query, limit)
+        begin
+          self.scrape_with_keyword(query, limit)
+        rescue => e
+          puts e
+          Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
+        end
       end
     end
 
@@ -40,6 +45,8 @@ module Scrape::Tumblr
 
     # タグ検索：limitで指定された数だけ画像を取得
     client.tagged(keyword).each_with_index do |image, count|
+      #puts image.class.name
+
       # 画像のみを対象とする
       if image['type'] != 'photo'
         skipped += 1
