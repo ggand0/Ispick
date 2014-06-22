@@ -1,8 +1,9 @@
 class DeliveredImage < ActiveRecord::Base
   belongs_to :user
   belongs_to :image
-  belongs_to :favored_image
+  #belongs_to :favored_image
   belongs_to :targetable, polymorphic: true
+  has_many :favored_images
   has_one :feature, as: :featurable
 
   # 明示的にテーブル名を指定することでエラー回避している

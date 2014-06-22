@@ -11,10 +11,19 @@
   <%= bytes_to_megabytes(get_total_size(@favored_images)) %> MB<br>
 </p>
 <%= link_to 'Download zip(Debug)', controller: 'users', action: 'download_favored_images' %>
-<br>
-<%= bs_dropdown_button_to 'Board選択' do %>
-  <% current_user.image_boards.each do |board| %>
-  <li><%= bs_button_to board.name, { controller: 'users', action: 'show_favored_images', board: board.name } %></li>
+<br />
+<br />
+<%= button_group do %>
+  <%= bs_dropdown_button_to 'Board選択' do %>
+    <% current_user.image_boards.each do |board| %>
+      <li>
+        <%= link_to board.name, { controller: 'users', action: 'show_favored_images', board: board.id }, class: 'btn-default' %>
+      </li>
+    <% end %>
+  <% end %>
+
+  <%= link_to(@image_board, method: :delete, data: { confirm: '本当に消してもよろしいですか？この操作は取り消せません。' }, class: 'btn btn-default') do %>
+    <i class="glyphicon glyphicon-remove">このボードを削除する</i>
   <% end %>
 <% end %>
 
@@ -22,7 +31,7 @@
   <% @favored_images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to 'Unclip', image, method: :delete %>
+        <%= link_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete %>
 
         <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
         <div class="titleBox"><%= image.title.to_s %></div>

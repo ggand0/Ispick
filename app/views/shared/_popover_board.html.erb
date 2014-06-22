@@ -1,0 +1,20 @@
+<%= javascript_include_tag 'modal_board' %>
+<%= stylesheet_link_tag 'users' %>
+
+<button id="popovercloseid" type="button" class="close">&times;</button>
+
+<div class="id"><%= image.id %></div>
+<div class="html-id"><%= html %></div>
+<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
+  <%= f.text_field :name, layout: :default, placeholder: '新しいボードを作成', class: 'new_board_input' %>
+  <%= f.submit 'New board', class: "btn btn-primary" %>
+<% end %>
+<br />
+
+<% current_user.image_boards.each do |board| %>
+  <!--<li class="clip_button btn btn-default btn-group-justified" >-->
+  <% existed = check_existed(board.id, image.id) %>
+  <%= button_group do %>
+    <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
+  <% end %>
+<% end %>

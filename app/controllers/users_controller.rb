@@ -2,10 +2,12 @@ require 'rubygems'
 require 'zip'
 
 class UsersController < ApplicationController
+  before_action :render_not_signed_in, only: [:show_favored_images]
+
   def home
     if signed_in?
       delivered_images = current_user.delivered_images.where.not(images: { site_name: 'twitter' }).
-        joins(:image).#reorder('images.created_at')
+        joins(:image).
         reorder('created_at DESC')
 
       # 配信日で絞り込む場合
@@ -64,18 +66,20 @@ class UsersController < ApplicationController
   end
 
   def show_favored_images
-    if signed_in?
-      board_name = params[:board]
-      if board_name.nil?
-        board = current_user.image_boards.first
-      else
-        board = current_user.image_boards.where(name: board_name).first
-      end
-      @favored_images = board.favored_images.page(params[:page]).per(25)
+    board_id = params[:board]
 
-      render action: 'show_favored_images'
+    if board_id.nil?
+      board = current_user.image_boards.first
     else
-      render action: 'not_signed_in'
+      board = current_user.image_boards.find(board_id)
+    end
+
+    unless board.nil?
+      session[:selected_board] = board.id
+      @image_board = ImageBoard.find(board.id)
+      @favored_images = board.favored_images.page(params[:page]).per(25)
+    else
+      render action: 'no_boards'
     end
   end
 
@@ -141,6 +145,10 @@ class UsersController < ApplicationController
 
   private
 
+  def render_not_signed_in
+    render action: 'not_signed_in' if not signed_in?
+  end
+
   def filter_illust(delivered_images)
     case session[:illust]
     when 'all'
@@ -159,6 +167,7 @@ class UsersController < ApplicationController
       reorder('images.favorites desc').references(:images)
     delivered_images.page(params[:page]).per(25)
   end
+
   def sort_by_quality(delivered_images)
     delivered_images = delivered_images.includes(:image).
       reorder('images.quality desc').references(:images)
