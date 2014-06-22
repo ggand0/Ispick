@@ -22,14 +22,13 @@ class ImageBoardsController < ApplicationController
   end
 
   def boards
-    #puts current_user.image_boards.count
-    ImageBoard.connection.clear_query_cache
-    puts @id = params[:id]
+    #ImageBoard.connection.clear_query_cache
     @image = DeliveredImage.find(params[:image])
     @board = ImageBoard.new
+    @id = params[:id]
     respond_to do |format|
       format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
-      format.js { render partial: 'boards' }  # => _boards.js.erbを描画
+      format.js { render partial: 'boards' }  # _boards.js.erbを描画
     end
   end
 

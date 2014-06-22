@@ -11,11 +11,10 @@ module ImageBoardsHelper
 
     included = false
     included = image_board.favored_images.any? do |f|
-      #
-      f.delivered_image.id == delivered_image_id# if f.delivered_image
+      # idが等しければ含まれていると判断
+      f.delivered_image.id == delivered_image_id
     end
 
-    puts included
     included
   end
 end

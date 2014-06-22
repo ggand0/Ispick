@@ -37,3 +37,15 @@ $ ->
   $("body").on("click", ".filter-button", () ->
     $(selector).datepicker('show')
   )
+
+
+  # Popovers
+  # Close popover on click wherever except popover windows
+  $('body').on('click', (e) ->
+    $('[data-toggle="popover"]').each(() ->
+      # the 'is' for buttons that trigger popups
+      # the 'has' for icons within a button that triggers a popup
+      if (!$(this).is(e.target) && ($(this).has(e.target).length is 0) && $('.popover').has(e.target).length is 0)
+        $(this).popover('hide')
+    )
+  )

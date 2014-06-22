@@ -1,7 +1,6 @@
 <%= javascript_include_tag 'modal_board' %>
 <%= stylesheet_link_tag 'users' %>
 
-
 <button id="popovercloseid" type="button" class="close">&times;</button>
 
 <div class="id"><%= image.id %></div>
@@ -15,7 +14,6 @@
 <% current_user.image_boards.each do |board| %>
   <!--<li class="clip_button btn btn-default btn-group-justified" >-->
   <% existed = check_existed(board.id, image.id) %>
-  <%# existed %>
   <%= button_group do %>
     <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
   <% end %>

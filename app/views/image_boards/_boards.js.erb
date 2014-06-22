@@ -1,18 +1,8 @@
 //= require 'modal_boards'
 
 console.log('AJAXing: '+"<%= @id %>");
-selector = "#" + "<%= @id.to_s %>";//"#popover-board"+
-//console.log(selector);
-
-//$(selector).popover('toggle');
-//$(selector).popover('destroy');//".popover-board"
-
-/*$(selector).popover({
-	html: true,
-	//content: "ajax"
-  content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>"
-});*/
-//$(selector).data('bs.popover').tip().html("<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>");
+selector = "#" + "<%= @id.to_s %>";
+console.log(selector);
 
 $(selector).popover('destroy');
 $(selector).popover({
@@ -20,6 +10,3 @@ $(selector).popover({
   content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>",
   container: 'body'
 }).popover('show');
-console.log($(selector).data('bs.popover').options.content);
-//$(selector).data('bs.popover').options.content = "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>";
-//$(selector).popover('show');
