@@ -66,24 +66,21 @@ class UsersController < ApplicationController
   end
 
   def show_favored_images
-    board_name = params[:board]
+    board_id = params[:board]
 
-    if board_name.nil?
+    if board_id.nil?
       board = current_user.image_boards.first
     else
-      board = current_user.image_boards.where(name: board_name).first
+      board = current_user.image_boards.find(board_id)
     end
 
     unless board.nil?
+      session[:selected_board] = board.id
+      @image_board = ImageBoard.find(board.id)
       @favored_images = board.favored_images.page(params[:page]).per(25)
     else
       render action: 'no_boards'
     end
-
-    #if signed_in?
-    #else
-    #  render action: 'not_signed_in'
-    #end
   end
 
   # デバッグ用
