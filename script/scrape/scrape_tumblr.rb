@@ -21,7 +21,8 @@ module Scrape::Tumblr
         next if query.nil? or query.empty?
 
         begin
-          self.scrape_with_keyword(query, limit)
+          result = self.scrape_with_keyword(query, limit)
+          puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
         rescue => e
           puts e
           Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
@@ -33,20 +34,29 @@ module Scrape::Tumblr
   end
 
   # キーワードによる抽出処理を行う
+  # @param [String]
   def self.scrape_keyword(keyword)
-    self.scrape_with_keyword(keyword, 10, true)
+    limit = 10
+    puts "Extracting #{limit} images from: #{ROOT_URL}"
+
+    result = self.scrape_with_keyword(keyword, limit, true)
+    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
   # 対象のタグを持つPostの画像を抽出する
-  def self.scrape_with_keyword(keyword, limit, validation=true)
+  # @param [String]
+  # @param [Integer]
+  # @param [Boolean]
+  # @return [Hash] Scraping result
+  def self.scrape_with_keyword(keyword, limit, validation=true, logging=false)
     client = self.get_client
     duplicates = 0
     skipped = 0
+    scraped = 0
+    avg_time = 0
 
     # タグ検索：limitで指定された数だけ画像を取得
     client.tagged(keyword).each_with_index do |image, count|
-      #puts image.class.name
-
       # 画像のみを対象とする
       if image['type'] != 'photo'
         skipped += 1
@@ -56,14 +66,21 @@ module Scrape::Tumblr
       # API responseから画像情報を取得してDBへ保存する
       start = Time.now
       image_data = Scrape::Tumblr.get_data(image)
-      res = Scrape.save_image(image_data,self.get_tags(image['tags']), validation)
+      res = Scrape.save_image(image_data, self.get_tags(image['tags']), validation)
+
+
       duplicates += res ? 0 : 1
-      puts "Scraped from #{image_data[:src_url]} in #{Time.now - start} sec" if res
+      scraped += 1 if res
+      elapsed_time = Time.now - start
+      avg_time += elapsed_time
+      puts "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
 
       # limit枚抽出したら終了
       #break if duplicates >= 3 # 検討中
-      break if count+1-skipped >= limit
+      break if (count+1 - skipped) >= limit
     end
+
+    { scraped: scraped, duplicates: duplicates, avg_time: avg_time / (scraped+duplicates)*1.0 }
   end
 
   # 画像１枚に関する情報をHashにして返す

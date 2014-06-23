@@ -16,7 +16,9 @@ module Scrape::Nico
         begin
           query = target_word.person ? target_word.person.name : target_word.word
           puts "query = #{query}"
-          self.scrape_with_keyword(agent, query, limit, true)
+
+          result = self.scrape_with_keyword(agent, query, limit, true)
+          puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
         rescue => e
           puts e
           Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
@@ -27,38 +29,48 @@ module Scrape::Nico
   end
 
   # キーワードによる検索
+  # @param[String]
   def self.scrape_keyword(keyword)
     agent = self.get_client
     limit = 10
-    self.scrape_with_keyword(agent, keyword, limit, true)
+    puts "Extracting #{limit} images from: #{ROOT_URL}"
+
+    result = self.scrape_with_keyword(agent, keyword, limit, true)
+    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
   # キーワードからタグ検索してlimit分の画像を保存する
-  def self.scrape_with_keyword(agent, keyword, limit, validation)
-    # nilのクエリを送らないようにする
+  # @param [Mechanize::Agent]
+  # @param [String]
+  # @param [Integer]
+  # @param [Boolean]
+  # @return [Hash]
+  def self.scrape_with_keyword(agent, keyword, limit, validation, logging=false)
+    # nilのクエリ弾く
     return if keyword.nil? or keyword.empty?
 
     url = "#{TAG_SEARCH_URL}?page=1&query=#{keyword}"
     escaped = URI.escape(url)
     xml = agent.get(escaped)
     duplicates = 0
+    scraped = 0
+    avg_time = 0
     id_array = []
 
     # 画像情報を取得してlimit枚DBヘ保存する
-    puts "Extracting #{limit.to_s} images from: #{url}"
-    puts xml.search('image').count
     xml.search('image').take(limit).each_with_index do |item, count|
       begin
         start = Time.now
-        next if item.css('adult_level').first.content.to_i > 0  # 春画画像はskip
+        next if item.css('adult_level').first.content.to_i > 0  # 春画画像をskip
         image_data = self.get_data(item)                        # APIの結果から画像情報取得
-        #self.get_contents(page_url, agent, image_data, validation)# hashを渡して残りを抽出
-        # 抽出した画像を保存
-        #res = Scrape::save_image(image_data, [], validation)
+
         res = Scrape::save_image(image_data, [self.get_tag(keyword)] , validation)
         duplicates += res ? 0 : 1
+        scraped += 1 if res
         id_array.push(res)
-        puts "Scraped from #{image_data[:src_url]} in #{(Time.now - start).to_s} sec" if res
+        elapsed_time = Time.now - start
+        avg_time += elapsed_time
+        puts "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
 
         break if duplicates >= 3
       rescue
@@ -66,7 +78,8 @@ module Scrape::Nico
       end
       break if count+1 >= limit
     end
-    id_array
+
+    { scraped: scraped, duplicates: duplicates, avg_time: avg_time / (scraped+duplicates)*1.0 }
   end
 
   def self.get_data(item)

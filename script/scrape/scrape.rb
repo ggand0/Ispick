@@ -69,10 +69,10 @@ module Scrape
 
   # Imageモデル生成＆DB保存
   # @param [Hash] Imageレコードに与える属性のHash
-  def self.save_image(attributes, tags=[], validation=true, large=false)
+  def self.save_image(attributes, tags=[], validation=true, large=false, logging=false)
     # 重複を確認
     if validation and self.is_duplicate(attributes[:src_url])
-      puts 'Skipping a duplicate image...'
+      puts 'Skipping a duplicate image...' if logging
       return false
     end
 
@@ -87,8 +87,9 @@ module Scrape
       return false
     end
 
-    # DBに保存する
+
     begin
+      # DBに保存する
       # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
       if image.save(validate: validation)
         # 特徴抽出処理をresqueに投げる

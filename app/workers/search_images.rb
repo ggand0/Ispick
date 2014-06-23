@@ -13,10 +13,9 @@ class SearchImages
 
     Scrape.scrape_keyword target_word
 
-    puts 'debug: delivering'
     Deliver.deliver_keyword(target_word.user_id, target_word.id)
 
-    puts "Finished: elapsed_time=#{(Time.now - start).to_s}"
+    puts "\nFinished: elapsed_time=#{(Time.now - start).to_s}"
     puts 'SEARCH IMAGES DONE!'
     puts '--------------------------------------------------'
   end
