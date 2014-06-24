@@ -8,17 +8,26 @@ require 'securerandom'
 module Scrape::Tumblr
   ROOT_URL = 'https://tumblr.com'
 
-  def self.scrape
+  def self.scrape(interval=60, debug=false)
+    if interval < 15
+      puts 'debug'
+      raise Exception.new('the interval argument must be more than 10!')
+      return
+    end
+
     limit   = 20                  # 取得するPostの上限数。APIの仕様で20postsが限度
     count = Image.count
+    reserved_time = 10
+    puts local_interval = (interval-reserved_time) / TargetWord.count*1.0
     puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
         # Person.nameで検索（e.g. "鹿目まどか"）
         # personと関連していない場合は直接word属性を使う
-        puts query = target_word.person ? target_word.person.name : target_word.word
+        query = Scrape.get_query target_word
         next if query.nil? or query.empty?
+        puts "query=#{query} time=#{DateTime.now}"
 
         begin
           result = self.scrape_with_keyword(query, limit)
@@ -28,6 +37,8 @@ module Scrape::Tumblr
           Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
         end
       end
+
+      sleep(local_interval*60) if not debug
     end
 
     puts "Extracted: #{(Image.count - count).to_s}"

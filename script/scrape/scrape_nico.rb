@@ -9,7 +9,6 @@ module Scrape::Nico
   # @param [Integer] min
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, debug=false)
-    puts interval
     if interval < 15
       puts 'debug'
       raise Exception.new('the interval argument must be more than 10!')

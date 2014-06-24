@@ -7,7 +7,7 @@ describe Scrape::Tumblr do
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
   before do
     IO.any_instance.stub(:puts)         # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return    # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Tumblr.get_client()
     @response = JSON.parse(response)['response']
   end
@@ -16,27 +16,43 @@ describe Scrape::Tumblr do
     it "calls scrape_with_keyword function" do
       FactoryGirl.create(:person_madoka)
       Scrape::Tumblr.should_receive(:scrape_with_keyword)
-      Scrape::Tumblr.scrape()
+      Scrape::Tumblr.scrape(60, true)
     end
     it "does not call scrape_with_keyword function when targetable is NOT enabled" do
       FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return nil
       Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
 
-      Scrape::Tumblr.scrape()
+      Scrape::Tumblr.scrape(60, true)
     end
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!
-      Scrape::Tumblr.stub(:scrape_with_keyword).and_return
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return nil
       Scrape::Tumblr.should_not_receive(:scrape_with_keyword)
 
-      Scrape::Tumblr.scrape()
+      Scrape::Tumblr.scrape(60, true)
+    end
+
+
+    it "sleeps with right interval after each scraping" do
+      FactoryGirl.create_list(:person_with_word, 5)
+      Scrape::Tumblr.should_receive(:sleep).with(10*60) # (60-10) / 5*1.0
+      Scrape::Tumblr.stub(:sleep).and_return nil
+      puts TargetWord.count
+
+      Scrape::Tumblr.scrape(60, false)
+    end
+
+    it "raise error when it gets improper argument" do
+      FactoryGirl.create(:person_madoka)
+      expect { Scrape::Tumblr.scrape(14, false) }.to raise_error(Exception)
     end
   end
   describe "scrape_keyword function" do
     it "calls scrape_with_keyword function" do
       Scrape::Tumblr.should_receive(:scrape_with_keyword).with('madoka', 10, true)
+      Scrape::Tumblr.stub(:scrape_with_keyword).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       Scrape::Tumblr.scrape_keyword('madoka')
     end
   end
