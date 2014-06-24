@@ -6,16 +6,28 @@ module Scrape::Nico
   TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
   ROOT_URL = 'http://seiga.nicovideo.jp'
 
-  def self.scrape
+  # @param [Integer] min
+  # @param [Boolean] whether it's called for debug or not
+  def self.scrape(interval=60, debug=false)
+    puts interval
+    if interval < 15
+      puts 'debug'
+      raise Exception.new('the interval argument must be more than 10!')
+      return
+    end
+
     agent = self.get_client
     limit = 50
+    reserved_time = 10
+    puts local_interval = (interval-reserved_time) / TargetWord.count*1.0
     puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
 
     TargetWord.all.each do |target_word|
+
       if target_word.enabled
         begin
-          query = target_word.person ? target_word.person.name : target_word.word
-          puts "query = #{query}"
+          query = Scrape.get_query target_word
+          puts "query=#{query} time=#{DateTime.now}"
 
           result = self.scrape_with_keyword(agent, query, limit, true)
           puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
@@ -24,6 +36,8 @@ module Scrape::Nico
           Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
         end
       end
+
+      sleep(local_interval*60) if not debug
     end
 
   end
@@ -79,7 +93,7 @@ module Scrape::Nico
       break if count+1 >= limit
     end
 
-    { scraped: scraped, duplicates: duplicates, avg_time: avg_time / (scraped+duplicates)*1.0 }
+    { scraped: scraped, duplicates: duplicates, avg_time: avg_time / ((scraped+duplicates)*1.0) }
   end
 
   def self.get_data(item)

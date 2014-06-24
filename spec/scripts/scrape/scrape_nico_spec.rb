@@ -6,9 +6,9 @@ describe Scrape::Nico do
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
 
   before do
-    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
-    @agent = Scrape::Nico.get_client       # Mechanize agentの作成
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
+    @agent = Scrape::Nico.get_client      # Mechanize agentの作成
 
     url = 'http://seiga.nicovideo.jp/rss/illust/new'
     xml = Nokogiri::XML(open(url))
@@ -19,16 +19,31 @@ describe Scrape::Nico do
   describe "scrape method" do
     it "calls scrape_with_keyword method" do
       FactoryGirl.create(:person_madoka)
-      Scrape::Nico.stub(:scrape_with_keyword).and_return
+      Scrape::Nico.stub(:scrape_with_keyword).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       Scrape::Nico.should_receive(:scrape_with_keyword)
 
-      Scrape::Nico.scrape()
+      Scrape::Nico.scrape(60, true)
+    end
+
+    it "sleeps with right interval after each scraping" do
+      FactoryGirl.create_list(:person_with_word, 5)
+      Scrape::Nico.should_receive(:sleep).with(10*60) # (60-10) / 5*1.0
+      Scrape::Nico.stub(:sleep).and_return nil
+      puts TargetWord.count
+
+      Scrape::Nico.scrape(60, false)
+    end
+
+    it "raise error when it gets improper argument" do
+      FactoryGirl.create(:person_madoka)
+      expect { Scrape::Nico.scrape(14, false) }.to raise_error(Exception)
     end
   end
 
   describe "scrape_keyword function" do
     it "calls proper functions" do
       Scrape::Nico.should_receive(:scrape_with_keyword)
+      Scrape::Nico.stub(:scrape_with_keyword).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       Scrape::Nico.scrape_keyword '鹿目まどか'
     end
   end
@@ -60,7 +75,7 @@ describe Scrape::Nico do
     it "allows duplicates three times" do
       Scrape::Nico.stub(:get_data).and_return({})
       Scrape::Nico.should_receive(:get_data).exactly(3).times
-      Scrape.stub(:save_image).and_return
+      Scrape.stub(:save_image).and_return nil
       Scrape.should_receive(:save_image).exactly(3).times
 
       Scrape::Nico.scrape_with_keyword(@agent, 'まどかわいい', 3, false)
