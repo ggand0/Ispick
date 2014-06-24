@@ -18,8 +18,10 @@ module Scrape::Tumblr
     limit   = 20                  # 取得するPostの上限数。APIの仕様で20postsが限度
     count = Image.count
     reserved_time = 10
-    puts local_interval = (interval-reserved_time) / TargetWord.count*1.0
+    local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
+    puts '--------------------------------------------------'
     puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
+    puts "interval=#{interval} local_interval=#{local_interval}"
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
@@ -42,6 +44,7 @@ module Scrape::Tumblr
     end
 
     puts "Extracted: #{(Image.count - count).to_s}"
+    puts '--------------------------------------------------'
   end
 
   # キーワードによる抽出処理を行う
@@ -51,7 +54,7 @@ module Scrape::Tumblr
     puts "Extracting #{limit} images from: #{ROOT_URL}"
 
     result = self.scrape_with_keyword(keyword, limit, true)
-    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
+    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
   # 対象のタグを持つPostの画像を抽出する
@@ -91,7 +94,7 @@ module Scrape::Tumblr
       break if (count+1 - skipped) >= limit
     end
 
-    { scraped: scraped, duplicates: duplicates, avg_time: avg_time / (scraped+duplicates)*1.0 }
+    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / (scraped+duplicates)*1.0 }
   end
 
   # 画像１枚に関する情報をHashにして返す

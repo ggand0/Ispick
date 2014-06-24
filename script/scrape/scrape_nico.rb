@@ -18,8 +18,10 @@ module Scrape::Nico
     agent = self.get_client
     limit = 50
     reserved_time = 10
-    puts local_interval = (interval-reserved_time) / TargetWord.count*1.0
+    puts local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
+    puts '--------------------------------------------------'
     puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
+    puts "interval=#{interval} local_interval=#{local_interval}"
 
     TargetWord.all.each do |target_word|
 
@@ -39,6 +41,7 @@ module Scrape::Nico
       sleep(local_interval*60) if not debug
     end
 
+    puts '--------------------------------------------------'
   end
 
   # キーワードによる検索
