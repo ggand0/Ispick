@@ -61,6 +61,11 @@ module Scrape
     Image.where(src_url: src_url).length > 0
   end
 
+  # @return [String]
+  def self.get_query(target_word)
+    target_word.person ? target_word.person.name : target_word.word
+  end
+
   def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
     image_id = self.save_image(attributes, tags, validation)
     Deliver.deliver_one(user_id, target_word_id, image_id)
