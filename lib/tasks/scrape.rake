@@ -68,42 +68,7 @@ namespace :scrape do
 
 
   # ----------------------------------
-  # 以下、whenever用のタスク
-  # ----------------------------------
-  require "#{Rails.root}/script/scrape/scrape"
-  desc "every 5 min"
-  task min5: :environment do
-    puts 'Scraping images from target websites...'
-    Scrape.scrape_5min()
-  end
-
-  desc "every 15 min"
-  task min15: :environment do
-    puts 'Scraping images from target websites...'
-    Scrape.scrape_15min()
-  end
-
-  desc "every 30 min"
-  task min30: :environment do
-    puts 'Scraping images from target websites...'
-    Scrape.scrape_30min()
-  end
-
-  desc "every 60 min"
-  task min60: :environment do
-    puts 'Scraping images from target websites...'
-    Scrape.scrape_60min()
-  end
-
-  desc "キャラクタに関する静的なDBを構築する"
-  task wiki: :environment do
-    require "#{Rails.root}/script/scrape/scrape_wiki.rb"
-    puts 'Scraping character names...'
-    Scrape::Wiki.scrape()
-  end
-
-  # ----------------------------------
-  # 以下、１つのサイトから画像抽出するタスク
+  # 特定のサイトから画像抽出するタスク
   # ----------------------------------
   desc "2chから画像抽出する"
   task nichan: :environment do
@@ -144,7 +109,7 @@ namespace :scrape do
   desc "Tumblrから画像抽出する"
   task tumblr: :environment do
     require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
-    Scrape::Tumblr.scrape()
+    Scrape::Tumblr.scrape(15, false)
   end
 
   desc "deviantARTから画像抽出する"

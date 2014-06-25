@@ -189,33 +189,4 @@ module Scrape
     image.id
   end
 
-
-  def self.scrape_5min
-    #Scrape::Futaba.scrape
-    puts 'DONE!!'
-  end
-
-  def self.scrape_15min
-    #Scrape::Piapro.scrape
-    #Scrape::Nichan.scrape
-    Scrape::Twitter.scrape
-    puts 'DONE!!'
-  end
-
-  def self.scrape_30min
-    #Scrape::Fourchan.scrape
-    puts 'DONE!!'
-  end
-
-  def self.scrape_60min
-    Scrape::Nico.scrape
-    #Scrape::Pixiv.scrape
-    #Scrape::Deviant.scrape
-    puts 'DONE!!'
-  end
-
-  def self.scrape_3h
-    Scrape::Tumblr.scrape
-    puts 'DONE!!'
-  end
 end
