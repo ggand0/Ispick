@@ -73,6 +73,7 @@ gem 'rmagick', require: false                    # Image processing lib. Used by
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
 gem 'daemon-spawn', require: 'daemon_spawn'
+gem 'pidfile'
 gem 'whenever', require: false                   # Support crontab
 gem 'rubyzip'
 gem 'ransack'
