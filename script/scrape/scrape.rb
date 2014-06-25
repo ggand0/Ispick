@@ -20,6 +20,7 @@ module Scrape
     end
     puts 'DONE!!'
   end
+
   def self.scrape_users
     User.all.each do |user|
       user.target_words.each do |target_word|
@@ -29,24 +30,74 @@ module Scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_keyword(target_word)
-    puts query = target_word.person ? target_word.person.name : target_word.word
-    Scrape::Nico.scrape_keyword(query)
+
+  # 定時配信時、タグ検索APIを用いて抽出するサイト用の関数
+  # Scrape images from websites which has api. The latter two params are used for testing.
+  # @param [Integer] min
+  # @param [Boolean] whether it's called for debug or not
+  # @param [Boolean] whether it's called for debug or not
+  def self.scrape_target_words(module_type, interval=60, pid_debug=false, sleep_debug=false)
+    if interval < 15
+      raise Exception.new('the interval argument must be more than 10!')
+      return
+    end
+
+    puts child_module = Object::const_get(module_type)
+
+    agent = child_module.get_client
+    reserved_time = 10
+    limit = 50
+    local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
+
+
+    puts '--------------------------------------------------'
+    puts "Start extracting from #{child_module::ROOT_URL}: time=#{DateTime.now}"
+    puts "interval=#{interval} local_interval=#{local_interval}"
+
+    # PIDファイルを用いて多重起動を防ぐ
+    Scrape.detect_multiple_running(pid_debug, false)
+
+    # １タグごとにタグ検索APIを用いて画像取得
+    TargetWord.all.each do |target_word|
+      if target_word.enabled
+        begin
+          query = Scrape.get_query target_word
+          puts "query=#{query} time=#{DateTime.now}"
+
+          result = child_module.scrape_using_api(agent, query, limit, true)
+          puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
+        rescue => e
+          puts e
+          Rails.logger.info("Scraping from #{child_module::ROOT_URL} has failed!")
+        end
+      end
+
+      sleep(local_interval*60) if not sleep_debug
+    end
+    puts '--------------------------------------------------'
+  end
+
+  # タグ登録直後の配信用
+  # @param [TargetWord]
+  def self.scrape_target_word(target_word)
+    #puts query = target_word.person ? target_word.person.name : target_word.word
+    Scrape::Nico.scrape_target_word(target_word)
     #Scrape::Twitter.scrape_keyword(query)
-    Scrape::Tumblr.scrape_keyword(query)
+    Scrape::Tumblr.scrape_target_word(target_word)
 
     # 英名が存在する場合はさらに検索
     puts "name_english:#{target_word.person.name_english}" if target_word.person and target_word.person.name_english
-    #if target_word.person.name_english
     if target_word.person and not target_word.person.name_english.empty?
       query = target_word.person.name_english
       puts "name_english:#{query}"
+
       Scrape::Tumblr.scrape_keyword(query)
       Scrape::Giphy.scrape_keyword(target_word)
     end
     puts 'DONE!!'
   end
 
+  # Paperclipのattachmentがnilのレコードを探し再度DLする
   def self.redownload
     images = Image.where(data_file_size: nil)
     puts "number of images with nil data: #{images.count}"
@@ -57,14 +108,37 @@ module Scrape
   end
 
   # 重複したsrc_urlを持つレコードがDBにあるか調べる
+  # @param [String] 確認するsource url.
   def self.is_duplicate(src_url)
     Image.where(src_url: src_url).length > 0
   end
 
+  # TargetWordのレコードから、API使用時に用いるクエリを取得する
   # @return [String]
   def self.get_query(target_word)
     target_word.person ? target_word.person.name : target_word.word
   end
+
+  # PIDファイルを用いて多重起動を防ぐ
+  # @param [Boolean]
+  # @param [Boolean]
+  def self.detect_multiple_running(pid_debug, debug=false)
+    if not pid_debug
+      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
+
+      # PidFileが存在しない場合、新たにPidFileを作成し、
+      # 新たにプロセスが生成されるのを防ぐ
+      p = PidFile.new
+
+      # デフォルトでは/tmp以下にPidFileが作成される
+      puts 'PidFile DEBUG:'
+      puts p.pidfile
+      puts p.piddir
+      puts p.pid
+      puts p.pidpath
+    end
+  end
+
 
   def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
     image_id = self.save_image(attributes, tags, validation)
@@ -117,31 +191,31 @@ module Scrape
 
 
   def self.scrape_5min
-    #Scrape::Futaba.scrape()
+    #Scrape::Futaba.scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_15min()
-    #Scrape::Piapro.scrape()
-    #Scrape::Nichan.scrape()
-    Scrape::Twitter.scrape()
+  def self.scrape_15min
+    #Scrape::Piapro.scrape
+    #Scrape::Nichan.scrape
+    Scrape::Twitter.scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_30min()
-    #Scrape::Fourchan.scrape()
+  def self.scrape_30min
+    #Scrape::Fourchan.scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_60min()
-    Scrape::Nico.scrape()
-    #Scrape::Pixiv.scrape()
-    #Scrape::Deviant.scrape()
+  def self.scrape_60min
+    Scrape::Nico.scrape
+    #Scrape::Pixiv.scrape
+    #Scrape::Deviant.scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_3h()
-    Scrape::Tumblr.scrape()
+  def self.scrape_3h
+    Scrape::Tumblr.scrape
     puts 'DONE!!'
   end
 end

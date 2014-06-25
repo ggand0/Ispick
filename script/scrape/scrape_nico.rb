@@ -11,6 +11,9 @@ module Scrape::Nico
   # @param [Boolean] whether it's called for debug or not
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
+    Scrape.scrape_target_words('Scrape::Nico', interval, pid_debug, sleep_debug)
+  end
+=begin
     if interval < 15
       raise Exception.new('the interval argument must be more than 10!')
       return
@@ -25,7 +28,7 @@ module Scrape::Nico
     puts "interval=#{interval} local_interval=#{local_interval}"
 
     # PIDファイルを用いて多重起動を防ぐ
-    self.detect_multiple_running(pid_debug, false)
+    Scrape.detect_multiple_running(pid_debug, false)
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
@@ -33,7 +36,7 @@ module Scrape::Nico
           query = Scrape.get_query target_word
           puts "query=#{query} time=#{DateTime.now}"
 
-          result = self.scrape_with_keyword(agent, query, limit, true)
+          result = self.scrape_using_api(agent, query, limit, true)
           puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
         rescue => e
           puts e
@@ -45,34 +48,18 @@ module Scrape::Nico
     end
     puts '--------------------------------------------------'
   end
-
-  # PIDファイルを用いて多重起動を防ぐ
-  def self.detect_multiple_running(pid_debug, debug=false)
-    if not pid_debug
-      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
-
-      # PidFileが存在しない場合、新たにPidFileを作成し、
-      # 新たにプロセスが生成されるのを防ぐ
-      p = PidFile.new
-
-      # デフォルトでは/tmp以下にPidFileが作成される
-      puts 'PidFile DEBUG:'
-      puts p.pidfile
-      puts p.piddir
-      puts p.pid
-      puts p.pidpath
-    end
-  end
+=end
 
 
   # キーワードによる検索・抽出を行う
   # @param[String]
-  def self.scrape_keyword(keyword)
+  def self.scrape_target_word(target_word)
     agent = self.get_client
+    query = Scrape.get_query target_word
     limit = 10
     puts "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_with_keyword(agent, keyword, limit, true)
+    result = self.scrape_using_api(agent, query, limit, true)
     puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -82,11 +69,11 @@ module Scrape::Nico
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash]
-  def self.scrape_with_keyword(agent, keyword, limit, validation, logging=false)
+  def self.scrape_using_api(agent, query, limit, validation, logging=false)
     # nilのクエリ弾く
-    return if keyword.nil? or keyword.empty?
+    return if query.nil? or query.empty?
 
-    url = "#{TAG_SEARCH_URL}?page=1&query=#{keyword}"
+    url = "#{TAG_SEARCH_URL}?page=1&query=#{query}"
     escaped = URI.escape(url)
     xml = agent.get(escaped)
     duplicates = 0
@@ -101,7 +88,7 @@ module Scrape::Nico
         next if item.css('adult_level').first.content.to_i > 0  # 春画画像をskip
         image_data = self.get_data(item)                        # APIの結果から画像情報取得
 
-        res = Scrape::save_image(image_data, [self.get_tag(keyword)] , validation)
+        res = Scrape::save_image(image_data, [self.get_tag(query)] , validation)
         duplicates += res ? 0 : 1
         scraped += 1 if res
         id_array.push(res)
