@@ -6,11 +6,12 @@ module Scrape::Nico
   TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
   ROOT_URL = 'http://seiga.nicovideo.jp'
 
+  # Scrape images from nicoseiga. The latter two params are used for testing.
   # @param [Integer] min
   # @param [Boolean] whether it's called for debug or not
-  def self.scrape(interval=60, debug=false)
+  # @param [Boolean] whether it's called for debug or not
+  def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     if interval < 15
-      puts 'debug'
       raise Exception.new('the interval argument must be more than 10!')
       return
     end
@@ -23,8 +24,23 @@ module Scrape::Nico
     puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
     puts "interval=#{interval} local_interval=#{local_interval}"
 
-    TargetWord.all.each do |target_word|
+    # PIDファイルを用いて多重起動を防ぐ
+    if not pid_debug
+      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
 
+      # PidFileが存在しない場合、新たにPidFileを作成し、
+      # 新たにプロセスが生成されるのを防ぐ
+      p = PidFile.new
+
+      # デフォルトでは/tmp以下にPidFileが作成される
+      puts 'PidFile DEBUG:'
+      puts p.pidfile
+      puts p.piddir
+      puts p.pid
+      puts p.pidpath
+    end
+
+    TargetWord.all.each do |target_word|
       if target_word.enabled
         begin
           query = Scrape.get_query target_word
@@ -38,13 +54,13 @@ module Scrape::Nico
         end
       end
 
-      sleep(local_interval*60) if not debug
+      sleep(local_interval*60) if not sleep_debug
     end
 
     puts '--------------------------------------------------'
   end
 
-  # キーワードによる検索
+  # キーワードによる検索・抽出を行う
   # @param[String]
   def self.scrape_keyword(keyword)
     agent = self.get_client
@@ -98,6 +114,8 @@ module Scrape::Nico
     { scraped: scraped, duplicates: duplicates, avg_time: avg_time / ((scraped+duplicates)*1.0) }
   end
 
+  # Image modelのattributesを組み立てる
+  # @param [Nokogiri::HTML]
   def self.get_data(item)
     {
       title: item.css('title').first.content,

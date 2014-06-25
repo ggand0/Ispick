@@ -22,21 +22,28 @@ describe Scrape::Nico do
       Scrape::Nico.stub(:scrape_with_keyword).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       Scrape::Nico.should_receive(:scrape_with_keyword)
 
-      Scrape::Nico.scrape(60, true)
+      Scrape::Nico.scrape(60, true, true)
     end
 
     it "sleeps with right interval after each scraping" do
       FactoryGirl.create_list(:person_with_word, 5)
       Scrape::Nico.should_receive(:sleep).with(10*60) # (60-10) / 5*1.0
       Scrape::Nico.stub(:sleep).and_return nil
-      puts TargetWord.count
 
-      Scrape::Nico.scrape(60, false)
+      Scrape::Nico.scrape(60, true, false)
     end
 
     it "raise error when it gets improper argument" do
       FactoryGirl.create(:person_madoka)
-      expect { Scrape::Nico.scrape(14, false) }.to raise_error(Exception)
+      expect { Scrape::Nico.scrape(14, false, true) }.to raise_error(Exception)
+    end
+
+    it "exit if another process is running" do
+      PidFile.stub(:running?).and_return(true)
+
+      expect {
+        Scrape::Nico.scrape(15, false, false)
+      }.to raise_error(SystemExit)
     end
   end
 
