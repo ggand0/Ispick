@@ -25,20 +25,7 @@ module Scrape::Nico
     puts "interval=#{interval} local_interval=#{local_interval}"
 
     # PIDファイルを用いて多重起動を防ぐ
-    if not pid_debug
-      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
-
-      # PidFileが存在しない場合、新たにPidFileを作成し、
-      # 新たにプロセスが生成されるのを防ぐ
-      p = PidFile.new
-
-      # デフォルトでは/tmp以下にPidFileが作成される
-      puts 'PidFile DEBUG:'
-      puts p.pidfile
-      puts p.piddir
-      puts p.pid
-      puts p.pidpath
-    end
+    self.detect_multiple_running(pid_debug, false)
 
     TargetWord.all.each do |target_word|
       if target_word.enabled
@@ -56,9 +43,27 @@ module Scrape::Nico
 
       sleep(local_interval*60) if not sleep_debug
     end
-
     puts '--------------------------------------------------'
   end
+
+  # PIDファイルを用いて多重起動を防ぐ
+  def self.detect_multiple_running(pid_debug, debug=false)
+    if not pid_debug
+      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
+
+      # PidFileが存在しない場合、新たにPidFileを作成し、
+      # 新たにプロセスが生成されるのを防ぐ
+      p = PidFile.new
+
+      # デフォルトでは/tmp以下にPidFileが作成される
+      puts 'PidFile DEBUG:'
+      puts p.pidfile
+      puts p.piddir
+      puts p.pid
+      puts p.pidpath
+    end
+  end
+
 
   # キーワードによる検索・抽出を行う
   # @param[String]
@@ -116,6 +121,7 @@ module Scrape::Nico
 
   # Image modelのattributesを組み立てる
   # @param [Nokogiri::HTML]
+  # @return [Hash]
   def self.get_data(item)
     {
       title: item.css('title').first.content,
@@ -130,7 +136,11 @@ module Scrape::Nico
     }
   end
 
-  # page_urlから情報・画像抽出
+  # page_urlから情報・画像抽出する
+  # @param [String]
+  # @param [Mechanize]
+  # @param [Hash]
+  # @param [Boolean]
   def self.get_contents(page_url, agent, image_data, validation=true)
     start = Time.now
     begin
@@ -152,7 +162,8 @@ module Scrape::Nico
     puts "Updated in #{(Time.now - start).to_s} sec"
   end
 
-  # Mechanizeによるログイン
+  # Mechanizeによるログインを行う
+  # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
   def self.get_client
     agent = Mechanize.new
     agent.ssl_version = 'SSLv3'
@@ -161,11 +172,15 @@ module Scrape::Nico
     agent
   end
 
+  # タグを取得する。DBに既にある場合はそのレコードを返す
+  # @param [String]
   def self.get_tag(tag)
     t = Tag.where(name: tag)
     t.empty? ? Tag.new(name: tag) : t.first
   end
+
   # タグを取得する。DBに既にある場合はそのレコードを返す
+  # @param [Array]
   def self.get_tags(tags)
     tags.map do |tag|
       t = Tag.where(name: tag)
@@ -175,6 +190,9 @@ module Scrape::Nico
 
   # delivered_images update用に、
   # ログインしてstats情報だけ返す関数
+  # @param [Mechanize]
+  # @param [String]
+  # @return [Hash]
   def self.get_stats(agent, page_url)
     begin
       page = agent.get(page_url)
