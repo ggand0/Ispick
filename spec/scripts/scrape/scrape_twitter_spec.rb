@@ -5,58 +5,63 @@ require "#{Rails.root}/script/scrape/scrape_twitter"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
   describe "scrape function" do
-    it "calls scrape_with_keyword function when targetable is enabled" do
+    it "calls scrape_using_api function when targetable is enabled" do
       FactoryGirl.create(:person_madoka)
-      Scrape::Twitter.should_receive(:scrape_with_keyword)
+      Scrape::Twitter.should_receive(:scrape_using_api)
 
-      Scrape::Twitter.scrape()
+      Scrape::Twitter.scrape(60, true, true)
     end
-    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
+    it "does not call scrape_using_api function when targetable is NOT enabled" do
       FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Twitter.stub(:scrape_with_keyword).and_return
-      Scrape::Twitter.should_not_receive(:scrape_with_keyword)
+      Scrape::Twitter.stub(:scrape_using_api).and_return nil
+      Scrape::Twitter.should_not_receive(:scrape_using_api)
 
-      Scrape::Twitter.scrape()
+      Scrape::Twitter.scrape(60, true, true)
     end
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!
-      Scrape::Twitter.stub(:scrape_with_keyword).and_return
-      Scrape::Twitter.should_not_receive(:scrape_with_keyword)
+      Scrape::Twitter.stub(:scrape_using_api).and_return nil
+      Scrape::Twitter.should_not_receive(:scrape_using_api)
 
-      Scrape::Twitter.scrape()
+      Scrape::Twitter.scrape(60, true, true)
     end
   end
-  describe "scrape_keyword function" do
-    it "calls scrape_with_keyword function" do
-      Scrape::Twitter.should_receive(:scrape_with_keyword).with('madoka', 200, true)
-      Scrape::Twitter.scrape_keyword('madoka')
+  describe "scrape_target_word function" do
+    it "calls scrape_using_api function" do
+      target_word = FactoryGirl.create(:word_with_person)
+      Scrape::Twitter.should_receive(:scrape_using_api)
+      Scrape::Twitter.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
+      Scrape::Twitter.scrape_target_word target_word
     end
   end
 
-  describe "scrape_with_keyword function" do
+  describe "scrape_using_api function" do
     it "calls proper methods" do
-      Scrape::Twitter.stub(:get_contents).and_return()
+      Scrape::Twitter.stub(:get_contents).and_return nil
       Scrape::Twitter.should_receive(:get_contents).exactly(1).times
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+      Scrape::Twitter.scrape_using_api('madoka', 5)
     end
+
     it "rescues exceptions" do
       Scrape::Twitter.stub(:get_contents).and_raise Twitter::Error::ClientError
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+      Scrape::Twitter.scrape_using_api('madoka', 5)
     end
-    it "rescues TooManyReq exception" do
-      Twitter::RateLimit.stub(:reset_in).and_return(300)
-      Scrape::Twitter.stub(:get_contents).once.and_raise Twitter::Error::TooManyRequests
-      Scrape::Twitter.should_receive(:get_contents)
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+    it "rescues TooManyRequest exception" do
+      Twitter::RateLimit.any_instance.stub(:reset_in).and_return(300)
+      Scrape::Twitter.stub(:get_contents) { Scrape::Twitter.unstub(:get_contents); raise Twitter::Error::TooManyRequests }
+      Scrape::Twitter.should_receive(:get_contents).exactly(2).times
+      Scrape::Twitter.should_receive(:sleep).with(300)
+
+      Scrape::Twitter.scrape_using_api('madoka', 5)
     end
   end
 
@@ -112,9 +117,15 @@ describe Scrape::Twitter do
     end
   end
 
+=begin
   describe "get_tags function" do
     it "returns an array of tags" do
+      puts Tag.count
       tags = Scrape::Twitter.get_tags('Madoka')
+      puts tags.first
+      puts tags.first.name
+      puts tags.first.class
+      puts tags.first.attributes
       expect(tags).to be_an(Array)
       expect(tags.first.name).to eql('Madoka')
     end
@@ -127,6 +138,7 @@ describe Scrape::Twitter do
       expect(tags.first.images.first.id).to eql(tag.images.first.id)
     end
   end
+=end
 
   describe "get_stats function" do
     it "returns stats information from a page_url" do
