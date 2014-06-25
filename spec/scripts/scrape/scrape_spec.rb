@@ -29,6 +29,21 @@ describe Scrape do
     end
   end
 
+  describe "get_query function" do
+    it "returns proper string when target_word has a person model" do
+      target_word = FactoryGirl.create(:word_with_person)
+      result = Scrape.get_query target_word
+
+      expect(result).to eq('鹿目まどか')
+    end
+    it "returns proper string when target_word doesn't have a person model" do
+      target_word = FactoryGirl.create(:target_word)
+      result = Scrape.get_query target_word
+
+      expect(result).to eq('鹿目 まどか（かなめ まどか）1')
+    end
+  end
+
   describe "save_image method" do
     describe "with valid attributes" do
       it "should create a new Image model" do
@@ -62,13 +77,13 @@ describe Scrape do
     end
 
     describe "with invalid attributes" do
-      it "should not save the image with validation" do
+      it "should not save an invalid image when validation param is true" do
         count = Image.count
         Scrape::save_image({ title: 'title', src_url: 'url with no images' }, nil, true)
         Image.count.should eq(count)
       end
 
-      it "should ignore duplicate image" do
+      it "should ignore a duplicate image" do
         image = FactoryGirl.create(:image_url)
         count = Image.count
 
