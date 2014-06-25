@@ -1,59 +1,32 @@
 # -*- coding: utf-8 -*-
 require 'tumblr_client'
 require 'tumblr/tagged'
+# coding: utf-8
 require 'securerandom'
 
 
-# Tumblrから画像抽出する
 module Scrape::Tumblr
   ROOT_URL = 'https://tumblr.com'
 
-  def self.scrape(interval=60, debug=false)
-    if interval < 15
-      puts 'debug'
-      raise Exception.new('the interval argument must be more than 10!')
-      return
-    end
-
-    limit   = 20                  # 取得するPostの上限数。APIの仕様で20postsが限度
-    count = Image.count
-    reserved_time = 10
-    local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
-    puts '--------------------------------------------------'
-    puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
-    puts "interval=#{interval} local_interval=#{local_interval}"
-
-    TargetWord.all.each do |target_word|
-      if target_word.enabled
-        # Person.nameで検索（e.g. "鹿目まどか"）
-        # personと関連していない場合は直接word属性を使う
-        query = Scrape.get_query target_word
-        next if query.nil? or query.empty?
-        puts "query=#{query} time=#{DateTime.now}"
-
-        begin
-          result = self.scrape_with_keyword(query, limit)
-          puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
-        rescue => e
-          puts e
-          Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
-        end
-      end
-
-      sleep(local_interval*60) if not debug
-    end
-
-    puts "Extracted: #{(Image.count - count).to_s}"
-    puts '--------------------------------------------------'
+  # 取得するPostの上限数。APIの仕様で20postsが限度
+  # Scrape images from nicoseiga. The latter two params are used for testing.
+  # @param [Integer] min
+  # @param [Boolean] whether it's called for debug or not
+  # @param [Boolean] whether it's called for debug or not
+  def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
+    limit = 20
+    Scrape.scrape_target_words('Scrape::Tumblr', limit, interval, pid_debug, sleep_debug)
   end
 
+
   # キーワードによる抽出処理を行う
-  # @param [String]
-  def self.scrape_keyword(keyword)
+  # @param [TargetWord]
+  def self.scrape_target_word(target_word)
+    query = Scrape.get_query target_word
     limit = 10
     puts "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_with_keyword(keyword, limit, true)
+    result = self.scrape_using_api(query, limit, true)
     puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -62,7 +35,7 @@ module Scrape::Tumblr
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash] Scraping result
-  def self.scrape_with_keyword(keyword, limit, validation=true, logging=false)
+  def self.scrape_using_api(query, limit, validation=true, logging=false)
     client = self.get_client
     duplicates = 0
     skipped = 0
@@ -70,7 +43,7 @@ module Scrape::Tumblr
     avg_time = 0
 
     # タグ検索：limitで指定された数だけ画像を取得
-    client.tagged(keyword).each_with_index do |image, count|
+    client.tagged(query).each_with_index do |image, count|
       # 画像のみを対象とする
       if image['type'] != 'photo'
         skipped += 1
@@ -81,7 +54,6 @@ module Scrape::Tumblr
       start = Time.now
       image_data = Scrape::Tumblr.get_data(image)
       res = Scrape.save_image(image_data, self.get_tags(image['tags']), validation)
-
 
       duplicates += res ? 0 : 1
       scraped += 1 if res
@@ -97,9 +69,11 @@ module Scrape::Tumblr
     { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / (scraped+duplicates)*1.0 }
   end
 
-  # 画像１枚に関する情報をHashにして返す
+  # 画像１枚に関する情報をHashにして返す。
+  # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
+  # @param [Hash]
+  # @return [Hash]
   def self.get_data(image)
-    # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避
     {
       title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
       caption: image['caption'],
@@ -114,31 +88,32 @@ module Scrape::Tumblr
     }
   end
 
+  # @return [Tumblr::Client] APIキーを設定したClientオブジェクト
   def self.get_client
     Tumblr.configure do |config|
       config.consumer_key = CONFIG['tumblr_consumer_key']
       config.consumer_secret = CONFIG['tumblr_consumer_secret']
-      #config.oauth_token = "access_token"
-      #config.oauth_token_secret = "access_token_secret"
     end
     Tumblr::Client.new
   end
 
-  # 直接HTMLを開いてlikes数を取得する。遅い
+  # 直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
+  # @param [String] likes_countを取得するページのurl
   def self.get_favorites(page_url)
     begin
-      # show:likesを設定しているページのみget
+      # show:likesを設定しているページのみ取得
       html = Nokogiri::HTML(open(page_url))
       likes = html.css("ol[class='notes']").first.content.to_s.scan(/ likes this/)
       suki = html.css("ol[class='notes']").first.content.to_s.scan(/「スキ!」/)
       return likes.count + suki.count
     rescue => e
       puts e
-      return
     end
   end
 
-  # @tag : Array of strings
+  # Tagインスタンスの配列を作成する
+  # @param [Array] タグを表す文字列の配列
+  # @return [Array] Tagオブジェクトの配列
   def self.get_tags(tags)
     tags.map do |tag|
       t = Tag.where(name: tag)
@@ -146,7 +121,10 @@ module Scrape::Tumblr
     end
   end
 
-  # 統計情報(likes_count)を更新する
+  # likes_countを更新する
+  # @param [Tumblr::Client]
+  # @param [String]
+  # @return [Hash]
   def self.get_stats(client, page_url)
     #client = self.get_client
     blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
