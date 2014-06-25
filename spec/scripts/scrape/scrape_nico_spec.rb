@@ -6,7 +6,7 @@ describe Scrape::Nico do
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
 
   before do
-    #IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
     @agent = Scrape::Nico.get_client      # Mechanize agentの作成
 
@@ -49,11 +49,9 @@ describe Scrape::Nico do
 
   describe "scrape_target_word function" do
     it "calls proper functions" do
-      #target_word = FactoryGirl.create(:person_madoka)
       target_word = FactoryGirl.create(:word_with_person)
       Scrape::Nico.should_receive(:scrape_using_api)
       Scrape::Nico.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
-      #Scrape::Nico.scrape_target_word '鹿目まどか'
       Scrape::Nico.scrape_target_word target_word
     end
   end
@@ -69,7 +67,7 @@ describe Scrape::Nico do
 
     it "skip if keyword arg is nil" do
       Scrape::Nico.should_not_receive(:get_data)
-      Scrape::Nico.scrape_using_api(@agent, nil, 5, false)
+      Scrape::Nico.scrape_using_api(nil, 5, false)
     end
 
     it "calls get_data function 'limit' times" do
@@ -79,7 +77,7 @@ describe Scrape::Nico do
       Scrape.stub(:save_image).and_return(1)
       Scrape.should_receive(:save_image).exactly(limit).times
 
-      Scrape::Nico.scrape_using_api(@agent, 'まどかわいい', limit, false)
+      Scrape::Nico.scrape_using_api('まどかわいい', limit, false)
     end
 
     it "allows duplicates three times" do
@@ -88,7 +86,7 @@ describe Scrape::Nico do
       Scrape.stub(:save_image).and_return nil
       Scrape.should_receive(:save_image).exactly(3).times
 
-      Scrape::Nico.scrape_using_api(@agent, 'まどかわいい', 3, false)
+      Scrape::Nico.scrape_using_api('まどかわいい', 3, false)
     end
   end
 

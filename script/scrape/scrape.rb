@@ -38,7 +38,7 @@ module Scrape
   # @param [Integer] min
   # @param [Boolean] whether it's called for debug or not
   # @param [Boolean] whether it's called for debug or not
-  def self.scrape_target_words(module_type, interval=60, pid_debug=false, sleep_debug=false)
+  def self.scrape_target_words(module_type, limit=20, interval=60, pid_debug=false, sleep_debug=false)
     # 予備時間が十分に取れない程短時間の場合は例外を発生させる
     if interval < 15
       raise Exception.new('the interval argument must be more than 10!')
@@ -46,9 +46,9 @@ module Scrape
     end
 
     child_module = Object::const_get(module_type)
-    agent = child_module.get_client
+    #agent = child_module.get_client
     reserved_time = 10
-    limit = 50
+    #limit = 50
     local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
 
     puts '--------------------------------------------------'
@@ -66,7 +66,7 @@ module Scrape
           puts "query=#{query} time=#{DateTime.now}"
 
           # パラメータに基づいてAPIリクエストを行い結果を得る
-          result = child_module.scrape_using_api(agent, query, limit, true)
+          result = child_module.scrape_using_api(query, limit, true)
           puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
         rescue => e
           puts e

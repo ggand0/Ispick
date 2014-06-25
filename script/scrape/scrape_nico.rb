@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'open-uri'
 
+
 module Scrape::Nico
   RSS_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
   TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
@@ -11,68 +12,32 @@ module Scrape::Nico
   # @param [Boolean] whether it's called for debug or not
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
-    Scrape.scrape_target_words('Scrape::Nico', interval, pid_debug, sleep_debug)
-  end
-=begin
-    if interval < 15
-      raise Exception.new('the interval argument must be more than 10!')
-      return
-    end
-
-    agent = self.get_client
     limit = 50
-    reserved_time = 10
-    puts local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
-    puts '--------------------------------------------------'
-    puts "Start extracting from #{ROOT_URL}: time=#{DateTime.now}"
-    puts "interval=#{interval} local_interval=#{local_interval}"
-
-    # PIDファイルを用いて多重起動を防ぐ
-    Scrape.detect_multiple_running(pid_debug, false)
-
-    TargetWord.all.each do |target_word|
-      if target_word.enabled
-        begin
-          query = Scrape.get_query target_word
-          puts "query=#{query} time=#{DateTime.now}"
-
-          result = self.scrape_using_api(agent, query, limit, true)
-          puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
-        rescue => e
-          puts e
-          Rails.logger.info("Scraping from #{ROOT_URL} has failed!")
-        end
-      end
-
-      sleep(local_interval*60) if not sleep_debug
-    end
-    puts '--------------------------------------------------'
+    Scrape.scrape_target_words('Scrape::Nico', limit, interval, pid_debug, sleep_debug)
   end
-=end
 
 
   # キーワードによる検索・抽出を行う
-  # @param[String]
+  # @param [TargetWord]
   def self.scrape_target_word(target_word)
-    agent = self.get_client
     query = Scrape.get_query target_word
     limit = 10
     puts "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(agent, query, limit, true)
+    result = self.scrape_using_api(query, limit, true)
     puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
   # キーワードからタグ検索してlimit分の画像を保存する
-  # @param [Mechanize::Agent]
   # @param [String]
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash]
-  def self.scrape_using_api(agent, query, limit, validation, logging=false)
+  def self.scrape_using_api(query, limit, validation, logging=false)
     # nilのクエリ弾く
     return if query.nil? or query.empty?
 
+    agent = self.get_client
     url = "#{TAG_SEARCH_URL}?page=1&query=#{query}"
     escaped = URI.escape(url)
     xml = agent.get(escaped)
