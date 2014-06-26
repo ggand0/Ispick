@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'release-0.2'
+set :branch, 'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -112,7 +112,8 @@ namespace :whenever do
   desc "update crontab tasks"
   task :update do
     on roles(:all) do
-      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --clear-crontab"
+      execute "cd #{current_path} && crontab -r"
+
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab"
     end
