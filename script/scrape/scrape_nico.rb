@@ -82,7 +82,8 @@ module Scrape::Nico
       page_url: "http://seiga.nicovideo.jp/seiga/im#{item.css('id').first.content}",
       views: item.css('view_count').first.content,
       favorites: item.css('clip_count').first.content,
-      posted_at: DateTime.parse(item.css('created').first.content),
+      # JSTの投稿日時が返却されるのでUTCに変換する
+      posted_at: DateTime.parse(item.css('created').first.content).in_time_zone('Asia/Tokyo').utc,
       site_name: 'nicoseiga',
       module_name: 'Scrape::Nico',
     }
