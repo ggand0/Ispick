@@ -11,7 +11,11 @@ class SearchImages
     puts '--------------------------------------------------'
     puts "Starting: target_word=#{target_word_id}, time=#{DateTime.now}"
 
-    Scrape.scrape_target_word target_word
+    begin
+      Scrape.scrape_target_word target_word
+    rescue => e
+      puts e
+    end
 
     Deliver.deliver_keyword(target_word.user_id, target_word.id)
 

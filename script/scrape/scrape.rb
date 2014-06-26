@@ -90,7 +90,7 @@ module Scrape
       puts "name_english: #{query}"
 
       Scrape::Tumblr.scrape_target_word(target_word)
-      Scrape::Giphy.scrap_target_word(target_word)
+      #Scrape::Giphy.scrape_target_word(target_word)
     end
     puts 'DONE!!'
   end
