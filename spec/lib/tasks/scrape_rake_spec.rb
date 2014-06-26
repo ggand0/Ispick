@@ -21,7 +21,7 @@ end
 describe "scrape:delete_excess" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -44,13 +44,13 @@ end
 describe "scrape:all" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
   it "should call valid methods" do
-    Scrape.stub(:scrape_all).and_return
+    Scrape.stub(:scrape_all).and_return nil
     Scrape.should_receive(:scrape_all)
     subject.invoke
   end
@@ -59,71 +59,14 @@ end
 describe "scrape:keyword" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
   it "should call valid methods" do
-    Scrape.stub(:scrape_keyword).and_return
+    Scrape.stub(:scrape_keyword).and_return nil
     Scrape.should_receive(:scrape_keyword)
-    subject.invoke
-  end
-end
-
-
-
-# Misc tasks
-describe "scrape:min5" do
-  before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-
-  it "should call a valid method" do
-    Scrape.stub(:scrape_5min).and_return
-    Scrape.should_receive(:scrape_5min)
-    subject.invoke
-  end
-end
-describe "scrape:min15" do
-  before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-  it "should call a valid method" do
-    Scrape.stub(:scrape_15min).and_return
-    Scrape.should_receive(:scrape_15min)
-    subject.invoke
-  end
-end
-describe "scrape:min30" do
-  before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-  it "should call a valid method" do
-    Scrape.stub(:scrape_30min).and_return
-    Scrape.should_receive(:scrape_30min)
-    subject.invoke
-  end
-end
-describe "scrape:min60" do
-  before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
-  end
-  include_context 'rake'
-  its(:prerequisites) { should include('environment') }
-  it "should call a valid method" do
-    Scrape.stub(:scrape_60min).and_return
-    Scrape.should_receive(:scrape_60min)
     subject.invoke
   end
 end

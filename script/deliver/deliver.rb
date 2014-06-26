@@ -38,7 +38,7 @@ module Deliver
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
-    puts "Delivering to target_word=#{target_word_id}"
+    puts "\nDelivering to target_word=#{target_word_id} start=#{DateTime.now}"
 
     Deliver::Words.deliver_from_word(user, target_word, false)
 
@@ -93,8 +93,7 @@ module Deliver
         tmp_images << delivered_image
       end
 
-      puts "- Creating delivered_images: #{count.to_s} /
-        #{images.count.to_s}" if count % 10 == 0
+      puts "- Creating delivered_images: #{count.to_s} / #{images.count.to_s}" if count % 10 == 0
     end
 
 

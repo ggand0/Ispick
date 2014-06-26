@@ -3,7 +3,14 @@
 FactoryGirl.define do
   factory :person do
     name "鹿目まどか"
-    name_type ""
+    name_type "Character"
+  end
+  factory :person_with_word, class: Person do
+    sequence(:name) { |n| "鹿目まどか#{n}" }
+    name_english 'Madoka Kaname'
+    name_type 'Character'
+    name_display '鹿目 まどか（かなめ まどか）'
+    association :target_word, factory: :target_word
   end
 
   factory :person_madoka, class: Person do

@@ -19,19 +19,19 @@
 
 # Learn more: http://github.com/javan/whenever
 
-set :output, { error: 'log/error.log', standard: 'log/cron.log'}
+#set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
 
 every 60.minutes do
-  #rake 'scrape:twitter'
+  rake 'scrape:twitter', output: { error: 'log/scrape_twitter_error.log', standard: 'log/scrape_twitter_cron.log' }
 end
 
 every 60.minutes do
-  rake 'scrape:nico'
+  rake 'scrape:nico', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
 every 3.hours do
-  rake 'scrape:tumblr'
+  rake 'scrape:tumblr', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
 every 6.hours do
@@ -41,10 +41,10 @@ end
 # 配信システム系
 every 30.minutes do
   # 指定枚数を超えたらその分Imagesから削除
-  rake 'scrape:delete_excess[100000]'
+  rake 'scrape:delete_excess[100000]', output: 'log/deliver.log'
 
   # 全てのユーザーに推薦イラストを配信
-  rake 'deliver:all'
+  rake 'deliver:all', output: 'log/deliver.log'
 end
 
 # パフォーマンスの関係で凍結中

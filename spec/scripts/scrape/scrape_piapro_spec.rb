@@ -6,7 +6,7 @@ describe Scrape::Piapro do
   before do
     IO.any_instance.stub(:puts)
     # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
     @agent = Scrape::Piapro.login()
   end
 
@@ -32,7 +32,7 @@ describe Scrape::Piapro do
   describe "get_contents function" do
     it "creates an image model from image source" do
       # save_image functionが呼ばれるはず
-      Scrape.stub(:save_image).and_return
+      Scrape.stub(:save_image).and_return nil
       Scrape.should_receive(:save_image)
 
       # イラスト表示ページ
