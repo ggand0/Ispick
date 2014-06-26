@@ -89,8 +89,8 @@ module Scrape
       query = target_word.person.name_english
       puts "name_english: #{query}"
 
-      Scrape::Tumblr.scrape_keyword(query)
-      Scrape::Giphy.scrape_keyword(target_word)
+      Scrape::Tumblr.scrape_target_word(target_word)
+      Scrape::Giphy.scrap_target_word(target_word)
     end
     puts 'DONE!!'
   end

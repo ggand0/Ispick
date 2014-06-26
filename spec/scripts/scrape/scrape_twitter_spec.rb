@@ -5,7 +5,7 @@ require "#{Rails.root}/script/scrape/scrape_twitter"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    #IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 

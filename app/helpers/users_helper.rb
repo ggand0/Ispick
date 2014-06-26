@@ -1,6 +1,6 @@
 module UsersHelper
   def get_clip_string(delivered_image)
-    if delivered_image.favored_image_id
+    if delivered_image.favored_images.count > 0
       'Clipped'
     else
       'Clip'
@@ -9,7 +9,7 @@ module UsersHelper
 
   def get_clip_string_styled(delivered_image)
     style = ''
-    if delivered_image.favored_image_id
+    if delivered_image.favored_images.count > 0
       style = 'style="color: #02C293;"'
     else
       style = 'style="color: #000;"'

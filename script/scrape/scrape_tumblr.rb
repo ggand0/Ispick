@@ -21,8 +21,12 @@ module Scrape::Tumblr
 
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
-  def self.scrape_target_word(target_word)
-    query = Scrape.get_query target_word
+  def self.scrape_target_word(target_word, english=false)
+    if english
+      query = target_word.person.name_english
+    else
+      query = Scrape.get_query target_word
+    end
     limit = 10
     puts "Extracting #{limit} images from: #{ROOT_URL}"
 
@@ -66,7 +70,7 @@ module Scrape::Tumblr
       break if (count+1 - skipped) >= limit
     end
 
-    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / (scraped+duplicates)*1.0 }
+    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
   end
 
   # 画像１枚に関する情報をHashにして返す。

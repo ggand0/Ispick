@@ -165,6 +165,9 @@ describe DeliveredImagesController do
       delivered_image = FactoryGirl.create(:delivered_image)
       current_user = User.first
 
+      # Userを作成した段階でImageBoardとお気に入り画像がseedされているので
+      # その分を考慮する
+      count = current_user.image_boards.first.favored_images.count
       put :favor, {
         id: delivered_image.id,
         board: 'Default',
@@ -173,7 +176,7 @@ describe DeliveredImagesController do
       }, valid_session
 
       # ImageBoardに１枚追加されているはずである
-      expect(current_user.image_boards.first.favored_images.count).to eq(1)
+      expect(current_user.image_boards.first.favored_images.count).to eq(count+1)
       expect(response).to redirect_to show_favored_images_users_path
     end
 

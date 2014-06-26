@@ -77,8 +77,10 @@ RSpec.describe ImageBoardsController, :type => :controller do
 
     describe "with valid params" do
       it "creates a new ImageBoard" do
+        delivered_image = FactoryGirl.create(:delivered_image)
+
         expect {
-          post :create, {:image_board => valid_attributes}, valid_session
+          post :create, { :image_board => valid_attributes, image: delivered_image.id }, valid_session
         }.to change(ImageBoard, :count).by(1)
       end
     end
@@ -139,7 +141,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
     it "redirects to the image_boards list" do
       image_board = ImageBoard.create! valid_attributes
       delete :destroy, {:id => image_board.to_param}, valid_session
-      expect(response).to redirect_to(image_boards_url)
+      expect(response).to redirect_to(show_favored_images_users_path)
     end
   end
 

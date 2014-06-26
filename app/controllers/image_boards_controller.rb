@@ -22,7 +22,6 @@ class ImageBoardsController < ApplicationController
   end
 
   def boards
-    #ImageBoard.connection.clear_query_cache
     @image = DeliveredImage.find(params[:image])
     @board = ImageBoard.new
     @id = params[:id]
@@ -51,7 +50,6 @@ class ImageBoardsController < ApplicationController
     @image_board = ImageBoard.new(image_board_params)
     @image_board.save!
     current_user.image_boards << @image_board
-    #render nothing: true
 
     @image = DeliveredImage.find(params[:image])
     @board = ImageBoard.new

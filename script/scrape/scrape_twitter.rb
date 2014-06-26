@@ -91,7 +91,7 @@ module Scrape::Twitter
       break if scraped+1-skipped >= limit
     end
 
-    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / (scraped+duplicates)*1.0 }
+    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
   end
 
   # TwitterのClientオブジェクトを取得する
