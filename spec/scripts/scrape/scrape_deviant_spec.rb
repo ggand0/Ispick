@@ -6,7 +6,7 @@ describe Scrape::Deviant do
   before do
     IO.any_instance.stub(:puts)
     # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
 
   # R18コンテンツを判定する関数について
@@ -61,7 +61,7 @@ describe Scrape::Deviant do
 
   describe "scrape method" do
     it "should call get_contents method at least 20 time" do
-      Scrape::Deviant.stub(:get_contents).and_return()
+      Scrape::Deviant.stub(:get_contents).and_return nil
       Scrape::Deviant.should_receive(:get_contents).at_least(20).times
 
       Scrape::Deviant.scrape()

@@ -6,8 +6,8 @@ describe Scrape::Giphy do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
   before do
-    IO.any_instance.stub(:puts)         # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return    # resqueにenqueueしないように
+    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Giphy.get_client
     #@response = JSON.parse(response)['response']
   end
@@ -20,7 +20,7 @@ describe Scrape::Giphy do
     end
     it "does not call scrape_with_keyword function when targetable is NOT enabled" do
       FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Giphy.stub(:scrape_with_keyword).and_return
+      Scrape::Giphy.stub(:scrape_with_keyword).and_return nil
       Scrape::Giphy.should_not_receive(:scrape_with_keyword)
 
       Scrape::Giphy.scrape
@@ -28,7 +28,7 @@ describe Scrape::Giphy do
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!
-      Scrape::Giphy.stub(:scrape_with_keyword).and_return
+      Scrape::Giphy.stub(:scrape_with_keyword).and_return nil
       Scrape::Giphy.should_not_receive(:scrape_with_keyword)
 
       Scrape::Giphy.scrape
