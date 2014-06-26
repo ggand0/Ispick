@@ -61,9 +61,10 @@ module Scrape::Twitter
   # @param [Integer]
   # @param [Boolean]
   def self.get_contents(client, query, limit, validation=true, logging=false)
+    scraped = 0
     skipped = 0
     duplicates = 0
-    count = 0
+    avg_time = 0
 
     # limitで指定された数だけツイートを取得
     client.search("#{query} -rt", locale: 'ja', result_type: 'recent',
@@ -73,9 +74,11 @@ module Scrape::Twitter
 
       if image_data.count > 0
         image_data.each do |data|
-          res = Scrape.save_image(data, self.get_tag(query), validation)
+          res = Scrape.save_image(data, [ self.get_tag(query) ], validation)
           duplicates += res ? 0 : 1
-          count += 1 if res
+          scraped += 1 if res
+          elapsed_time = Time.now - start
+          avg_time += elapsed_time
           puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and res
         end
       else
@@ -85,8 +88,10 @@ module Scrape::Twitter
 
       # limit枚抽出、もしくは重複が出現し始めたら終了
       break if duplicates >= 3
-      break if count+1-skipped >= limit
+      break if scraped+1-skipped >= limit
     end
+
+    { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / (scraped+duplicates)*1.0 }
   end
 
   # TwitterのClientオブジェクトを取得する

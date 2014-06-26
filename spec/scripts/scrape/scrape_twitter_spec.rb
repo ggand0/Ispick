@@ -5,7 +5,7 @@ require "#{Rails.root}/script/scrape/scrape_twitter"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    #IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
@@ -66,14 +66,20 @@ describe Scrape::Twitter do
   end
 
   describe "get_contents function" do
-    it "returns tweet array" do
+    it "returns scarping result hash" do
       client = Scrape::Twitter.get_client
+      query = '鹿目まどか'
+      result = client.search("#{query} -rt", locale: 'ja', result_type: 'recent', include_entity: true)
 
-      #Scrape.should_receive(:save_image).exactly(5).times
+      Twitter::REST::Client.any_instance.stub(:search).and_return(result)
+      Twitter::REST::Client.any_instance.should_receive(:search)
 
-      #Twitter::REST::Client.any_instance.should_receive(:search).exactly(1).times
-      #Scrape::Twitter.should_receive(:get_data)
-      Scrape::Twitter.get_contents(client, '鹿目まどか', 200)
+      result_hash = Scrape::Twitter.get_contents(client, query, 5)
+      expect(result_hash).to be_a(Hash)
+    end
+    it "call save_image function with right arguments" do
+      # TODO: 画像tweetを含むTwitter API responseをTwitter::SearchResultsオブジェクトにパースし、
+      # Scrape.save_imageが画像ツイート数と同じ回数呼ばれている事をassertする
     end
   end
 
@@ -84,11 +90,15 @@ describe Scrape::Twitter do
       @tweet = Twitter::Tweet.new({id:1})
     end
     it "returns image_data array" do
-      # APIアクセスしないようにstubしている
+      # 仮のデータをstubを利用してreturnする
+      # FactoryGirlを使用して書き換えても良い
       Twitter::Tweet.any_instance.stub(:media?).and_return(true)
-      Twitter::Tweet.any_instance.stub(:text).and_return('大佐、会議室でよく使うハンドサイン発見しました☆パァ')
+      Twitter::Tweet.any_instance.stub(:text).and_return(
+        '大佐、会議室でよく使うハンドサイン発見しました☆パァ'
+      )
       Twitter::Tweet.any_instance.stub(:url).and_return(
-        'https://twitter.com/wycejezevix/status/454783931636670464')
+        'https://twitter.com/wycejezevix/status/454783931636670464'
+      )
       Twitter::Tweet.any_instance.stub(:retweet_count).and_return(0)
       Twitter::Tweet.any_instance.stub(:favorite_count).and_return(0)
       Twitter::Tweet.any_instance.stub(:created_at).and_return(DateTime.now)
@@ -98,7 +108,8 @@ describe Scrape::Twitter do
 
       expect(image_data).to be_an(Array)
       expect(image_data[0][:page_url]).to eql(
-        'https://twitter.com/wycejezevix/status/454783931636670464')
+        'https://twitter.com/wycejezevix/status/454783931636670464'
+      )
     end
   end
 
