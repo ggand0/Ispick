@@ -46,9 +46,7 @@ module Scrape
     end
 
     child_module = Object::const_get(module_type)
-    #agent = child_module.get_client
     reserved_time = 10
-    #limit = 50
     local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
 
     puts '--------------------------------------------------'
@@ -56,7 +54,7 @@ module Scrape
     puts "interval=#{interval} local_interval=#{local_interval}"
 
     # PIDファイルを用いて多重起動を防ぐ
-    Scrape.detect_multiple_running(pid_debug, false)
+    Scrape.detect_multiple_running(module_type, pid_debug, false)
 
     # １タグごとにタグ検索APIを用いて画像取得
     TargetWord.all.each do |target_word|
@@ -83,7 +81,7 @@ module Scrape
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
   def self.scrape_target_word(target_word)
     Scrape::Nico.scrape_target_word(target_word)
-    #Scrape::Twitter.scrape_keyword(target_word)
+    Scrape::Twitter.scrape_target_word(target_word)
     Scrape::Tumblr.scrape_target_word(target_word)
 
     # 英名が存在する場合はさらに検索
@@ -122,13 +120,20 @@ module Scrape
   # PIDファイルを用いて多重起動を防ぐ
   # @param [Boolean] PidFileを使用するかどうか
   # @param [Boolean] デバッグ出力を行うかどうか
-  def self.detect_multiple_running(pid_debug, debug=false)
+  def self.detect_multiple_running(module_type, pid_debug, debug=false)
     unless pid_debug
-      exit if PidFile.running? # PidFileが存在する場合はプロセスを終了する
+      if PidFile.running? # PidFileが存在する場合はプロセスを終了する
+        puts 'Another process is already runnnig. Exit.'
+        exit
+      end
 
       # PidFileが存在しない場合、新たにPidFileを作成し、
       # 新たにプロセスが生成されるのを防ぐ
-      p = PidFile.new
+      pid_hash = {
+        pidfile: "#{module_type}.pid",
+        piddir: "#{Rails.root}/tmp/pids"
+      }
+      p = PidFile.new(pid_hash)
 
       # デフォルトでは/tmp以下にPidFileが作成される
       puts 'PidFile DEBUG:'
