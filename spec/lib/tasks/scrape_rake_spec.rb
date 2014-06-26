@@ -21,7 +21,7 @@ end
 describe "scrape:delete_excess" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -44,13 +44,13 @@ end
 describe "scrape:all" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
   it "should call valid methods" do
-    Scrape.stub(:scrape_all).and_return
+    Scrape.stub(:scrape_all).and_return nil
     Scrape.should_receive(:scrape_all)
     subject.invoke
   end
@@ -59,13 +59,13 @@ end
 describe "scrape:keyword" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
 
   it "should call valid methods" do
-    Scrape.stub(:scrape_keyword).and_return
+    Scrape.stub(:scrape_keyword).and_return nil
     Scrape.should_receive(:scrape_keyword)
     subject.invoke
   end

@@ -9,7 +9,7 @@ module Scrape::Tumblr
   ROOT_URL = 'https://tumblr.com'
 
   # 取得するPostの上限数。APIの仕様で20postsが限度
-  # Scrape images from nicoseiga. The latter two params are used for testing.
+  # Scrape images from tumblr. The latter two params are used for testing.
   # @param [Integer] min
   # @param [Boolean] whether it's called for debug or not
   # @param [Boolean] whether it's called for debug or not
@@ -81,8 +81,11 @@ module Scrape::Tumblr
       page_url: image['post_url'],
       posted_at: image['date'],
       views: nil,
+
       #favorites: self.get_favorites(image['post_url']),
-      favorites: image['note_count'],# reblog+likesされた数の合計値。別々には取得不可
+      # reblog+likesされた数の合計値。別々には取得不可
+      favorites: image['note_count'],
+
       site_name: 'tumblr',
       module_name: 'Scrape::Tumblr',
     }
