@@ -2,8 +2,7 @@ describe "feature:face_targets" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
     IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil # resqueにenqueueしないように
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -21,7 +20,7 @@ end
 describe "feature:face_images" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return
+    Resque.stub(:enqueue).and_return nil
   end
   include_context 'rake'
   its(:prerequisites) { should include('environment') }
@@ -30,7 +29,7 @@ describe "feature:face_images" do
     Image.delete_all
     FactoryGirl.create(:image)
 
-    TargetImagesService.any_instance.stub(:prefer).and_return({result: '[]'})
+    TargetImagesService.any_instance.stub(:prefer).and_return({ result: '[]' })
     TargetImagesService.any_instance.should_receive(:prefer)
 
     subject.invoke

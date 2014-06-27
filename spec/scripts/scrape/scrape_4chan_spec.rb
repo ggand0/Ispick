@@ -4,16 +4,16 @@ require "#{Rails.root}/script/scrape/scrape_4chan"
 describe Scrape::Fourchan do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
   describe "scrape function" do
     it "calls valid functions" do
-      Scrape.stub(:save_image).and_return
+      Scrape.stub(:save_image).and_return nil
       Scrape.should_receive(:save_image).at_least(1).times
 
-      Scrape::Fourchan.stub(:get_thread_id_list).and_return()
-      Scrape::Fourchan.stub(:get_thread_post_list).and_return()
+      Scrape::Fourchan.stub(:get_thread_id_list).and_return nil
+      Scrape::Fourchan.stub(:get_thread_post_list).and_return nil
       Scrape::Fourchan.stub(:get_image_url_list).and_return([{ title: 'test', src_url: 'example.com', is_large: false }])
       Scrape::Fourchan.should_receive(:get_thread_id_list).exactly(1).times
       Scrape::Fourchan.should_receive(:get_thread_post_list).exactly(1).times

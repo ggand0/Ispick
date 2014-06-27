@@ -33,10 +33,12 @@ describe Scrape::Twitter do
     end
   end
   describe "scrape_target_word function" do
+    let(:function_response) { { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 } }
+
     it "calls scrape_using_api function" do
       target_word = FactoryGirl.create(:word_with_person)
       Scrape::Twitter.should_receive(:scrape_using_api)
-      Scrape::Twitter.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
+      Scrape::Twitter.stub(:scrape_using_api).and_return(function_response)
       Scrape::Twitter.scrape_target_word target_word
     end
   end
@@ -57,7 +59,9 @@ describe Scrape::Twitter do
 
     it "rescues TooManyRequest exception" do
       Twitter::RateLimit.any_instance.stub(:reset_in).and_return(300)
-      Scrape::Twitter.stub(:get_contents) { Scrape::Twitter.unstub(:get_contents); raise Twitter::Error::TooManyRequests }
+      Scrape::Twitter.stub(:get_contents) {
+        Scrape::Twitter.unstub(:get_contents); raise Twitter::Error::TooManyRequests
+      }
       Scrape::Twitter.should_receive(:get_contents).exactly(2).times
       Scrape::Twitter.should_receive(:sleep).with(300)
 
@@ -127,29 +131,6 @@ describe Scrape::Twitter do
       expect(name).to match(/twitter/)
     end
   end
-
-=begin
-  describe "get_tags function" do
-    it "returns an array of tags" do
-      puts Tag.count
-      tags = Scrape::Twitter.get_tags('Madoka')
-      puts tags.first
-      puts tags.first.name
-      puts tags.first.class
-      puts tags.first.attributes
-      expect(tags).to be_an(Array)
-      expect(tags.first.name).to eql('Madoka')
-    end
-    it "uses existing tags if tags are duplicate" do
-      image = FactoryGirl.create(:image)
-      tag = FactoryGirl.create(:tag)
-      image.tags << tag
-
-      tags = Scrape::Twitter.get_tags('鹿目まどか')
-      expect(tags.first.images.first.id).to eql(tag.images.first.id)
-    end
-  end
-=end
 
   describe "get_stats function" do
     it "returns stats information from a page_url" do

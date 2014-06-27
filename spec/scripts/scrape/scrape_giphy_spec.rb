@@ -5,6 +5,7 @@ require "#{Rails.root}/script/scrape/scrape_giphy"
 describe Scrape::Giphy do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
+
   before do
     IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
@@ -13,46 +14,50 @@ describe Scrape::Giphy do
   end
 
   describe "scrape function" do
-    it "calls scrape_with_keyword function" do
+    it "calls scrape_using_api function" do
       FactoryGirl.create(:person_madoka)
-      Scrape::Giphy.should_receive(:scrape_with_keyword)
-      Scrape::Giphy.scrape
+      Scrape::Giphy.should_receive(:scrape_using_api)
+      Scrape::Giphy.scrape(60, true, true)
     end
-    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
+    it "does not call scrape_using_api function when targetable is NOT enabled" do
       FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Giphy.stub(:scrape_with_keyword).and_return nil
-      Scrape::Giphy.should_not_receive(:scrape_with_keyword)
+      Scrape::Giphy.stub(:scrape_using_api).and_return nil
+      Scrape::Giphy.should_not_receive(:scrape_using_api)
 
-      Scrape::Giphy.scrape
+      Scrape::Giphy.scrape(60, true, true)
     end
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!
-      Scrape::Giphy.stub(:scrape_with_keyword).and_return nil
-      Scrape::Giphy.should_not_receive(:scrape_with_keyword)
+      Scrape::Giphy.stub(:scrape_using_api).and_return nil
+      Scrape::Giphy.should_not_receive(:scrape_using_api)
 
-      Scrape::Giphy.scrape
+      Scrape::Giphy.scrape(60, true, true)
     end
   end
-  describe "scrape_keyword function" do
-    it "calls scrape_with_keyword function" do
-      Scrape::Giphy.should_receive(:scrape_with_keyword).with('madoka', 10, true)
-      Scrape::Giphy.scrape_keyword('madoka')
+  describe "scrape_target_word function" do
+    let(:function_response) { { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 } }
+
+    it "calls scrape_using_api function" do
+      target_word = FactoryGirl.create(:word_with_person)
+
+      expect(Scrape::Giphy).to receive(:scrape_using_api).with(target_word, 10, true)
+      Scrape::Giphy.stub(:scrape_using_api).and_return(function_response)
+      Scrape::Giphy.scrape_target_word(target_word)
     end
   end
 
-  describe "scrape_with_keyword function" do
+  describe "scrape_using_api function" do
     it "calls proper functions" do
       Giphy.stub(:search).and_return([])#::Client.any_instance
 
       # get_data functionをmockすると何故かcallされなくなるので、save_imageのみ見る
       #Scrape::Giphy.should_receive(:get_data).exactly(5).times
 
-      #Scrape.should_receive(:save_image).exactly(5).times
-      Giphy.should_receive(:search).exactly(1).times
-      target_word = FactoryGirl.create(:target_word)
+      expect(Giphy).to receive(:search).exactly(1).times
+      target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Giphy.scrape_with_keyword(target_word, 5)
+      Scrape::Giphy.scrape_using_api(target_word, 5)
     end
   end
 
