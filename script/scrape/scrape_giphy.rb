@@ -17,10 +17,11 @@ module Scrape::Giphy
   # キーワードによる抽出処理を行う
   # @param target_word [TargetWord] 対象とするTargetWordオブジェクト
   def self.scrape_target_word(target_word)
-    query = self.get_query(target_word)
-    return if query.nil? or query.empty?
+    limit = 10
+    puts "Extracting #{limit} images from: #{ROOT_URL}"
 
-    self.scrape_using_api(query, 10, true)
+    result = self.scrape_using_api(target_word, limit, true)
+    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
   #
@@ -35,11 +36,14 @@ module Scrape::Giphy
     end
   end
 
-  # 対象のタグを持つPostの画像を抽出する
-  # @param query [String]
+  # 対象のTargetWordからPostの画像を抽出する
+  # @param target_word [TargetWord]
   # @param limit [Integer] 最大抽出枚数
   # @param validation [Boolean] validationを行うかどうか
-  def self.scrape_using_api(query, limit, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, validation=true, logging=false)
+    query = self.get_query(target_word)
+    return if query.nil? or query.empty?
+
     client = self.get_client
     scraped = 0
     duplicates = 0
@@ -53,9 +57,9 @@ module Scrape::Giphy
       image_data = self.get_data(image)
 
       # タグは和名を使用
-      res = Scrape.save_image(image_data, self.get_tag(query), validation)
+      res = Scrape.save_image(image_data, [ self.get_tag(target_word.word) ], validation)
       duplicates += res ? 0 : 1
-      craped += 1 if res
+      scraped += 1 if res
       elapsed_time = Time.now - start
       avg_time += elapsed_time
       puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and res
@@ -96,9 +100,13 @@ module Scrape::Giphy
       t.empty? ? Tag.new(name: tag) : t.first
     end
   end
-  def self.get_tag(query)
-    tag = Tag.where(name: query)
-    [ (tag.empty? ? Tag.new(name: query) : tag.first) ]
+
+  # タグを取得する。DBに既にある場合はそのレコードを返す
+  # @param [String]
+  # @return [Tag] Tagオブジェクト
+  def self.get_tag(tag)
+    t = Tag.where(name: tag)
+    t.empty? ? Tag.new(name: tag) : t.first
   end
 
 end

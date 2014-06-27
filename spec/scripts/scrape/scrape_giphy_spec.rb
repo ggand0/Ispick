@@ -36,10 +36,13 @@ describe Scrape::Giphy do
     end
   end
   describe "scrape_target_word function" do
+    let(:function_response) { { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 } }
+
     it "calls scrape_using_api function" do
       target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Giphy.should_receive(:scrape_using_api).with('Madoka Kaname', 10, true)
+      expect(Scrape::Giphy).to receive(:scrape_using_api).with(target_word, 10, true)
+      Scrape::Giphy.stub(:scrape_using_api).and_return(function_response)
       Scrape::Giphy.scrape_target_word(target_word)
     end
   end
@@ -51,9 +54,8 @@ describe Scrape::Giphy do
       # get_data functionをmockすると何故かcallされなくなるので、save_imageのみ見る
       #Scrape::Giphy.should_receive(:get_data).exactly(5).times
 
-      #Scrape.should_receive(:save_image).exactly(5).times
-      Giphy.should_receive(:search).exactly(1).times
-      target_word = FactoryGirl.create(:target_word)
+      expect(Giphy).to receive(:search).exactly(1).times
+      target_word = FactoryGirl.create(:word_with_person)
 
       Scrape::Giphy.scrape_using_api(target_word, 5)
     end
