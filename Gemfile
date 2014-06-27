@@ -106,7 +106,9 @@ group :development, :test do
 
 
   # Rails testing
-  gem 'rspec-rails', '~> 2.99.0'                     # Testing framework
+  gem 'rspec-rails', '~> 2.99.0'                    # Testing framework
+  gem 'rspec-its'                                   # Provides the 'its' method
+  gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
   gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
