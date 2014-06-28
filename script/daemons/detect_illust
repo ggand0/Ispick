@@ -21,6 +21,7 @@ DetectIllustDaemon.spawn!({
   processes: 2,
   working_dir: Rails.root,
   pid_file: File.join(Rails.root, 'tmp', 'pids', 'detect_illust.pid'),
+  log: false,
   #log_file: File.join(Rails.root, 'log', 'detect_illust.log'),
   #sync_log: true,
   singleton: true,
