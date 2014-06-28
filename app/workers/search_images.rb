@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 class SearchImages
-  # Woeker起動時に指定するQUEUE名
+  extend Resque::Plugins::Logger
   @queue = :search_images
 
   # タグ登録直後に実行されるjob
@@ -8,19 +8,20 @@ class SearchImages
   def self.perform(target_word_id)
     start = Time.now
     target_word = TargetWord.find(target_word_id)
-    puts '--------------------------------------------------'
-    puts "Starting: target_word=#{target_word_id}, time=#{DateTime.now}"
+    logger.info '--------------------------------------------------'
+    logger.info "Starting: target_word=#{target_word_id}, time=#{DateTime.now}"
 
     begin
-      Scrape.scrape_target_word target_word
+      Scrape.scrape_target_word target_word, logger
     rescue => e
-      puts e
+      logger.error e
     end
 
-    Deliver.deliver_keyword(target_word.user_id, target_word.id)
+    # DownloadImage.perform内で非同期的に配信する
+    #Deliver.deliver_keyword(target_word.user_id, target_word.id)
 
-    puts "\nFinished: elapsed_time=#{(Time.now - start).to_s}"
-    puts 'SEARCH IMAGES DONE!'
-    puts '--------------------------------------------------'
+    logger.info "\nFinished: elapsed_time=#{(Time.now - start).to_s}"
+    logger.info 'SEARCH IMAGES DONE!'
+    logger.info '--------------------------------------------------'
   end
 end
