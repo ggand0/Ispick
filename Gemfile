@@ -72,6 +72,7 @@ gem 'mechanize'
 gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
+gem 'resque-logger'
 gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'pidfile'
 gem 'whenever', require: false                   # Support crontab
