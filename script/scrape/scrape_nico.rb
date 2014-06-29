@@ -46,26 +46,27 @@ module Scrape::Nico
     duplicates = 0
     scraped = 0
     avg_time = 0
-    id_array = []
 
     # 画像情報を取得してlimit枚DBヘ保存する
     xml.search('image').take(limit).each_with_index do |item, count|
       begin
-        start = Time.now
         next if item.css('adult_level').first.content.to_i > 0  # 春画画像をskip
-        image_data = self.get_data(item)                        # APIの結果から画像情報取得
 
-        res = Scrape::save_image(image_data, logger, [ self.get_tag(query) ] , validation)
-        duplicates += res ? 0 : 1
-        scraped += 1 if res
-        id_array.push(res)
+        start = Time.now
+        image_data = self.get_data(item)                        # APIの結果から画像情報取得
+        saved = Scrape::save_image(image_data, logger, [ self.get_tag(query) ] , validation)
+
+        duplicates += saved ? 0 : 1
+        scraped += 1 if saved
         elapsed_time = Time.now - start
         avg_time += elapsed_time
         logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
 
         break if duplicates >= 3
-      rescue
-        next  # 検索結果が0の場合など
+      rescue => e
+        # 検索結果が0の場合など
+        logger.error e
+        next
       end
       break if count+1 >= limit
     end

@@ -11,17 +11,18 @@ module Scrape::Giphy
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 20
-    Scrape.scrape_target_words('Scrape::Giphy', limit, interval, pid_debug, sleep_debug)
+    logger = Logger.new('log/scrape_giphy.log')
+    Scrape.scrape_target_words('Scrape::Giphy', logger, limit, interval, pid_debug, sleep_debug)
   end
 
   # キーワードによる抽出処理を行う
   # @param target_word [TargetWord] 対象とするTargetWordオブジェクト
-  def self.scrape_target_word(target_word)
+  def self.scrape_target_word(target_word, logger)
     limit = 10
-    puts "Extracting #{limit} images from: #{ROOT_URL}"
+    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, true)
-    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+    result = self.scrape_using_api(target_word, limit, logger, true)
+    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
   #
@@ -40,7 +41,7 @@ module Scrape::Giphy
   # @param target_word [TargetWord]
   # @param limit [Integer] 最大抽出枚数
   # @param validation [Boolean] validationを行うかどうか
-  def self.scrape_using_api(target_word, limit, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
     query = self.get_query(target_word)
     return if query.nil? or query.empty?
 
@@ -57,7 +58,7 @@ module Scrape::Giphy
       image_data = self.get_data(image)
 
       # タグは和名を使用
-      res = Scrape.save_image(image_data, [ self.get_tag(target_word.word) ], validation)
+      res = Scrape.save_image(image_data, logger, [ self.get_tag(target_word.word) ], validation)
       duplicates += res ? 0 : 1
       scraped += 1 if res
       elapsed_time = Time.now - start
