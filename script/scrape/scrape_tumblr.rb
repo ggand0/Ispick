@@ -23,16 +23,20 @@ module Scrape::Tumblr
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
   def self.scrape_target_word(target_word, logger, english=false)
+    limit = 10
+    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
+
+    result = self.scrape_using_api(target_word, limit, logger, english, true)
+    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+  end
+
+  def self.get_query(target_word, english)
     if english
       query = target_word.person.name_english
     else
       query = Scrape.get_query target_word
     end
-    limit = 10
-    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
-
-    result = self.scrape_using_api(query, limit, logger, true)
-    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+    query
   end
 
   # 対象のタグを持つPostの画像を抽出する
@@ -40,7 +44,8 @@ module Scrape::Tumblr
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash] Scraping result
-  def self.scrape_using_api(query, limit, logger, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, logger, english=false, validation=true, logging=false)
+    query = self.get_query target_word, english
     client = self.get_client
     duplicates = 0
     skipped = 0
@@ -58,13 +63,19 @@ module Scrape::Tumblr
       # API responseから画像情報を取得してDBへ保存する
       start = Time.now
       image_data = Scrape::Tumblr.get_data(image)
-      res = Scrape.save_image(image_data, logger, self.get_tags(image['tags']), validation)
+      image_id = Scrape.save_image(image_data, logger, self.get_tags(image['tags']), validation, false, false, false)
 
-      duplicates += res ? 0 : 1
-      scraped += 1 if res
+      duplicates += image_id ? 0 : 1
+      scraped += 1 if image_id
       elapsed_time = Time.now - start
       avg_time += elapsed_time
       logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+
+      # Resqueで非同期的に画像解析を行う
+      # 始めに画像をダウンロードし、終わり次第ユーザに配信
+      if image_id
+        Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+      end
 
       # limit枚抽出したら終了
       #break if duplicates >= 3 # 検討中

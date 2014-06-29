@@ -49,7 +49,7 @@ module Deliver
 
 
 
-  # @param [Image]
+  # @param image [Image]
   # @return [DeliveredImage]
   def self.create_delivered_image(image)
     delivered_image = DeliveredImage.new
@@ -57,11 +57,25 @@ module Deliver
     delivered_image
   end
 
+  # １つのImageオブジェクトをuserに配信する
+  # @param user_id [Integer]
+  # @param target [TargetWord/TargetImage]
+  # @param image_id [Integer]
+  def self.deliver_image(user_id, target, image_id)
+    image = Image.find(image_id)
+    delivered_image = DeliveredImage.new
+    user = User.find(user_id)
+
+    image.delivered_images << delivered_image
+    target.delivered_images << delivered_image
+    user.delivered_images << delivered_image
+  end
+
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
-  # @param [User] 配信対象のUserオブジェクト
-  # @param [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
-  # @param [TargetWord/TargetImage]
-  # @param [Boolean] 定時配信かどうか
+  # @param user [User] 配信対象のUserオブジェクト
+  # @param images [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
+  # @param target [TargetWord/TargetImage]
+  # @param is_periodic [Boolean] 定時配信かどうか
   def self.deliver_images(user, images, target, is_periodic)
     tmp_images = []
 
@@ -69,7 +83,7 @@ module Deliver
       # 定期配信する際、dataが何らかの原因で存在しないImageはskip
       next if is_periodic and image.data.url == MISSING_URL
 
-      # imagesでマッチしているが既に配信済みの場合は、
+      # 先の行程でtarget_word/target_imageにマッチはしたが既に配信済みの画像の場合は、
       # target.delivered_imagesにだけ追加
       delivered = false
       user.delivered_images.each do |d|
@@ -77,6 +91,7 @@ module Deliver
           target.delivered_images << d
           target.delivered_images.uniq!
           delivered = true
+          puts "[DEBUG] matched but already delivered: #{image.src_url}"
           break
         end
       end
@@ -97,7 +112,7 @@ module Deliver
     end
 
 
-    # 投稿日時順（posted_at）にソートしてから配信する
+    # 投稿日時順（posted_at）に配信される画像群をソートしてから配信する
     tmp_images.each do |image|
       user.delivered_images << image
       user.save

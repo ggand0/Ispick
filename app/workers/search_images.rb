@@ -11,16 +11,16 @@ class SearchImages
     logger.info '--------------------------------------------------'
     logger.info "Starting: target_word=#{target_word_id}, time=#{DateTime.now}"
 
-    begin
-      Scrape.scrape_target_word target_word, logger
-    rescue => e
-      logger.error e
-    end
+    #begin
+    Scrape.scrape_target_word target_word, logger
+    #rescue => e
+    #  logger.error e
+    #end
 
     # DownloadImage.perform内で非同期的に配信する
     #Deliver.deliver_keyword(target_word.user_id, target_word.id)
 
-    logger.info "\nFinished: elapsed_time=#{(Time.now - start).to_s}"
+    logger.info "Finished: elapsed_time=#{(Time.now - start).to_s}"
     logger.info 'SEARCH IMAGES DONE!'
     logger.info '--------------------------------------------------'
   end
