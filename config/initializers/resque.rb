@@ -1,7 +1,4 @@
-# From http://qiita.com/hilotter/items/fc432c33f5a012b87dca
-#Resque.redis = 'localhost:6379'
-
-# アプリ毎に異なるnamespaceを定義しておく
+# アプリ毎に異なるnamespaceを定義する
 rails_root = ENV['RAILS_ROOT'] || File.dirname(__FILE__) + '/../..'
 rails_env = ENV['RAILS_ENV'] || 'development'
 
@@ -15,6 +12,6 @@ config = {
   class_name: Logger,                   # logger class name
   #class_args: [ 'daily', 1.kilobyte ],  # logger additional parameters
   level:      Logger::INFO,             # optional
-  formatter:  Logger::Formatter.new,    # optional
+  formatter:  ActiveSupport::Logger::SimpleFormatter.new,    # optional
 }
 Resque.logger_config = config
