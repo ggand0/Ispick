@@ -96,6 +96,7 @@ group :development, :test do
   gem 'binding_of_caller'
   gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
+  gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
 
   gem 'spring'
   gem 'spring-commands-rspec'
