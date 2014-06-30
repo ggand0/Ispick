@@ -4,6 +4,7 @@ require "#{Rails.root}/script/scrape/scrape_giphy"
 
 describe Scrape::Giphy do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
+  let(:logger) { Logger.new('log/scrape_giphy.log') }
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
 
   before do
@@ -41,9 +42,9 @@ describe Scrape::Giphy do
     it "calls scrape_using_api function" do
       target_word = FactoryGirl.create(:word_with_person)
 
-      expect(Scrape::Giphy).to receive(:scrape_using_api).with(target_word, 10, true)
+      expect(Scrape::Giphy).to receive(:scrape_using_api).with(target_word, 10, logger, true)
       Scrape::Giphy.stub(:scrape_using_api).and_return(function_response)
-      Scrape::Giphy.scrape_target_word(target_word)
+      Scrape::Giphy.scrape_target_word(target_word, logger)
     end
   end
 
@@ -57,7 +58,7 @@ describe Scrape::Giphy do
       expect(Giphy).to receive(:search).exactly(1).times
       target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Giphy.scrape_using_api(target_word, 5)
+      Scrape::Giphy.scrape_using_api(target_word, 5, logger)
     end
   end
 
