@@ -53,7 +53,7 @@ describe DetectIllust do
     it "writes a log when it crashes" do
       image = FactoryGirl.create(:image)
       DetectIllust.stub(:get_result).and_raise
-      Rails.logger.should_receive(:error).exactly(1).times
+      expect(DetectIllust.logger).to receive(:error).exactly(1).times
 
       DetectIllust.perform(image.class.name, image.id)
     end

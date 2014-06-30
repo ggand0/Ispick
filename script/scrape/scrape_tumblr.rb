@@ -33,7 +33,7 @@ module Scrape::Tumblr
 
   def self.get_query(target_word, english)
     if english
-      query = target_word.person and target_word.person.name_english
+      query = target_word.person.name_english if target_word.person
     else
       query = Scrape.get_query target_word
     end
@@ -47,6 +47,7 @@ module Scrape::Tumblr
   # @return [Hash] Scraping result
   def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false, english=false)
     query = self.get_query target_word, english
+    return if query.nil? or query.empty?
     logger.info "query=#{query}"
     client = self.get_client
     duplicates = 0

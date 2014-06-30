@@ -26,11 +26,12 @@ module Scrape::Pixiv
       caption: caption,
       src_url: img_url
     }
-    Scrape::save_image(image_data)
+    logger = Logger.new('log/scrape_pixiv_cron.log')
+    Scrape::save_image(image_data, logger)
   end
 
   # 返ってきた文字列から割と強引に抽出する
-  def self.scrape()
+  def self.scrape
     uri = URI.parse(ROOT_URL)
     result = Net::HTTP.get(uri)
 
