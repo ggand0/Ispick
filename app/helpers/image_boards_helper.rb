@@ -12,7 +12,9 @@ module ImageBoardsHelper
     included = false
     included = image_board.favored_images.any? do |f|
       # idが等しければ含まれていると判断
-      f.delivered_image.id == delivered_image_id
+      f.delivered_image.id == delivered_image_id if f.delivered_image
+      # DeliveredImageの参照が切れていたら警告を出す
+      Rails.logger.warning "FavoredImage with nil delivered_image: #{f.inspect}"
     end
 
     included

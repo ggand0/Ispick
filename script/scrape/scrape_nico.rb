@@ -13,19 +13,21 @@ module Scrape::Nico
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 50
-    Scrape.scrape_target_words('Scrape::Nico', limit, interval, pid_debug, sleep_debug)
+    logger = Logger.new('log/scrape_nico_cron.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
+    Scrape.scrape_target_words('Scrape::Nico', logger, limit, interval, pid_debug, sleep_debug)
   end
 
 
   # キーワードによる検索・抽出を行う
-  # @param [TargetWord]
-  def self.scrape_target_word(target_word)
-    query = Scrape.get_query target_word
+  # @param target_word[TargetWord]
+  # @param logger [Logger] ログ出力に使用させたいloggerインスタンス
+  def self.scrape_target_word(target_word, logger)
     limit = 10
-    puts "Extracting #{limit} images from: #{ROOT_URL}"
+    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(query, limit, true)
-    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
+    result = self.scrape_using_api(target_word, limit, logger, true)
+    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
   # キーワードからタグ検索してlimit分の画像を保存する
@@ -33,8 +35,10 @@ module Scrape::Nico
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash]
-  def self.scrape_using_api(query, limit, validation, logging=false)
-    # nilのクエリ弾く
+  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
+    # nilのクエリは弾く
+    query = Scrape.get_query target_word
+    logger.info "query=#{query}"
     return if query.nil? or query.empty?
 
     agent = self.get_client
@@ -44,26 +48,33 @@ module Scrape::Nico
     duplicates = 0
     scraped = 0
     avg_time = 0
-    id_array = []
 
     # 画像情報を取得してlimit枚DBヘ保存する
     xml.search('image').take(limit).each_with_index do |item, count|
       begin
-        start = Time.now
         next if item.css('adult_level').first.content.to_i > 0  # 春画画像をskip
-        image_data = self.get_data(item)                        # APIの結果から画像情報取得
 
-        res = Scrape::save_image(image_data, [self.get_tag(query)] , validation)
-        duplicates += res ? 0 : 1
-        scraped += 1 if res
-        id_array.push(res)
+        start = Time.now
+        image_data = self.get_data(item)                        # APIの結果から画像情報取得
+        image_id = Scrape::save_image(image_data, logger, [ self.get_tag(query) ] , validation, false, false, false)
+
+        duplicates += image_id ? 0 : 1
+        scraped += 1 if image_id
         elapsed_time = Time.now - start
         avg_time += elapsed_time
-        puts "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+        logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
+
+        # Resqueで非同期的に画像解析を行う
+        # 始めに画像をダウンロードし、終わり次第ユーザに配信
+        if image_id
+          Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+        end
 
         break if duplicates >= 3
-      rescue
-        next  # 検索結果が0の場合など
+      rescue => e
+        # 検索結果が0の場合など
+        logger.error e
+        next
       end
       break if count+1 >= limit
     end

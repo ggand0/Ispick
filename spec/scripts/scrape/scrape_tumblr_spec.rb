@@ -64,7 +64,9 @@ describe Scrape::Tumblr do
       target_word = FactoryGirl.create(:word_with_person)
       Scrape::Tumblr.should_receive(:scrape_using_api)
       Scrape::Tumblr.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
-      Scrape::Tumblr.scrape_target_word target_word
+      logger = Logger.new('log/scrape_tumblr_cron.log')
+
+      Scrape::Tumblr.scrape_target_word target_word, logger
     end
   end
 
@@ -74,8 +76,10 @@ describe Scrape::Tumblr do
       # get_data functionをmockすると何故かcallされなくなるので、save_imageのみ見る
       #Scrape::Tumblr.should_receive(:get_data).exactly(5).times
       Scrape.should_receive(:save_image).exactly(5).times
+      logger = Logger.new('log/scrape_tumblr_cron.log')
+      target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Tumblr.scrape_using_api('madoka', 5)
+      Scrape::Tumblr.scrape_using_api(target_word, 5, logger)
     end
   end
 

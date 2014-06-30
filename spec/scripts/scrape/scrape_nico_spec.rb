@@ -52,7 +52,9 @@ describe Scrape::Nico do
       target_word = FactoryGirl.create(:word_with_person)
       Scrape::Nico.should_receive(:scrape_using_api)
       Scrape::Nico.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
-      Scrape::Nico.scrape_target_word target_word
+      logger = Logger.new('log/scrape_nico_cron.log')
+
+      Scrape::Nico.scrape_target_word target_word, logger
     end
   end
   describe "scrape_using_api function" do
@@ -63,11 +65,14 @@ describe Scrape::Nico do
         URI.escape(uri) ,
         body: stream,
         content_type: 'text/xml')
+      @logger = Logger.new('log/scrape_nico_cron.log')
     end
 
     it "skip if keyword arg is nil" do
       Scrape::Nico.should_not_receive(:get_data)
-      Scrape::Nico.scrape_using_api(nil, 5, false)
+      logger = Logger.new('log/scrape_nico_cron.log')
+
+      Scrape::Nico.scrape_using_api(nil, 5, logger, false)
     end
 
     it "calls get_data function 'limit' times" do
@@ -76,8 +81,9 @@ describe Scrape::Nico do
       Scrape::Nico.should_receive(:get_data).exactly(limit).times
       Scrape.stub(:save_image).and_return(1)
       Scrape.should_receive(:save_image).exactly(limit).times
+      target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Nico.scrape_using_api('まどかわいい', limit, false)
+      Scrape::Nico.scrape_using_api(target_word, limit, @logger, false)
     end
 
     it "allows duplicates three times" do
@@ -85,8 +91,9 @@ describe Scrape::Nico do
       Scrape::Nico.should_receive(:get_data).exactly(3).times
       Scrape.stub(:save_image).and_return nil
       Scrape.should_receive(:save_image).exactly(3).times
+      target_word = FactoryGirl.create(:word_with_person)
 
-      Scrape::Nico.scrape_using_api('まどかわいい', 3, false)
+      Scrape::Nico.scrape_using_api(target_word, 3, @logger, false)
     end
   end
 

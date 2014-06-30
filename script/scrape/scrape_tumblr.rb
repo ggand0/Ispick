@@ -15,23 +15,29 @@ module Scrape::Tumblr
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 20
-    Scrape.scrape_target_words('Scrape::Tumblr', limit, interval, pid_debug, sleep_debug)
+    logger = Logger.new('log/scrape_tumblr_cron.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
+    Scrape.scrape_target_words('Scrape::Tumblr', logger, limit, interval, pid_debug, sleep_debug)
   end
 
 
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
-  def self.scrape_target_word(target_word, english=false)
+  def self.scrape_target_word(target_word, logger, english=false)
+    limit = 10
+    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
+
+    result = self.scrape_using_api(target_word, limit, logger, true, false, english)
+    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+  end
+
+  def self.get_query(target_word, english)
     if english
-      query = target_word.person.name_english
+      query = target_word.person.name_english if target_word.person
     else
       query = Scrape.get_query target_word
     end
-    limit = 10
-    puts "Extracting #{limit} images from: #{ROOT_URL}"
-
-    result = self.scrape_using_api(query, limit, true)
-    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+    query
   end
 
   # 対象のタグを持つPostの画像を抽出する
@@ -39,7 +45,10 @@ module Scrape::Tumblr
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash] Scraping result
-  def self.scrape_using_api(query, limit, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false, english=false)
+    query = self.get_query target_word, english
+    return if query.nil? or query.empty?
+    logger.info "query=#{query}"
     client = self.get_client
     duplicates = 0
     skipped = 0
@@ -57,13 +66,19 @@ module Scrape::Tumblr
       # API responseから画像情報を取得してDBへ保存する
       start = Time.now
       image_data = Scrape::Tumblr.get_data(image)
-      res = Scrape.save_image(image_data, self.get_tags(image['tags']), validation)
+      image_id = Scrape.save_image(image_data, logger, self.get_tags(image['tags']), validation, false, false, false)
 
-      duplicates += res ? 0 : 1
-      scraped += 1 if res
+      duplicates += image_id ? 0 : 1
+      scraped += 1 if image_id
       elapsed_time = Time.now - start
       avg_time += elapsed_time
-      puts "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+      logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+
+      # Resqueで非同期的に画像解析を行う
+      # 始めに画像をダウンロードし、終わり次第ユーザに配信
+      if image_id
+        Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+      end
 
       # limit枚抽出したら終了
       #break if duplicates >= 3 # 検討中
@@ -114,7 +129,7 @@ module Scrape::Tumblr
       suki = html.css("ol[class='notes']").first.content.to_s.scan(/「スキ!」/)
       return likes.count + suki.count
     rescue => e
-      puts e
+      logger.info e
     end
   end
 

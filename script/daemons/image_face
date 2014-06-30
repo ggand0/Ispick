@@ -20,8 +20,9 @@ ImageFaceDaemon.spawn!({
   processes: 2,
   working_dir: Rails.root,
   pid_file: File.join(Rails.root, 'tmp', 'pids', 'images_face.pid'),
-  log_file: File.join(Rails.root, 'log', 'images_face.log'),
-  sync_log: true,
+  log: false,
+  #log_file: File.join(Rails.root, 'log', 'images_face.log'),
+  #sync_log: true,
   singleton: true,
   signal: 'QUIT'
 })

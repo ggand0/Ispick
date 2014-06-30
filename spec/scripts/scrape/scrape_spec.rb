@@ -3,8 +3,9 @@ require "#{Rails.root}/script/scrape/scrape"
 
 describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
+  let(:logger) { Logger.new('log/scrape_cron.log') }
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
@@ -50,7 +51,7 @@ describe Scrape do
         Image.any_instance.stub(:image_from_url).and_return nil
         count = Image.count
 
-        Scrape::save_image({ title: 'title', src_url: 'src_url' })
+        Scrape::save_image({ title: 'title', src_url: 'src_url' }, logger)
         Image.count.should eq(count+1)
       end
 
@@ -60,26 +61,27 @@ describe Scrape do
           Image.any_instance.stub(:image_from_url).and_return nil
           #Rails.logger.should_receive(:info).with('Image model saving failed.')
 
-          Scrape::save_image({ title: 'title', src_url: 'src_url' })
+          Scrape::save_image({ title: 'title', src_url: 'src_url' }, logger)
         end
       end
 
-      describe "when DB raise an error during saving the image" do
-        it "should not save the image" do
-          Image.any_instance.stub(:image_from_url).and_return nil
-          Image.any_instance.stub(:save).and_raise Exception
+      describe "when it cannot save the image" do
+        it "returns nil" do
+          Image.any_instance.stub(:save).and_return(false)
 
           count = Image.count
-          Scrape::save_image({ title: 'title', src_url: 'src_url' })
-          Image.count.should eq(count)
+          result = Scrape::save_image({ title: 'title', src_url: 'src_url' }, logger)
+          expect(result).to eq(nil)
+          expect(Image.count).to eq(count)
         end
       end
     end
 
     describe "with invalid attributes" do
       it "should not save an invalid image when validation param is true" do
+        image = FactoryGirl.create(:image)
         count = Image.count
-        Scrape::save_image({ title: 'title', src_url: 'url with no images' }, nil, true)
+        Scrape::save_image({ title: 'test', src_url: 'test1@example.com' }, logger, [], true)
         Image.count.should eq(count)
       end
 
@@ -87,7 +89,7 @@ describe Scrape do
         image = FactoryGirl.create(:image_url)
         count = Image.count
 
-        Scrape::save_image({ title: 'title', src_url: image.src_url })
+        Scrape::save_image({ title: 'title', src_url: image.src_url }, logger)
         Image.count.should eq(count)
       end
     end

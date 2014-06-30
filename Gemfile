@@ -72,7 +72,8 @@ gem 'mechanize'
 gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
-gem 'daemon-spawn', require: 'daemon_spawn'
+gem 'resque-logger'
+gem 'daemon-spawn', require: 'daemon_spawn', git: 'git@github.com:pentiumx/daemon-spawn.git'
 gem 'pidfile'
 gem 'whenever', require: false                   # Support crontab
 gem 'rubyzip'
@@ -95,6 +96,7 @@ group :development, :test do
   gem 'binding_of_caller'
   gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
+  gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
 
   gem 'spring'
   gem 'spring-commands-rspec'

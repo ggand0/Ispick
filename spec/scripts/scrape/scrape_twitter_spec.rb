@@ -39,22 +39,28 @@ describe Scrape::Twitter do
       target_word = FactoryGirl.create(:word_with_person)
       Scrape::Twitter.should_receive(:scrape_using_api)
       Scrape::Twitter.stub(:scrape_using_api).and_return(function_response)
-      Scrape::Twitter.scrape_target_word target_word
+      logger = Logger.new('log/scrape_twitter_cron.log')
+
+      Scrape::Twitter.scrape_target_word target_word, logger
     end
   end
 
   describe "scrape_using_api function" do
+    before do
+      @target_word = FactoryGirl.create(:word_with_person)
+      @logger = Logger.new('log/scrape_twitter_cron.log')
+    end
     it "calls proper methods" do
       Scrape::Twitter.stub(:get_contents).and_return nil
       Scrape::Twitter.should_receive(:get_contents).exactly(1).times
 
-      Scrape::Twitter.scrape_using_api('madoka', 5)
+      Scrape::Twitter.scrape_using_api(@target_word, 5, @logger)
     end
 
     it "rescues exceptions" do
       Scrape::Twitter.stub(:get_contents).and_raise Twitter::Error::ClientError
 
-      Scrape::Twitter.scrape_using_api('madoka', 5)
+      Scrape::Twitter.scrape_using_api(@target_word, 5, @logger)
     end
 
     it "rescues TooManyRequest exception" do
@@ -65,20 +71,22 @@ describe Scrape::Twitter do
       Scrape::Twitter.should_receive(:get_contents).exactly(2).times
       Scrape::Twitter.should_receive(:sleep).with(300)
 
-      Scrape::Twitter.scrape_using_api('madoka', 5)
+      Scrape::Twitter.scrape_using_api(@target_word, 5, @logger)
     end
   end
 
   describe "get_contents function" do
     it "returns scarping result hash" do
       client = Scrape::Twitter.get_client
-      query = '鹿目まどか'
+      target_word = FactoryGirl.create(:word_with_person)
+      query = Scrape.get_query target_word
       result = client.search("#{query} -rt", locale: 'ja', result_type: 'recent', include_entity: true)
+      logger = Logger.new('log/scrape_twitter_cron.log')
 
       Twitter::REST::Client.any_instance.stub(:search).and_return(result)
       Twitter::REST::Client.any_instance.should_receive(:search)
 
-      result_hash = Scrape::Twitter.get_contents(client, query, 5)
+      result_hash = Scrape::Twitter.get_contents(client, target_word, 5, logger)
       expect(result_hash).to be_a(Hash)
     end
     it "call save_image function with right arguments" do

@@ -12,8 +12,7 @@ describe SearchImages do
 
       Scrape.stub(:scrape_target_word).and_return nil
       Deliver.stub(:deliver_keyword).and_return nil
-      Scrape.should_receive(:scrape_target_word)
-      Deliver.should_receive(:deliver_keyword)
+      expect(Scrape).to receive(:scrape_target_word)
 
       SearchImages.perform target_word.id
     end

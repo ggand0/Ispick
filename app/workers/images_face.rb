@@ -1,5 +1,5 @@
 class ImageFace
-  # Woeker起動時に指定するQUEUE名
+  extend Resque::Plugins::Logger
   @queue = :image_face
 
   # @param [Image/TargetImage] A record of TargetImage model which has already saved.
@@ -28,7 +28,7 @@ class ImageFace
     image = Object::const_get(image_type).find(image_id)
 
     # ImageNetのカテゴリ分類処理
-    puts json_string = self.get_categories(image).to_json
+    logger.info json_string = self.get_categories(image).to_json
     feature = Feature.new(categ_imagenet: json_string)
 
     Feature.transaction do
@@ -38,6 +38,6 @@ class ImageFace
       end
     end
 
-    puts 'IMAGE : FACE EXTRACTION DONE!'
+    logger.info 'IMAGE : FACE EXTRACTION DONE!'
   end
 end

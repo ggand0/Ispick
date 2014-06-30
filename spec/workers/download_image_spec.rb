@@ -15,6 +15,7 @@ describe DownloadImage do
 
       DownloadImage.perform(image.class.name, image.id, @url)
     end
+
     it "destroys the image when it has duplicate md5_checksum" do
       image1 = FactoryGirl.create(:image)
       image2 = FactoryGirl.create(:image)
@@ -22,11 +23,12 @@ describe DownloadImage do
       Image.should_receive(:destroy)
       DownloadImage.perform(image2.class.name, image2.id, @url)
     end
+
     # rescueされたときはRails.loggerを呼ぶ
     it "writes a log when it crashes" do
       image = FactoryGirl.create(:image)
       Image.any_instance.stub(:image_from_url).and_raise
-      Rails.logger.should_receive(:error).exactly(1).times
+      expect(DownloadImage.logger).to receive(:error).exactly(1).times
 
       DownloadImage.perform(image.class.name, image.id, @url)
     end

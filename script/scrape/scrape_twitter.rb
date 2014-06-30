@@ -13,44 +13,47 @@ module Scrape::Twitter
   # @param [Boolean] whether it's called for debug or not
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 1000
-    Scrape.scrape_target_words('Scrape::Twitter', limit, interval, pid_debug, sleep_debug)
+    logger = Logger.new('log/scrape_twitter_cron.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
+    Scrape.scrape_target_words('Scrape::Twitter', logger, limit, interval, pid_debug, sleep_debug)
   end
 
 
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
-  def self.scrape_target_word(target_word)
-    query = Scrape.get_query target_word
+  def self.scrape_target_word(target_word, logger)
     limit = 200
-    puts "Extracting #{limit} images from: #{ROOT_URL}"
+    logger = Logger.new('log/scrape_twitter_cron.log')
+    logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(query, limit, true)
-    puts "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+    result = self.scrape_using_api(target_word, limit, true)
+    logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
   # 対象のハッシュタグを持つツイートの画像を抽出する
   # @oaran [String]
   # @param [Integer]
   # @param [Boolean]
-  def self.scrape_using_api(query, limit, validation=true)
+  def self.scrape_using_api(target_word, limit, logger, validation=true)
     client = self.get_client
+
 
     # キーワードを含むハッシュタグの検索
     begin
-      self.get_contents(client, query, limit, validation)
+      self.get_contents(client, target_word, limit, logger, validation)
 
     # リクエストが多すぎる場合は待機する
     rescue Twitter::Error::TooManyRequests => error
-      puts 'Too many requests to twitter'
-      puts error
-      puts error.rate_limit
-      puts "Retrying in: #{error.rate_limit.reset_in}"
+      logger.info 'Too many requests to twitter'
+      logger.info error
+      logger.info error.rate_limit
+      logger.info "Retrying in: #{error.rate_limit.reset_in}"
       sleep error.rate_limit.reset_in
       retry
 
     # 検索ワードでツイートを取得できなかった場合
     rescue Twitter::Error::ClientError
-      puts 'ツイートを取得できませんでした'
+      logger.info 'ツイートを取得できませんでした'
     end
   end
 
@@ -60,7 +63,9 @@ module Scrape::Twitter
   # @oaran [String]
   # @param [Integer]
   # @param [Boolean]
-  def self.get_contents(client, query, limit, validation=true, logging=false)
+  def self.get_contents(client, target_word, limit, logger, validation=true, logging=false)
+    query = Scrape.get_query target_word
+    logger.info "query=#{query}"
     scraped = 0
     skipped = 0
     duplicates = 0
@@ -74,12 +79,18 @@ module Scrape::Twitter
 
       if image_data.count > 0
         image_data.each do |data|
-          res = Scrape.save_image(data, [ self.get_tag(query) ], validation)
-          duplicates += res ? 0 : 1
-          scraped += 1 if res
+          image_id = Scrape.save_image(data, logger, [ self.get_tag(query) ], validation, false, false, false)
+          duplicates += image_id ? 0 : 1
+          scraped += 1 if image_id
           elapsed_time = Time.now - start
           avg_time += elapsed_time
-          puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and res
+          logger.info "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and image_id
+
+          # Resqueで非同期的に画像解析を行う
+          # 始めに画像をダウンロードし、終わり次第ユーザに配信
+          if image_id
+            Scrape.generate_jobs(image_id, data[:src_url], false, target_word.class.name, target_word.id)
+          end
         end
       else
         skipped += 1
@@ -136,8 +147,8 @@ module Scrape::Twitter
   # @return [Array]
   def self.get_tags(tag)
     tag = Tag.where(name: tag)
-    puts tag.empty?
-    puts (tag.empty? ? Tag.new(name: tag) : tag.first).name
+    logger.info tag.empty?
+    logger.info (tag.empty? ? Tag.new(name: tag) : tag.first).name
     [ (tag.empty? ? Tag.new(name: tag) : tag.first) ]
   end
 
@@ -158,7 +169,7 @@ module Scrape::Twitter
       tweet = client.status(id)
     rescue => e
       # Twitter::Error::Forbidden:など
-      puts e
+      logger.info e
       return {}
     end
     { views: tweet.retweet_count, favorites: tweet.favorite_count }
