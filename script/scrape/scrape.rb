@@ -69,6 +69,13 @@ module Scrape
           # パラメータに基づいてAPIリクエストを行い結果を得る
           result = child_module.scrape_using_api(target_word, limit, logger, true)
           logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+
+          # 海外サイトの場合は英名でも検索する
+          if module_type == 'Scrape::Tumblr'
+            # english=trueで呼ぶ
+            result = child_module.scrape_using_api(target_word, limit, logger, true, false, true)
+            logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+          end
         rescue => e
           logger.info e
           logger.error "Scraping from #{child_module::ROOT_URL} has failed!"
@@ -117,6 +124,7 @@ module Scrape
   # TargetWordのレコードから、API使用時に用いるクエリを取得する
   # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
   def self.get_query(target_word)
+    return nil if target_word.nil?
     target_word.person ? target_word.person.name : target_word.word
   end
 
@@ -145,18 +153,6 @@ module Scrape
       logger.debug p.pid
       logger.debug p.pidpath
     end
-  end
-
-
-  # Imageレコード生成とユーザへの配信を同時に行う
-  # @param [Hash] Imageレコードに与える属性のHash
-  # @param [Integer] 配信対象のUserレコードのID
-  # @param [Integer] 画像抽出の元となったのTargetWordレコードのID
-  # @param [Array] 関連するタグ(String)の配列
-  # @param [Boolean] validationを行うかどうか
-  def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
-    image_id = self.save_image(attributes, tags, validation)
-    Deliver.deliver_one(user_id, target_word_id, image_id)
   end
 
 

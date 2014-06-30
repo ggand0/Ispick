@@ -27,13 +27,13 @@ module Scrape::Tumblr
     limit = 10
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, logger, english, true)
+    result = self.scrape_using_api(target_word, limit, logger, true, false, english)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
   def self.get_query(target_word, english)
     if english
-      query = target_word.person.name_english
+      query = target_word.person and target_word.person.name_english
     else
       query = Scrape.get_query target_word
     end
@@ -45,7 +45,7 @@ module Scrape::Tumblr
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash] Scraping result
-  def self.scrape_using_api(target_word, limit, logger, english=false, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false, english=false)
     query = self.get_query target_word, english
     logger.info "query=#{query}"
     client = self.get_client
