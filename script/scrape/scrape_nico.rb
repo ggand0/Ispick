@@ -14,6 +14,7 @@ module Scrape::Nico
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 50
     logger = Logger.new('log/scrape_nico_cron.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     Scrape.scrape_target_words('Scrape::Nico', logger, limit, interval, pid_debug, sleep_debug)
   end
 
@@ -22,11 +23,10 @@ module Scrape::Nico
   # @param target_word[TargetWord]
   # @param logger [Logger] ログ出力に使用させたいloggerインスタンス
   def self.scrape_target_word(target_word, logger)
-    query = Scrape.get_query target_word
     limit = 10
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(query, limit, logger, true)
+    result = self.scrape_using_api(target_word, limit, logger, true)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -35,8 +35,10 @@ module Scrape::Nico
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash]
-  def self.scrape_using_api(query, limit, logger, validation=true, logging=false)
-    # nilのクエリ弾く
+  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
+    # nilのクエリは弾く
+    query = Scrape.get_query target_word
+    logger.info "query=#{query}"
     return if query.nil? or query.empty?
 
     agent = self.get_client
@@ -54,13 +56,19 @@ module Scrape::Nico
 
         start = Time.now
         image_data = self.get_data(item)                        # APIの結果から画像情報取得
-        saved = Scrape::save_image(image_data, logger, [ self.get_tag(query) ] , validation)
+        image_id = Scrape::save_image(image_data, logger, [ self.get_tag(query) ] , validation, false, false, false)
 
-        duplicates += saved ? 0 : 1
-        scraped += 1 if saved
+        duplicates += image_id ? 0 : 1
+        scraped += 1 if image_id
         elapsed_time = Time.now - start
         avg_time += elapsed_time
-        logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+        logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
+
+        # Resqueで非同期的に画像解析を行う
+        # 始めに画像をダウンロードし、終わり次第ユーザに配信
+        if image_id
+          Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+        end
 
         break if duplicates >= 3
       rescue => e

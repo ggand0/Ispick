@@ -66,11 +66,8 @@ module Scrape
     TargetWord.all.each do |target_word|
       if target_word.enabled
         begin
-          query = Scrape.get_query target_word
-          logger.info "query=#{query} time=#{DateTime.now}"
-
           # パラメータに基づいてAPIリクエストを行い結果を得る
-          result = child_module.scrape_using_api(query, limit, logger, true)
+          result = child_module.scrape_using_api(target_word, limit, logger, true)
           logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
         rescue => e
           logger.info e
@@ -86,8 +83,8 @@ module Scrape
   # タグ登録直後の配信用
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
   def self.scrape_target_word(target_word, logger)
-    #Scrape::Nico.scrape_target_word(target_word, logger)
-    #Scrape::Twitter.scrape_target_word(target_word, logger)
+    Scrape::Nico.scrape_target_word(target_word, logger)
+    Scrape::Twitter.scrape_target_word(target_word, logger)
     Scrape::Tumblr.scrape_target_word(target_word, logger)
 
     # 英名が存在する場合はさらに検索
@@ -96,7 +93,7 @@ module Scrape
       logger.debug "name_english: #{query}"
 
       Scrape::Tumblr.scrape_target_word(target_word, logger)
-      #Scrape::Giphy.scrape_target_word(target_word, logger)
+      Scrape::Giphy.scrape_target_word(target_word, logger)
     end
     logger.info 'scrape_target_word DONE!!'
   end

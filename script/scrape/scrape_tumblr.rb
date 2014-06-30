@@ -16,6 +16,7 @@ module Scrape::Tumblr
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 20
     logger = Logger.new('log/scrape_tumblr_cron.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     Scrape.scrape_target_words('Scrape::Tumblr', logger, limit, interval, pid_debug, sleep_debug)
   end
 
@@ -46,6 +47,7 @@ module Scrape::Tumblr
   # @return [Hash] Scraping result
   def self.scrape_using_api(target_word, limit, logger, english=false, validation=true, logging=false)
     query = self.get_query target_word, english
+    logger.info "query=#{query}"
     client = self.get_client
     duplicates = 0
     skipped = 0

@@ -12,6 +12,7 @@ module Scrape::Giphy
   def self.scrape(interval=60, pid_debug=false, sleep_debug=false)
     limit = 20
     logger = Logger.new('log/scrape_giphy.log')
+    logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     Scrape.scrape_target_words('Scrape::Giphy', logger, limit, interval, pid_debug, sleep_debug)
   end
 
@@ -43,6 +44,7 @@ module Scrape::Giphy
   # @param validation [Boolean] validationを行うかどうか
   def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
     query = self.get_query(target_word)
+    logger.info "query=#{query}"
     return if query.nil? or query.empty?
 
     client = self.get_client
@@ -58,12 +60,18 @@ module Scrape::Giphy
       image_data = self.get_data(image)
 
       # タグは和名を使用
-      res = Scrape.save_image(image_data, logger, [ self.get_tag(target_word.word) ], validation)
-      duplicates += res ? 0 : 1
-      scraped += 1 if res
+      image_id = Scrape.save_image(image_data, logger, [ self.get_tag(target_word.word) ], validation, false, false, false)
+      duplicates += image_id ? 0 : 1
+      scraped += 1 if image_id
       elapsed_time = Time.now - start
       avg_time += elapsed_time
-      puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and res
+      puts "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if logging and image_id
+
+      # Resqueで非同期的に画像解析を行う
+      # 始めに画像をダウンロードし、終わり次第ユーザに配信
+      if image_id
+        Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+      end
 
       break if duplicates >= 3
     end
