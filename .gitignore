@@ -16,7 +16,7 @@
 /tmp
 
 # Ignore Gemfile.lock
-Gemfile.lock
+#Gemfile.lock
 
 # Ignore .DS_store
 .DS_Store

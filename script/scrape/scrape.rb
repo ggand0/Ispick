@@ -70,12 +70,14 @@ module Scrape
           result = child_module.scrape_using_api(target_word, limit, logger, true)
           logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
-          # 海外サイトの場合は英名でも検索する
+          # [保留中]海外サイトの場合は英名でも検索する
+=begin
           if module_type == 'Scrape::Tumblr'
             # english=trueで呼ぶ
             result = child_module.scrape_using_api(target_word, limit, logger, true, false, true)
             logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
           end
+=end
         rescue => e
           logger.info e
           logger.error "Scraping from #{child_module::ROOT_URL} has failed!"
