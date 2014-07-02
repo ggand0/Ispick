@@ -7,12 +7,13 @@
   「好みの設定」=>「登録ワード一覧」からタグを登録すると１分弱で抽出画像がホーム画面に表示されます。<br>
   <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @delivered_images_all %>
   <br>
-  <br>
-  <br>
-  配信日で絞り込む：
-  <div class="input-group date" style="width: 200px;" align="right">
-    <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
-  </div>
+  <%= bs_dropdown_button_to 'フィルター' do %>
+    配信日で絞り込む：
+    <div class="input-group date" style="width: 200px;" align="right">
+      <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+    </div>
+  <% end %>
+
 </p>
 
 
@@ -29,16 +30,21 @@
         <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
         <%= get_jst_string(image.posted_at) + '投稿' %>
-        <br>
-        <div class="favored">
-          <div class="id"><%= delivered_image.id %></div>
-          <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: delivered_image.id, id: "popover-board#{delivered_image.id}", class: 'popover-board btn-default' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{delivered_image.id}" %>
-        </div>
-        <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
+
 
         <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
 
-        <div class="titleBox"><%= image.title.to_s %></div>
+        <div class="titleBox">
+          <div class="title"><%= image.title.to_s %></div>
+
+          <div class="id"><%= delivered_image.id %></div>
+          <%= button_group class: 'pull-right blocks' do %>
+            <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: delivered_image.id, id: "popover-board#{delivered_image.id}", class: 'popover-board btn-default' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{delivered_image.id}" %>
+            <!--<div class="favored"></div>-->
+            <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default' %>
+             <%= bs_button_to 'Show', { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default' %>
+          <% end %>
+        </div>
       </div>
     </div>
 
