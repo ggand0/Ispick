@@ -41,12 +41,7 @@ module Deliver
     puts "\nDelivering to target_word=#{target_word_id} start=#{DateTime.now}"
 
     Deliver::Words.deliver_from_word(user, target_word, false)
-
-    # １ユーザーの最大容量を超えていたら古い順に削除
-    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
-
 
 
   # @param image [Image]
