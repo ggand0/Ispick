@@ -38,7 +38,7 @@ module Scrape::Nico
   def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
     # nilのクエリは弾く
     query = Scrape.get_query target_word
-    logger.info "query=#{query}"
+    logger.info "query=#{query} time=#{DateTime.now}"
     return if query.nil? or query.empty?
 
     agent = self.get_client

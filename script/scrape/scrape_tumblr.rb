@@ -48,7 +48,7 @@ module Scrape::Tumblr
   def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false, english=false)
     query = self.get_query target_word, english
     return if query.nil? or query.empty?
-    logger.info "query=#{query}"
+    logger.info "query=#{query} time=#{DateTime.now}"
     client = self.get_client
     duplicates = 0
     skipped = 0

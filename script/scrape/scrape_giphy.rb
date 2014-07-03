@@ -44,7 +44,7 @@ module Scrape::Giphy
   # @param validation [Boolean] validationを行うかどうか
   def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
     query = self.get_query(target_word)
-    logger.info "query=#{query}"
+    logger.info "query=#{query} time=#{DateTime.now}"
     return if query.nil? or query.empty?
 
     client = self.get_client
