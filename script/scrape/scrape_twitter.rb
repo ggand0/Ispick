@@ -26,7 +26,7 @@ module Scrape::Twitter
     logger = Logger.new('log/scrape_twitter_cron.log')
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, true)
+    result = self.scrape_using_api(target_word, limit, logger, true)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
