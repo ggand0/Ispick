@@ -37,8 +37,6 @@
         <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
 
         <div class="titleBox">
-
-
           <div class="id"><%= delivered_image.id %></div>
 
           <%= button_group class: 'pull-right blocks' do %>
@@ -48,8 +46,9 @@
              <%= bs_button_to 'Show', { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm' %>
           <% end %>
           <br />
-          <div class="title"><%= image.title.to_s %></div>
         </div>
+        <div class="title"><%= image.title.to_s %></div>
+
       </div>
     </div>
 
