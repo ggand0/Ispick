@@ -70,57 +70,69 @@ namespace :scrape do
   # ----------------------------------
   # 特定のサイトから画像抽出するタスク
   # ----------------------------------
+  require "#{Rails.root}/script/scrape/scrape_nico.rb"
+  require "#{Rails.root}/script/scrape/scrape_2ch.rb"
+  require "#{Rails.root}/script/scrape/scrape_futaba.rb"
+  require "#{Rails.root}/script/scrape/scrape_piapro.rb"
+  require "#{Rails.root}/script/scrape/scrape_4chan.rb"
+  require "#{Rails.root}/script/scrape/scrape_twitter.rb"
+  require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
+  require "#{Rails.root}/script/scrape/scrape_deviant.rb"
+  require "#{Rails.root}/script/scrape/scrape_giphy.rb"
+  require "#{Rails.root}/script/scrape/scrape_matome.rb"
+
   desc "2chから画像抽出する"
   task nichan: :environment do
-    require "#{Rails.root}/script/scrape/scrape_2ch.rb"
+
     Scrape::Nichan.scrape
   end
 
   desc "ニコ静から画像抽出する"
-  task nico: :environment do
-    require "#{Rails.root}/script/scrape/scrape_nico.rb"
-    Scrape::Nico.scrape(15, false)
+  task :nico, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 120 : args[:interval]
+    Scrape::Nico.scrape(interval, false)
   end
 
   desc "ピアプロから画像抽出する"
   task piapro: :environment do
-    require "#{Rails.root}/script/scrape/scrape_piapro.rb"
     Scrape::Piapro.scrape
   end
 
   desc "4chanから画像抽出する"
   task fchan: :environment do
-    require "#{Rails.root}/script/scrape/scrape_4chan.rb"
+
     Scrape::Fourchan.scrape
   end
 
   desc "2chanから画像抽出する"
   task futaba: :environment do
-    require "#{Rails.root}/script/scrape/scrape_futaba.rb"
     Scrape::Futaba.scrape
   end
 
   desc "Twitterから画像抽出する"
-  task twitter: :environment do
-    require "#{Rails.root}/script/scrape/scrape_twitter.rb"
-    Scrape::Twitter.scrape(15, false)
+  task :twitter, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 60 : args[:interval]
+    Scrape::Twitter.scrape(interval, false)
   end
 
   desc "Tumblrから画像抽出する"
-  task tumblr: :environment do
-    require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
-    Scrape::Tumblr.scrape(15, false)
+  task :tumblr, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Tumblr.scrape(interval, false)
   end
 
   desc "deviantARTから画像抽出する"
   task deviant: :environment do
-    require "#{Rails.root}/script/scrape/scrape_deviant.rb"
     Scrape::Deviant.scrape
   end
 
-   desc "Giphyから画像抽出する"
+  desc "Giphyから画像抽出する"
   task giphy: :environment do
-    require "#{Rails.root}/script/scrape/scrape_giphy.rb"
     Scrape::Giphy.scrape
+  end
+
+  desc "まとめサイトから画像抽出する"
+  task matome: :environment do
+    Scrape::Matome.scrape
   end
 end
