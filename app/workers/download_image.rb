@@ -28,7 +28,7 @@ class DownloadImage
 
         # 画像解析処理
         Resque.enqueue(DetectIllust, image_type, image.id)
-        Resque.enqueue(ImageFace, image_type, image.id)
+        #Resque.enqueue(ImageFace, image_type, image.id)  # 14/07/05停止中
 
         # Targetableの情報が設定されている場合は、
         # （登録直後の配信だと判断し）ユーザへ配信する
