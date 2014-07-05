@@ -1,18 +1,19 @@
 # coding: utf-8
 require 'open-uri'
 require 'time'
+require "#{Rails.root}/lib/keyword_analysis"
 
 module Scrape::Matome
 
   # 画像を抽出して保存
-  def self.get_img(img_items, title, caption, time, link)
+  def self.get_img(img_items, title, caption, time, link, tags=[])
     image_url = img_items.attr('src')
     title2 = title + SecureRandom.random_number(10**14).to_s
     hash = {:src_url=> image_url,:page_url=>link, :caption=>caption, :title=>title2, :posted_at=>time, :site_name=>title, :module_name=>"Scrape::Matome"}
 
     logger = Logger.new('log/scrape_matome.log')
     logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-    Scrape::save_image(hash, logger)
+    Scrape::save_image(hash, logger, tags)
   end
 
   # サイト固有値を返す
@@ -52,6 +53,18 @@ module Scrape::Matome
      # 各サイトの固有表現(0:サイト名 1:メイン記事位置)
     result = self.ptcl(key)
 
+    # タグ抽出
+    tags = [result[0]]
+    # メタ情報があれば追加
+    tags.push(item.at("//dc:subject"))
+    # はてなキーワードorWikipediaからの名詞がタイトルに含まれていた場合、
+    # その名詞をタグに含める
+    texts = [caption]
+    nouns = KeywordAnalysis.morphological_analysis(texts)
+    nouns.keys.each do |noun|
+      tags.push(noun)
+    end
+
      # メイン記事位置のimgタグについて
     page.css(result[1]).first.css("img").each do |img_items|
       self.get_img(img_items,result[0],caption,time,link)
@@ -78,7 +91,11 @@ module Scrape::Matome
 
       # 各item(記事)からコンテンツを取得
       xml.search("item").each do |item|
-        self.get_contents(item,key)
+        # その日に投稿された記事のみ抽出（負荷分散のため）
+        #time = Time.parse(item.at("//dc:date").content)
+        #next if time.to_date != DateTime.now.to_date
+
+        self.get_contents(item, key)
       end
     end
   end
