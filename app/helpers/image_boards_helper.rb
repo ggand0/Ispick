@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 module ImageBoardsHelper
 
   # paramsで指定されたdelivered_imageが
