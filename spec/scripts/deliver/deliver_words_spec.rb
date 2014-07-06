@@ -59,7 +59,14 @@ describe "Deliver::Words" do
       expect(Deliver::Words.get_query_en(@target_word)).to eq('Madoka Kaname')
     end
   end
-
+  describe "get_query_keywords function" do
+    it "returns valid array" do
+      result = Deliver::Words.get_query_keywords(@target_word)
+      #expect(result).to be_an(ActiveRecord::Associations::CollectionProxy)
+      expect(result).to be_an(Array)
+      expect(result).to eq(['魔法少女まどか☆マギカ', 'かなめ まどか'])
+    end
+  end
   describe "match_word function" do
     # contains_wordと同様
     it "returns true if target word exists in tags" do
