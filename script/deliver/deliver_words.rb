@@ -53,8 +53,8 @@ module Deliver::Words
     # タグ自身が何らかの文字情報に一致したらmatched
     return true if self.match_word(image, word_ja) or self.match_word(image, word_en)
     # 関連語がヒットしたらmatched
-    keywords.each do |keyword|
-      return true if self.match_word(image, keyword)
+    keywords.each do |word|
+      return true if self.match_word(image, word)
     end
     false
   end
@@ -66,7 +66,7 @@ module Deliver::Words
     target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
   end
   def self.get_query_keywords(target_word)
-    target_word.person ? target_word.person.keywords : []
+    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.word } : []
   end
 
   def self.match_word(image, word)

@@ -19,6 +19,7 @@ FactoryGirl.define do
     after(:create) do |image|
       image.tags << create(:tag)
       image.tags << create(:tag_en)
+      image.tags << create(:tag_title)
     end
 
     # sequenceされたタグがさらに必要な場合

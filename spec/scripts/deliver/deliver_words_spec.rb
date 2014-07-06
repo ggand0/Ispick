@@ -47,6 +47,12 @@ describe "Deliver::Words" do
       contains = Deliver::Words.contains_word(image, @target_word)
       expect(contains).to eq(true)
     end
+    # 関連語がタグか文字情報にマッチすればtrue
+    it "returns true if image's tag or string info contains the related words" do
+      target_word = FactoryGirl.create(:target_word_title)
+      contains = Deliver::Words.contains_word(@image, target_word)
+      expect(contains).to eq(true)
+    end
   end
 
   describe "get_query_ja function" do
