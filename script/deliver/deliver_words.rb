@@ -16,9 +16,9 @@ module Deliver::Words
     images.compact!
     puts "Matched: #{images.count} images"
 
-    images = Deliver.limit_images(user, images)                      # 配信画像を制限する
+    #images = Deliver.limit_images(user, images)                      # 配信画像を制限する
     Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
-    target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
+    target_word.last_delivered_at = DateTime.now                     # 最終配信日時を記録
   end
 
 
@@ -46,19 +46,40 @@ module Deliver::Words
   # @param [TargetWord] 比較したいTargetWordオブジェクト
   # @return [Boolean] TargetWordに近いかどうか
   def self.contains_word(image, target_word)
-    word = target_word.person ? target_word.person.name : target_word.word
-    word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+    word_ja = self.get_query_ja(target_word)
+    word_en = self.get_query_en(target_word)
+    keywords = self.get_query_keywords(target_word)
+
+    # タグ自身が何らかの文字情報に一致したらmatched
+    return true if self.match_word(image, word_ja) or self.match_word(image, word_en)
+    # 関連語がヒットしたらmatched
+    keywords.each do |keyword|
+      return true if self.match_word(image, keyword)
+    end
+    false
+  end
+
+  def self.get_query_ja(target_word)
+    target_word.person ? target_word.person.name : target_word.word
+  end
+  def self.get_query_en(target_word)
+    target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+  end
+  def self.get_query_keywords(target_word)
+    target_word.person ? target_word.person.keywords : []
+  end
+
+  def self.match_word(image, word)
+    return false if word.nil? or word.empty?
 
     # まず、タグがマッチするかどうかチェック
     image.tags.each do |tag|
       return true if tag.name.include?(word)
-      return true if word_en and tag.name.include?(word_en)
     end
 
-    # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
-    return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
-    return false if word_en.nil?
-    return true if ( !image.title.nil? and image.title.include?(word_en) ) or ( !image.caption.nil? and image.caption.include?(word_en))
+    # タグが含まれていない場合で、title/captionに単語が含まれていればtrue
+    return true if (image.title and image.title.include?(word)) or
+      (image.caption and image.caption.include?(word))
     false
   end
 end
