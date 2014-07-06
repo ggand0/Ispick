@@ -27,14 +27,11 @@ module Deliver
     #user.target_images.each do |t|
     #  Deliver::Images.deliver_from_image(user, t) if t.enabled
     #end
-
-    # １ユーザーの最大容量を超えていたら古い順に削除
-    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
 
+  # 特定のTargetWordを持つ画像を特定のユーザに配信する
   # @param [Integer] 配信するUserレコードのID
-  # @param [Integer] 配信するTagレコードのID
+  # @param [Integer] 配信するTargetWordレコードのID
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
@@ -114,7 +111,7 @@ module Deliver
     end
   end
 
-  # 配信画像数を指定枚数に制限する、DL済み前提
+  # [OLD]配信画像数を指定枚数に制限する、DL済み前提
   # @param [User] 配信対象のUserオブジェクト
   # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
   # @return [ActiveRecord_Relation_Image] 制限後のrelation
