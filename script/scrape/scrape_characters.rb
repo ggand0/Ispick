@@ -33,7 +33,7 @@ module Scrape::Wiki::Character
       end
 
       # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
-      anime_character_page_url[title_ja] = { ja: page_url_ja[:url], en: page_url_en[:url] }#anime_title
+      anime_character_page_url[title_ja] = { ja: page_url_ja[:url], en: page_url_en[:url], title_en: title_en }
       #puts anime_character_page_url[title_ja] if logging
       puts anime_character_page_url.to_a.last if logging
     end
@@ -107,8 +107,8 @@ module Scrape::Wiki::Character
   end
 
   # アニメの登場人物を取得する
-  # @param [Hash] { 'An anime title' => { ja: url, en: url } }
-  # @return [Hash] キャラクタ一覧
+  # @param [Hash] { 'An anime title' => { ja: url, en: url, title_en: 'title in english' } }
+  # @return [Hash] キャラクタ一覧と英名タイトルを含むHash
   def self.get_anime_character_name(wiki_url, logging=true)
     puts 'Extracting character names...'
     anime_character = {}
@@ -130,7 +130,7 @@ module Scrape::Wiki::Character
       end
 
       puts name_array if logging
-      anime_character[anime_title] = name_array
+      anime_character[anime_title] = { title_en: wiki_url[:title_en], characters: name_array }
     end
 
     anime_character

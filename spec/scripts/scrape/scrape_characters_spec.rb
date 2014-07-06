@@ -7,7 +7,7 @@ include Scrape::Wiki::Character
 
 describe "Scrape::Wiki::Character" do
   before do
-    IO.any_instance.stub(:puts)
+    #IO.any_instance.stub(:puts)
   end
 
   describe "scrape character pages, then extract character names" do
@@ -41,10 +41,10 @@ describe "Scrape::Wiki::Character" do
         'さよなら絶望先生' => { ja: url_ja0, en: url_en0 }
       }
       valid_hash = {
-        "さよなら絶望先生"=>{:ja=>"http://ja.wikipedia.org/wiki/%E3%81%95%E3%82%88%E3%81%AA%E3%82%89%E7%B5%B6%E6%9C%9B%E5%85%88%E7%94%9F%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9", :en=>"http://en.wikipedia.org/wiki/List_of_Sayonara,_Zetsubou-Sensei_characters"},
+        "さよなら絶望先生"=>{:ja=>"http://ja.wikipedia.org/wiki/%E3%81%95%E3%82%88%E3%81%AA%E3%82%89%E7%B5%B6%E6%9C%9B%E5%85%88%E7%94%9F%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9", :en=>"http://en.wikipedia.org/wiki/List_of_Sayonara,_Zetsubou-Sensei_characters", :title_en=>"Sayonara, Zetsubou-Sensei"},
         "魔法少女まどか☆マギカ"=>
           {:ja=>"http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7",
-            :en=>"http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters"
+            :en=>"http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters", :title_en=>"Puella Magi Madoka Magica"
           }
       }
 
@@ -98,7 +98,7 @@ describe "Scrape::Wiki::Character" do
       puts result = Scrape::Wiki::Character.get_anime_character_name(wiki_url)
       expect(result).to be_a(Hash)
       puts result['魔法少女まどか☆マギカ']
-      expect(result['魔法少女まどか☆マギカ'].first[:en]).to eq('Madoka Kaname')
+      expect(result['魔法少女まどか☆マギカ'][:characters].first[:en]).to eq('Madoka Kaname')
     end
 
     it "test" do
