@@ -21,11 +21,11 @@ describe Scrape do
 
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
-      FactoryGirl.create(:image_url)
+      FactoryGirl.create(:image_min)
       Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
     end
     it "should return false when arg url is NOT duplicate" do
-      FactoryGirl.create(:image_url)
+      FactoryGirl.create(:image_min)
       Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
     end
   end
@@ -86,7 +86,7 @@ describe Scrape do
       end
 
       it "should ignore a duplicate image" do
-        image = FactoryGirl.create(:image_url)
+        image = FactoryGirl.create(:image_min)
         count = Image.count
 
         Scrape::save_image({ title: 'title', src_url: image.src_url }, logger)

@@ -38,7 +38,7 @@ describe Scrape::Tumblr do
 
 
     it "sleeps with right interval after each scraping" do
-      FactoryGirl.create_list(:person_with_word, 5)
+      FactoryGirl.create_list(:target_word, 5)
       Scrape.should_receive(:sleep).with(10*60)      # (60-10) / 5*1.0
       Scrape.stub(:sleep).and_return nil
 
@@ -112,12 +112,12 @@ describe Scrape::Tumblr do
       expect(tags.first.name).to eql('Madoka')
     end
     it "uses existing tags if tags are duplicate" do
-      image = FactoryGirl.create(:image)
-      tag = FactoryGirl.create(:tag)
-      image.tags << tag
+      image = FactoryGirl.create(:image_with_specific_tags)
 
       tags = Scrape::Tumblr.get_tags(['鹿目まどか'])
-      expect(tags.first.images.first.id).to eql(tag.images.first.id)
+      puts tags.inspect
+      puts tags.first.images
+      expect(tags.first.images.first.id).to eql(image.id)
     end
   end
 

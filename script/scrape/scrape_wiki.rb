@@ -153,7 +153,9 @@ module Scrape::Wiki
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
     input_hash.each do |anime, value|
-      next if value.nil?
+      next if value.nil? or value[:characters].nil?
+      puts "anime=#{anime}"
+      puts "value=#{value}"
 
       title_en = value[:title_en]
       value[:characters].each do |name_hash|
@@ -174,7 +176,7 @@ module Scrape::Wiki
         # Titleレコード追加
         #title = Title.create(name: anime)
         #title.people << person
-        title = self.get_title(anime)
+        title = self.get_title(anime, title_en)
         person.titles << title
 
         # よみがなをaliasとして追加
@@ -194,7 +196,7 @@ module Scrape::Wiki
         #end
         # =>パフォーマンスに問題あり？ => C++/C#
 
-        person.save!
+        person.save
       end
     end
   end
@@ -212,9 +214,9 @@ module Scrape::Wiki
   # @param [String]
   # @param [Boolean]
   # @return [Title]
-  def self.get_title(name)
+  def self.get_title(name, name_en)
     title = Title.where(name: name)
-    title.empty? ? Title.new(name: name) : title.first
+    title.empty? ? Title.new(name: name, name_english: name_en) : title.first
   end
 
 end

@@ -2,7 +2,7 @@ require "#{Rails.root}/spec/support/consts"
 
 FactoryGirl.define do
   factory :image_min, class: Image do
-    src_url 'http://lohas.nicoseiga.jp/thumb/3804029i'
+    sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
 
   factory :image, class: Image do
@@ -16,10 +16,20 @@ FactoryGirl.define do
     views 10000
     posted_at DateTime.now
     is_illust true
+=begin
     after(:create) do |image|
       image.tags << create(:tag)
       image.tags << create(:tag_en)
       image.tags << create(:tag_title)
+    end
+=end
+    # sequenceされていないタグのみ必要な場合
+    factory :image_with_specific_tags do
+      after(:create) do |image|
+        image.tags << create(:tag)
+        image.tags << create(:tag_en)
+        image.tags << create(:tag_title)
+      end
     end
 
     # sequenceされたタグがさらに必要な場合
@@ -114,7 +124,7 @@ FactoryGirl.define do
     end
   end
 
-=begin
+  # Scrape::Nico.get_stats用
   factory :image_nicoseiga, class: Image do
     src_url 'http://lohas.nicoseiga.jp/thumb/3932299i'
     page_url 'http://seiga.nicovideo.jp/seiga/im3932299'
@@ -122,7 +132,6 @@ FactoryGirl.define do
       image.tags = [ create(:tag) ]
     end
   end
-=end
 
   # Image with related title and caption
   factory :image_madoka, class: Image do

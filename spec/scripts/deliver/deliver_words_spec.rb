@@ -10,7 +10,7 @@ describe "Deliver::Words" do
     #IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
 
-    @image = FactoryGirl.create(:image)   # '鹿目まどか'タグを持つImage
+    @image = FactoryGirl.create(:image_with_specific_tags)   # '鹿目まどか'タグを持つImage
     @target_word = FactoryGirl.create(:word_with_person)
   end
 

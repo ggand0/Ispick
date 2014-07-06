@@ -11,7 +11,7 @@ describe Scrape::Twitter do
 
   describe "scrape function" do
     it "calls scrape_using_api function when targetable is enabled" do
-      FactoryGirl.create(:person_madoka)
+      FactoryGirl.create(:word_with_person)
       Scrape::Twitter.should_receive(:scrape_using_api)
 
       Scrape::Twitter.scrape(60, true, true)

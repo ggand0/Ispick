@@ -16,7 +16,7 @@ describe Scrape::Giphy do
 
   describe "scrape function" do
     it "calls scrape_using_api function" do
-      FactoryGirl.create(:person_madoka)
+      FactoryGirl.create(:word_with_person)
       Scrape::Giphy.should_receive(:scrape_using_api)
       Scrape::Giphy.scrape(60, true, true)
     end

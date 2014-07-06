@@ -18,7 +18,7 @@ describe Scrape::Nico do
 
   describe "scrape method" do
     it "calls scrape_using_api method" do
-      FactoryGirl.create(:person_madoka)
+      FactoryGirl.create(:word_with_person)
       Scrape::Nico.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       Scrape::Nico.should_receive(:scrape_using_api)
 
@@ -26,7 +26,7 @@ describe Scrape::Nico do
     end
 
     it "sleeps with right interval after each scraping" do
-      FactoryGirl.create_list(:person_with_word, 5)
+      FactoryGirl.create_list(:target_word, 5)
       Scrape.should_receive(:sleep).with(10*60)      # (60-10) / 5*1.0
       Scrape.stub(:sleep).and_return nil
 
@@ -34,7 +34,7 @@ describe Scrape::Nico do
     end
 
     it "raise error when it gets improper argument" do
-      FactoryGirl.create(:person_madoka)
+      FactoryGirl.create(:word_with_person)
       expect { Scrape::Nico.scrape(14, false, true) }.to raise_error(Exception)
     end
 
@@ -104,12 +104,11 @@ describe Scrape::Nico do
       expect(tags.first.name).to eql('Madoka')
     end
     it "uses existing tags if tags are duplicate" do
-      image = FactoryGirl.create(:image)
-      tag = FactoryGirl.create(:tag)
-      image.tags << tag
+      image = FactoryGirl.create(:image_with_specific_tags)
 
       tags = Scrape::Nico.get_tags(['鹿目まどか'])
-      expect(tags.first.images.first.id).to eql(tag.images.first.id)
+      #expect(tags.first.images.first.id).to eql(tag.images.first.id)
+      expect(tags.first.images.first.id).to eql(image.id)
     end
   end
 

@@ -15,9 +15,7 @@ describe "Deliver" do
     it "calls proper functions" do
       user = FactoryGirl.create(:user_with_target_words)
       Deliver.stub(:deliver_from_word).and_return nil
-      Deliver.stub(:delete_excessed_records).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(user.target_words.count).times
-      expect(Deliver).to receive(:delete_excessed_records).exactly(1).times
 
       Deliver.deliver(user.id)
     end
@@ -36,7 +34,6 @@ describe "Deliver" do
     it "deliver properly" do
       FactoryGirl.create(:image)
       FactoryGirl.create(:user_with_target_words, words_count: 5)
-      Deliver.should_receive(:limit_images).exactly(1).times
       Deliver.should_receive(:deliver_images).exactly(1).times
 
       Deliver::Words.deliver_from_word(1, User.first.target_words.first, true)
@@ -80,7 +77,7 @@ describe "Deliver" do
   describe "limit_images function" do
     it "limits images when its count excess max num" do
       stub_const('Deliver::MAX_DELIVER_NUM', 1)
-      images = FactoryGirl.create_list(:image, 3)
+      images = FactoryGirl.create_list(:image_min, 3)
       user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
 
       images = Deliver.limit_images(user, images)
