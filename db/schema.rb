@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140602154729) do
+ActiveRecord::Schema.define(version: 20140706084301) do
 
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
@@ -83,7 +83,6 @@ ActiveRecord::Schema.define(version: 20140602154729) do
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
     t.text     "word"
-    t.integer  "person_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -96,6 +95,11 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.integer  "target_word_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "people_keywords", id: false, force: true do |t|
+    t.integer "keyword_id", null: false
+    t.integer "person_id",  null: false
   end
 
   create_table "people_titles", id: false, force: true do |t|
