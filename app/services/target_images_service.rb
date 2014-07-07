@@ -1,6 +1,6 @@
 require 'pp'
 require 'rubygems'
-require 'AnimeFace'
+#require 'AnimeFace'
 require 'RMagick'
 
 class TargetImagesService
