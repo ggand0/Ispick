@@ -36,7 +36,7 @@ describe "Deliver" do
       FactoryGirl.create(:user_with_target_words, words_count: 5)
       Deliver.should_receive(:deliver_images).exactly(1).times
 
-      Deliver::Words.deliver_from_word(1, User.first.target_words.first, true)
+      Deliver::Words.deliver_from_word(1, User.first.target_words.first)
     end
   end
 
@@ -91,7 +91,7 @@ describe "Deliver" do
       target_word = FactoryGirl.create(:target_word)  # 仮にtarget_wordとする
       images = [ FactoryGirl.create(:image_file) ]
 
-      Deliver.deliver_images(user, images, target_word, true)
+      Deliver.deliver_images(user, images, target_word)
       expect(user.delivered_images.count).to eq(images.count)
     end
 
@@ -114,7 +114,7 @@ describe "Deliver" do
       target_word = TargetWord.first
       images = [ FactoryGirl.create(:image_for_delivered_image) ]
 
-      images = Deliver.deliver_images(user, images, target_word, true)
+      images = Deliver.deliver_images(user, images, target_word)
       expect(target_word.delivered_images.count).to eq(1)
     end
   end
@@ -146,7 +146,7 @@ describe "Deliver" do
       user = FactoryGirl.create(:user_with_delivered_images_file, images_count: 5)
       user.delivered_images << DeliveredImage.none  # 空のrelationを追加
 
-      Deliver.update()
+      Deliver.update
     end
     # 当日配信された画像のみ更新する
     it "updates delivered_image which is delivered in the day" do
@@ -169,7 +169,7 @@ describe "Deliver" do
       Scrape::Tumblr.should_not_receive(:get_stats)
       Scrape::Nico.should_not_receive(:get_stats)
 
-      Deliver.update()
+      Deliver.update
     end
   end
 end
