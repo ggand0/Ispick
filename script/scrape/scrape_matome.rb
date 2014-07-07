@@ -54,20 +54,21 @@ module Scrape::Matome
     result = self.ptcl(key)
 
     # タグ抽出
-    tags = [result[0]]
+    tags = [ Scrape.get_tag(result[0]) ]
     # メタ情報があれば追加
-    tags.push(item.at("//dc:subject"))
+    tags.push( Scrape.get_tag(item.at("//dc:subject").content) )
     # はてなキーワードorWikipediaからの名詞がタイトルに含まれていた場合、
     # その名詞をタグに含める
     texts = [caption]
     nouns = KeywordAnalysis.morphological_analysis(texts)
     nouns.keys.each do |noun|
-      tags.push(noun)
+      tags.push(Scrape.get_tag(noun))
     end
+    puts tags.inspect
 
      # メイン記事位置のimgタグについて
     page.css(result[1]).first.css("img").each do |img_items|
-      self.get_img(img_items,result[0],caption,time,link)
+      self.get_img(img_items, result[0], caption, time, link, tags)
     end
 
   end
@@ -81,6 +82,7 @@ module Scrape::Matome
       ota:'http://otanews.livedoor.biz/index.rdf',
       nizi:'http://blog.livedoor.jp/nizigami/index.rdf',
     }
+    limit = 2
 
      # 各サイトから抽出
     site_url.keys.each do |key|
@@ -90,12 +92,13 @@ module Scrape::Matome
       xml = Nokogiri::XML(open(site_url[key]))
 
       # 各item(記事)からコンテンツを取得
-      xml.search("item").each do |item|
+      xml.search("item").each_with_index do |item, count|
         # その日に投稿された記事のみ抽出（負荷分散のため）
         #time = Time.parse(item.at("//dc:date").content)
         #next if time.to_date != DateTime.now.to_date
 
         self.get_contents(item, key)
+        break if count >= limit
       end
     end
   end
