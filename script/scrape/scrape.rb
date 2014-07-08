@@ -67,6 +67,7 @@ module Scrape
       if target_word.enabled
         begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
+          #logger.info "scraping: "
           result = child_module.scrape_using_api(target_word, limit, logger, true)
           logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
@@ -130,6 +131,11 @@ module Scrape
     target_word.person ? target_word.person.name : target_word.word
   end
 
+  def self.get_titles (target_word)
+    return nil if target_word.nil?
+    target_word.person.titles if target_word.person and target_word.person.titles
+  end
+
   # PIDファイルを用いて多重起動を防ぐ
   # @param [Boolean] PidFileを使用するかどうか
   # @param [Boolean] デバッグ出力を行うかどうか
@@ -188,6 +194,13 @@ module Scrape
     end
 
     image.id
+  end
+
+  # タグを取得する。DBに既にある場合はそのレコードを返す
+  # @param [String]
+  def self.get_tag(tag)
+    t = Tag.where(name: tag)
+    t.empty? ? Tag.new(name: tag) : t.first
   end
 
   # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
