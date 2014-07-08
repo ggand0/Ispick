@@ -2,43 +2,50 @@ module Deliver::Words
   # 登録タグから配信する
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
-  def self.deliver_from_word(user, target_word, is_periodic)
-    query = target_word.person ? target_word.person.name : target_word.word
-    puts "Starting: target_word=#{query}"
+  def self.deliver_from_word(user, target_word, logger)
+    logger.info "Starting: target_word=#{target_word.inspect}"
 
-    images = self.get_images(is_periodic, query)
-    puts "Processing: #{images.count} images"
+    #images = self.get_images(query)
+    images = self.get_images(target_word, logger)
+    logger.info "Processing: #{images.count} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
-    images = images.map do |image|
-      self.contains_word(image, target_word) ? image : nil
-    end
+    # get_imagesの段階で絞られているので無意味
+    #images = images.map do |image|
+    #  self.contains_word(image, target_word) ? image : nil
+    #end
+    images.uniq!
     images.compact!
-    puts "Matched: #{images.count} images"
+    logger.info "Matched: #{images.count} images"
 
     #images = Deliver.limit_images(user, images)                      # 配信画像を制限する
-    Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
+    Deliver.deliver_images(user, images, target_word)                # User.delivered_imagesへ追加する
     target_word.last_delivered_at = DateTime.now                     # 最終配信日時を記録
   end
 
 
   # 文字情報が存在するImageレコードを検索して返す
-  # @param [Boolean] 定時配信で呼ばれたのかどうか
   # @return [ActiveRecord_Relation_Image]
-  def self.get_images(is_periodic, tag)
-    if is_periodic
-      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
+  def self.get_images(target_word, logger)
+    query = Scrape.get_query target_word
+    title = Scrape.get_titles(target_word).first
+    logger.debug "#{title.name}"
+
+    # イラスト判定が終了している[is_illustがnilではない]もののみ配信
+    # イラスト判定が終了している=既にダウンロードされている
+    # とりあえずは、タイトルタグの画像も一緒に拾ってくる仕様で
+    if title.nil? or title.name.nil? or title.name.empty?
       images = Image.includes(:tags).
-        where.not(is_illust: nil, src_url: nil).where(tags: { name: tag }).
+        where.not(is_illust: nil).where(tags: { name: query }).
         references(:tags)
     else
-      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
+      # まとめサイト由来の画像のみ広くマッチさせる
       images = Image.includes(:tags).
-        where(tags: { name: tag }).
+        where.not(is_illust: nil).
+        where(module_name: 'Scrape::Matome')
+        where('tags.name=? OR tags.name=?', query, title.name).
         references(:tags)
     end
-    images
   end
 
   # 特定のImageオブジェクトがtarget_wordにマッチするか判定する

@@ -19,9 +19,10 @@ module Deliver
   # @param [Integer] 配信対象のUserオブジェクト
   def self.deliver(user_id)
     user = User.find(user_id)
+    logger = Logger.new('log/deliver.log')
 
     user.target_words.each do |t|
-      Deliver::Words.deliver_from_word(user, t, true) if t.enabled
+      Deliver::Words.deliver_from_word(user, t, logger) if t.enabled
     end
     # 登録画像に基づく配信処理：14/06/14現在停止中
     #user.target_images.each do |t|
@@ -30,14 +31,16 @@ module Deliver
   end
 
   # 特定のTargetWordを持つ画像を特定のユーザに配信する
+  # 呼ばれた段階でDBに存在している画像のみ配信
   # @param [Integer] 配信するUserレコードのID
   # @param [Integer] 配信するTargetWordレコードのID
   def self.deliver_keyword(user_id, target_word_id)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
     puts "\nDelivering to target_word=#{target_word_id} start=#{DateTime.now}"
+    logger = Logger.new('log/search_images.log')
 
-    Deliver::Words.deliver_from_word(user, target_word, false)
+    Deliver::Words.deliver_from_word(user, target_word, logger)
   end
 
 
@@ -67,13 +70,12 @@ module Deliver
   # @param user [User] 配信対象のUserオブジェクト
   # @param images [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
   # @param target [TargetWord/TargetImage]
-  # @param is_periodic [Boolean] 定時配信かどうか
-  def self.deliver_images(user, images, target, is_periodic)
+  def self.deliver_images(user, images, target)
     tmp_images = []
 
     images.each_with_index do |image, count|
-      # 定期配信する際、dataが何らかの原因で存在しないImageはskip
-      next if is_periodic and image.data.url == MISSING_URL
+      # dataが何らかの原因で存在しないImageはskip
+      next if image.data.url == MISSING_URL
 
       # 先の行程でtarget_word/target_imageにマッチはしたが既に配信済みの画像の場合は、
       # target.delivered_imagesにだけ追加
