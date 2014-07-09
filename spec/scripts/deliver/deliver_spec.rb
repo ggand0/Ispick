@@ -9,6 +9,7 @@ describe "Deliver" do
   before do
     IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
+    @logger = Logger.new('log/deliver.log')
   end
 
   describe "deliver function" do
@@ -27,7 +28,7 @@ describe "Deliver" do
       Deliver::Words.stub(:deliver_from_word).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(1).times
 
-      Deliver.deliver_keyword(user.id, target_word.id)
+      Deliver.deliver_keyword(user.id, target_word.id, @logger)
     end
   end
   describe "deliver_from_word function" do
@@ -36,7 +37,7 @@ describe "Deliver" do
       FactoryGirl.create(:user_with_target_words, words_count: 5)
       Deliver.should_receive(:deliver_images).exactly(1).times
 
-      Deliver::Words.deliver_from_word(1, User.first.target_words.first)
+      Deliver::Words.deliver_from_word(1, User.first.target_words.first, @logger)
     end
   end
 

@@ -6,7 +6,7 @@ include Scrape::Wiki
 
 describe "Scrape" do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "point test" do
@@ -40,13 +40,10 @@ describe "Scrape" do
       Scrape::Wiki.stub(:get_english_anime_page).and_return ''
       # アニメタイトル数を減らした、remoteと同様の構造を持ったhtmlファイルを使用する：
       doc = Nokogiri::HTML(open("#{Rails.root}/spec/fixtures/2011_animes.html"))
-      puts doc
       Nokogiri::HTML::Document.stub(:parse)
       Nokogiri::HTML::Document.should_receive(:parse).and_return(doc)
 
       url = 'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
-      #url = "file://#{Rails.root}/spec/fixtures/2011_animes.html"
-      #puts result = Scrape::Wiki.get_anime_page(url, false)
       puts result = Scrape::Wiki.get_anime_page(url, true)
 
       expect(result).to be_a(Hash)

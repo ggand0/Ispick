@@ -34,11 +34,10 @@ module Deliver
   # 呼ばれた段階でDBに存在している画像のみ配信
   # @param [Integer] 配信するUserレコードのID
   # @param [Integer] 配信するTargetWordレコードのID
-  def self.deliver_keyword(user_id, target_word_id)
+  def self.deliver_keyword(user_id, target_word_id, logger)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
-    puts "\nDelivering to target_word=#{target_word_id} start=#{DateTime.now}"
-    logger = Logger.new('log/search_images.log')
+    logger.info "Delivering to target_word=#{target_word_id} start=#{DateTime.now}"
 
     Deliver::Words.deliver_from_word(user, target_word, logger)
   end

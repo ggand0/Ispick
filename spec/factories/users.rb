@@ -56,7 +56,9 @@ FactoryGirl.define do
         words_count 5
       end
       after(:create) do |user, evaluator|
-        create_list(:target_words, evaluator.words_count, user: user)
+        #create_list(:target_words, evaluator.words_count, user: user)
+        #create(:target_word_user, target_word: create(:target_words), user: user)
+        create_list(:target_words_user, evaluator.words_count, target_word: create(:target_words), user: user)
       end
     end
 

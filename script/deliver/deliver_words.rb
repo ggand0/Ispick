@@ -28,8 +28,9 @@ module Deliver::Words
   # @return [ActiveRecord_Relation_Image]
   def self.get_images(target_word, logger)
     query = Scrape.get_query target_word
-    title = Scrape.get_titles(target_word).first
-    logger.debug "#{title.name}"
+    titles = Scrape.get_titles(target_word)
+    title = titles.first if (not titles.nil?) and (not titles.empty?)
+
 
     # イラスト判定が終了している[is_illustがnilではない]もののみ配信
     # イラスト判定が終了している=既にダウンロードされている
@@ -40,6 +41,7 @@ module Deliver::Words
         references(:tags)
     else
       # まとめサイト由来の画像のみ広くマッチさせる
+      logger.debug "#{title.name}"
       images = Image.includes(:tags).
         where.not(is_illust: nil).
         where(module_name: 'Scrape::Matome')

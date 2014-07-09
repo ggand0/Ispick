@@ -75,7 +75,8 @@ FactoryGirl.define do
         tags_count 5
       end
       after(:create) do |image, evaluator|
-        create_list(:tags, evaluator.tags_count, images: [image])
+        #create_list(:tags, evaluator.tags_count, images: [image])
+        create_list(:images_tag, evaluator.tags_count, tag: create(:tags), image: image)
       end
     end
     to_create do |instance|

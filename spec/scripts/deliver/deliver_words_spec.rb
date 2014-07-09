@@ -12,6 +12,7 @@ describe "Deliver::Words" do
 
     @image = FactoryGirl.create(:image_with_specific_tags)   # '鹿目まどか'タグを持つImage
     @target_word = FactoryGirl.create(:word_with_person)
+    @logger = Logger.new('log/deliver.log')
   end
 
   describe "deliver_from_word function" do
@@ -19,7 +20,7 @@ describe "Deliver::Words" do
       FactoryGirl.create(:user_with_target_words, words_count: 5)
       expect(Deliver).to receive(:deliver_images).exactly(1).times
 
-      Deliver::Words.deliver_from_word(1, User.first.target_words.first)
+      Deliver::Words.deliver_from_word(1, User.first.target_words.first, @logger)
     end
   end
 
@@ -90,29 +91,17 @@ describe "Deliver::Words" do
 
 
   describe "get_images function" do
-    before do
-      @name = '鹿目まどか'
-    end
-
     it "get images relation which have tags" do
       FactoryGirl.create(:image_min)                        # tag無
       # @image => tag有
-      expect(Deliver::Words.get_images(@name).count).to eql(1)
+      expect(Deliver::Words.get_images(@target_word, @logger).count).to eql(1)
     end
     it "includes images which have nil value in is_illust column with true flag" do
       # Imageを２レコード作成
       # @image => is_illust: true
       FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
 
-      expect(Deliver::Words.get_images(@name).count).to eql(1)
+      expect(Deliver::Words.get_images(@target_word, @logger).count).to eql(1)
     end
-=begin
-    it "ignores images which have nil value in is_illust column with false flag" do
-      # @image => is_illust: true
-      FactoryGirl.create(:image_with_only_tags, tags_count: 5)   # is_illust: nil
-
-      expect(Deliver::Words.get_images(false, @name).count).to eql(1)
-    end
-=end
   end
 end
