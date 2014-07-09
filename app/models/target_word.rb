@@ -3,7 +3,7 @@ require "#{Rails.root}/script/deliver/deliver"
 require "#{Rails.root}/app/workers/search_images"
 
 class TargetWord < ActiveRecord::Base
-  belongs_to :user
+  has_many :users, :through => :user_target_words
   has_one :person
   has_many :delivered_images, as: :targetable
 
