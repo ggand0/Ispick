@@ -2,7 +2,9 @@ class User < ActiveRecord::Base
   has_many :delivered_images, dependent: :destroy
   has_many :target_images, dependent: :destroy
   has_many :image_boards, dependent: :destroy
-  has_many :target_words, :through => :user_target_words
+
+  has_many :target_words_users
+  has_many :target_words, :through => :target_word_users
 
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
