@@ -4,7 +4,7 @@ require "#{Rails.root}/app/workers/search_images"
 
 class TargetWord < ActiveRecord::Base
   has_many :target_words_users
-  has_many :users, :through => :target_word_users
+  has_many :users, :through => :target_words_users
 
   has_one :person
   has_many :delivered_images, as: :targetable

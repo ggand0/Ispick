@@ -1,4 +1,5 @@
 class Title < ActiveRecord::Base
-  has_and_belongs_to_many :people
+  has_many :people_titles
+  has_many :people, :through => :people_titles
   validates_uniqueness_of :name
 end
