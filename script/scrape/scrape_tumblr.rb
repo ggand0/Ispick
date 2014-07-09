@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'tumblr_client'
 require 'tumblr/tagged'
-# coding: utf-8
 require 'securerandom'
-
 
 module Scrape::Tumblr
   ROOT_URL = 'https://tumblr.com'
@@ -148,7 +146,6 @@ module Scrape::Tumblr
   # @param [String]
   # @return [Hash]
   def self.get_stats(client, page_url)
-    #client = self.get_client
     blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
     id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
     posts = client.posts(blog_name)

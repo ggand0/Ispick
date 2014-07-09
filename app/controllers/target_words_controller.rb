@@ -24,8 +24,6 @@ class TargetWordsController < ApplicationController
   # POST /target_words
   # POST /target_words.json
   def create
-    #@target_word = current_user.target_words.build(target_word_params)
-    #@target_word = TargetWord.build(target_word_params)
     @target_word = get_target_word(target_word_params)
     current_user.target_words << @target_word
 

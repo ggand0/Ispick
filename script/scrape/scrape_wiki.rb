@@ -168,19 +168,14 @@ module Scrape::Wiki
         )
 
         # 関連キーワードとしてアニメタイトルを追加
-        #keyword = Keyword.where(word: anime)
-        #person.keywords.create(word: anime, is_alias: false)
         keyword = self.get_keyword(anime, false)
         person.keywords << keyword
 
         # Titleレコード追加
-        #title = Title.create(name: anime)
-        #title.people << person
         title = self.get_title(anime, title_en)
         person.titles << title
 
         # よみがなをaliasとして追加
-        #person.keywords.create(word: name_hash[:_alias], is_alias: true)
         keyword = self.get_keyword(name_hash[:_alias], true)
         person.keywords << keyword
 
