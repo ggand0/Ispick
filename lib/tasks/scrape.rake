@@ -80,6 +80,13 @@ namespace :scrape do
   require "#{Rails.root}/script/scrape/scrape_deviant.rb"
   require "#{Rails.root}/script/scrape/scrape_giphy.rb"
   require "#{Rails.root}/script/scrape/scrape_matome.rb"
+  require "#{Rails.root}/script/scrape/scrape_wiki.rb"
+
+  desc "キャラクタに関する静的なDBを構築する"
+    task wiki: :environment do
+      puts 'Scraping character names...'
+      Scrape::Wiki.scrape
+    end
 
   desc "2chから画像抽出する"
   task nichan: :environment do
