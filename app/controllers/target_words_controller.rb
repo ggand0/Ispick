@@ -25,10 +25,11 @@ class TargetWordsController < ApplicationController
   # POST /target_words.json
   def create
     @target_word = get_target_word(target_word_params)
-    current_user.target_words << @target_word
+
 
     respond_to do |format|
       if @target_word.id or @target_word.id.nil? and @target_word.save
+        current_user.target_words << @target_word
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
       else

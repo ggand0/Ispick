@@ -22,7 +22,7 @@ describe Scrape do
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_min)
-      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i').should eq(true)
+      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i1').should eq(true)
     end
     it "should return false when arg url is NOT duplicate" do
       FactoryGirl.create(:image_min)
