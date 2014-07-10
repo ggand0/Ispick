@@ -36,9 +36,4 @@ FactoryGirl.define do
   factory :target_words, class: TargetWord do
     sequence(:word) { |n| "鹿目 まどか#{n}" }
   end
-
-  factory :target_word_with_user, class: TargetWord do
-    word '鹿目まどか'
-    sequence(:user_id) { |n| n }
-  end
 end
