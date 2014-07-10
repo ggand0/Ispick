@@ -19,14 +19,6 @@ describe Scrape::Tumblr do
       Scrape::Tumblr.scrape(60, true, true)
     end
 
-    it "does not call scrape_using_api function when targetable is NOT enabled" do
-      FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Tumblr.stub(:scrape_using_api).and_return nil
-      Scrape::Tumblr.should_not_receive(:scrape_using_api)
-
-      Scrape::Tumblr.scrape(60, true, true)
-    end
-
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!

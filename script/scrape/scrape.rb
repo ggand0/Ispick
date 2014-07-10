@@ -64,10 +64,9 @@ module Scrape
 
     # １タグごとにタグ検索APIを用いて画像取得
     TargetWord.all.each do |target_word|
-      if target_word.enabled
-        begin
-          # パラメータに基づいてAPIリクエストを行い結果を得る
-          #logger.info "scraping: "
+      begin
+        # パラメータに基づいてAPIリクエストを行い結果を得る
+        if (not target_word.word.nil?) and (not target_word.word.empty?)
           result = child_module.scrape_using_api(target_word, limit, logger, true)
           logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
@@ -79,10 +78,10 @@ module Scrape
             logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
           end
 =end
-        rescue => e
-          logger.info e
-          logger.error "Scraping from #{child_module::ROOT_URL} has failed!"
         end
+      rescue => e
+        logger.info e
+        logger.error "Scraping from #{child_module::ROOT_URL} has failed!"
       end
 
       sleep(local_interval*60) unless sleep_debug
@@ -92,18 +91,18 @@ module Scrape
 
   # タグ登録直後の配信用
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
-  def self.scrape_target_word(target_word, logger)
-    Scrape::Nico.scrape_target_word(target_word, logger)
-    Scrape::Twitter.scrape_target_word(target_word, logger)
-    Scrape::Tumblr.scrape_target_word(target_word, logger)
+  def self.scrape_target_word(user_id, target_word, logger)
+    Scrape::Nico.scrape_target_word(user_id, target_word, logger)
+    Scrape::Twitter.scrape_target_word(user_id, target_word, logger)
+    Scrape::Tumblr.scrape_target_word(user_id, target_word, logger)
 
     # 英名が存在する場合はさらに検索
     if target_word.person and not target_word.person.name_english.empty?
       query = target_word.person.name_english
       logger.debug "name_english: #{query}"
 
-      Scrape::Tumblr.scrape_target_word(target_word, logger)
-      Scrape::Giphy.scrape_target_word(target_word, logger)
+      Scrape::Tumblr.scrape_target_word(user_id, target_word, logger)
+      Scrape::Giphy.scrape_target_word(user_id, target_word, logger)
     end
     logger.info 'scrape_target_word DONE!!'
   end
@@ -180,6 +179,10 @@ module Scrape
       return
     end
 
+    # Remove 4 bytes chars
+    #attributes[:title] = attributes[:title]
+    attributes[:caption] = self.remove_4bytes(attributes[:caption])
+
     # 新規レコードを作成
     image = Image.new attributes
     tags.each { |tag| image.tags << tag }
@@ -203,23 +206,28 @@ module Scrape
     t.empty? ? Tag.new(name: tag) : t.first
   end
 
+  def self.remove_4bytes(string)
+    return nil if string.nil?
+    string.each_char.select{|c| c.bytes.count < 4 }.join('')
+  end
+
   # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
   # Resqueのjobとして行う（非同期的に）
-  def self.generate_jobs(image_id, src_url, large=false, target_type=nil, target_id=nil)
+  def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil)
     image = Image.find(image_id)
     if target_type and target_id
       if large
-        Resque.enqueue(DownloadImageLarge, image.class.name, image_id, src_url,
+        Resque.enqueue(DownloadImageLarge, user_id, image.class.name, image_id, src_url,
           target_type, target_id)
       else
-        Resque.enqueue(DownloadImage, image.class.name, image_id, src_url,
+        Resque.enqueue(DownloadImage, user_id, image.class.name, image_id, src_url,
           target_type, target_id)
       end
     else
       if large
-        Resque.enqueue(DownloadImageLarge, image.class.name, image_id, src_url)
+        Resque.enqueue(DownloadImageLarge, user_id, image.class.name, image_id, src_url)
       else
-        Resque.enqueue(DownloadImage, image.class.name, image_id, src_url)
+        Resque.enqueue(DownloadImage, user_id, image.class.name, image_id, src_url)
       end
     end
   end

@@ -9,7 +9,7 @@ class DownloadImage
   # @param image_type [String] 画像オブジェクトのクラス名
   # @param image_id [Integer] テーブル内のID
   # @param src_url [String] Source url
-  def self.perform(image_type, image_id, src_url, target_type=nil, target_id=nil)
+  def self.perform(user_id, image_type, image_id, src_url, target_type=nil, target_id=nil)
     image = Object::const_get(image_type).find(image_id)
 
     begin
@@ -30,10 +30,12 @@ class DownloadImage
         Resque.enqueue(DetectIllust, image_type, image.id)
         #Resque.enqueue(ImageFace, image_type, image.id)  # 14/07/05停止中
 
+        # ====================================
         # Targetableの情報が設定されている場合は、
-        # （登録直後の配信だと判断し）ユーザへ配信する
+        # 登録直後の配信だと判断しユーザへ配信する
+        # ====================================
         target =  Object::const_get(target_type).find(target_id)
-        Deliver.deliver_image(target.user_id, target, image_id)
+        Deliver.deliver_image(user_id, target, image_id)
       end
     rescue => e
       logger.info e

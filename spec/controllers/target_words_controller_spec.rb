@@ -192,25 +192,4 @@ describe TargetWordsController do
       expect(assigns(:delivered_images).count).to eq(count)
     end
   end
-
-  describe "switch action" do
-    before(:each) do
-      request.env['HTTP_REFERER'] = '/'
-    end
-    it "Set 'enabled' attribute to false when it's true" do
-      target_word = FactoryGirl.create(:target_word)
-      target_word.update_attributes(enabled: true)
-
-      expect_any_instance_of(TargetWord).to receive(:update_attributes).with({enabled: false})
-      get :switch, { id: target_word.id }, valid_session
-    end
-    it "Set 'enabled' attribute to true when it's false" do
-      target_word = FactoryGirl.create(:target_word)
-      target_word.update_attributes(enabled: false)
-
-      expect_any_instance_of(TargetWord).to receive(:update_attributes).with({enabled: true})
-      get :switch, { id: target_word.to_param }, valid_session
-    end
-  end
-
 end

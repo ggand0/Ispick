@@ -22,7 +22,7 @@ module Deliver
     logger = Logger.new('log/deliver.log')
 
     user.target_words.each do |t|
-      Deliver::Words.deliver_from_word(user, t, logger) if t.enabled
+      Deliver::Words.deliver_from_word(user, t, logger)
     end
     # 登録画像に基づく配信処理：14/06/14現在停止中
     #user.target_images.each do |t|

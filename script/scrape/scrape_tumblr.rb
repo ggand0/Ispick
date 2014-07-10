@@ -21,11 +21,11 @@ module Scrape::Tumblr
 
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
-  def self.scrape_target_word(target_word, logger, english=false)
+  def self.scrape_target_word(user_id, target_word, logger, english=false)
     limit = 10
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, logger, true, false, english)
+    result = self.scrape_using_api(user_id, target_word, limit, logger, true, false, english)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -43,10 +43,11 @@ module Scrape::Tumblr
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash] Scraping result
-  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false, english=false)
+  def self.scrape_using_api(user_id, target_word, limit, logger, validation=true, logging=false, english=false)
     query = self.get_query target_word, english
     return if query.nil? or query.empty?
-    logger.info "query=#{query} time=#{DateTime.now}"
+
+    logger.info "query=#{query}"
     client = self.get_client
     duplicates = 0
     skipped = 0
@@ -75,7 +76,7 @@ module Scrape::Tumblr
       # Resqueで非同期的に画像解析を行う
       # 始めに画像をダウンロードし、終わり次第ユーザに配信
       if image_id
-        Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+        Scrape.generate_jobs(user_id, image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
       end
 
       # limit枚抽出したら終了

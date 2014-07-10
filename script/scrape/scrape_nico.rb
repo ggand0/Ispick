@@ -22,11 +22,11 @@ module Scrape::Nico
   # キーワードによる検索・抽出を行う
   # @param target_word[TargetWord]
   # @param logger [Logger] ログ出力に使用させたいloggerインスタンス
-  def self.scrape_target_word(target_word, logger)
+  def self.scrape_target_word(user_id, target_word, logger)
     limit = 10
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, logger, true)
+    result = self.scrape_using_api(user_id, target_word, limit, logger, true)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -35,10 +35,10 @@ module Scrape::Nico
   # @param [Integer]
   # @param [Boolean]
   # @return [Hash]
-  def self.scrape_using_api(target_word, limit, logger, validation=true, logging=false)
+  def self.scrape_using_api(target_word, limit, logger, user_id=nil, validation=true, logging=false)
     # nilのクエリは弾く
     query = Scrape.get_query target_word
-    logger.info "query=#{query} time=#{DateTime.now}"
+    logger.info "query=#{query}"
     return if query.nil? or query.empty?
 
     agent = self.get_client
@@ -67,7 +67,7 @@ module Scrape::Nico
         # Resqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id
-          Scrape.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+          Scrape.generate_jobs(image_id, image_data[:src_url], false, user_id, target_word.class.name, target_word.id)
         end
 
         break if duplicates >= 3

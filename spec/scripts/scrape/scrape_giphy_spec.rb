@@ -20,13 +20,7 @@ describe Scrape::Giphy do
       Scrape::Giphy.should_receive(:scrape_using_api)
       Scrape::Giphy.scrape(60, true, true)
     end
-    it "does not call scrape_using_api function when targetable is NOT enabled" do
-      FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Giphy.stub(:scrape_using_api).and_return nil
-      Scrape::Giphy.should_not_receive(:scrape_using_api)
 
-      Scrape::Giphy.scrape(60, true, true)
-    end
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!

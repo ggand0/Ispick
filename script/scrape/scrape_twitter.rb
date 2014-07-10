@@ -21,12 +21,12 @@ module Scrape::Twitter
 
   # キーワードによる抽出処理を行う
   # @param [TargetWord]
-  def self.scrape_target_word(target_word, logger)
+  def self.scrape_target_word(user_id, target_word, logger)
     limit = 200
     logger = Logger.new('log/scrape_twitter_cron.log')
     logger.info "Extracting #{limit} images from: #{ROOT_URL}"
 
-    result = self.scrape_using_api(target_word, limit, logger,true)
+    result = self.scrape_using_api(user_id, target_word, limit, logger,true)
     logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
   end
 
@@ -34,13 +34,13 @@ module Scrape::Twitter
   # @oaran [String]
   # @param [Integer]
   # @param [Boolean]
-  def self.scrape_using_api(target_word, limit, logger, validation=true)
+  def self.scrape_using_api(user_id, target_word, limit, logger, validation=true)
     client = self.get_client
 
 
     # キーワードを含むハッシュタグの検索
     begin
-      self.get_contents(client, target_word, limit, logger, validation)
+      self.get_contents(user_id, client, target_word, limit, logger, validation)
 
     # リクエストが多すぎる場合は待機する
     rescue Twitter::Error::TooManyRequests => error
@@ -63,7 +63,7 @@ module Scrape::Twitter
   # @oaran [String]
   # @param [Integer]
   # @param [Boolean]
-  def self.get_contents(client, target_word, limit, logger, validation=true, logging=false)
+  def self.get_contents(user_id, client, target_word, limit, logger, validation=true, logging=false)
     query = Scrape.get_query target_word
     logger.info "query=#{query} time=#{DateTime.now}"
     scraped = 0
@@ -89,7 +89,7 @@ module Scrape::Twitter
           # Resqueで非同期的に画像解析を行う
           # 始めに画像をダウンロードし、終わり次第ユーザに配信
           if image_id
-            Scrape.generate_jobs(image_id, data[:src_url], false, target_word.class.name, target_word.id)
+            Scrape.generate_jobs(user_id, image_id, data[:src_url], false, target_word.class.name, target_word.id)
           end
         end
       else

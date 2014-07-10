@@ -82,9 +82,9 @@ module Scrape::Matome
       ota:'http://otanews.livedoor.biz/index.rdf',
       nizi:'http://blog.livedoor.jp/nizigami/index.rdf',
     }
-    limit = 2
+    limit = 10
 
-     # 各サイトから抽出
+    # 各サイトから抽出
     site_url.keys.each do |key|
       puts 'Extracting : ' + site_url[key]
 
