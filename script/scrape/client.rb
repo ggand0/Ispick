@@ -130,7 +130,7 @@ module Scrape
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-        self.class.generate_jobs(image.id, attributes[:src_url], options[:large]) if options[:resque]
+        Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) if not options[:resque]
       else
         logger.info 'Image model saving failed. (maybe due to duplication)'
         return
