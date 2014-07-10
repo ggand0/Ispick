@@ -25,14 +25,6 @@ module Scrape
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     end
 
-    # @return [Tumblr::Client] APIキーを設定したClientオブジェクト
-    def self.get_client
-      ::Tumblr.configure do |config|
-        config.consumer_key = CONFIG['tumblr_consumer_key']
-        config.consumer_secret = CONFIG['tumblr_consumer_secret']
-      end
-      ::Tumblr::Client.new
-    end
 
     # 取得するPostの上限数。APIの仕様で20postsまでに制限されている
     # Scrape images from tumblr. The latter two params are used for testing.
@@ -127,6 +119,15 @@ module Scrape
     end
 
 
+    # @return [Tumblr::Client] APIキーを設定したClientオブジェクト
+    def self.get_client
+      ::Tumblr.configure do |config|
+        config.consumer_key = CONFIG['tumblr_consumer_key']
+        config.consumer_secret = CONFIG['tumblr_consumer_secret']
+      end
+      ::Tumblr::Client.new
+    end
+
     def self.get_query(target_word, english)
       if english
         query = target_word.person.name_english if target_word.person
@@ -159,11 +160,14 @@ module Scrape
     end
 
 
-    # likes_countを更新する
+    # [OLD]likes_countを更新する
     # @param [String]
     # @return [Hash]
     def self.get_stats(page_url)
-      client = self.class.get_client
+      puts 'DEBUG'
+      client = self.get_client
+      #client = self.class.get_client
+
       blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
       id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
       posts = client.posts(blog_name)
