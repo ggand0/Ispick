@@ -97,7 +97,8 @@ namespace :scrape do
   desc "ニコ静から画像抽出する"
   task :nico, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 120 : args[:interval]
-    Scrape::Nico.scrape(interval.to_i, false)
+    #Scrape::Nico.scrape(interval.to_i, false)
+    Scrape::Nico.new.scrape(interval.to_i)
   end
 
   desc "ピアプロから画像抽出する"
@@ -119,13 +120,17 @@ namespace :scrape do
   desc "Twitterから画像抽出する"
   task :twitter, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 60 : args[:interval]
-    Scrape::Twitter.scrape(interval.to_i, false)
+    #Scrape::Twitter.scrape(interval.to_i, false)
+    Scrape::Twitter.new.scrape(interval.to_i)
   end
 
   desc "Tumblrから画像抽出する"
   task :tumblr, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
-    Scrape::Tumblr.scrape(interval.to_i, false)
+
+    #Scrape::Tumblr.scrape(interval.to_i, false)
+    #Scrape::TumblrClient.new.scrape(interval.to_i)
+    Scrape::Tumblr.new.scrape(interval.to_i)
   end
 
   desc "deviantARTから画像抽出する"
@@ -135,7 +140,8 @@ namespace :scrape do
 
   desc "Giphyから画像抽出する"
   task giphy: :environment do
-    Scrape::Giphy.scrape
+    interval = args[:interval].nil? ? 720 : args[:interval]
+    Scrape::Giphy.new.scrape(interval.to_i)
   end
 
   desc "まとめサイトから画像抽出する"
