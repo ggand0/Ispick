@@ -26,16 +26,16 @@ class DownloadImage
       else
         # DBに保存
         image.save!
-        logger.info "Downloaded : #{image_type}/#{image_id}"
+        logger.info "Downloaded : Image.id=#{image_id}"
 
         # 画像解析処理
-        Resque.enqueue(DetectIllust, image_type, image.id)
-        #Resque.enqueue(ImageFace, image_type, image.id)  # 14/07/05停止中
+        Resque.enqueue(DetectIllust, image.id)
+        #Resque.enqueue(ImageFace, image.id)  # 14/07/05停止中
 
-        # ====================================
+        # ===================================
         # Targetableの情報が設定されている場合は、
         # 登録直後の配信だと判断しユーザへ配信する
-        # ====================================
+        # ===================================
         unless user_id.nil?
           target = Object::const_get(target_type).find(target_id)
           Deliver.deliver_image(user_id, target, image_id)

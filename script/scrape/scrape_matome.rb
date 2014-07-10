@@ -13,7 +13,7 @@ module Scrape::Matome
 
     logger = Logger.new('log/scrape_matome.log')
     logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-    Scrape::save_image(hash, logger, tags)
+    Scrape::Client.save_image(hash, logger, tags)
   end
 
   # サイト固有値を返す

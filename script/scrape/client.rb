@@ -75,24 +75,6 @@ module Scrape
       @logger.info '--------------------------------------------------'
     end
 
-    # タグ登録直後の配信用
-    # @param [TargetWord] 配信対象であるTargetWordインスタンス
-    def scrape_target_word(user_id, target_word)
-      Scrape::Nico.scrape_target_word(user_id, target_word)
-      Scrape::Twitter.scrape_target_word(user_id, target_word)
-      Scrape::Tumblr.scrape_target_word(user_id, target_word)
-
-      # 英名が存在する場合はさらに検索
-      if target_word.person and not target_word.person.name_english.empty?
-        query = target_word.person.name_english
-        @logger.debug "name_english: #{query}"
-
-        Scrape::Tumblr.scrape_target_word(user_id, target_word)
-        Scrape::Giphy.scrape_target_word(user_id, target_word)
-      end
-      @logger.info 'scrape_target_word DONE!!'
-    end
-
 
     # PIDファイルを用いて多重起動を防ぐ
     # @param [Boolean] PidFileを使用するかどうか
@@ -131,10 +113,10 @@ module Scrape
     # @param [Boolean] ログ出力を行うかどうか
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
     #def self.save_image(attributes, tags=[], validation=true, large=false, verbose=false, resque=true)
-    def save_image(attributes, tags=[], options={})
+    def self.save_image(attributes, logger, tags=[], options={})
       # 予め（ダウンロードする前に）重複を確認
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
-        @logger.info 'Skipping a duplicate image...' if options[:verbose]
+        logger.info 'Skipping a duplicate image...' if options[:verbose]
         return
       end
 
@@ -150,7 +132,7 @@ module Scrape
       if image.save(validate: options[:validation])
         self.class.generate_jobs(image.id, attributes[:src_url], options[:large]) if options[:resque]
       else
-        @logger.info 'Image model saving failed. (maybe due to duplication)'
+        logger.info 'Image model saving failed. (maybe due to duplication)'
         return
       end
       image.id
@@ -163,17 +145,17 @@ module Scrape
       image = Image.find(image_id)
       if target_type and target_id
         if large
-          Resque.enqueue(DownloadImageLarge, image.class.name, image_id, src_url,
+          Resque.enqueue(DownloadImageLarge, image_id, src_url,
             user_id, target_type, target_id)
         else
-          Resque.enqueue(DownloadImage, image.class.name, image_id, src_url,
+          Resque.enqueue(DownloadImage, image_id, src_url,
             user_id, target_type, target_id)
         end
       else
         if large
-          Resque.enqueue(DownloadImageLarge, image.class.name, image_id, src_url)
+          Resque.enqueue(DownloadImageLarge, image_id, src_url)
         else
-          Resque.enqueue(DownloadImage, image.class.name, image_id, src_url)
+          Resque.enqueue(DownloadImage, image_id, src_url)
         end
       end
     end

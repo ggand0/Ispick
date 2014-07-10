@@ -6,15 +6,16 @@ describe Scrape::Tumblr do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
   before do
-    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     #@client = Scrape::Tumblr.get_client()
     @client = Scrape::Tumblr.new
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
     @response = JSON.parse(response)['response']
+    @logger = Logger.new('log/scrape_tumblr_cron.log')
   end
 
-  describe "scrape function" do
+  describe "scrape method" do
     it "calls scrape_target_words function" do
       FactoryGirl.create(:person_madoka)
       Scrape.should_receive(:scrape_target_words)
@@ -29,7 +30,6 @@ describe Scrape::Tumblr do
 
       Scrape::Tumblr.scrape(60, true, true)
     end
-
 
     it "sleeps with right interval after each scraping" do
       FactoryGirl.create_list(:target_word, 5)
@@ -53,16 +53,21 @@ describe Scrape::Tumblr do
     end
   end
 
-  describe "scrape_target_word function" do
-    it "calls scrape_using_api function" do
-      target_word = FactoryGirl.create(:word_with_person)
-      Scrape::Tumblr.should_receive(:scrape_using_api)
-      Scrape::Tumblr.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
-      logger = Logger.new('log/scrape_tumblr_cron.log')
 
-      Scrape::Tumblr.scrape_target_word target_word, logger
+  describe "scrape_target_word method" do
+    it "calls scrape_using_api method" do
+      target_word = FactoryGirl.create(:word_with_person)
+      #puts Scrape::Tumblr.class
+      #puts Scrape::Tumblr.any_instance.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 }).inspect
+      @client.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 }) # => pass
+
+      #client = Scrape::Tumblr.new
+      expect(@client).to receive(:scrape_using_api)
+
+      @client.scrape_target_word(1, target_word)
     end
   end
+
 
   describe "scrape_using_api function" do
     it "calls proper functions" do
@@ -120,7 +125,7 @@ describe Scrape::Tumblr do
       post = FactoryGirl.build(:tumblr_api_response)
       Tumblr::Client.any_instance.stub(:posts).and_return(post[:response])
       page_url = 'http://realotakuman.tumblr.com/post/84103502875/twitter-kiya-si-http-t-co-mq1t'
-      stats = Scrape::Tumblr.get_stats(@client, page_url)
+      stats = Scrape::Tumblr.get_stats(page_url)
 
       expect(stats).to be_a(Hash)
       expect(stats[:favorites]).to eql(post[:response]['posts'][0]['note_count'])
@@ -137,7 +142,7 @@ describe Scrape::Tumblr do
   describe "get_favorites function" do
     it "returns favorites count of the post" do
       page_url = 'http://senshi.org/post/82331944259/miku-x-cat-by-kenji'
-      puts result = Scrape::Tumblr.get_favorites(page_url)
+      puts result = @client.get_favorites(page_url)
       expect(result).not_to eql(nil)
     end
   end

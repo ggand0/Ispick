@@ -32,6 +32,25 @@ module Scrape
     puts 'DONE!!'
   end
 
+  # タグ登録直後の配信用
+  # @param [TargetWord] 配信対象であるTargetWordインスタンス
+  def self.scrape_target_word(user_id, target_word, logger)
+    #Scrape::Nico.scrape_target_word(user_id, target_word)
+    #Scrape::Twitter.scrape_target_word(user_id, target_word)
+    Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
+
+    # 英名が存在する場合はさらに検索
+    if target_word.person and not target_word.person.name_english.empty?
+      query = target_word.person.name_english
+      logger.debug "name_english: #{query}"
+
+      #Scrape::Tumblr.scrape_target_word(user_id, target_word)
+      #Scrape::Giphy.scrape_target_word(user_id, target_word)
+    end
+    logger.info 'scrape_target_word DONE!!'
+  end
+
+
   # Paperclipのattachmentがnilのレコードを探し再度downloadする
   def self.redownload
     images = Image.where(data_file_size: nil)

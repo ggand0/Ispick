@@ -9,10 +9,9 @@ class SearchImages
     start = Time.now
     target_word = TargetWord.find(target_word_id)
     logger.info '--------------------------------------------------'
-    logger.info "Starting: target_word=#{target_word_id}, time=#{DateTime.now}"
+    logger.info "Starting: target_word=#{target_word_id}"
 
     # 先に、既にDB内に存在するレコードから配信する
-    #Deliver.deliver_keyword(target_word.user_id, target_word.id, logger)
     Deliver.deliver_keyword(user_id, target_word.id, logger)
 
     # 続いて少量のリクエストを各サイトに送り結果を取得する

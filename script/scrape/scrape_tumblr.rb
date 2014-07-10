@@ -14,7 +14,7 @@ module Scrape
     ROOT_URL = 'https://tumblr.com'
 
     # user_id=nil：定時抽出（＝後でまとめて配信）、user_id != nil、すぐに配信
-    def initialize(limit=20, logger=nil)
+    def initialize(logger=nil, limit=20)
       self.limit = limit
 
       if logger.nil?
@@ -51,7 +51,7 @@ module Scrape
     def scrape_target_word(user_id, target_word, english=false)
       @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
-      result = self.scrape_using_api(user_id, target_word, english)
+      result = scrape_using_api(target_word, user_id, english)
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
     end
 
@@ -89,7 +89,7 @@ module Scrape
           verbose: false,
           resque: false
         }
-        image_id = save_image(image_data, Scrape.get_tags(image['tags']), options)
+        image_id = self.class.save_image(image_data, @logger, Scrape.get_tags(image['tags']), options)
 
         # 抽出情報の更新
         duplicates += image_id ? 0 : 1
@@ -159,13 +159,11 @@ module Scrape
     end
 
 
-
-
     # likes_countを更新する
-    # @param [Tumblr::Client]
     # @param [String]
     # @return [Hash]
-    def self.get_stats(client, page_url)
+    def self.get_stats(page_url)
+      client = self.class.get_client
       blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
       id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
       posts = client.posts(blog_name)
