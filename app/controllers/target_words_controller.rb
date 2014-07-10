@@ -44,7 +44,7 @@ class TargetWordsController < ApplicationController
     target_word = target_word.empty? ? TargetWord.new(word: word) : target_word.first
 
     target_word.person = Person.find(params[:id]) if params[:id]
-    target_word.enabled = true
+    #target_word.enabled = true
     target_word
   end
 
@@ -100,12 +100,6 @@ class TargetWordsController < ApplicationController
     else
       render action: 'not_signed_in'
     end
-  end
-
-  def switch
-    enabled = @target_word.enabled ? false : true
-    @target_word.update_attributes(enabled: enabled)
-    redirect_to :back
   end
 
 

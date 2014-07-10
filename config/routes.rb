@@ -64,7 +64,6 @@ Ispic::Application.routes.draw do
     member do
       get 'prefer'
       get 'show_delivered'
-      get 'switch'
     end
   end
 
