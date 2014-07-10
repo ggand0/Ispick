@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   has_many :image_boards, dependent: :destroy
 
   has_many :target_words_users
-  has_many :target_words, :through => :target_words_users
+  has_many :target_words, :through => :target_words_users, :after_add => :search_keyword
 
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable
@@ -19,6 +19,12 @@ class User < ActiveRecord::Base
 
   def set_default_url
     ActionController::Base.helpers.asset_path('default_user_thumb.png')
+  end
+
+  # 少量の画像を抽出・配信する
+  # @param target_word [TargetWord]
+  def search_keyword(target_word)
+    Resque.enqueue(SearchImages, self.id, target_word.id)
   end
 
   def create_default

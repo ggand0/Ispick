@@ -27,6 +27,7 @@ module Scrape::Wiki::Character
       # 英語版の登場人物一覧ページを取得する
       if (not url[:en].empty?) and (not html_en.nil?)
         title_en = html_en.css('h1[class="firstHeading"]').first.content
+        puts "DEBUG: #{title_en}"
         page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
       else
         page_url_en = { title: title_ja, url: '' } # 日本語タイトルをkeyとする
@@ -130,7 +131,7 @@ module Scrape::Wiki::Character
       end
 
       puts name_array if logging
-      anime_character[anime_title] = { title_en: wiki_url[:title_en], characters: name_array }
+      anime_character[anime_title] = { title_en: url[:title_en], characters: name_array }
     end
 
     anime_character

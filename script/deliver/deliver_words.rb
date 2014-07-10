@@ -44,7 +44,7 @@ module Deliver::Words
       logger.debug "#{title.name}"
       images = Image.includes(:tags).
         where.not(is_illust: nil).
-        where(module_name: 'Scrape::Matome')
+        where(module_name: 'Scrape::Matome').
         where('tags.name=? OR tags.name=?', query, title.name).
         references(:tags)
     end
