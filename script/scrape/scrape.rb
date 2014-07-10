@@ -32,81 +32,6 @@ module Scrape
     puts 'DONE!!'
   end
 
-
-  # 定時配信時、タグ検索APIを用いて抽出するサイト用の関数
-  # Scrape images from websites which has api. The latter two params are used for testing.
-  # @param module_type [String]
-  # @param [Integer] min
-  # @param logger [Logger] logger instance to output logs.
-  # @param [Boolean] whether it's called for debug or not
-  # @param [Boolean] whether it's called for debug or not
-  def self.scrape_target_words(module_type, logger, limit=20, interval=60,
-    pid_debug=false, sleep_debug=false)
-    # 予備時間が十分に取れない程短時間の場合は例外を発生させる
-    if interval < 15
-      raise Exception.new('the interval argument must be more than 10!')
-      return
-    end
-
-    # Generate an instance of a default logger
-    logger = Logger.new('log/scrape.log') if logger.nil?
-
-    child_module = Object::const_get(module_type)
-    reserved_time = 10
-    local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
-
-    logger.info '--------------------------------------------------'
-    logger.info "Start extracting from #{child_module::ROOT_URL}: time=#{DateTime.now}"
-    logger.info "interval=#{interval} local_interval=#{local_interval}"
-
-    # PIDファイルを用いて多重起動を防ぐ
-    Scrape.detect_multiple_running(module_type, logger, pid_debug, false)
-
-    # １タグごとにタグ検索APIを用いて画像取得
-    TargetWord.all.each do |target_word|
-      begin
-        # パラメータに基づいてAPIリクエストを行い結果を得る
-        if (not target_word.word.nil?) and (not target_word.word.empty?)
-          result = child_module.scrape_using_api(target_word, limit, logger, true)
-          logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
-
-          # [保留中]海外サイトの場合は英名でも検索する
-=begin
-          if module_type == 'Scrape::Tumblr'
-            # english=trueで呼ぶ
-            result = child_module.scrape_using_api(target_word, limit, logger, true, false, true)
-            logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
-          end
-=end
-        end
-      rescue => e
-        logger.info e
-        logger.error "Scraping from #{child_module::ROOT_URL} has failed!"
-      end
-
-      sleep(local_interval*60) unless sleep_debug
-    end
-    logger.info '--------------------------------------------------'
-  end
-
-  # タグ登録直後の配信用
-  # @param [TargetWord] 配信対象であるTargetWordインスタンス
-  def self.scrape_target_word(user_id, target_word, logger)
-    Scrape::Nico.scrape_target_word(user_id, target_word, logger)
-    Scrape::Twitter.scrape_target_word(user_id, target_word, logger)
-    Scrape::Tumblr.scrape_target_word(user_id, target_word, logger)
-
-    # 英名が存在する場合はさらに検索
-    if target_word.person and not target_word.person.name_english.empty?
-      query = target_word.person.name_english
-      logger.debug "name_english: #{query}"
-
-      Scrape::Tumblr.scrape_target_word(user_id, target_word, logger)
-      Scrape::Giphy.scrape_target_word(user_id, target_word, logger)
-    end
-    logger.info 'scrape_target_word DONE!!'
-  end
-
   # Paperclipのattachmentがnilのレコードを探し再度downloadする
   def self.redownload
     images = Image.where(data_file_size: nil)
@@ -135,69 +60,6 @@ module Scrape
     target_word.person.titles if target_word.person and target_word.person.titles
   end
 
-  # PIDファイルを用いて多重起動を防ぐ
-  # @param [Boolean] PidFileを使用するかどうか
-  # @param [Boolean] デバッグ出力を行うかどうか
-  def self.detect_multiple_running(module_type, logger, pid_debug, debug=false)
-    unless pid_debug
-      if PidFile.running? # PidFileが存在する場合はプロセスを終了する
-        logger.info 'Another process is already runnnig. Exit.'
-        exit
-      end
-
-      # PidFileが存在しない場合、新たにPidFileを作成し、
-      # 新たにプロセスが生成されるのを防ぐ
-      pid_hash = {
-        pidfile: "#{module_type}.pid",
-        piddir: "#{Rails.root}/tmp/pids"
-      }
-      p = PidFile.new(pid_hash)
-
-      # デフォルトでは/tmp以下にPidFileが作成される
-      logger.debug 'PidFile DEBUG:'
-      logger.debug p.pidfile
-      logger.debug p.piddir
-      logger.debug p.pid
-      logger.debug p.pidpath
-    end
-  end
-
-
-  # Imageレコードを新たに生成してDBに保存する
-  # @param [Hash] Imageレコードに与える属性のHash
-  # @param [Array] 関連するタグ(String)の配列
-  # @param [Boolean] validationを行うかどうか
-  # @param [Boolean] 大きいサイズの画像かどうか
-  # @param [Boolean] ログ出力を行うかどうか
-  # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
-  def self.save_image(attributes, logger, tags=[],
-    validation=true, large=false, verbose=false, resque=true)
-
-    # 予め（ダウンロードする前に）重複を確認
-    if validation and self.is_duplicate(attributes[:src_url])
-      logger.info 'Skipping a duplicate image...' if verbose
-      return
-    end
-
-    # Remove 4 bytes chars
-    #attributes[:title] = attributes[:title]
-    attributes[:caption] = self.remove_4bytes(attributes[:caption])
-
-    # 新規レコードを作成
-    image = Image.new attributes
-    tags.each { |tag| image.tags << tag }
-
-    # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
-    if image.save(validate: validation)
-      # 特徴抽出処理をresqueで非同期的に行う
-      self.generate_jobs(image.id, attributes[:src_url], large) if resque
-    else
-      logger.info 'Image model saving failed. (maybe due to duplication)'
-      return
-    end
-
-    image.id
-  end
 
   # タグを取得する。DBに既にある場合はそのレコードを返す
   # @param [String]
@@ -206,30 +68,21 @@ module Scrape
     t.empty? ? Tag.new(name: tag) : t.first
   end
 
+  # Tagインスタンスの配列を作成する
+  # @param [Array] タグを表す文字列の配列
+  # @return [Array] Tagオブジェクトの配列
+  def self.get_tags(tags)
+    tags.map do |tag|
+      t = Tag.where(name: tag)
+      t.empty? ? Tag.new(name: tag) : t.first
+    end
+  end
+
   def self.remove_4bytes(string)
     return nil if string.nil?
     string.each_char.select{|c| c.bytes.count < 4 }.join('')
   end
 
-  # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
-  # Resqueのjobとして行う（非同期的に）
-  def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil)
-    image = Image.find(image_id)
-    if target_type and target_id
-      if large
-        Resque.enqueue(DownloadImageLarge, user_id, image.class.name, image_id, src_url,
-          target_type, target_id)
-      else
-        Resque.enqueue(DownloadImage, user_id, image.class.name, image_id, src_url,
-          target_type, target_id)
-      end
-    else
-      if large
-        Resque.enqueue(DownloadImageLarge, user_id, image.class.name, image_id, src_url)
-      else
-        Resque.enqueue(DownloadImage, user_id, image.class.name, image_id, src_url)
-      end
-    end
-  end
+
 
 end

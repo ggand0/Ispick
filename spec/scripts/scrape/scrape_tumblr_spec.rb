@@ -8,7 +8,9 @@ describe Scrape::Tumblr do
   before do
     IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
-    @client = Scrape::Tumblr.get_client()
+    #@client = Scrape::Tumblr.get_client()
+    @client = Scrape::Tumblr.new
+    #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
     @response = JSON.parse(response)['response']
   end
 
