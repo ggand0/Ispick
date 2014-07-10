@@ -100,6 +100,7 @@ group :development, :test do
   gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
   #gem 'pry-rails'                                   # Improve the console
   #gem 'pry-nav'
+  gem 'diffy'
 
   gem 'spring'
   gem 'spring-commands-rspec'
