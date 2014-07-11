@@ -28,8 +28,8 @@
       <tr>
         <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { word: person.name_display }}, method: :post %></td>
         <td><%= person.name_english %></td>
-        <td><%= link_to person.titles.first.name, { action: 'create', target_word: { word: person.name_display }}, method: :post unless person.titles.empty? %></td>
-        <td><%= link_to person.titles.first.name_english, { action: 'create', target_word: { word: person.name_display }}, method: :post  unless person.titles.empty? %></td>
+        <td><%= link_to person.titles.first.name, { action: 'create', target_word: { word: person.titles.first.name }}, method: :post unless person.titles.empty? %></td>
+        <td><%= link_to person.titles.first.name_english, { action: 'create', target_word: { word: person.titles.first.name_english }}, method: :post  unless person.titles.empty? %></td>
       </tr>
     <% end %>
   </tbody>
