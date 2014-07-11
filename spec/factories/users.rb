@@ -9,7 +9,8 @@ FactoryGirl.define do
     # デフォルトでユーザーが持つFavoredImage
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
-      user.class.skip_callback(:add, :after, :search_keyword)
+      #user.class.skip_callback(:add, :after, :search_keyword)
+      #user.target_words.skip_callback(:add, :after, :search_keyword)
     end
   end
 
@@ -27,7 +28,7 @@ FactoryGirl.define do
     provider  'twitter'
     uid '12345678'
     sequence(:name) { |n| "ispick_twitter#{n}" }
-    after(:create) { |user| user.class.skip_callback(:add, :after, :search_keyword) }
+    #after(:create) { |user| user.target_words.skip_callback(:add, :after, :search_keyword) }
 
     factory :user_with_delivered_images do
       sequence(:name) { |n| "ispick_twitter_d#{n}" }
@@ -86,7 +87,7 @@ FactoryGirl.define do
     provider  'facebook'
     uid '12345678'
     sequence(:name) { |n| "ispick_facebook#{n}" }
-    after(:create) { |user| user.class.skip_callback(:add, :after, :search_keyword) }
+    #after(:create) { |user| user.class.skip_callback(:add, :after, :search_keyword) }
   end
 
 end
