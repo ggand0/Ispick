@@ -1,10 +1,14 @@
 class User < ActiveRecord::Base
+  cattr_accessor :skip_callbacks
+
   has_many :delivered_images, dependent: :destroy
   has_many :target_images, dependent: :destroy
   has_many :image_boards, dependent: :destroy
 
+  # 登録タグをhas_manyしている
+  # タグが追加されたらcallbackを呼んで抽出・配信処理を行う
   has_many :target_words_users
-  has_many :target_words, :through => :target_words_users, :after_add => :search_keyword
+  has_many :target_words, :through => :target_words_users
 
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable

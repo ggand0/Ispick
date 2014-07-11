@@ -9,11 +9,6 @@ class TargetWord < ActiveRecord::Base
   has_one :person
   has_many :delivered_images, as: :targetable
 
-  #after_create :search_keyword
   validates_uniqueness_of :word
-
-  # 少量の画像を抽出・配信する
-  #def search_keyword(obj)
-  #  Resque.enqueue(SearchImages, obj.id)
-  #end
+  #validates :word, uniqueness: { scope: :user_id }
 end
