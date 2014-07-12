@@ -16,7 +16,9 @@ module Ispic
 
     # for bootsrap-sass
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
-    config.assets.paths << "#{Rails}/vendor/assets/fonts"
+    #config.assets.paths << "#{Rails}/vendor/assets/fonts"
+
+    #config.encoding = "utf-8"
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/client"
 
 describe Scrape::Client do
   before do
-    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Client.new
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)

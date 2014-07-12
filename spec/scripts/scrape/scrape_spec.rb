@@ -5,7 +5,7 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:logger) { Logger.new('log/scrape_cron.log') }
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 

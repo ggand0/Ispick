@@ -152,6 +152,8 @@ module Scrape::Wiki
   # キャラクタ情報をparseしてPeopleテーブルへ保存する
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
+    puts "Saving character names to database..."
+
     input_hash.each do |anime, value|
       next if value.nil? or value[:characters].nil?
       puts "anime=#{anime}"
