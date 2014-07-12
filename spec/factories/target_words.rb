@@ -30,9 +30,11 @@ FactoryGirl.define do
     end
 
   end
+
   factory :target_word_title, class: TargetWord do
     word '魔法少女まどか☆マギカ'
   end
+
   factory :target_words, class: TargetWord do
     sequence(:word) { |n| "鹿目 まどか#{n}" }
   end

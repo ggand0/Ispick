@@ -8,7 +8,7 @@ describe Scrape::Giphy do
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
 
   before do
-    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     #@response = JSON.parse(response)['response']
 

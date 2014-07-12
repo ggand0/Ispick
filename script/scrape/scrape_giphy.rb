@@ -9,7 +9,7 @@ module Scrape
       self.limit = limit
 
       if logger.nil?
-        self.logger = Logger.new('log/scrape_tumblr_cron.log')
+        self.logger = Logger.new('log/scrape_giphy_cron.log')
       else
         self.logger = logger
       end

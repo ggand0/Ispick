@@ -7,7 +7,7 @@ describe Scrape::Nico do
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
 
   before do
-    #IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
     @agent = Scrape::Nico.get_client      # Mechanize agentの作成
     @client = Scrape::Nico.new(nil, 10)

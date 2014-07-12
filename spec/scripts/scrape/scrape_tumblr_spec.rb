@@ -6,7 +6,7 @@ describe Scrape::Tumblr do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
   before do
-    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     #@client = Scrape::Tumblr.get_client()
     @client = Scrape::Tumblr.new(nil, 5)

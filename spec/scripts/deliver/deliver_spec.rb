@@ -8,7 +8,7 @@ include ApplicationHelper
 describe "Deliver" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
+    Resque.stub(:enqueue).and_return nil    # resqueのjobを実際に実行しないように
     @logger = Logger.new('log/deliver.log')
   end
 
@@ -21,9 +21,10 @@ describe "Deliver" do
       Deliver.deliver(user.id)
     end
   end
+
   describe "deliver_keyword function" do
     it "calls proper functions" do
-      user = FactoryGirl.create(:user_with_target_words)
+      user = FactoryGirl.create(:user_with_target_words, words_count: 5)
       target_word = user.target_words.first
       Deliver::Words.stub(:deliver_from_word).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(1).times
@@ -31,6 +32,7 @@ describe "Deliver" do
       Deliver.deliver_keyword(user.id, target_word.id, @logger)
     end
   end
+
   describe "deliver_from_word function" do
     it "deliver properly" do
       FactoryGirl.create(:image)
@@ -72,17 +74,6 @@ describe "Deliver" do
       image = FactoryGirl.create(:image)
       delivered_image = Deliver.create_delivered_image(image)
       expect(delivered_image.image).to eql(image)
-    end
-  end
-
-  describe "limit_images function" do
-    it "limits images when its count excess max num" do
-      stub_const('Deliver::MAX_DELIVER_NUM', 1)
-      images = FactoryGirl.create_list(:image_min, 3)
-      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
-
-      images = Deliver.limit_images(user, images)
-      expect(images.count).to eq(1)
     end
   end
 
@@ -158,7 +149,7 @@ describe "Deliver" do
 
       Object.const_get(delivered_image.image.module_name).should_receive(:get_stats).exactly(1).times
 
-      Deliver.update()
+      Deliver.update
     end
     it "ignore delivered_image which is delivered in the other days" do
       user = FactoryGirl.create(:twitter_user)

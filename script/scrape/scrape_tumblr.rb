@@ -6,14 +6,10 @@ require 'securerandom'
 
 module Scrape
   class Tumblr < Client
-  #class TumblrClient < Client
     require 'tumblr_client'
-    #include Tumblr
 
-    #attr_accessor :user_id
     ROOT_URL = 'https://tumblr.com'
 
-    # user_id=nil：定時抽出（＝後でまとめて配信）、user_id != nil、すぐに配信
     def initialize(logger=nil, limit=20)
       self.limit = limit
 
@@ -29,8 +25,6 @@ module Scrape
     # 取得するPostの上限数。APIの仕様で20postsまでに制限されている
     # Scrape images from tumblr. The latter two params are used for testing.
     # @param [Integer] min
-    # @param [Boolean] whether it's called for debug or not
-    # @param [Boolean] whether it's called for debug or not
     def scrape(interval=60)
       scrape_target_words('Scrape::Tumblr', interval)
     end
@@ -41,6 +35,7 @@ module Scrape
     # @param target_word [TargetWord]
     # @param english [Boolean]
     def scrape_target_word(user_id, target_word, english=false)
+      @limit = 10
       @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
       result = scrape_using_api(target_word, user_id, english)

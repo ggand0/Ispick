@@ -27,7 +27,7 @@ module Scrape::Pixiv
       src_url: img_url
     }
     logger = Logger.new('log/scrape_pixiv_cron.log')
-    Scrape::save_image(image_data, logger)
+    Scrape::Client.save_image(image_data, logger)
   end
 
   # 返ってきた文字列から割と強引に抽出する

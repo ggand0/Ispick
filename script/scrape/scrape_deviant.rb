@@ -58,7 +58,7 @@ module Scrape::Deviant
     tags = tags.map { |tag| Tag.new(name: tag) }
 
     # Imageモデル生成＆DB保存
-    Scrape::save_image(image_data, tags)
+    Scrape::Client.save_image(image_data, tags)
   end
 
   def self.scrape()

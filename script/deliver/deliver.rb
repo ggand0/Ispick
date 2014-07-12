@@ -84,7 +84,7 @@ module Deliver
           target.delivered_images << d
           target.delivered_images.uniq!
           delivered = true
-          puts "[DEBUG] matched but already delivered: #{image.src_url}"
+          #puts "[DEBUG] matched but already delivered: #{image.src_url}"
           break
         end
       end
@@ -96,8 +96,6 @@ module Deliver
       # DB保存後にuser.delivered_imagesに追加して配信する
       if image.delivered_images << delivered_image
         target.delivered_images << delivered_image
-        #user.delivered_images << delivered_image
-        #user.save
         tmp_images << delivered_image
       end
 
@@ -111,27 +109,6 @@ module Deliver
       user.save
     end
   end
-
-  # [OLD]配信画像数を指定枚数に制限する、DL済み前提
-  # @param [User] 配信対象のUserオブジェクト
-  # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
-  # @return [ActiveRecord_Relation_Image] 制限後のrelation
-  def self.limit_images(user, images)
-    # 最大配信数に絞る（推薦度の高い順に残す）
-    if images.count > MAX_DELIVER_NUM
-      puts 'Removing excessed images...'
-      images = images.take MAX_DELIVER_NUM
-    end
-
-    # posted_atでソートする
-    # Homeではcreated_at順にソートするが、
-    # １回配信分の中ではposted_at順になる
-    #images.sort_by! { |image| image.posted_at }
-
-    puts "Limited: #{images.count.to_s} images"
-    images
-  end
-
 
   # max_size以下になるまでdelivered_imagesのレコードを古い順に消す
   # @param [ActiveRecord::Relation] DeliveredImageを想定
@@ -159,7 +136,8 @@ module Deliver
   end
 
 
-  # 全userの配信画像の、元サイトでの統計情報を更新する
+
+  # [OLD]全userの配信画像の、元サイトでの統計情報を更新する
   def self.update
     today = Time.now.in_time_zone('Asia/Tokyo').to_date
 

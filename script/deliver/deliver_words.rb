@@ -7,7 +7,7 @@ module Deliver::Words
 
     #images = self.get_images(query)
     images = self.get_images(target_word, logger)
-    logger.info "Processing: #{images.count} images"
+    logger.info "Matched: #{images.count} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
     # get_imagesの段階で絞られているので無意味
@@ -16,9 +16,8 @@ module Deliver::Words
     #end
     images.uniq!
     images.compact!
-    logger.info "Matched: #{images.count} images"
+    #logger.info "Matched: #{images.count} images"
 
-    #images = Deliver.limit_images(user, images)                      # 配信画像を制限する
     Deliver.deliver_images(user, images, target_word)                # User.delivered_imagesへ追加する
     target_word.last_delivered_at = DateTime.now                     # 最終配信日時を記録
   end
@@ -44,8 +43,8 @@ module Deliver::Words
       logger.debug "#{title.name}"
       images = Image.includes(:tags).
         where.not(is_illust: nil).
-        where(module_name: 'Scrape::Matome').
-        where('tags.name=? OR tags.name=?', query, title.name).
+        #where(module_name: 'Scrape::Matome').
+        where('tags.name=? OR (tags.name=? AND module_name=?)', query, title.name, 'Scrape::Matome').
         references(:tags)
     end
   end
