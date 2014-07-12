@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140602154729) do
+ActiveRecord::Schema.define(version: 20140709043052) do
 
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.datetime "updated_at"
   end
 
-  create_table "images_tags", id: false, force: true do |t|
+  create_table "images_tags", force: true do |t|
     t.integer "image_id", null: false
     t.integer "tag_id",   null: false
   end
@@ -83,7 +83,6 @@ ActiveRecord::Schema.define(version: 20140602154729) do
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
     t.text     "word"
-    t.integer  "person_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -98,7 +97,12 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.datetime "updated_at"
   end
 
-  create_table "people_titles", id: false, force: true do |t|
+  create_table "people_keywords", force: true do |t|
+    t.integer "keyword_id", null: false
+    t.integer "person_id",  null: false
+  end
+
+  create_table "people_titles", force: true do |t|
     t.integer "title_id",  null: false
     t.integer "person_id", null: false
   end
@@ -124,15 +128,21 @@ ActiveRecord::Schema.define(version: 20140602154729) do
 
   create_table "target_words", force: true do |t|
     t.string   "word"
-    t.integer  "user_id"
     t.datetime "last_delivered_at"
-    t.boolean  "enabled"
+    t.datetime "newest_scraped_at"
+    t.datetime "oldest_scraped_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  create_table "target_words_users", force: true do |t|
+    t.integer "target_word_id", null: false
+    t.integer "user_id",        null: false
+  end
+
   create_table "titles", force: true do |t|
     t.text     "name"
+    t.text     "name_english"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

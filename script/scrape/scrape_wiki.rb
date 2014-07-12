@@ -12,18 +12,22 @@ module Scrape::Wiki
   # 日本版Wikipedia URL
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
 
-  # TEST!!!
   def self.scrape
     puts 'Extracting : ' + ROOT_URL
 
     # 起点となるWikipediaカテゴリページのURL
     # アニメタイトル一覧ページの配列：
     url = [
+=begin
+      'http://ja.wikipedia.org/wiki/Category:2007%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      'http://ja.wikipedia.org/wiki/Category:2008%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       'http://ja.wikipedia.org/wiki/Category:2010%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
       'http://ja.wikipedia.org/wiki/Category:2012%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
+=end
+      'http://ja.wikipedia.org/wiki/Category:2014%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
     ]
 
     # 各URLについて情報を取得
@@ -148,10 +152,15 @@ module Scrape::Wiki
   # キャラクタ情報をparseしてPeopleテーブルへ保存する
   # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
-    input_hash.each do |anime, characters|
-      next if characters.nil?
+    puts "Saving character names to database..."
 
-      characters.each do |name_hash|
+    input_hash.each do |anime, value|
+      next if value.nil? or value[:characters].nil?
+      puts "anime=#{anime}"
+      puts "value=#{value}"
+
+      title_en = value[:title_en]
+      value[:characters].each do |name_hash|
         # {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
         person = Person.create(
           name: name_hash[:query],
@@ -161,14 +170,16 @@ module Scrape::Wiki
         )
 
         # 関連キーワードとしてアニメタイトルを追加
-        person.keywords.create(word: anime, is_alias: false)
+        keyword = self.get_keyword(anime, false)
+        person.keywords << keyword
 
         # Titleレコード追加
-        title = Title.create(name: anime)
-        title.people << person
+        title = self.get_title(anime, title_en)
+        person.titles << title
 
         # よみがなをaliasとして追加
-        person.keywords.create(word: name_hash[:_alias], is_alias: true)
+        keyword = self.get_keyword(name_hash[:_alias], true)
+        person.keywords << keyword
 
         # keywords保存の例
         #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される
@@ -182,10 +193,27 @@ module Scrape::Wiki
         #end
         # =>パフォーマンスに問題あり？ => C++/C#
 
-        person.save!
+        person.save
       end
     end
   end
 
+  # 既存のKeywordレコードを調べて、既存のものか新規作成してインスタンスを返す
+  # @param [String]
+  # @param [Boolean]
+  # @return [Keyword]
+  def self.get_keyword(word, is_alias)
+    keyword = Keyword.where(word: word)
+    keyword.empty? ? Keyword.new(word: word, is_alias: is_alias) : keyword.first
+  end
+
+  # 既存のTitleレコードを調べて、既存のものか新規作成してインスタンスを返す
+  # @param [String]
+  # @param [Boolean]
+  # @return [Title]
+  def self.get_title(name, name_en)
+    title = Title.where(name: name)
+    title.empty? ? Title.new(name: name, name_english: name_en) : title.first
+  end
 
 end

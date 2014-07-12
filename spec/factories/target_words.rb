@@ -3,7 +3,6 @@
 FactoryGirl.define do
   factory :target_word do
     sequence(:word) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
-    enabled true
 
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     factory :word_with_run_callback do
@@ -31,18 +30,12 @@ FactoryGirl.define do
     end
 
   end
+
+  factory :target_word_title, class: TargetWord do
+    word '魔法少女まどか☆マギカ'
+  end
+
   factory :target_words, class: TargetWord do
     sequence(:word) { |n| "鹿目 まどか#{n}" }
-    enabled true
-  end
-
-  factory :target_word_with_user, class: TargetWord do
-    word '鹿目まどか'
-    sequence(:user_id) { |n| n }
-  end
-
-  factory :target_word_not_enabled, class: TargetWord do
-    word '美樹 さやか（みき さやか）'
-    enabled false
   end
 end

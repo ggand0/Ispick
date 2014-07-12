@@ -1,6 +1,9 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
-  has_and_belongs_to_many :tags
+
+  has_many :images_tags
+  has_many :tags, :through => :images_tags
+
   has_many :delivered_images, dependent: :destroy
 
   # 明示的にテーブル名を指定することでエラー回避
@@ -12,22 +15,29 @@ class Image < ActiveRecord::Base
     default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
 
+  # レコード削除時に画像ファイルも消す
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
-  #validates_uniqueness_of :md5_checksum
 
+  # @return [String] デフォルトでattachmentに設定される画像のpath
   def set_default_url
     ActionController::Base.helpers.asset_path('default_image_thumb.png')
   end
 
+  # Destroys paperclip attachment
   def destroy_attachment
     self.data.destroy
   end
 
+  # Generate MD5 checksum value from the file
+  # @param file [File] MD5を得たいファイルオブジェクト
+  # @return [String] MD5 checksum value
   def generate_md5_checksum(file)
     self.md5_checksum = Digest::MD5.hexdigest(file.read)
   end
 
+  # Downloads image data from url and stores it as a paperclip attachment
+  # @param url [String] 画像のソースURL
 	def image_from_url(url)
     extension = url.match(/.(jpg|jpeg|pjpeg|png|x-png|gif)$/).to_s
     file = Tempfile.new(['image', extension])

@@ -9,10 +9,10 @@ class DetectIllust
   end
 
   # イラストかどうか判定する
-  def self.perform(image_type, image_id)
+  def self.perform(image_id)
     begin
       # ツール実行
-      image = Object::const_get(image_type).find(image_id)
+      image = Image.find(image_id)
       tool_path = CONFIG['illust_detection_path']
 
       # 結果をtrue/falseにparse
@@ -28,6 +28,6 @@ class DetectIllust
       logger.error('Illust detection failed!')
     end
 
-    logger.info "Tool result: #{illust},#{quality} with #{image_type}/#{image_id}"
+    logger.info "Tool result: #{illust},#{quality} with Image.id=#{image_id}"
   end
 end

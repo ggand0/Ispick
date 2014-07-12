@@ -2,43 +2,51 @@ module Deliver::Words
   # 登録タグから配信する
   # @param [User] 配信するUserレコードのインスタンス
   # @param [TargetWord] 保存済みのTargetWordレコード
-  def self.deliver_from_word(user, target_word, is_periodic)
-    query = target_word.person ? target_word.person.name : target_word.word
-    puts "Starting: target_word=#{query}"
+  def self.deliver_from_word(user, target_word, logger)
+    logger.info "Starting: target_word=#{target_word.inspect}"
 
-    images = self.get_images(is_periodic, query)
-    puts "Processing: #{images.count} images"
+    #images = self.get_images(query)
+    images = self.get_images(target_word, logger)
+    logger.info "Matched: #{images.count} images"
 
     # 何らかの文字情報がtarget_word.wordと部分一致するimageがあれば残す
-    images = images.map do |image|
-      self.contains_word(image, target_word) ? image : nil
-    end
+    # get_imagesの段階で絞られているので無意味
+    #images = images.map do |image|
+    #  self.contains_word(image, target_word) ? image : nil
+    #end
+    images.uniq!
     images.compact!
-    puts "Matched: #{images.count} images"
+    #logger.info "Matched: #{images.count} images"
 
-    images = Deliver.limit_images(user, images)                      # 配信画像を制限する
-    Deliver.deliver_images(user, images, target_word, is_periodic)   # User.delivered_imagesへ追加する
-    target_word.last_delivered_at = DateTime.now                  # 最終配信日時を記録
+    Deliver.deliver_images(user, images, target_word)                # User.delivered_imagesへ追加する
+    target_word.last_delivered_at = DateTime.now                     # 最終配信日時を記録
   end
 
 
   # 文字情報が存在するImageレコードを検索して返す
-  # @param [Boolean] 定時配信で呼ばれたのかどうか
   # @return [ActiveRecord_Relation_Image]
-  def self.get_images(is_periodic, tag)
-    if is_periodic
-      # 定時配信の場合は、イラスト判定が終了している[is_illustがnilではない]もののみ配信
+  def self.get_images(target_word, logger)
+    query = Scrape.get_query target_word
+    titles = Scrape.get_titles(target_word)
+    title = titles.first if (not titles.nil?) and (not titles.empty?)
+
+
+    # イラスト判定が終了している[is_illustがnilではない]もののみ配信
+    # イラスト判定が終了している=既にダウンロードされている
+    # とりあえずは、タイトルタグの画像も一緒に拾ってくる仕様で
+    if title.nil? or title.name.nil? or title.name.empty?
       images = Image.includes(:tags).
-        where.not(is_illust: nil, src_url: nil).where(tags: { name: tag }).
+        where.not(is_illust: nil).where(tags: { name: query }).
         references(:tags)
     else
-      # 即座に配信するときは、イラスト判定を後で行う事が確定しているのでnilのレコードも許容する：
-      # が、既存のDL失敗画像で落ちる可能性が高いので要修正
+      # まとめサイト由来の画像のみ広くマッチさせる
+      logger.debug "#{title.name}"
       images = Image.includes(:tags).
-        where(tags: { name: tag }).
+        where.not(is_illust: nil).
+        #where(module_name: 'Scrape::Matome').
+        where('tags.name=? OR (tags.name=? AND module_name=? AND  data_content_type=?)', query, title.name, 'Scrape::Matome', 'image/gif').
         references(:tags)
     end
-    images
   end
 
   # 特定のImageオブジェクトがtarget_wordにマッチするか判定する
@@ -46,19 +54,40 @@ module Deliver::Words
   # @param [TargetWord] 比較したいTargetWordオブジェクト
   # @return [Boolean] TargetWordに近いかどうか
   def self.contains_word(image, target_word)
-    word = target_word.person ? target_word.person.name : target_word.word
-    word_en = target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+    word_ja = self.get_query_ja(target_word)
+    word_en = self.get_query_en(target_word)
+    keywords = self.get_query_keywords(target_word)
+
+    # タグ自身が何らかの文字情報に一致したらmatched
+    return true if self.match_word(image, word_ja) or self.match_word(image, word_en)
+    # 関連語がヒットしたらmatched
+    keywords.each do |word|
+      return true if self.match_word(image, word)
+    end
+    false
+  end
+
+  def self.get_query_ja(target_word)
+    target_word.person ? target_word.person.name : target_word.word
+  end
+  def self.get_query_en(target_word)
+    target_word.person.name_english if target_word.person and not target_word.person.name_english.empty?
+  end
+  def self.get_query_keywords(target_word)
+    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.word } : []
+  end
+
+  def self.match_word(image, word)
+    return false if word.nil? or word.empty?
 
     # まず、タグがマッチするかどうかチェック
     image.tags.each do |tag|
       return true if tag.name.include?(word)
-      return true if word_en and tag.name.include?(word_en)
     end
 
-    # タグが含まれていない場合で、title / captionに単語が含まれていればtrue
-    return true if image.title and image.title.include?(word) or image.caption and image.caption.include?(word)
-    return false if word_en.nil?
-    return true if ( !image.title.nil? and image.title.include?(word_en) ) or ( !image.caption.nil? and image.caption.include?(word_en))
+    # タグが含まれていない場合で、title/captionに単語が含まれていればtrue
+    return true if (image.title and image.title.include?(word)) or
+      (image.caption and image.caption.include?(word))
     false
   end
 end

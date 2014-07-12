@@ -5,6 +5,8 @@ include ActionDispatch::TestProcess
 describe TargetImagesService do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
+# 2014/07/06現在AnimeFaceは凍結中
+=begin
   describe "get_face_feature method" do
     it "returns face feature array of a image" do
       target_image = TargetImage.create! valid_attributes
@@ -25,6 +27,7 @@ describe TargetImagesService do
       list.should be_an(Hash)
     end
   end
+=end
 
   describe "get_preferred_images" do
     # 正しい型の値を返すこと
@@ -76,7 +79,7 @@ describe TargetImagesService do
         result[:images].length.should eq(1)
       end
     end
-
+=begin
     describe "with multiple faces" do
       # 全ての顔に対して似た特徴量を持つイラストを推薦すること
       it "returns precise preferred images to ALL target_images" do
@@ -91,6 +94,7 @@ describe TargetImagesService do
         result[:images].length.should eq(2)
       end
     end
+=end
 
     describe "with already delivered target_image" do
       it "should ignore old images before last_delivered_at datetime" do

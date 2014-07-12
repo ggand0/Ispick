@@ -28,6 +28,7 @@ Ispic::Application.routes.draw do
       get 'show_target_images'
       get 'show_target_words'
       get 'show_favored_images'
+      delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
@@ -63,7 +64,6 @@ Ispic::Application.routes.draw do
     member do
       get 'prefer'
       get 'show_delivered'
-      get 'switch'
     end
   end
 

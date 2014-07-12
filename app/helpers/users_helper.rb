@@ -29,9 +29,7 @@ module UsersHelper
     end
     total_size
   end
-  def get_enabled_html(enabled)
-    '<strong>' + (enabled ? 'on' : 'off') + '</strong>'
-  end
+
   def get_illust_html(image)
     return 'Illust: nil' if image.nil?
     "Illust: <span><strong>#{image.is_illust.to_s}</strong></span>".html_safe

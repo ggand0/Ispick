@@ -24,12 +24,22 @@ class TargetWordsController < ApplicationController
   # POST /target_words
   # POST /target_words.json
   def create
-    @target_word = current_user.target_words.build(target_word_params)
-    @target_word.person = Person.find(params[:id]) if params[:id]
-    @target_word.enabled = true
+    @target_word = get_target_word(target_word_params)
 
+    unless current_user.target_words.where(word: @target_word.word).empty?
+      @target_word.errors.add(:base, "That target_word is already registered!!")
+      return render action: 'new'
+    end
+
+    #current_user.target_words << @target_word
     respond_to do |format|
-      if @target_word.save
+      if @target_word.id
+
+        current_user.target_words << @target_word
+        #ds
+        format.html { redirect_to controller: 'users', action: 'show_target_words' }
+      elsif @target_word.id.nil? and @target_word.save
+      #if @target_word.save
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
       else
@@ -37,6 +47,16 @@ class TargetWordsController < ApplicationController
         format.json { render json: @target_word.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def get_target_word(target_word_params)
+    word = target_word_params['word']
+    target_word = TargetWord.where(word: word)
+    #target_word = target_word.empty? ? TargetWord.new(word: word) : target_word.first
+    target_word = target_word.empty? ? current_user.target_words.build(target_word_params) : target_word.first
+
+    target_word.person = Person.find(params[:id]) if params[:id]
+    target_word
   end
 
   # PATCH/PUT /target_words/1
@@ -91,12 +111,6 @@ class TargetWordsController < ApplicationController
     else
       render action: 'not_signed_in'
     end
-  end
-
-  def switch
-    enabled = @target_word.enabled ? false : true
-    @target_word.update_attributes(enabled: enabled)
-    redirect_to :back
   end
 
 

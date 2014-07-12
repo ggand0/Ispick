@@ -1,3 +1,5 @@
 class Keyword < ActiveRecord::Base
-  belongs_to :person
+  has_many :people_keywords
+  has_many :people, :through => :people_keywords
+  validates_uniqueness_of :word
 end

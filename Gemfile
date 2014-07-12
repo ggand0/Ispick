@@ -56,8 +56,9 @@ end
 gem 'puma'
 
 # Console
-gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
-gem 'pry-rails'                                  # Improve the console
+gem 'rb-readline', require: false
+#gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
+
 
 # OAuth
 gem 'devise'
@@ -97,6 +98,9 @@ group :development, :test do
   gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
   gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
+  #gem 'pry-rails'                                   # Improve the console
+  #gem 'pry-nav'
+  gem 'diffy'
 
   gem 'spring'
   gem 'spring-commands-rspec'

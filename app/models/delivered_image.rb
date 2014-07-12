@@ -1,7 +1,6 @@
 class DeliveredImage < ActiveRecord::Base
   belongs_to :user
   belongs_to :image
-  #belongs_to :favored_image
   belongs_to :targetable, polymorphic: true
   has_many :favored_images
   has_one :feature, as: :featurable
@@ -15,13 +14,4 @@ class DeliveredImage < ActiveRecord::Base
       thumb: "300x300#"
     },
     use_timestamp: false
-
-
-  # URLから画像をDLして、attachmentに設定する
-  # 後でmodule化する
-  # @param [String] 画像のソースURL
-  def image_from_url(url)
-    require 'open-uri'
-    self.data = open(url)
-  end
 end

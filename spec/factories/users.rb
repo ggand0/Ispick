@@ -9,7 +9,17 @@ FactoryGirl.define do
     # デフォルトでユーザーが持つFavoredImage
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
+      #user.class.skip_callback(:add, :after, :search_keyword)
+      #user.target_words.skip_callback(:add, :after, :search_keyword)
     end
+  end
+
+  factory :user_with_callbacks, class: User do
+    sequence(:email) { |n| "test#{n}@example.com" }
+    password '12345678'
+    provider  'twitter'
+    uid '12345678'
+    sequence(:name) { |n| "ispick_twitter#{n}" }
   end
 
   factory :twitter_user, class: User do
@@ -18,6 +28,7 @@ FactoryGirl.define do
     provider  'twitter'
     uid '12345678'
     sequence(:name) { |n| "ispick_twitter#{n}" }
+    #after(:create) { |user| user.target_words.skip_callback(:add, :after, :search_keyword) }
 
     factory :user_with_delivered_images do
       sequence(:name) { |n| "ispick_twitter_d#{n}" }
@@ -56,7 +67,12 @@ FactoryGirl.define do
         words_count 5
       end
       after(:create) do |user, evaluator|
-        create_list(:target_words, evaluator.words_count, user: user)
+        #evaluator.words_count do
+        5.times do
+          user.target_words << create(:target_words)
+        end
+        #create_list(:target_words, evaluator.words_count, user: user)
+        #create_list(:target_words_user, evaluator.words_count, target_word: create(:target_words), user: user)
       end
     end
 
@@ -67,12 +83,14 @@ FactoryGirl.define do
     end
 
   end
+
   factory :facebook_user, class: User do
     email 'test@example.com'
     password '12345678'
     provider  'facebook'
     uid '12345678'
     sequence(:name) { |n| "ispick_facebook#{n}" }
+    #after(:create) { |user| user.class.skip_callback(:add, :after, :search_keyword) }
   end
 
 end

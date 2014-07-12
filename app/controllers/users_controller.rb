@@ -71,6 +71,14 @@ class UsersController < ApplicationController
     end
   end
 
+  # 関連のみ削除する
+  def delete_target_word
+    current_user.target_words.delete(TargetWord.find(params[:id]))
+
+    @words = current_user.target_words
+    render action: 'show_target_words'
+  end
+
   def show_favored_images
     board_id = params[:board]
 
