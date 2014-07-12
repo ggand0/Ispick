@@ -6,13 +6,14 @@ module Scrape
   class Client
     include Scrape
     attr_accessor :logger, :limit, :pid_debug, :sleep_debug
+    ROOT_URL = ''
 
     # Initializes a new Client object
     #
     # @param limit [Integer]
     # @param logger [Logger]
     # @return [Scrape::Client]
-    def initialize(limit, logger=nil)
+    def initialize(logger=nil, limit=1)
       self.limit = limit
       # Generate an instance of a default logger
       if logger.nil?
@@ -73,6 +74,10 @@ module Scrape
         sleep(local_interval*60) unless @sleep_debug
       end
       @logger.info '--------------------------------------------------'
+    end
+
+    def scrape_using_api(target_word)
+      { scraped: 0, duplicates: 0, avg_time: 0 }
     end
 
 
@@ -142,7 +147,7 @@ module Scrape
     # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
     # Resqueのjobとして行う（非同期的に）
     def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil)
-      image = Image.find(image_id)
+      #image = Image.find(image_id)
       if target_type and target_id
         if large
           Resque.enqueue(DownloadImageLarge, image_id, src_url,
