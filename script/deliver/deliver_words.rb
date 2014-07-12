@@ -44,7 +44,7 @@ module Deliver::Words
       images = Image.includes(:tags).
         where.not(is_illust: nil).
         #where(module_name: 'Scrape::Matome').
-        where('tags.name=? OR (tags.name=? AND module_name=?)', query, title.name, 'Scrape::Matome').
+        where('tags.name=? OR (tags.name=? AND module_name=? AND  data_content_type=?)', query, title.name, 'Scrape::Matome', 'image/gif').
         references(:tags)
     end
   end
