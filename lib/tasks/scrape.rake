@@ -148,4 +148,10 @@ namespace :scrape do
   task matome: :environment do
     Scrape::Matome.scrape
   end
+  
+    desc "tinamiから画像抽出する"
+  task tinami: :environment do
+    require "#{Rails.root}/script/scrape/scrape_tinami.rb"
+    Scrape::Tinami.scrape(15, false)
+  end
 end
