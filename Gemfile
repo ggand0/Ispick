@@ -87,6 +87,7 @@ gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
 gem 'giphy'
+gem 'tinami'
 
 group :test do
   gem 'webmock'                                     # developmentからは外す必要有り
