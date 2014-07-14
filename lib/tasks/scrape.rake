@@ -81,6 +81,7 @@ namespace :scrape do
   require "#{Rails.root}/script/scrape/scrape_giphy.rb"
   require "#{Rails.root}/script/scrape/scrape_matome.rb"
   require "#{Rails.root}/script/scrape/scrape_wiki.rb"
+  require "#{Rails.root}/script/scrape/scrape_tinami.rb"
 
   desc "キャラクタに関する静的なDBを構築する"
     task wiki: :environment do
@@ -149,9 +150,12 @@ namespace :scrape do
     Scrape::Matome.scrape
   end
   
-    desc "tinamiから画像抽出する"
-  task tinami: :environment do
-    require "#{Rails.root}/script/scrape/scrape_tinami.rb"
-    Scrape::Tinami.scrape(15, false)
+  desc "TINAMIから画像抽出する"
+  task :tinami, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+
+    #Scrape::Tumblr.scrape(interval.to_i, false)
+    #Scrape::TumblrClient.new.scrape(interval.to_i)
+    Scrape::Tinami.new.scrape(interval.to_i)
   end
 end
