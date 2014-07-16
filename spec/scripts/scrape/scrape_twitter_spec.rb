@@ -79,9 +79,14 @@ describe Scrape::Twitter do
       result_hash = @client.get_contents(target_word)
       expect(result_hash).to be_a(Hash)
     end
+
     it "call save_image function with right arguments" do
       # TODO: 画像tweetを含むTwitter API responseをTwitter::SearchResultsオブジェクトにパースし、
       # Scrape.save_imageが画像ツイート数と同じ回数呼ばれている事をassertする
+    end
+
+    it "does something" do
+      # get_contentsをuser_id付きで呼ぶ
     end
   end
 

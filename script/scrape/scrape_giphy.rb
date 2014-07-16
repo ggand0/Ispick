@@ -66,7 +66,13 @@ module Scrape
         image_data = self.class.get_data(image)
 
         # タグは和名を使用
-        image_id = save_image(image_data, [ Scrape.get_tag(target_word.word) ], validation, false, false, false)
+        options = {
+          validation: validation,
+          large: false,
+          verbose: false,
+          resque: (not user_id.nil?)
+        }
+        image_id = self.class.save_image(image_data, @logger, [ Scrape.get_tag(target_word.word) ], options)
         duplicates += image_id ? 0 : 1
         scraped += 1 if image_id
         elapsed_time = Time.now - start
@@ -76,7 +82,9 @@ module Scrape
         # Resqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id
-          Scrape::Client.generate_jobs(image_id, image_data[:src_url], false, user_id, target_word.class.name, target_word.id)
+          @logger.debug "scrape_giphy: user=#{user_id}"
+          self.class.generate_jobs(image_id, image_data[:src_url], false,
+            user_id, target_word.class.name, target_word.id, @logger)
         end
 
         break if duplicates >= 3
