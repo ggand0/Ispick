@@ -79,6 +79,7 @@ gem 'pidfile'
 gem 'whenever', require: false                   # Support crontab
 gem 'rubyzip'
 gem 'ransack'
+gem 'factory_girl_rails'                          # A fixtures replacement
 
 # API clients
 gem 'natto'
@@ -116,7 +117,6 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.99.0'                    # Testing framework
   gem 'rspec-its'                                   # Provides the 'its' method
   gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
-  gem 'factory_girl_rails'                          # A fixtures replacement
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化
