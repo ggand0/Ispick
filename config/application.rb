@@ -17,8 +17,11 @@ module Ispic
     # for bootsrap-sass
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
     #config.assets.paths << "#{Rails}/vendor/assets/fonts"
-
     #config.encoding = "utf-8"
+    config.assets.precompile += [
+      'glyphicons-halflings.png',
+      'glyphicons-halflings-white.png'
+    ]
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
