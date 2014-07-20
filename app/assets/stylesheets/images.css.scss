@@ -1,9 +1,10 @@
+// 以下のクラスは全て画像整列用に使用している：
 // Place all the styles related to the images controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-// 簡易版 from http://goo.gl/zsi5mT
-/* サムネイル画像をタイル状に並べる */
+// デバッグ用画面の画像表示に使用
+// from http://goo.gl/zsi5mT
 ul.boxline {
     padding-left: 0!important;
     text-align: left;
@@ -32,6 +33,7 @@ ul.boxline li img {
 }
 
 
+// Home画面の画像整列に使用
 // from http://www.dwuser.com/education/content/creating-responsive-tiled-layout-with-pure-css/
 body {
    margin: 0;
@@ -61,23 +63,14 @@ body {
    width: 100%;
 }
 .boxInner .titleBox {
-//.titleBox {
    position: absolute;
    visibility: hidden;
    top: 30px;
-   //bottom: 0;
    left: 0;
    right: -10px;
    margin-bottom: 0px;
-   //background: #000;
-   //background: rgba(0, 0, 0, 0.5);
    color: #FFF;
    padding: 10px;
-   //text-align: center;
-   /*-webkit-transition: all 0.3s ease-out;
-   -moz-transition: all 0.3s ease-out;
-   -o-transition: all 0.3s ease-out;
-   transition: all 0.3s ease-out;*/
 }
 .title {
   text-align: center;
@@ -91,8 +84,7 @@ body {
    color: #FFF;
    padding: 10px;
 }
-/**/
-//body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
+
 body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
    margin-bottom: 0;
    color: #FFF;
