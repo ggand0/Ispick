@@ -20,6 +20,10 @@ describe DownloadImage do
     it "destroys the image when it has duplicate md5_checksum" do
       image1 = FactoryGirl.create(:image)
       image2 = FactoryGirl.create(:image)
+
+      puts image1.inspect
+      puts image2.inspect
+      puts '================================='
       DownloadImage.perform(image1.id, @url)
       puts image1.inspect
       Image.should_receive(:destroy)
@@ -38,4 +42,5 @@ describe DownloadImage do
       DownloadImage.perform(image.id, @url)
     end
   end
+
 end

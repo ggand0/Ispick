@@ -32,9 +32,10 @@ module Scrape
     # @param target_word[TargetWord]
     def scrape_target_word(user_id, target_word)
       @limit = 10
-      @logger.info "Extracting #{limit} images from: #{ROOT_URL}"
+      @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
       result = scrape_using_api(target_word, user_id, true)
+
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
     end
 
@@ -44,7 +45,6 @@ module Scrape
     # @param [Boolean]
     # @return [Hash]
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false)
-      # nilのクエリは弾く
       query = Scrape.get_query target_word
       return if query.nil? or query.empty?
 
@@ -69,7 +69,7 @@ module Scrape
             validation: validation,
             large: false,
             verbose: false,
-            resque: false
+            resque: (not user_id.nil?)
           }
           image_id = self.class.save_image(image_data, @logger, [ Scrape.get_tag(query) ], options)
 
@@ -77,12 +77,14 @@ module Scrape
           scraped += 1 if image_id
           elapsed_time = Time.now - start
           avg_time += elapsed_time
-          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
 
           # Resqueで非同期的に画像解析を行う
           # 始めに画像をダウンロードし、終わり次第ユーザに配信
           if image_id
-            Scrape.generate_jobs(image_id, image_data[:src_url], false, user_id, target_word.class.name, target_word.id)
+            #@logger.debug "scrape_nico: user=#{user_id}"
+            @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
+            self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
+              target_word.class.name, target_word.id, @logger)
           end
 
           break if duplicates >= 3

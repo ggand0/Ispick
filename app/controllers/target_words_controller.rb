@@ -34,12 +34,9 @@ class TargetWordsController < ApplicationController
     #current_user.target_words << @target_word
     respond_to do |format|
       if @target_word.id
-
         current_user.target_words << @target_word
-        #ds
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
-      elsif @target_word.id.nil? and @target_word.save
-      #if @target_word.save
+    elsif @target_word.id.nil? and current_user.save
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
       else

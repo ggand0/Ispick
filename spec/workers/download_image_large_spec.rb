@@ -15,13 +15,16 @@ describe DownloadImageLarge do
 
       DownloadImageLarge.perform(image.class.name, image.id, @url)
     end
+
     it "destroys the image when it has duplicate md5_checksum" do
       image1 = FactoryGirl.create(:image)
       image2 = FactoryGirl.create(:image)
+
       DownloadImageLarge.perform(image1.class.name, image1.id, @url)
       Image.should_receive(:destroy)
       DownloadImageLarge.perform(image2.class.name, image2.id, @url)
     end
+
     # rescueされたときはRails.loggerを呼ぶ
     it "writes a log when it crashes" do
       image = FactoryGirl.create(:image)
@@ -31,4 +34,5 @@ describe DownloadImageLarge do
       DownloadImageLarge.perform(image.class.name, image.id, @url)
     end
   end
+
 end

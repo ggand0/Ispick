@@ -8,8 +8,8 @@ class SearchImages
   def self.perform(user_id, target_word_id)
     start = Time.now
     target_word = TargetWord.find(target_word_id)
-    logger.info '--------------------------------------------------'
-    logger.info "Starting: target_word=#{target_word_id}"
+    logger.info '==================================================================='
+    logger.info "Starting: target_word=#{target_word_id} user=#{user_id}"
 
     # 先に、既にDB内に存在するレコードから配信する
     Deliver.deliver_keyword(user_id, target_word.id, logger)
@@ -19,6 +19,6 @@ class SearchImages
 
     logger.info "Finished: elapsed_time=#{(Time.now - start).to_s}"
     logger.info 'SEARCH IMAGES DONE!'
-    logger.info '--------------------------------------------------'
+    logger.info '==================================================================='
   end
 end

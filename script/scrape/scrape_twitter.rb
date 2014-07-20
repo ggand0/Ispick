@@ -43,7 +43,7 @@ module Scrape
     def scrape_using_api(target_word, user_id=nil, validation=true)
       # キーワードを含むハッシュタグの検索
       begin
-        get_contents(user_id, target_word, validation)
+        get_contents(target_word, user_id, validation)
 
       # リクエストが多すぎる場合は待機する
       rescue ::Twitter::Error::TooManyRequests => error
@@ -87,19 +87,19 @@ module Scrape
             validation: validation,
             large: false,
             verbose: false,
-            resque: false
+            resque: (not user_id.nil?)
           }
           image_data.each do |data|
-            image_id = self.class.save_image(data, [ Scrape.get_tag(query) ], options)
+            image_id = self.class.save_image(data, @logger, [ Scrape.get_tag(query) ], options)
             duplicates += image_id ? 0 : 1
             scraped += 1 if image_id
             elapsed_time = Time.now - start
             avg_time += elapsed_time
-            @logger.info "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if verbose and image_id
 
             # Resqueで非同期的に画像解析を行う
             # 始めに画像をダウンロードし、終わり次第ユーザに配信
             if image_id
+              @logger.info "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if verbose
               Scrape::Client.generate_jobs(image_id, data[:src_url], false, user_id, target_word.class.name, target_word.id)
             end
           end

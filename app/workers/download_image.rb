@@ -18,17 +18,15 @@ class DownloadImage
     begin
       # 画像をsource urlからダウンロード
       image.image_from_url(src_url)
-      logger.info "Target hash: #{image.md5_checksum}"
-      logger.info "Target relation: #{Image.where(md5_checksum: image.md5_checksum).count}"
+      logger.info "user_id=#{user_id} image_id=#{image_id} src=#{src_url} #{target_id}"
 
       # 全く同一のファイルを持つレコードが既にDBに存在すれば削除する
-      # 対象とするレコードの分も含めて2以上なら重複と判断し削除
       # 自分自身はまだ保存していないので、1以上なら重複
-      if Image.where(md5_checksum: image.md5_checksum).count > 0#1
+      duplicates = Image.where(md5_checksum: image.md5_checksum)
+      if duplicates.count > 0#1
         Image.destroy(image_id)
-        logger.info "Destroyed duplicates : Image.id=#{image_id}"
+        logger.info "Destroyed duplicates : Image.id=#{image_id} dup=#{duplicates.first.inspect}"
       else
-        # DBに保存
         image.save!
         logger.info "Downloaded : Image.id=#{image_id}"
 
@@ -47,7 +45,6 @@ class DownloadImage
       end
     rescue => e
       logger.error e
-      logger.error('Image download failed!')
     end
   end
 

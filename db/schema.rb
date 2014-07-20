@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140709043052) do
+ActiveRecord::Schema.define(version: 20140719164609) do
 
   create_table "delivered_images", force: true do |t|
     t.integer  "user_id"
@@ -87,6 +87,8 @@ ActiveRecord::Schema.define(version: 20140709043052) do
     t.datetime "updated_at"
   end
 
+  add_index "keywords", ["word"], name: "index_keywords_on_word", length: {"word"=>10}, using: :btree
+
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "name_display"
@@ -97,6 +99,8 @@ ActiveRecord::Schema.define(version: 20140709043052) do
     t.datetime "updated_at"
   end
 
+  add_index "people", ["name", "name_english", "name_display"], name: "index_people_on_name_and_name_english_and_name_display", using: :btree
+
   create_table "people_keywords", force: true do |t|
     t.integer "keyword_id", null: false
     t.integer "person_id",  null: false
@@ -106,6 +110,8 @@ ActiveRecord::Schema.define(version: 20140709043052) do
     t.integer "title_id",  null: false
     t.integer "person_id", null: false
   end
+
+  add_index "people_titles", ["person_id", "title_id"], name: "index_people_titles_on_person_id_and_title_id", using: :btree
 
   create_table "tags", force: true do |t|
     t.string   "name"
@@ -146,6 +152,8 @@ ActiveRecord::Schema.define(version: 20140709043052) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "titles", ["name", "name_english"], name: "index_titles_on_name_and_name_english", length: {"name"=>10, "name_english"=>10}, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "avatar_file_name"

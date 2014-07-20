@@ -10,13 +10,14 @@ describe "Scrape" do
   end
 
 # start of scrape wiki for game
+=begin
   describe "get_game_character_name function" do
     it "get_game_character_name" do
       game_character_page = {"ドラゴンクエストエデンの戦士たち"=>
                     {:ja=>"http://ja.wikipedia.org/wiki/%E5%A4%A7%E4%B9%B1%E9%97%98%E3%82%B9%E3%83%9E%E3%83%83%E3%82%B7%E3%83%A5%E3%83%96%E3%83%A9%E3%82%B6%E3%83%BC%E3%82%BAX",
                     :en=>"http://en.wikipedia.org/wiki/Dragon_Warrior_VII"}
                 }
-                
+
       game_character = Scrape::Wiki::Character.get_game_character_name(game_character_page)
       #puts(game_character)
     end
@@ -41,6 +42,7 @@ describe "Scrape" do
       puts(boolean)
     end
   end
+=end
 # end of scrape wiki for game
 
   describe "scrape function" do
@@ -49,11 +51,13 @@ describe "Scrape" do
       Scrape::Wiki.stub(:get_anime_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_name).and_return nil
+      #Scrape::Wiki::GameCharacter.stub(:get_game_character_name).and_return nil
       Scrape::Wiki.stub(:save_to_database).and_return nil
 
       expect(Scrape::Wiki).to receive(:get_anime_page).exactly(years).times
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(years).times
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(years).times
+      #expect(Scrape::Wiki::GameCharacter).to receive(:get_game_character_name).exactly(1).times
       expect(Scrape::Wiki).to receive(:save_to_database).exactly(years).times
 
       Scrape::Wiki.scrape
