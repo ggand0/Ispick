@@ -40,7 +40,7 @@ module Scrape
     Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
 
     # 英名が存在する場合はさらに検索
-    if target_word.person and not target_word.person.name_english.empty?
+    if target_word.person and target_word.person.name_english and not target_word.person.name_english.empty?
       query = target_word.person.name_english
       logger.debug "name_english: #{query}"
 
