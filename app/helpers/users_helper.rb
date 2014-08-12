@@ -34,9 +34,33 @@ module UsersHelper
     return 'Illust: nil' if image.nil?
     "Illust: <span><strong>#{image.is_illust.to_s}</strong></span>".html_safe
   end
+
   def get_quality_html(image)
     return 'Quality: nil' if image.nil?
     "Quality: <span><strong>#{image.quality.to_s}</strong></span>".html_safe
+  end
+
+  def get_debug_html(delivered_images)
+    "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe
+  end
+
+  # ===================
+  #  Rendering helpers
+  # ===================
+  def render_delivered_image(delivered_image, image)
+    link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  end
+
+  def render_clip_button(delivered_image)
+    bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: delivered_image.id, id: "popover-board#{delivered_image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{delivered_image.id}"
+  end
+
+  def render_hide_button(delivered_image)
+    bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default btn-sm'
+  end
+
+  def render_show_button(delivered_image)
+    bs_button_to 'Show', { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
   end
 
 end
