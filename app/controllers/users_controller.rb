@@ -4,6 +4,9 @@ require 'zip'
 class UsersController < ApplicationController
   before_action :render_not_signed_in, only: [:show_favored_images]
 
+  # GET
+  # Render an user's home page.
+  # ユーザのホームページを表示する。
   def home
     return render action: 'not_signed_in' unless signed_in?
     session[:sort] = params[:sort] if params[:sort]
@@ -45,6 +48,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # Render the index page of target_images.
   def show_target_images
     return render action: 'not_signed_in' unless signed_in?
 
@@ -52,6 +56,7 @@ class UsersController < ApplicationController
     render action: 'show_target_images'
   end
 
+  # Render the index page of target_words.
   def show_target_words
     return render action: 'not_signed_in' unless signed_in?
 
@@ -59,17 +64,10 @@ class UsersController < ApplicationController
     render action: 'show_target_words'
   end
 
-  # 登録タグの削除：関連のみ削除する
-  def delete_target_word
-    current_user.target_words.delete(TargetWord.find(params[:id]))
-
-    @words = current_user.target_words
-    render action: 'show_target_words'
-  end
-
+  # Render the list of clipped images.
   def show_favored_images
     board_id = params[:board]
-    board = get_board(board_id)
+    board = current_user.get_board(board_id)
 
     unless board.nil?
       session[:selected_board] = board.id
@@ -80,9 +78,19 @@ class UsersController < ApplicationController
     end
   end
 
+  # Remove a registered text tag from user.target_words.
+  # 登録タグの削除：関連のみ削除する
+  def delete_target_word
+    current_user.target_words.delete(TargetWord.find(params[:id]))
 
-  # A function for debug
-  # This feature will be deleted in the production
+    @words = current_user.target_words
+    render action: 'show_target_words'
+  end
+
+
+  # A function for debug.
+  # This feature will be deleted in the production.
+  # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     return redirect_to :back unless signed_in?
 
@@ -104,23 +112,23 @@ class UsersController < ApplicationController
   end
 
 
-  # A page for debug
+  # A page for debugging illust detection feature.
+  # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
     return redirect_to :back unless signed_in?
 
     update_session(params)
 
+    # Get delivered_images
     if session[:all]
-      delivered_images = current_user.delivered_images.
-        joins(:image).order('images.posted_at')
+      delivered_images = current_user.get_delivered_images_all
     else
-      delivered_images = current_user.delivered_images.where(images: { site_name: 'twitter' }).
-        joins(:image).order('images.posted_at')
+      delivered_images = current_user.get_delivered_images
     end
 
     # Filter by is_an_illustration value
     @debug = get_session_data
-    delivered_images = filter_illust(delivered_images)
+    delivered_images = User.filter_by_illust(delivered_images, session[:illust])
 
     # Sort delivered_images if any requests exist.
     delivered_images = User.sort_delivered_images(delivered_images) if session[:sort] == 'favorites'
@@ -132,10 +140,12 @@ class UsersController < ApplicationController
 
   private
 
+  # Render the template if an user is not signed in.
   def render_not_signed_in
     render action: 'not_signed_in' unless signed_in?
   end
 
+  # Update session values by request parameters.
   def update_session(params)
     session[:all] = (not session[:all]) if params[:toggle_site]
     session[:sort] = params[:sort] if params[:sort]
@@ -143,27 +153,9 @@ class UsersController < ApplicationController
     session[:illust] = params[:illust] if params[:illust]
   end
 
-  def filter_illust(delivered_images)
-    case session[:illust]
-    when 'all'
-      return delivered_images
-    when 'illust'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: true }).references(:images)
-    when 'photo'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: false }).references(:images)
-    end
-  end
 
-  def get_board(board_id)
-    if board_id.nil?
-      board = current_user.image_boards.first
-    else
-      board = current_user.image_boards.find(board_id)
-    end
-  end
-
+  # デバッグ用にsessionの情報を返す。
+  # @return [Array] String array of session data
   def get_session_data
     [
       "filter_illust: #{session[:illust]}",

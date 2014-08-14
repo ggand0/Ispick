@@ -27,11 +27,17 @@ class User < ActiveRecord::Base
     Resque.enqueue(SearchImages, self.id, target_word.id)
   end
 
+  # @return [ActiveRecord::AssociationRelation]
   def get_delivered_images
     delivered_images.
       where.not(images: { site_name: 'twitter' }).
       joins(:image).
       reorder('created_at DESC')
+  end
+
+  # @return [ActiveRecord::AssociationRelation]
+  def get_delivered_images_all
+    delivered_images.joins(:image).order('images.posted_at')
   end
 
   # @param delivered_images [ActiveRecord::CollectionProxy]
@@ -41,12 +47,32 @@ class User < ActiveRecord::Base
     delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
   end
 
+  # Return delivered_images which is filtered by is_illust data.
+  # How the filter is applied depends on the session[:illust] value.
+  # イラストと判定されてるかどうかでフィルタをかけるメソッド。
+  # @param delivered_images [ActiveRecord::Association::CollectionProxy]
+  # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
+  def self.filter_by_illust(delivered_images, illust)
+    case illust
+    when 'all'
+      return delivered_images
+    when 'illust'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: true }).references(:images)
+    when 'photo'
+      return delivered_images.includes(:image).
+        where(images: { is_illust: false }).references(:images)
+    end
+  end
+
+  # @return [ActiveRecord::AssociationRelation]
   def sort_delivered_images(delivered_images)
     delivered_images = delivered_images.includes(:image).
       reorder('images.favorites desc').references(:images)
     delivered_images.page(params[:page]).per(25)
   end
 
+  # @return [ActiveRecord::AssociationRelation]
   def sort_by_quality(delivered_images)
     delivered_images = delivered_images.includes(:image).
       reorder('images.quality desc').references(:images)
@@ -69,10 +95,20 @@ class User < ActiveRecord::Base
     self.save!
   end
 
+  # @param board_id [Integer] The image_board's id which you want to retrive
+  # @return [ImageBoard]
+  def get_board(board_id=nil)
+    if board_id.nil?
+      board = image_boards.first
+    else
+      board = image_boards.find(board_id)
+    end
+  end
 
-  # =========================
-  # Authorization related
-  # =========================
+
+  # ===============================
+  #  Authorization related methods
+  # ===============================
 
   def self.new_with_session(params, session)
     super.tap do |user|
