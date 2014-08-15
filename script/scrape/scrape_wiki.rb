@@ -15,9 +15,9 @@ module Scrape::Wiki
   ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
 
   def self.scrape
-    puts 'Extracting : ' + ROOT_URL
+    puts "Extracting: #{ROOT_URL}"
 
-    # 起点となるWikipediaカテゴリページのURL
+    # The array of Wikipedia pages that list up anime titles.
     # アニメタイトル一覧ページの配列：
     url = [
       'http://ja.wikipedia.org/wiki/Category:2007%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
@@ -30,7 +30,7 @@ module Scrape::Wiki
       'http://ja.wikipedia.org/wiki/Category:2014%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
     ]
 
-    # 各URLについて情報を取得
+
     url.each do |value|
       # アニメの概要ページのURL/タイトルのHashを取得
       anime_page = self.get_anime_page(value)
@@ -46,11 +46,8 @@ module Scrape::Wiki
       #self.hash_output(anime_character)
       self.save_to_database(anime_character)
     end
-=begin
-=end
 
     # ゲームキャラクタ名を取得する
-
     self.scrape_wiki_for_game_characters
   end
 

@@ -4,7 +4,7 @@ require "#{Rails.root}/app/workers/download_image"
 
 describe DownloadImage do
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
     Resque.stub(:enqueue).and_return nil
     @url = 'http://goo.gl/4b7UUc'
   end
@@ -32,12 +32,12 @@ describe DownloadImage do
     end
 
     # rescueされたときはResque.loggerを呼ぶ
-    it "writes a log when it crashes" do
+    it "writes a line in the log when it crashes" do
       image = FactoryGirl.create(:image)
       Image.any_instance.stub(:image_from_url).and_raise
 
       # error文と"Image download failed!"の２回
-      expect(DownloadImage.logger).to receive(:error).exactly(2).times
+      expect(DownloadImage.logger).to receive(:error).exactly(1).times
 
       DownloadImage.perform(image.id, @url)
     end
