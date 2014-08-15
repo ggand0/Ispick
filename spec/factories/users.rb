@@ -13,6 +13,7 @@ FactoryGirl.define do
     end
   end
 
+
   factory :user_with_callbacks, class: User do
     sequence(:email) { |n| "test#{n}@example.com" }
     password '12345678'
@@ -21,6 +22,7 @@ FactoryGirl.define do
     sequence(:name) { |n| "ispick_twitter#{n}" }
   end
 
+
   factory :twitter_user, class: User do
     sequence(:email) { |n| "test#{n}@example.com" }
     password '12345678'
@@ -28,7 +30,7 @@ FactoryGirl.define do
     uid '12345678'
     sequence(:name) { |n| "ispick_twitter#{n}" }
 
-    # 配信画像（レコードのみ）を持つuser
+    # 配信画像（ファイル無）を持つuser
     factory :user_with_delivered_images do
       sequence(:name) { |n| "ispick_twitter_d#{n}" }
       ignore do
@@ -37,6 +39,15 @@ FactoryGirl.define do
       after(:create) do |user, evaluator|
         create_list(:delivered_image, evaluator.images_count, user: user)
         1.times { create(:delivered_image_photo, user: user) }
+      end
+    end
+
+    # 異なる配信画像（ファイル無）を持つuser
+    factory :user_with_dif_delivered_images do
+      sequence(:name) { |n| "ispick_twitter_d#{n}" }
+      after(:create) do |user|
+        1.times { create(:delivered_image_photo, user: user) }
+        1.times { create(:delivered_image1, user: user) }
       end
     end
 
@@ -82,6 +93,7 @@ FactoryGirl.define do
     end
 
   end
+
 
   factory :facebook_user, class: User do
     email 'test@example.com'

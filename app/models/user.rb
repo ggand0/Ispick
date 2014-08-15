@@ -66,17 +66,19 @@ class User < ActiveRecord::Base
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def sort_delivered_images(delivered_images)
+  def self.sort_delivered_images(delivered_images, page)
     delivered_images = delivered_images.includes(:image).
       reorder('images.favorites desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
+    #delivered_images.page(params[:page]).per(25)
+    delivered_images.page(page).per(25)
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def sort_by_quality(delivered_images)
+  def self.sort_by_quality(delivered_images, page)
     delivered_images = delivered_images.includes(:image).
       reorder('images.quality desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
+    #delivered_images.page(params[:page]).per(25)
+    delivered_images.page(page).per(25)
   end
 
   # @return The path where default thumbnail file is.
