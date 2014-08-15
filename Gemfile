@@ -91,12 +91,13 @@ gem 'tinami'
 
 group :test do
   gem 'webmock'                                     # developmentからは外す必要有り
+  gem 'fakeweb', '~> 1.3'                           # Mock urls
 end
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'fakeweb', '~> 1.3'                           # Mock urls
+#  gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
   gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
   #gem 'pry-rails'                                   # Improve the console
