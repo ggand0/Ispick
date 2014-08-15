@@ -131,8 +131,8 @@ class UsersController < ApplicationController
     delivered_images = User.filter_by_illust(delivered_images, session[:illust])
 
     # Sort delivered_images if any requests exist.
-    delivered_images = User.sort_delivered_images(delivered_images) if session[:sort] == 'favorites'
-    delivered_images = User.sort_by_quality(delivered_images) if session[:sort] == 'quality'
+    delivered_images = User.sort_delivered_images(delivered_images, params[:page]) if session[:sort] == 'favorites'
+    delivered_images = User.sort_by_quality(delivered_images, params[:page]) if session[:sort] == 'quality'
 
     @delivered_images = delivered_images.page(params[:page]).per(25)
   end
