@@ -5,12 +5,13 @@ require "#{Rails.root}/script/scrape/client"
 describe Scrape::Nico do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
+  let(:limit) { 10 }
 
   before do
     IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
     @agent = Scrape::Nico.get_client      # Mechanize agentの作成
-    @client = Scrape::Nico.new(nil, 10)
+    @client = Scrape::Nico.new(nil, limit)
 
     url = 'http://seiga.nicovideo.jp/rss/illust/new'
     xml = Nokogiri::XML(open(url))
@@ -27,7 +28,6 @@ describe Scrape::Nico do
 
       @client.scrape(60)
     end
-
   end
 
   describe "scrape_target_word function" do
@@ -53,20 +53,21 @@ describe Scrape::Nico do
 
     it "skip if keyword arg is nil" do
       Scrape::Nico.should_not_receive(:get_data)
-
       @client.scrape_using_api(nil)
     end
 
     it "calls get_data function 'limit' times" do
-      limit = 10
-
       Scrape::Nico.stub(:get_data).and_return({})
-      Scrape::Nico.should_receive(:get_data).exactly(limit).times
-      Scrape::Client.stub(:save_image).and_return(1)
-      Scrape::Client.should_receive(:save_image).exactly(limit).times
-      target_word = FactoryGirl.create(:word_with_person)
 
-      @client.scrape_using_api(target_word)
+      target_word = FactoryGirl.create(:word_with_person)
+      Scrape::Client.stub(:save_image).and_return(1)
+      result = @client.scrape_using_api(target_word)
+      puts result
+      Scrape::Nico.should_receive(:get_data).exactly(limit - result[:skipped]).times
+
+      Scrape::Client.should_receive(:save_image).exactly(limit - result[:skipped]).times
+
+      puts result = @client.scrape_using_api(target_word)
     end
 
     it "allows duplicates three times" do
@@ -83,12 +84,6 @@ describe Scrape::Nico do
 
 
   describe "get_contents method" do
-    it "creates an image model from image source" do
-      #xml = Nokogiri::XML(open('http://seiga.nicovideo.jp/rss/illust/new'))
-      #Scrape.should_receive(:save_image)
-      #Scrape::Nico.get_contents(@page_url, @agent, @title)
-    end
-
     # 対象の画像URLを開けなかった時、ログに書き出すこと
     it "writes a log when it fails to open the image page" do
       count = Image.count
