@@ -5,6 +5,8 @@ require "#{Rails.root}/script/scrape/scrape_wiki"
 include Scrape::Wiki
 
 describe "Scrape" do
+  let(:years) { 8 }
+
   before do
     IO.any_instance.stub(:puts)
   end
@@ -47,10 +49,10 @@ describe "Scrape" do
 
   describe "scrape function" do
     it "calls proper functions" do
-      years = 8
       Scrape::Wiki.stub(:get_anime_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_name).and_return nil
+      Scrape::Wiki.stub(:scrape_wiki_for_game_characters).and_return nil
       #Scrape::Wiki::GameCharacter.stub(:get_game_character_name).and_return nil
       Scrape::Wiki.stub(:save_to_database).and_return nil
 
@@ -59,6 +61,7 @@ describe "Scrape" do
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(years).times
       #expect(Scrape::Wiki::GameCharacter).to receive(:get_game_character_name).exactly(1).times
       expect(Scrape::Wiki).to receive(:save_to_database).exactly(years).times
+      expect(Scrape::Wiki).to receive(:scrape_wiki_for_game_characters).exactly(1).times
 
       Scrape::Wiki.scrape
     end

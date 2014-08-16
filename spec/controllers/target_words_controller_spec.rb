@@ -83,7 +83,7 @@ describe TargetWordsController do
       end
 
       # ユーザの登録ワード一覧ページへリダイレクトする事
-      it "redirects to the list of target_words" do
+      it "redirects to the list page of target_words" do
         person = FactoryGirl.create(:person)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
         response.should redirect_to(show_target_words_users_path)
@@ -102,7 +102,9 @@ describe TargetWordsController do
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         person = FactoryGirl.create(:person)
+
         TargetWord.any_instance.stub(:save).and_return(false)
+        User.any_instance.stub(:save).and_return(false)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
         response.should render_template("new")
       end

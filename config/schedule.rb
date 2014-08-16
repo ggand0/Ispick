@@ -26,12 +26,12 @@ every 2.hours do
   #rake 'scrape:twitter[60]', output: { error: 'log/scrape_twitter_error.log', standard: 'log/scrape_twitter_cron.log' }
 end
 
-every 4.hours do
-  rake 'scrape:nico[240]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+every 12.hours do
+  rake 'scrape:nico[720]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
-every 5.hours do
-  rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+every 12.hours do
+  rake 'scrape:tumblr[720]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
 every 6.hours do

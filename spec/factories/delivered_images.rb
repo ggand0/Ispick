@@ -14,6 +14,19 @@ FactoryGirl.define do
     association :image, factory: :image
   end
 
+  factory :delivered_image1, class: DeliveredImage do
+    avoided false
+    favored false
+
+    # Skip validation when saving
+    to_create do |instance|
+      instance.save validate: false
+    end
+    association :targetable, factory: :target_word, strategy: :build
+    association :image, factory: :image_for_delivered_image
+  end
+
+
   factory :delivered_image_no_association, class: DeliveredImage do
     association :image, factory: :image
   end

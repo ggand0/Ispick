@@ -30,12 +30,14 @@ describe "Default feature" do
       expect(page).to have_content('Detail')
     end
 
+=begin
     it "Go to target_images page" do
       visit home_users_path
 
       click_link '登録イラスト一覧'
       expect(page).to have_content('登録イラスト一覧')
     end
+=end
 
   end
 end

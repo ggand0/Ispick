@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 require "#{Rails.root}/script/scrape/client"
-#require 'tumblr_client'
-#require 'tumblr/tagged'
 require 'securerandom'
+require 'tumblr_client'
 
 module Scrape
   class Tumblr < Client
-    require 'tumblr_client'
-
     ROOT_URL = 'https://tumblr.com'
 
     def initialize(logger=nil, limit=20)

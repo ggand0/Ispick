@@ -16,13 +16,7 @@ FactoryGirl.define do
     views 10000
     posted_at DateTime.now
     is_illust true
-=begin
-    after(:create) do |image|
-      image.tags << create(:tag)
-      image.tags << create(:tag_en)
-      image.tags << create(:tag_title)
-    end
-=end
+
     # sequenceされていないタグのみ必要な場合
     factory :image_with_specific_tags do
       after(:create) do |image|
@@ -57,7 +51,8 @@ FactoryGirl.define do
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
     views 10000
-    posted_at DateTime.now
+    posted_at DateTime.now - 2.day
+    #created_at DateTime.now - 1.day
     is_illust true
 
     to_create do |instance|

@@ -4,31 +4,26 @@ require 'zip'
 class UsersController < ApplicationController
   before_action :render_not_signed_in, only: [:show_favored_images]
 
+  # GET
+  # Render an user's home page.
+  # ユーザのホームページを表示する。
   def home
-    if signed_in?
-      session[:sort] = params[:sort] if params[:sort]
+    return render action: 'not_signed_in' unless signed_in?
+    session[:sort] = params[:sort] if params[:sort]
 
-      delivered_images = current_user.delivered_images.where.not(images: { site_name: 'twitter' }).
-        joins(:image).
-        reorder('created_at DESC')
+    # Get delivered_images
+    delivered_images = current_user.get_delivered_images
+    delivered_images.reorder!('posted_at DESC') if params[:sort]
 
-      if params[:sort]
-        delivered_images = delivered_images.reorder('posted_at DESC')
-      end
-
-      # 配信日で絞り込む場合
-      if params[:date]
-        date = params[:date]
-        date = DateTime.parse(date).to_date
-        delivered_images = delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
-      end
-
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      @delivered_images_all = delivered_images
-      render action: 'signed_in'
-    else
-      render action: 'not_signed_in'
+    # Filter delivered_images by date
+    if params[:date]
+      date = DateTime.parse(params[:date]).to_date
+      delivered_images = User.filter_by_date(delivered_images, date)
     end
+
+    @delivered_images = delivered_images.page(params[:page]).per(25)
+    @delivered_images_all = delivered_images
+    render action: 'signed_in'
   end
 
   # GET
@@ -53,40 +48,26 @@ class UsersController < ApplicationController
     end
   end
 
+  # Render the index page of target_images.
   def show_target_images
-    if signed_in?
-      @target_images = current_user.target_images
-      render action: 'show_target_images'
-    else
-      render action: 'not_signed_in'
-    end
+    return render action: 'not_signed_in' unless signed_in?
+
+    @target_images = current_user.target_images
+    render action: 'show_target_images'
   end
 
+  # Render the index page of target_words.
   def show_target_words
-    if signed_in?
-      @words = current_user.target_words
-      render action: 'show_target_words'
-    else
-      render action: 'not_signed_in'
-    end
-  end
-
-  # 関連のみ削除する
-  def delete_target_word
-    current_user.target_words.delete(TargetWord.find(params[:id]))
+    return render action: 'not_signed_in' unless signed_in?
 
     @words = current_user.target_words
     render action: 'show_target_words'
   end
 
+  # Render the list of clipped images.
   def show_favored_images
     board_id = params[:board]
-
-    if board_id.nil?
-      board = current_user.image_boards.first
-    else
-      board = current_user.image_boards.find(board_id)
-    end
+    board = current_user.get_board(board_id)
 
     unless board.nil?
       session[:selected_board] = board.id
@@ -97,95 +78,90 @@ class UsersController < ApplicationController
     end
   end
 
-  # デバッグ用
-  def download_favored_images
-    if signed_in?
-      @images = current_user.image_boards.first.favored_images
-      file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
+  # Remove a registered text tag from user.target_words.
+  # 登録タグの削除：関連のみ削除する
+  def delete_target_word
+    current_user.target_words.delete(TargetWord.find(params[:id]))
 
-      temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
-      Zip::OutputStream.open(temp_file.path) do |zos|
-        @images.each do |image|
-          title = "#{image.title}#{File.extname(image.data.path)}"
-          zos.put_next_entry(title)
-          zos.print IO.read(image.data.path)
-        end
-      end
-
-      send_file temp_file.path, type: 'application/zip',
-                                disposition: 'attachment',
-                                filename: file_name
-      temp_file.close
-    else
-      redirect_to :back
-    end
+    @words = current_user.target_words
+    render action: 'show_target_words'
   end
 
 
-  # デバッグ用page
-  def debug_illust_detection
-    if signed_in?
-      session[:all] = (not session[:all]) if params[:toggle_site]
-      session[:sort] = params[:sort] if params[:sort]
-      session[:illust] ||= 'all'
-      session[:illust] = params[:illust] if params[:illust]
+  # A function for debug.
+  # This feature will be deleted in the production.
+  # 画像のダウンロード：releaseする時にこの機能は削除する。
+  def download_favored_images
+    return redirect_to :back unless signed_in?
 
-      if session[:all]
-        delivered_images = current_user.delivered_images.
-          joins(:image).order('images.posted_at')
-      else
-        delivered_images = current_user.delivered_images.where(images: { site_name: 'twitter' }).
-          joins(:image).order('images.posted_at')
+    @images = current_user.image_boards.first.favored_images
+    file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
+
+    temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      @images.each do |image|
+        title = "#{image.title}#{File.extname(image.data.path)}"
+        zos.put_next_entry(title)
+        zos.print IO.read(image.data.path)
       end
-
-      # イラスト判定情報で絞り込む
-      @debug = [
-        "filter_illust: #{session[:illust]}",
-        "sort_type: #{session[:sort]}",
-        "filter_site: #{session[:all]}",
-      ]
-      delivered_images = filter_illust(delivered_images)
-
-      # リクエストがある場合はソート
-      delivered_images = sort_delivered_images delivered_images if session[:sort] == 'favorites'
-      delivered_images = sort_by_quality delivered_images if session[:sort] == 'quality'
-
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-    else
-      render action: 'not_signed_in'
     end
+    send_file temp_file.path, type: 'application/zip',
+                              disposition: 'attachment',
+                              filename: file_name
+    temp_file.close
+  end
+
+
+  # A page for debugging illust detection feature.
+  # イラスト判定ツールのデバッグ用ページを表示する。
+  def debug_illust_detection
+    return redirect_to :back unless signed_in?
+
+    update_session(params)
+
+    # Get delivered_images
+    if session[:all]
+      delivered_images = current_user.get_delivered_images_all
+    else
+      delivered_images = current_user.get_delivered_images
+    end
+
+    # Filter by is_an_illustration value
+    @debug = get_session_data
+    delivered_images = User.filter_by_illust(delivered_images, session[:illust])
+
+    # Sort delivered_images if any requests exist.
+    delivered_images = User.sort_delivered_images(delivered_images, params[:page]) if session[:sort] == 'favorites'
+    delivered_images = User.sort_by_quality(delivered_images, params[:page]) if session[:sort] == 'quality'
+
+    @delivered_images = delivered_images.page(params[:page]).per(25)
   end
 
 
   private
 
+  # Render the template if an user is not signed in.
   def render_not_signed_in
-    render action: 'not_signed_in' if not signed_in?
+    render action: 'not_signed_in' unless signed_in?
   end
 
-  def filter_illust(delivered_images)
-    case session[:illust]
-    when 'all'
-      return delivered_images
-    when 'illust'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: true }).references(:images)
-    when 'photo'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: false }).references(:images)
-    end
+  # Update session values by request parameters.
+  def update_session(params)
+    session[:all] = (not session[:all]) if params[:toggle_site]
+    session[:sort] = params[:sort] if params[:sort]
+    session[:illust] ||= 'all'
+    session[:illust] = params[:illust] if params[:illust]
   end
 
-  def sort_delivered_images(delivered_images)
-    delivered_images = delivered_images.includes(:image).
-      reorder('images.favorites desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
-  end
 
-  def sort_by_quality(delivered_images)
-    delivered_images = delivered_images.includes(:image).
-      reorder('images.quality desc').references(:images)
-    delivered_images.page(params[:page]).per(25)
+  # デバッグ用にsessionの情報を返す。
+  # @return [Array] String array of session data
+  def get_session_data
+    [
+      "filter_illust: #{session[:illust]}",
+      "sort_type: #{session[:sort]}",
+      "filter_site: #{session[:all]}",
+    ]
   end
 
 end

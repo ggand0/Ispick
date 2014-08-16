@@ -28,7 +28,7 @@ describe "Default feature" do
       expect(page).to have_content('New target_image')
 
       attach_file 'Data', "#{Rails.root}/spec/files/target_images/madoka0.jpg"
-      Resque.stub(:enqueue).and_return
+      Resque.stub(:enqueue).and_return nil
       click_on 'Create Target image'
 
       #save_and_open_page
