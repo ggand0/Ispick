@@ -44,5 +44,5 @@ every 60.minutes do
   rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
 
   # 全てのユーザーに推薦イラストを配信
-  rake 'deliver:all', output: 'log/deliver.log'
+  #rake 'deliver:all', output: 'log/deliver.log'
 end
