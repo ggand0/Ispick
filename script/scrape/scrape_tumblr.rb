@@ -40,6 +40,7 @@ module Scrape
     end
 
 
+    # Scrape images that posess target_word
     # 対象のタグを持つPostの画像を抽出する
     # @param [String]
     # @param [Integer]
@@ -73,7 +74,7 @@ module Scrape
           verbose: false,
           resque: (not user_id.nil?)
         }
-        image_id = self.class.save_image(image_data, @logger, Scrape.get_tags(image['tags']), options)
+        image_id = self.class.save_image(target_word, image_data, @logger, Scrape.get_tags(image['tags']), options)
 
         # 抽出情報の更新
         duplicates += image_id ? 0 : 1
@@ -81,9 +82,10 @@ module Scrape
         elapsed_time = Time.now - start
         avg_time += elapsed_time
 
-        # Resqueで非同期的に画像解析を行う
+
+        # 登録直後の配信の場合は、ここでResqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
-        if image_id
+        if image_id and (not user_id.nil?)
           #@logger.debug "scrape_tumblr: user=#{user_id}"
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
           self.class.generate_jobs(image_id, image_data[:src_url], false,
@@ -98,7 +100,12 @@ module Scrape
       { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
     end
 
-    # 直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
+
+
+    # ==============
+    #  OLD METHODS
+    # ==============
+    # [OLD]直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
     # @param [String] likes_countを取得するページのurl
     def get_favorites(page_url)
       begin

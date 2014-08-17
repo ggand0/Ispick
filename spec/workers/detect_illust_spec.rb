@@ -17,6 +17,15 @@ describe DetectIllust do
 
       DetectIllust.get_result(tool_path, image)
     end
+
+    # IF this example failed, prolly your tool_path is wrong.
+    it "correctly executed result should not to be NIL" do
+      tool_path = CONFIG['illust_detection_path']
+      image = FactoryGirl.create(:image_file)
+
+      result = DetectIllust.get_result(tool_path, image)
+      expect(result).not_to eq(nil)
+    end
   end
 
   describe "perform method" do
