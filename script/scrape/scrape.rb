@@ -36,8 +36,8 @@ module Scrape
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
   def self.scrape_target_word(user_id, target_word, logger)
     Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
-    Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
     Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
+    #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
 
     # 英名が存在する場合はさらに検索
     if target_word.person and target_word.person.name_english and not target_word.person.name_english.empty?

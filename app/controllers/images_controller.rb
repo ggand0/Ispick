@@ -31,12 +31,10 @@ class ImagesController < ApplicationController
   # imageをお気に入り画像として追加する。
   def favor
     board_name = params[:board]
-    puts "===============#{@image}"
     #@image.update_attributes!(favored: true) unless @image.favored
 
     # FavoredImageオブジェクト作成
     # src_urlが重複していた場合はvalidationでfalseが返る
-    #image = @image
     board = current_user.image_boards.where(name: board_name).first
     favored_image = board.favored_images.build(
       title: @image.title,
@@ -51,7 +49,6 @@ class ImagesController < ApplicationController
     end
 
     # format.jsの場合はpopoverをリロードするために'boards' templateを呼ぶ
-    #@image = @image
     @board = ImageBoard.new
     @id = params[:html_id]
     respond_to do |format|

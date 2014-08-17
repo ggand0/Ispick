@@ -141,7 +141,7 @@ module Scrape
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-        logger.debug "saved image: #{image.inspect}"
+        logger.debug "saved image: #{image.id}"
         # target_wordオブジェクトに関連づける
         target_word.images << image
 
