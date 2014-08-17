@@ -6,13 +6,14 @@ class UsersController < ApplicationController
 
   # GET
   # Render an user's home page.
-  # ユーザのホームページを表示する。
+  # ユーザ個別のホームページを表示する。
   def home
     return render action: 'not_signed_in' unless signed_in?
     session[:sort] = params[:sort] if params[:sort]
 
     # Get delivered_images
-    delivered_images = current_user.get_delivered_images
+    delivered_images = current_user.target_words.first.images
+    #delivered_images = current_user.get_delivered_images
     delivered_images.reorder!('posted_at DESC') if params[:sort]
 
     # Filter delivered_images by date
@@ -88,8 +89,8 @@ class UsersController < ApplicationController
   end
 
 
-  # A function for debug.
-  # This feature will be deleted in the production.
+  # An action for debug.
+  # This feature will be deleted in the production version.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     return redirect_to :back unless signed_in?
