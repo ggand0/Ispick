@@ -2,6 +2,7 @@
 
 module Scrape
 
+  # The base(parent) class of scraping classes.
   # スクレイピング処理を行うクラス群の親クラス
   class Client
     include Scrape
@@ -59,7 +60,7 @@ module Scrape
             result = scrape_using_api(target_word)
             @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
-            # [保留中]海外サイトの場合は英名でも検索する
+            # [保留中]英語対応サイトの場合は英名でも検索する
             #if module_type == 'Scrape::Tumblr'
             #  # english=trueで呼ぶ
             #  result = child_module.scrape_using_api(target_word, limit, logger, true, false, true)
@@ -78,12 +79,13 @@ module Scrape
       @logger.info '--------------------------------------------------'
     end
 
+    # 派生クラスでoverrideして使う。
     def scrape_using_api(target_word)
       { scraped: 0, duplicates: 0, avg_time: 0 }
     end
 
 
-    # PIDファイルを用いて多重起動を防ぐ
+    # PIDファイルを用いて多重起動を防ぐ。pidfile gem使用。
     # @param [Boolean] PidFileを使用するかどうか
     # @param [Boolean] デバッグ出力を行うかどうか
     def detect_multiple_running(debug=false)
@@ -112,6 +114,8 @@ module Scrape
     end
 
 
+    # TODO: Associate the target_word to the image here.
+    # Create new image instanace and save it to the database.
     # Imageレコードを新たに生成してDBに保存する
     # @param [Hash] Imageレコードに与える属性のHash
     # @param [Array] 関連するタグ(String)の配列
@@ -119,25 +123,28 @@ module Scrape
     # @param [Boolean] 大きいサイズの画像かどうか
     # @param [Boolean] ログ出力を行うかどうか
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
-    #def self.save_image(attributes, tags=[], validation=true, large=false, verbose=false, resque=true)
-    def self.save_image(attributes, logger, tags=[], options={})
-      #logger.debug "save_image options: #{options.inspect} #{options[:validation]}"
-      # 予め（ダウンロードする前に）重複を確認
+    def self.save_image(target_word, attributes, logger, tags=[], options={})
+      # 予め（ダウンロードする前に）src_urlの重複を確認
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
         logger.info 'Skipping a duplicate image...' if options[:verbose]
         return
       end
 
       # Remove 4 bytes chars
+      # Because with the old version of the MySQL we cannot save them to any columns.
       attributes[:caption] = Scrape.remove_4bytes(attributes[:caption])
 
-      # 新規レコードを作成
+      # Create a new instance and associate tags
       image = Image.new attributes
       tags.each { |tag| image.tags << tag }
 
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
+        logger.debug "saved image: #{image.inspect}"
+        # target_wordオブジェクトに関連づける
+        target_word.images << image
+
         Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else
         logger.info 'Image model saving failed. (maybe due to duplication)'
@@ -147,8 +154,16 @@ module Scrape
     end
 
 
+    # Enqueues a resque job that downloads an image.
     # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
     # Resqueのjobとして行う（非同期的に）
+    # @params image_id [Integer] An ID of an image that you wanna it download.
+    # @params src_url [String] A source url string.
+    # @params large [Boolean] Whether its file size is beyond 2 MB.
+    # @params user_id [Integer]
+    # @params target_type [String] A string that represents a class name.
+    # @params target_id [Integer]
+    # @params logger [Logger] An instance of a logger class that is derived from Rails Logger class.
     def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil, logger=nil)
       if user_id and target_type and target_id
         if large
