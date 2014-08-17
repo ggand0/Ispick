@@ -12,8 +12,8 @@ class UsersController < ApplicationController
     session[:sort] = params[:sort] if params[:sort]
 
     # Get delivered_images
-    delivered_images = current_user.target_words.first.images
-    #delivered_images = current_user.get_delivered_images
+    #delivered_images = current_user.target_words.first.images
+    delivered_images = current_user.get_delivered_images
     delivered_images.reorder!('posted_at DESC') if params[:sort]
 
     # Filter delivered_images by date

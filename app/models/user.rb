@@ -30,10 +30,24 @@ class User < ActiveRecord::Base
 
   # @return [ActiveRecord::AssociationRelation]
   def get_delivered_images
+    delivered_images = target_words.first.images
+    target_words.all.each_with_index do |target_word, count|
+      next if count == 1
+      delivered_images.merge(target_word.images)
+    end
+
+=begin
     delivered_images.
       where.not(images: { site_name: 'twitter' }).
       joins(:image).
       reorder('created_at DESC')
+=end
+
+    delivered_images.
+      where.not(is_illust: nil).        # Already downloaded
+      where.not(site_name: 'twitter').
+      #reorder('created_at DESC')
+      reorder('posted_at DESC')
   end
 
   # @return [ActiveRecord::AssociationRelation]
