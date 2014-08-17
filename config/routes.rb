@@ -77,6 +77,12 @@ Ispic::Application.routes.draw do
   resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
+  resources :images do
+    member do
+      put 'favor'
+      put 'hide'
+    end
+  end
 
   resources :people do
     collection do

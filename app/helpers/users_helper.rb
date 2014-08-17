@@ -48,8 +48,11 @@ module UsersHelper
   # @params delivered_image [DeliveredImage] An object of DeliveredImage.
   # @params image [Image] An object of Image which is included in the delivered_image.
   # @return []
-  def render_delivered_image(delivered_image, image)
-    link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  #def render_delivered_image(delivered_image, image)
+  #  link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  #end
+  def render_delivered_image(image)
+    link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
 
   # Renders a bootstrap button with the link.

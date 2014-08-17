@@ -1,13 +1,14 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
-  has_many :delivered_images, dependent: :destroy
+  #has_many :delivered_images, dependent: :destroy
+  has_many :favored_images
   has_many :images_tags
   has_many :tags, :through => :images_tags
   has_many :images_target_words
   has_many :target_words, :through => :images_target_words
 
 
-  # 明示的にテーブル名を指定することでエラー回避
+  # 明示的にテーブル名を指定することでエラー回避している
   default_scope { order("#{table_name}.created_at DESC") }
   paginates_per 100
 
