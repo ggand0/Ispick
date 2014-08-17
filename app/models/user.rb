@@ -46,8 +46,7 @@ class User < ActiveRecord::Base
     delivered_images.
       where.not(is_illust: nil).        # Already downloaded
       where.not(site_name: 'twitter').
-      #reorder('created_at DESC')
-      reorder('posted_at DESC')
+      reorder('posted_at DESC')         # Sort by posted_at value
   end
 
   # @return [ActiveRecord::AssociationRelation]
@@ -106,6 +105,10 @@ class User < ActiveRecord::Base
     # generate default image_board
     image_board = ImageBoard.create(name: 'Default')
     self.image_boards << image_board
+
+    # generate default target_word
+    target_word = TargetWord.where(word: '鹿目まどか').first
+    self.target_words << target_word
 
     # generate default avatar
     self.avatar = File.open("#{Rails.root}/app/assets/images/icepick.png")
