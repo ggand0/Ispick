@@ -9,6 +9,17 @@ namespace :deliver do
   # [MB]
   @MAX_DELIVER_SIZE = 100
 
+  desc "Associate all target_words with images"
+  task associate: :environment do
+    start = Time.now
+    Deliver::Words.associate_words_with_images
+    puts 'Elapsed time: ' + (Time.now - start).to_s
+    puts 'DONE!'
+  end
+
+  # ===========
+  #  Old tasks
+  # ===========
   desc "Deliver images to all users"
   task all: :environment do
     puts '-----------------------------------'
