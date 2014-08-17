@@ -4,7 +4,7 @@ class Image < ActiveRecord::Base
   has_many :images_tags
   has_many :tags, :through => :images_tags
   has_many :images_target_words
-  has_many :images, :through => :images_target_words
+  has_many :target_words, :through => :images_target_words
 
 
   # 明示的にテーブル名を指定することでエラー回避

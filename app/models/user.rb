@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  # Set this variabale true during testing.
   cattr_accessor :skip_callbacks
 
   has_many :delivered_images, dependent: :destroy
