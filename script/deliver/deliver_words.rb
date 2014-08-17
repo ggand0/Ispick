@@ -37,7 +37,7 @@ module Deliver::Words
       images = Image.includes(:tags).
         where.not(is_illust: nil).
         where(tags: { name: query }).
-        where("images.created_at>?", DateTime.now-1)
+        where("images.created_at>?", DateTime.now - 1).
         references(:tags)
     else
       # まとめサイト由来の画像のみ広くマッチさせる
