@@ -61,4 +61,42 @@ describe ImagesController do
     end
   end
 
+
+
+  describe "PUT favor" do
+    before do
+      login_user
+    end
+    it "Add image to User.favored_images" do
+      image = FactoryGirl.create(:image)
+      current_user = User.first
+
+      # Userを作成した段階でImageBoardとお気に入り画像がseedされているので
+      # その分を考慮する
+      count = current_user.image_boards.first.favored_images.count
+      put :favor, {
+        id: image.id,
+        board: 'Default',
+        image: image.as_json,
+        render: 'true'
+      }, valid_session
+
+      # ImageBoardに１枚追加されているはずである
+      expect(current_user.image_boards.first.favored_images.count).to eq(count+1)
+      expect(response).to redirect_to show_favored_images_users_path
+    end
+
+    it "redirects to show_favored_images_users_path" do
+      favored_image = FactoryGirl.create(:favored_image_with_image)
+      put :favor, {
+        id: favored_image.image.id,
+        board: 'Default',
+        image: favored_image.image,
+        render: 'true'
+      }, valid_session
+
+      expect(response).to redirect_to show_favored_images_users_path
+    end
+  end
+
 end
