@@ -12,14 +12,17 @@ class UsersController < ApplicationController
     session[:sort] = params[:sort] if params[:sort]
 
     # Get delivered_images
-    #delivered_images = current_user.target_words.first.images
-    delivered_images = current_user.get_delivered_images
-    delivered_images.reorder!('posted_at DESC') if params[:sort]
+    if current_user.target_words.nil? or current_user.target_words.empty?
+      delivered_images = Image.where("created_at>?", DateTime.now)
+    else
+      delivered_images = current_user.get_delivered_images
+      delivered_images.reorder!('posted_at DESC') if params[:sort]
 
-    # Filter delivered_images by date
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      delivered_images = User.filter_by_date(delivered_images, date)
+      # Filter delivered_images by date
+      if params[:date]
+        date = DateTime.parse(params[:date]).to_date
+        delivered_images = User.filter_by_date(delivered_images, date)
+      end
     end
 
     @delivered_images = delivered_images.page(params[:page]).per(25)

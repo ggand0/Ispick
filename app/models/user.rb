@@ -36,13 +36,6 @@ class User < ActiveRecord::Base
       delivered_images.merge(target_word.images)
     end
 
-=begin
-    delivered_images.
-      where.not(images: { site_name: 'twitter' }).
-      joins(:image).
-      reorder('created_at DESC')
-=end
-
     delivered_images.
       where.not(is_illust: nil).        # Already downloaded
       where.not(site_name: 'twitter').
@@ -107,8 +100,9 @@ class User < ActiveRecord::Base
     self.image_boards << image_board
 
     # generate default target_word
-    target_word = TargetWord.where(word: '鹿目まどか').first
-    self.target_words << target_word
+    #target_word = TargetWord.where(word: '鹿目まどか').first
+    #target_word = TargetWord.create(word: '鹿目まどか') if target_word.nil?
+    #self.target_words << target_word
 
     # generate default avatar
     self.avatar = File.open("#{Rails.root}/app/assets/images/icepick.png")
