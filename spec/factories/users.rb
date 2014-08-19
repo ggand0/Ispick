@@ -86,6 +86,24 @@ FactoryGirl.define do
       end
     end
 
+    factory :user_with_target_word do
+      sequence(:name) { |n| "ispick_twitter_w#{n}" }
+      after(:create) do |user|
+        1.times do
+          user.target_words << create(:target_words)
+        end
+      end
+    end
+
+    factory :user_with_target_word_image_file do
+      sequence(:name) { |n| "ispick_twitter_w#{n}" }
+      after(:create) do |user|
+        1.times do
+          user.target_words << create(:word_with_image_file)
+        end
+      end
+    end
+
     # デフォルトでユーザーが持つFavoredImage
     after(:create) do |user|
       # after_createで生成するので、それに追加する

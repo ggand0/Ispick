@@ -40,6 +40,7 @@ FactoryGirl.define do
     to_create do |instance|
       instance.save validate: false
     end
+    #association :targetable, factory: :target_word, strategy: :build
   end
 
   factory :image_for_delivered_image, class: Image do
@@ -59,6 +60,7 @@ FactoryGirl.define do
       instance.save validate: false
     end
   end
+
 
   factory :image_tag_only, class: Image do
     title 'test'
