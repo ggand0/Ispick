@@ -155,16 +155,12 @@ namespace :scrape do
   task :tinami, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
 
-    #Scrape::Tumblr.scrape(interval.to_i, false)
-    #Scrape::TumblrClient.new.scrape(interval.to_i)
     Scrape::Tinami.new.scrape(interval.to_i)
   end
   
   desc "Anime pictures and wallpapersから画像抽出する"
   task :anipic, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
-    #Scrape::Tumblr.scrape(interval.to_i, false)
-    #Scrape::TumblrClient.new.scrape(interval.to_i)
     Scrape::Anipic.new.scrape(interval.to_i)
   end
 end

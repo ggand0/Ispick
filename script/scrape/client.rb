@@ -164,6 +164,5 @@ module Scrape
         end
       end
     end
-
   end
 end
