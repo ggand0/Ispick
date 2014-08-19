@@ -5,9 +5,8 @@ describe Scrape::Piapro do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return nil
-    @agent = Scrape::Piapro.login()
+    Resque.stub(:enqueue).and_return nil # resqueにenqueueしないように
+    @agent = Scrape::Piapro.login
   end
 
   describe "get_illust_html function" do
@@ -73,7 +72,7 @@ describe Scrape::Piapro do
 
   describe "scrape function" do
     it "should call get_contents method at least 30 time" do
-      Scrape::Piapro.stub(:get_contents).and_return()
+      Scrape::Piapro.stub(:get_contents).and_return nil
       Scrape::Piapro.should_receive(:get_contents).at_least(30).times
 
       Scrape::Piapro.scrape()

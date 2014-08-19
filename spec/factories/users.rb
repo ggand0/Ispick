@@ -6,13 +6,13 @@ FactoryGirl.define do
     sequence(:password) { |n| "#{n}2345678" }
     sequence(:name) { |n| "ispick#{n}" }
 
-    # デフォルトでユーザーが持つFavoredImage
+    # デフォルトでユーザーが持つFavoredImageを作成
+    # Create a default FavoredImage object of an user
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
-      #user.class.skip_callback(:add, :after, :search_keyword)
-      #user.target_words.skip_callback(:add, :after, :search_keyword)
     end
   end
+
 
   factory :user_with_callbacks, class: User do
     sequence(:email) { |n| "test#{n}@example.com" }
@@ -22,14 +22,15 @@ FactoryGirl.define do
     sequence(:name) { |n| "ispick_twitter#{n}" }
   end
 
+
   factory :twitter_user, class: User do
     sequence(:email) { |n| "test#{n}@example.com" }
     password '12345678'
     provider  'twitter'
     uid '12345678'
     sequence(:name) { |n| "ispick_twitter#{n}" }
-    #after(:create) { |user| user.target_words.skip_callback(:add, :after, :search_keyword) }
 
+    # 配信画像（ファイル無）を持つuser
     factory :user_with_delivered_images do
       sequence(:name) { |n| "ispick_twitter_d#{n}" }
       ignore do
@@ -41,6 +42,16 @@ FactoryGirl.define do
       end
     end
 
+    # 異なる配信画像（ファイル無）を持つuser
+    factory :user_with_dif_delivered_images do
+      sequence(:name) { |n| "ispick_twitter_d#{n}" }
+      after(:create) do |user|
+        1.times { create(:delivered_image_photo, user: user) }
+        1.times { create(:delivered_image1, user: user) }
+      end
+    end
+
+    # 配信画像を持つuser
     factory :user_with_delivered_images_file do
       sequence(:name) { |n| "ispick_twitter_df#{n}" }
       ignore do
@@ -51,6 +62,7 @@ FactoryGirl.define do
       end
     end
 
+    # 登録画像を持つuser
     factory :user_with_target_images do
       sequence(:name) { |n| "ispick_twitter_i#{n}" }
       ignore do
@@ -61,18 +73,16 @@ FactoryGirl.define do
       end
     end
 
+    # 登録タグを持つuser
     factory :user_with_target_words do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       ignore do
         words_count 5
       end
       after(:create) do |user, evaluator|
-        #evaluator.words_count do
         5.times do
           user.target_words << create(:target_words)
         end
-        #create_list(:target_words, evaluator.words_count, user: user)
-        #create_list(:target_words_user, evaluator.words_count, target_word: create(:target_words), user: user)
       end
     end
 
@@ -84,13 +94,13 @@ FactoryGirl.define do
 
   end
 
+
   factory :facebook_user, class: User do
     email 'test@example.com'
     password '12345678'
     provider  'facebook'
     uid '12345678'
     sequence(:name) { |n| "ispick_facebook#{n}" }
-    #after(:create) { |user| user.class.skip_callback(:add, :after, :search_keyword) }
   end
 
 end

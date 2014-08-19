@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 require "#{Rails.root}/script/scrape/client"
-#require 'tumblr_client'
-#require 'tumblr/tagged'
 require 'securerandom'
+require 'tumblr_client'
 
 module Scrape
   class Tumblr < Client
-    require 'tumblr_client'
-
     ROOT_URL = 'https://tumblr.com'
 
     def initialize(logger=nil, limit=20)
@@ -38,7 +35,7 @@ module Scrape
       @limit = 10
       @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
-      result = scrape_using_api(target_word, user_id, english)
+      result = scrape_using_api(target_word, user_id, true, false, english)
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
     end
 
@@ -74,7 +71,7 @@ module Scrape
           validation: validation,
           large: false,
           verbose: false,
-          resque: false
+          resque: (not user_id.nil?)
         }
         image_id = self.class.save_image(image_data, @logger, Scrape.get_tags(image['tags']), options)
 
@@ -87,8 +84,10 @@ module Scrape
         # Resqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id
+          #@logger.debug "scrape_tumblr: user=#{user_id}"
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
-          self.class.generate_jobs(image_id, image_data[:src_url], false, user_id, target_word.class.name, target_word.id)
+          self.class.generate_jobs(image_id, image_data[:src_url], false,
+            user_id, target_word.class.name, target_word.id, @logger)
         end
 
         # limit枚抽出したら終了
@@ -140,7 +139,8 @@ module Scrape
       {
         title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
         caption: image['caption'],
-        src_url: image['photos'].first['original_size']['url'],
+        #src_url: image['photos'].first['original_size']['url'],
+        src_url: image['photos'].first['alt_sizes'][0]['url'],
         page_url: image['post_url'],
         posted_at: image['date'],
         views: nil,

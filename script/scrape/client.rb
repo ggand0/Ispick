@@ -53,7 +53,7 @@ module Scrape
 
       # １タグごとにタグ検索APIを用いて画像取得
       TargetWord.all.each do |target_word|
-        #begin
+        begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
           if (not target_word.word.nil?) and (not target_word.word.empty?)
             result = scrape_using_api(target_word)
@@ -66,12 +66,14 @@ module Scrape
             #  logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
             #end
           end
-        #rescue => e
-        #  @logger.info e
-        #  logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
-        #end
+        rescue => e
+          @logger.info e
+          logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
+        end
 
-        sleep(local_interval*60) unless @sleep_debug
+        sleep_time = local_interval*60
+        logger.info "Sleeping #{local_interval} minutes."
+        sleep(sleep_time) unless @sleep_debug
       end
       @logger.info '--------------------------------------------------'
     end
@@ -119,6 +121,7 @@ module Scrape
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
     #def self.save_image(attributes, tags=[], validation=true, large=false, verbose=false, resque=true)
     def self.save_image(attributes, logger, tags=[], options={})
+      #logger.debug "save_image options: #{options.inspect} #{options[:validation]}"
       # 予め（ダウンロードする前に）重複を確認
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
         logger.info 'Skipping a duplicate image...' if options[:verbose]
@@ -135,7 +138,7 @@ module Scrape
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-        Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) if not options[:resque]
+        Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else
         logger.info 'Image model saving failed. (maybe due to duplication)'
         return
@@ -146,13 +149,13 @@ module Scrape
 
     # 既にsaveしたImageレコードに対してダウンロード・画像解析処理を
     # Resqueのjobとして行う（非同期的に）
-    def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil)
-      #image = Image.find(image_id)
-      if target_type and target_id
+    def self.generate_jobs(image_id, src_url, large=false, user_id=nil, target_type=nil, target_id=nil, logger=nil)
+      if user_id and target_type and target_id
         if large
           Resque.enqueue(DownloadImageLarge, image_id, src_url,
             user_id, target_type, target_id)
         else
+          #logger.info "with #{user_id}: #{image_id}" if logger
           Resque.enqueue(DownloadImage, image_id, src_url,
             user_id, target_type, target_id)
         end
@@ -160,6 +163,7 @@ module Scrape
         if large
           Resque.enqueue(DownloadImageLarge, image_id, src_url)
         else
+          #logger.info "without #{user_id}: #{image_id}" if logger
           Resque.enqueue(DownloadImage, image_id, src_url)
         end
       end

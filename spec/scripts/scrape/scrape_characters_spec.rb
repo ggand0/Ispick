@@ -55,8 +55,9 @@ describe "Scrape::Wiki::Character" do
   end
 
   describe "get_character_page_ja function" do
-    it "returns a valid hash" do
-      # 登場人物」の項が概要ページに存在するurl
+    it "returns the hash that contains characters page url if characters list page exists" do
+      # Use the url that contains the character list page link.
+      # 「登場人物」の項が概要ページに存在するurl
       url = 'http://ja.wikipedia.org/wiki/%E3%81%93%E3%81%B0%E3%81%A8%E3%80%82'
       #url = 'http://ja.wikipedia.org/wiki/IS_%E3%80%88%E3%82%A4%E3%83%B3%E3%83%95%E3%82%A3%E3%83%8B%E3%83%83%E3%83%88%E3%83%BB%E3%82%B9%E3%83%88%E3%83%A9%E3%83%88%E3%82%B9%E3%80%89'
       html = Scrape::Wiki.open_html(url)
@@ -66,8 +67,9 @@ describe "Scrape::Wiki::Character" do
       expect(result).to eql({ title: 'こばと。',
         url: 'http://ja.wikipedia.org/wiki/%E3%81%93%E3%81%B0%E3%81%A8%E3%80%82' })
     end
+
     it "returns a valid hash with external links" do
-      # 登場人物」の項が概要ページに存在するurl
+      # 「登場人物」の項が概要ページに存在するurl
       url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
       html = Scrape::Wiki.open_html(url)
       puts result = Scrape::Wiki::Character.get_character_page_ja('魔法少女まどか☆マギカ', url, html)

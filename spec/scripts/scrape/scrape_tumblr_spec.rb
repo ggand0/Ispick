@@ -8,7 +8,6 @@ describe Scrape::Tumblr do
   before do
     IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
-    #@client = Scrape::Tumblr.get_client()
     @client = Scrape::Tumblr.new(nil, 5)
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
     @response = JSON.parse(response)['response']
@@ -63,10 +62,12 @@ describe Scrape::Tumblr do
         "tags"=>["アナログ", "VOICEROID+", "結月ゆかり", "弦巻マキ"],
         "note_count"=>3,
         "caption"=>"blah blah",
-        "photos"=>[{"original_size"=>{
-          "width"=>697,
-          "height"=>981,
-          "url"=>"http://37.media.tumblr.com/9cbde1a610fd826c87600caa3372e176/tumblr_n2sk2cFwOB1qdwsovo1_1280.jpg"
+        "photos"=>[{
+          "alt_sizes"=>[{"width"=>518,"height"=>800,"url"=>"http:\/\/24.media.tumblr.com\/6105c6ed9ec401e0bb756eb0fe29ffca\/tumblr_n4q40pWU3T1s7jcyvo1_1280.jpg"}],
+          "original_size"=>{
+            "width"=>697,
+            "height"=>981,
+            "url"=>"http://37.media.tumblr.com/9cbde1a610fd826c87600caa3372e176/tumblr_n2sk2cFwOB1qdwsovo1_1280.jpg"
           }}]
       }
 

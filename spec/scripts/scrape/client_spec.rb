@@ -105,4 +105,19 @@ describe Scrape::Client do
     end
   end
 
+  describe "generate_jobs method" do
+    it "does something" do
+      #Resque.unstub(:enqueue)
+      #expect(Scrape::Client).to receive(:generate_jobs).with(1, 'goo', false, 1, 'TargetWord', 1)
+      #expect(Scrape::Client).to receive(:generate_jobs)#.with(1, 'goo', false, 1, 'TargetWord', 1)
+
+      #Resque.stub(:enqueue)
+      expect(Resque).to receive(:enqueue).with(DownloadImage, 1, 'goo', 1, 'TargetWord', 1)#.and_return nil
+      #expect(Resque).to receive(:enqueue)#.with(DownloadImage, 1, 'goo')
+
+      puts 'test'
+      Scrape::Client.generate_jobs(1, 'goo', false, 1, 'TargetWord', 1)
+    end
+  end
+
 end

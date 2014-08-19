@@ -1,11 +1,11 @@
 <%= javascript_include_tag 'users_home' %>
 <%= javascript_include_tag 'core' %>
+<%= stylesheet_link_tag 'users' %>
 <%= render 'shared/modal_image' %>
-<%# render 'shared/modal_board' %>
 
 <p>
   「好みの設定」=>「登録ワード一覧」からタグを登録すると１分弱で抽出画像がホーム画面に表示されます。<br>
-  <%= "<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe if @delivered_images_all %>
+  <%= get_debug_html(@delivered_images_all) if @delivered_images_all %>
   <br>
   <%= bs_dropdown_button_to 'フィルター' do %>
     配信日で絞り込む：
@@ -15,14 +15,11 @@
     <li role="presentation" class="divider"></li>
     <li><%= link_to '投稿日時順にする', home_users_path(sort: true) %></li>
   <% end %>
-
 </p>
-
 
 <%= paginate @delivered_images %>
 
 <div class="wrap">
-
   <% @delivered_images.each_with_index do |delivered_image, index| %>
     <% image = delivered_image.image %>
     <% next if delivered_image.avoided %>
@@ -32,27 +29,24 @@
         <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
         <%= get_jst_string(image.posted_at) + '投稿' %>
-
-
-        <%= link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
+        <%= render_delivered_image(delivered_image, image) %>
 
         <div class="titleBox">
           <div class="id"><%= delivered_image.id %></div>
 
           <%= button_group class: 'pull-right blocks' do %>
-            <%= bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: delivered_image.id, id: "popover-board#{delivered_image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{delivered_image.id}" %>
-            <!--<div class="favored"></div>-->
-            <%= bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default btn-sm' %>
-             <%= bs_button_to 'Show', { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm' %>
+            <%= render_clip_button(delivered_image) %>
+            <%= render_hide_button(delivered_image) %>
+            <%= render_show_button(delivered_image) %>
           <% end %>
           <br />
         </div>
-        <div class="title"><%= image.title.to_s %></div>
+        <div class="title">
+          <%= image.title.to_s %><br />
+        </div>
 
       </div>
     </div>
-
-
   <% end %>
 </div>
 

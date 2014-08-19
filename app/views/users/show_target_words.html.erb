@@ -27,7 +27,6 @@
       <tr>
         <td><%= link_to target_word.word, target_word %></td>
         <td><%= link_to 'このタグへの配信画像を見る', show_delivered_target_word_path(target_word) %></td>
-        <td><%# link_to 'Destroy', target_word, method: :delete %></td>
         <td><%= link_to 'Unfollow', delete_target_word_users_path({id: target_word.id}), method: :delete %></td>
       </tr>
     <% end %>
