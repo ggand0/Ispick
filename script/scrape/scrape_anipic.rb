@@ -43,6 +43,7 @@ module Scrape
     
     
     # Mechanizeにより検索結果を取得
+    # @param [String]
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
     def get_search_result(query)
       agent = Mechanize.new
@@ -60,13 +61,27 @@ module Scrape
       #puts(page.forms[2]['search_tags'])
       return result
     end
+    
+    # xmlからタグを取得
+    # @param [Nokogiri::XML]
+    # @return [Array::String]
+    def get_tags_original(xml)
+      result = []
+      index = 0
+      xml.css("ul[class='tags']").first.css('a').each do |a|
+        result[index] = a.content
+        index = index + 1
+      end
+
+      return result
+    end
 
     # 対象のタグを持つPostの画像を抽出する
     # @param [String]
     # @param [Integer]
     # @param [Boolean]
     # @return [Hash] Scraping result
-    def scrape_using_api(target_word, validation=true, logging=false)
+    def scrape_using_api(target_word, validation=true, logging=false) 
       query = Scrape.get_query target_word
       return if query.nil? or query.empty?
       @logger.info "query=#{query}"
@@ -79,26 +94,24 @@ module Scrape
 
       #Mecanizeによりクエリ検索結果のページを取得
       page = self.get_search_result(query)
-
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
       page.search("span[class='img_block_big']").each_with_index do |image, count|
         # サーチ結果ページから、ソースページのURLを取得
         page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
-        
-        # ソースページから画像情報を取得してDBへ保存する
+          # ソースページのパース
+        xml = Nokogiri::XML(open(page_url))
+          # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-        image_data = self.get_data(page_url)
-        
+        image_data = self.get_data(xml, page_url)
         options = {
           validation: validation,
           large: false,
           verbose: false,
           resque: false
-        }
-        
-        # tagについてはひとまずキャプションに含まれる単語
-        tags = image_data[:caption].split("  ")
-        
+            }
+
+        tags = self.get_tags_original(xml)
+      
         # 保存に必要なものはimage_data, tags, validetion
         image_id = self.class.save_image(image_data, @logger, Scrape.get_tags(tags), options)
 
@@ -125,12 +138,11 @@ module Scrape
 
     # 画像１枚に関する情報をHashにして返す。
     # favoritesの抽出にはVotesを利用
+    # @param [Nokogiri::XML]
     # @param [String]
     # @return [Hash]
-    def get_data(page_url)
+    def get_data(xml, page_url)
 
-          # ソースページのパース
-        xml = Nokogiri::XML(open(page_url))
         # titleの取得
           # 改行の除去
         title = xml.css("div[class='post_content']").css("h1").first.content.gsub!(/\n/,'')
