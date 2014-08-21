@@ -37,7 +37,6 @@ module UsersHelper
   # @params image [ActiveRecord::AssociationRelation] A relation object of Image class.
   # @return [String] html code with the count of input relation.
   def get_debug_html(images)
-    #"<strong>Found #{@images_all.count} images.</strong".html_safe
     "<strong>Found #{images.count} images.</strong>".html_safe
   end
 
@@ -48,9 +47,6 @@ module UsersHelper
   # @params image [Image] An object of Image.
   # @params image [Image] An object of Image which is included in the image.
   # @return []
-  #def render_image(image, image)
-  #  link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
-  #end
   def render_image(image)
     link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
