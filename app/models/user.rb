@@ -22,12 +22,19 @@ class User < ActiveRecord::Base
   after_create :create_default
   validates :name, presence: true
 
-  # Scrape and deliver images right after a new tag is created by an user
+
+
+  # ==================
+  #  Instance methods
+  # ==================
+
+  # Scrape and deliver images right after a new tag is created by an user.
   # @param target_word [TargetWord]
   def search_keyword(target_word)
     Resque.enqueue(SearchImages, self.id, target_word.id)
   end
 
+  # Get images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     images = target_words.first.images
@@ -45,6 +52,8 @@ class User < ActiveRecord::Base
       where.not(site_name: 'twitter').
       #reorder('posted_at DESC')         # Sort by posted_at value
       reorder('created_at DESC')         # Sort by posted_at value
+      .limit(200)
+
   end
 
   # @return [ActiveRecord::AssociationRelation]
