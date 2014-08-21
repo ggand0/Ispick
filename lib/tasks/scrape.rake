@@ -28,11 +28,11 @@ namespace :scrape do
     old = DateTime.now.utc - 7.days
     Image.where("created_at < ?", old).destroy_all
 
-    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
-    puts 'Current image count: ' + Image.count.to_s
+    puts "Deleted: #{(before_count - Image.count).to_s} images"
+    puts "Current image count: #{Image.count.to_s}"
   end
 
-  # @limit 最大保存数
+  # @params limit [Integer] 最大保存数
   desc "最大保存数を超えている場合古いImageから順に削除"
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
@@ -47,11 +47,10 @@ namespace :scrape do
     before_count = Image.count
     if Image.count > limit
       delete_num = Image.count - limit
-      #puts Image.limit(delete_num).order(:created_at)
       Image.limit(delete_num).order(:created_at).destroy_all
     end
-    puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
-    puts 'Current image count: ' + Image.count.to_s
+    puts "Deleted: #{(before_count - Image.count).to_s} images"
+    puts "Current image count: #{Image.count.to_s}"
   end
 
   desc "画像を対象webサイト全てから抽出する"
@@ -79,9 +78,9 @@ namespace :scrape do
   end
 
 
-  # ----------------------------------
+  # -----------------------------
   # 特定のサイトから画像抽出するタスク
-  # ----------------------------------
+  # -----------------------------
   require "#{Rails.root}/script/scrape/scrape_nico.rb"
   require "#{Rails.root}/script/scrape/scrape_2ch.rb"
   require "#{Rails.root}/script/scrape/scrape_futaba.rb"
@@ -147,7 +146,7 @@ namespace :scrape do
   end
 
   desc "Giphyから画像抽出する"
-  task giphy: :environment do
+  task :giphy, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 720 : args[:interval]
     Scrape::Giphy.new.scrape(interval.to_i)
   end

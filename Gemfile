@@ -10,7 +10,9 @@ gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 
 # View related gems
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 3.2.0'
+gem 'autoprefixer-rails'
+
 gem 'bootstrap-datepicker-rails'
 gem 'rails-bootstrap-helpers'
 gem 'bootstrap_form'

@@ -90,7 +90,7 @@ module Scrape
             resque: (not user_id.nil?)
           }
           image_data.each do |data|
-            image_id = self.class.save_image(data, @logger, [ Scrape.get_tag(query) ], options)
+            image_id = self.class.save_image(data, @logger, target_word, [ Scrape.get_tag(query) ], options)
             duplicates += image_id ? 0 : 1
             scraped += 1 if image_id
             elapsed_time = Time.now - start
@@ -98,7 +98,7 @@ module Scrape
 
             # Resqueで非同期的に画像解析を行う
             # 始めに画像をダウンロードし、終わり次第ユーザに配信
-            if image_id
+            if image_id and (not user_id.nil?)
               @logger.info "Scraped from #{data[:src_url]} in #{Time.now - start} sec" if verbose
               Scrape::Client.generate_jobs(image_id, data[:src_url], false, user_id, target_word.class.name, target_word.id)
             end

@@ -122,7 +122,7 @@ FactoryGirl.define do
         1.times do
           user.target_words << create(:word_with_image)
           user.target_words << create(:word_with_image_dif_time)
-          user.target_words << create(:word_with_image_photo)
+          #user.target_words << create(:word_with_image_photo)
         end
       end
     end

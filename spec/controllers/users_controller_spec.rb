@@ -15,7 +15,7 @@ describe UsersController do
 
     it "renders 'not_signed_in' template when the user is NOT logged in" do
       get :home, {}, valid_session
-      expect(response).to render_template('not_signed_in')
+      expect(response).to redirect_to('/signin_with_password')
     end
   end
 
@@ -29,7 +29,7 @@ describe UsersController do
 
     it "renders not_signed_in template when NOT logged in" do
       get :show_target_images, {}, valid_session
-      response.should render_template('not_signed_in')
+      expect(response).to redirect_to('/signin_with_password')
     end
   end
 
@@ -42,7 +42,7 @@ describe UsersController do
 
     it "renders 'not_signed_in' template when NOT logged in" do
       get :show_target_words, {}, valid_session
-      response.should render_template('not_signed_in')
+      expect(response).to redirect_to('/signin_with_password')
     end
   end
 
@@ -55,7 +55,7 @@ describe UsersController do
 
     it "renders not_signed_in template when NOT logged in" do
       get :show_favored_images, {}, valid_session
-      response.should render_template('not_signed_in')
+      expect(response).to redirect_to('/signin_with_password')
     end
   end
 

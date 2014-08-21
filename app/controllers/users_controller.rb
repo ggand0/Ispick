@@ -56,7 +56,7 @@ class UsersController < ApplicationController
 
   # Render the index page of target_images.
   def show_target_images
-    return render action: '/signin_with_password' unless signed_in?
+    return redirect_to '/signin_with_password' unless signed_in?
 
     @target_images = current_user.target_images
     render action: 'show_target_images'
@@ -64,7 +64,7 @@ class UsersController < ApplicationController
 
   # Render the index page of target_words.
   def show_target_words
-    return render action: '/signin_with_password' unless signed_in?
+    return redirect_to '/signin_with_password' unless signed_in?
 
     @words = current_user.target_words
     render action: 'show_target_words'
