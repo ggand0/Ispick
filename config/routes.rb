@@ -39,16 +39,6 @@ Ispic::Application.routes.draw do
     end
   end
 
-  resources :delivered_images do
-    collection do
-      get 'show_user_image'
-    end
-    member do
-      put 'favor'
-      put 'avoid'
-    end
-  end
-
   resources :target_images do
     member do
       get 'prefer'
