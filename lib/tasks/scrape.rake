@@ -1,19 +1,31 @@
 # encoding: utf-8
 require "#{Rails.root}/script/scrape/scrape"
+require "#{Rails.root}/script/scrape/scrape_nico.rb"
+require "#{Rails.root}/script/scrape/scrape_2ch.rb"
+require "#{Rails.root}/script/scrape/scrape_futaba.rb"
+require "#{Rails.root}/script/scrape/scrape_piapro.rb"
+require "#{Rails.root}/script/scrape/scrape_4chan.rb"
+require "#{Rails.root}/script/scrape/scrape_twitter.rb"
+require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
+require "#{Rails.root}/script/scrape/scrape_deviant.rb"
+require "#{Rails.root}/script/scrape/scrape_giphy.rb"
+require "#{Rails.root}/script/scrape/scrape_matome.rb"
+require "#{Rails.root}/script/scrape/scrape_wiki.rb"
+require "#{Rails.root}/script/scrape/scrape_tinami.rb"
 
 namespace :scrape do
   @DEFAULT = 10000
 
   # ----------------------------------
-  # General
+  #  General tasks
   # ----------------------------------
   desc "指定された時期より古いImageを削除"
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
 
-    # http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
-    old = DateTime.now.utc - 7.days                 # rails onlyな書き方
+    # ref: http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
+    old = DateTime.now.utc - 7.days
     Image.where("created_at < ?", old).destroy_all
 
     puts 'Deleted: ' + (before_count - Image.count).to_s + ' images'
@@ -70,35 +82,20 @@ namespace :scrape do
   # ----------------------------------
   # 特定のサイトから画像抽出するタスク
   # ----------------------------------
-  require "#{Rails.root}/script/scrape/scrape_nico.rb"
-  require "#{Rails.root}/script/scrape/scrape_2ch.rb"
-  require "#{Rails.root}/script/scrape/scrape_futaba.rb"
-  require "#{Rails.root}/script/scrape/scrape_piapro.rb"
-  require "#{Rails.root}/script/scrape/scrape_4chan.rb"
-  require "#{Rails.root}/script/scrape/scrape_twitter.rb"
-  require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
-  require "#{Rails.root}/script/scrape/scrape_deviant.rb"
-  require "#{Rails.root}/script/scrape/scrape_giphy.rb"
-  require "#{Rails.root}/script/scrape/scrape_matome.rb"
-  require "#{Rails.root}/script/scrape/scrape_wiki.rb"
-  require "#{Rails.root}/script/scrape/scrape_tinami.rb"
-
   desc "キャラクタに関する静的なDBを構築する"
-    task wiki: :environment do
-      puts 'Scraping character names...'
-      Scrape::Wiki.scrape
-    end
+  task wiki: :environment do
+    puts 'Scraping character names...'
+    Scrape::Wiki.scrape
+  end
 
   desc "2chから画像抽出する"
   task nichan: :environment do
-
     Scrape::Nichan.scrape
   end
 
   desc "ニコ静から画像抽出する"
   task :nico, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 120 : args[:interval]
-    #Scrape::Nico.scrape(interval.to_i, false)
     Scrape::Nico.new.scrape(interval.to_i)
   end
 
@@ -121,16 +118,12 @@ namespace :scrape do
   desc "Twitterから画像抽出する"
   task :twitter, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 60 : args[:interval]
-    #Scrape::Twitter.scrape(interval.to_i, false)
     Scrape::Twitter.new.scrape(interval.to_i)
   end
 
   desc "Tumblrから画像抽出する"
   task :tumblr, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
-
-    #Scrape::Tumblr.scrape(interval.to_i, false)
-    #Scrape::TumblrClient.new.scrape(interval.to_i)
     Scrape::Tumblr.new.scrape(interval.to_i)
   end
 
@@ -149,13 +142,10 @@ namespace :scrape do
   task matome: :environment do
     Scrape::Matome.scrape
   end
-  
+
   desc "TINAMIから画像抽出する"
   task :tinami, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
-
-    #Scrape::Tumblr.scrape(interval.to_i, false)
-    #Scrape::TumblrClient.new.scrape(interval.to_i)
     Scrape::Tinami.new.scrape(interval.to_i)
   end
 end
