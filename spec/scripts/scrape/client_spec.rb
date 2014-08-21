@@ -29,13 +29,15 @@ describe Scrape::Client do
     end
 
     it "sleeps with right interval after each scraping" do
-      FactoryGirl.create_list(:target_word, 5)
+      FactoryGirl.create_list(:target_word, 5)  # = 5 TargetWords as all
+      puts TargetWord.count
       @client.pid_debug = true
       @client.should_receive(:sleep).with(10*60)      # (60-10) / 5*1.0
       @client.stub(:sleep).and_return nil
 
       @client.scrape_target_words('', 60)
 
+      # Set it false for the next example
       @client.pid_debug = false
     end
 
@@ -56,13 +58,20 @@ describe Scrape::Client do
 
 
   describe "save_image method" do
+    before do
+      @target_word = FactoryGirl.create(:target_word)
+    end
+
     describe "with valid attributes" do
       it "should create a new Image model" do
         Image.any_instance.stub(:image_from_url).and_return nil
         count = Image.count
 
-        Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger)
-        Image.count.should eq(count+1)
+        id = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
+        image = Image.find(id)
+
+        Image.count.should eq(count+1)                  # DBに保存されるはず
+        expect(@target_word.images.first).to eq(image)  # target_wordに関連づけられるはず
       end
 
       describe "when the image is not saved" do
@@ -71,7 +80,7 @@ describe Scrape::Client do
           Image.any_instance.stub(:image_from_url).and_return nil
           #Rails.logger.should_receive(:info).with('Image model saving failed.')
 
-          Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger)
+          Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
         end
       end
 
@@ -80,7 +89,7 @@ describe Scrape::Client do
           Image.any_instance.stub(:save).and_return(false)
 
           count = Image.count
-          result = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger)
+          result = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
           expect(result).to eq(nil)
           expect(Image.count).to eq(count)
         end
@@ -91,7 +100,7 @@ describe Scrape::Client do
       it "should not save an invalid image when validation param is true" do
         image = FactoryGirl.create(:image)
         count = Image.count
-        Scrape::Client.save_image({ title: 'test', src_url: 'test1@example.com' }, @logger, [])
+        Scrape::Client.save_image({ title: 'test', src_url: 'test1@example.com' }, @logger, @target_word, [])
         Image.count.should eq(count)
       end
 
@@ -99,7 +108,7 @@ describe Scrape::Client do
         image = FactoryGirl.create(:image_min)
         count = Image.count
 
-        Scrape::Client.save_image({ title: 'title', src_url: image.src_url }, @logger)
+        Scrape::Client.save_image({ title: 'title', src_url: image.src_url }, @logger, @target_word)
         Image.count.should eq(count)
       end
     end

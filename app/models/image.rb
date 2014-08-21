@@ -1,12 +1,13 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
-
+  has_many :favored_images
   has_many :images_tags
   has_many :tags, :through => :images_tags
+  has_many :images_target_words
+  has_many :target_words, :through => :images_target_words
 
-  has_many :delivered_images, dependent: :destroy
 
-  # 明示的にテーブル名を指定することでエラー回避
+  # 明示的にテーブル名を指定することでエラー回避している
   default_scope { order("#{table_name}.created_at DESC") }
   paginates_per 100
 
@@ -38,6 +39,7 @@ class Image < ActiveRecord::Base
 
   # Downloads image data from url and stores it as a paperclip attachment
   # @param url [String] 画像のソースURL
+  # @return [String] A MD5 checksum string.
 	def image_from_url(url)
     extension = url.match(/.(jpg|jpeg|pjpeg|png|x-png|gif)$/).to_s
     file = Tempfile.new(['image', extension])

@@ -15,6 +15,7 @@
   <!--<li class="clip_button btn btn-default btn-group-justified" >-->
   <% existed = check_existed(board.id, image.id) %>
   <%= button_group do %>
-    <%= bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
+    <%# bs_button_to board.name.to_s, { controller: 'delivered_images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
+    <%= bs_button_to board.name.to_s, { controller: 'images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
   <% end %>
 <% end %>

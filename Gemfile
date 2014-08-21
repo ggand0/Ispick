@@ -80,6 +80,7 @@ gem 'whenever', require: false                   # Support crontab
 gem 'rubyzip'
 gem 'ransack'
 gem 'factory_girl_rails'                          # A fixtures replacement
+gem 'engtagger'
 
 # API clients
 gem 'natto'

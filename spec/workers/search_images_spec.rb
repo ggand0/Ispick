@@ -12,12 +12,11 @@ describe SearchImages do
       user = FactoryGirl.create(:user_with_callbacks)
 
       Scrape.stub(:scrape_target_word).and_return nil
-      Deliver.stub(:deliver_keyword).and_return nil
-      expect(Deliver).to receive(:deliver_keyword).with(user.id, target_word.id, SearchImages.logger)
+      #Deliver.stub(:deliver_keyword).and_return nil
+      #expect(Deliver).to receive(:deliver_keyword).with(user.id, target_word.id, SearchImages.logger)
       expect(Scrape).to receive(:scrape_target_word).with(user.id, target_word, SearchImages.logger)
 
       SearchImages.perform(user.id, target_word.id)
-      #user.target_words << target_word
     end
   end
 end

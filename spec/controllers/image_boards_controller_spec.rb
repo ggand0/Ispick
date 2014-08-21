@@ -77,10 +77,10 @@ RSpec.describe ImageBoardsController, :type => :controller do
 
     describe "with valid params" do
       it "creates a new ImageBoard" do
-        delivered_image = FactoryGirl.create(:delivered_image)
+        image = FactoryGirl.create(:image)
 
         expect {
-          post :create, { :image_board => valid_attributes, image: delivered_image.id }, valid_session
+          post :create, { :image_board => valid_attributes, image: image.id }, valid_session
         }.to change(ImageBoard, :count).by(1)
       end
     end

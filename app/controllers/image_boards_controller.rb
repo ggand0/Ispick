@@ -22,7 +22,8 @@ class ImageBoardsController < ApplicationController
   end
 
   def boards
-    @image = DeliveredImage.find(params[:image])
+    #@image = DeliveredImage.find(params[:image])
+    @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:id]
     respond_to do |format|
@@ -32,7 +33,8 @@ class ImageBoardsController < ApplicationController
   end
 
   def reload
-    @image = DeliveredImage.find(params[:image])
+    #@image = DeliveredImage.find(params[:image])
+    @image = Image.find(params[:image])
     @board = ImageBoard.new
     respond_to do |format|
       format.html
@@ -51,7 +53,8 @@ class ImageBoardsController < ApplicationController
     @image_board.save!
     current_user.image_boards << @image_board
 
-    @image = DeliveredImage.find(params[:image])
+    #@image = DeliveredImage.find(params[:image])
+    @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:html_id]
     respond_to do |format|

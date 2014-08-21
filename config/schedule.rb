@@ -41,8 +41,15 @@ end
 # 配信システム系
 every 60.minutes do
   # 指定枚数を超えたらその分Imagesから削除
-  rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
+  #rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
 
   # 全てのユーザーに推薦イラストを配信
   #rake 'deliver:all', output: 'log/deliver.log'
+
+
+  rake 'deliver:associate', output: 'log/deliver.log'
 end
+
+every 6.hours do
+  # 指定枚数を超えたらその分Imagesから削除
+  rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'

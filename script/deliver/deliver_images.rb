@@ -1,4 +1,6 @@
 
+# Delivers images based on uploaded images.
+# Currently not in use.
 module Deliver::Images
   THRESHOLD = 70
 

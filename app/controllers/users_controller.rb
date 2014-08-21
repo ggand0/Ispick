@@ -6,19 +6,25 @@ class UsersController < ApplicationController
 
   # GET
   # Render an user's home page.
-  # ユーザのホームページを表示する。
+  # ユーザ個別のホームページを表示する。
   def home
-    return render action: 'not_signed_in' unless signed_in?
+    return redirect_to '/signin_with_password' unless signed_in?
     session[:sort] = params[:sort] if params[:sort]
 
     # Get delivered_images
-    delivered_images = current_user.get_delivered_images
-    delivered_images.reorder!('posted_at DESC') if params[:sort]
+    # For a new user, display the newer images
+    if current_user.target_words.nil? or current_user.target_words.empty?
+      delivered_images = Image.where("created_at>?", DateTime.now - 1)
+    # Otherwise, display images from user.target_words relation
+    else
+      delivered_images = current_user.get_images
+      delivered_images.reorder!('posted_at DESC') if params[:sort]
 
-    # Filter delivered_images by date
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      delivered_images = User.filter_by_date(delivered_images, date)
+      # Filter delivered_images by date
+      if params[:date]
+        date = DateTime.parse(params[:date]).to_date
+        delivered_images = User.filter_by_date(delivered_images, date)
+      end
     end
 
     @delivered_images = delivered_images.page(params[:page]).per(25)
@@ -50,7 +56,7 @@ class UsersController < ApplicationController
 
   # Render the index page of target_images.
   def show_target_images
-    return render action: 'not_signed_in' unless signed_in?
+    return render action: '/signin_with_password' unless signed_in?
 
     @target_images = current_user.target_images
     render action: 'show_target_images'
@@ -58,7 +64,7 @@ class UsersController < ApplicationController
 
   # Render the index page of target_words.
   def show_target_words
-    return render action: 'not_signed_in' unless signed_in?
+    return render action: '/signin_with_password' unless signed_in?
 
     @words = current_user.target_words
     render action: 'show_target_words'
@@ -88,8 +94,8 @@ class UsersController < ApplicationController
   end
 
 
-  # A function for debug.
-  # This feature will be deleted in the production.
+  # An action for debug.
+  # This feature will be deleted in the production version.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     return redirect_to :back unless signed_in?
@@ -121,9 +127,9 @@ class UsersController < ApplicationController
 
     # Get delivered_images
     if session[:all]
-      delivered_images = current_user.get_delivered_images_all
+      delivered_images = current_user.get_images_all
     else
-      delivered_images = current_user.get_delivered_images
+      delivered_images = current_user.get_images
     end
 
     # Filter by is_an_illustration value
@@ -142,7 +148,7 @@ class UsersController < ApplicationController
 
   # Render the template if an user is not signed in.
   def render_not_signed_in
-    render action: 'not_signed_in' unless signed_in?
+    redirect_to '/signin_with_password' unless signed_in?
   end
 
   # Update session values by request parameters.

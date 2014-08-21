@@ -11,25 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140719164609) do
-
-  create_table "delivered_images", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "image_id"
-    t.integer  "targetable_id"
-    t.string   "targetable_type"
-    t.boolean  "favored"
-    t.boolean  "avoided"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20140817110713) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
     t.integer  "image_board_id"
-    t.integer  "delivered_image_id"
+    t.integer  "image_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
@@ -78,6 +67,11 @@ ActiveRecord::Schema.define(version: 20140719164609) do
   create_table "images_tags", force: true do |t|
     t.integer "image_id", null: false
     t.integer "tag_id",   null: false
+  end
+
+  create_table "images_target_words", force: true do |t|
+    t.integer "image_id",       null: false
+    t.integer "target_word_id", null: false
   end
 
   create_table "keywords", force: true do |t|

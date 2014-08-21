@@ -21,11 +21,13 @@ class DownloadImage
       logger.info "user_id=#{user_id} image_id=#{image_id} src=#{src_url} #{target_id}"
 
       # 全く同一のファイルを持つレコードが既にDBに存在すれば削除する
-      # 自分自身はまだ保存していないので、1以上なら重複
+      # 自分自身は、変更を加えた後まだ保存していないので含まれない、1以上なら重複
       duplicates = Image.where(md5_checksum: image.md5_checksum)
-      if duplicates.count > 0#1
+      logger.debug "count: #{duplicates.count}"
+      if duplicates.count > 0
+        logger.debug "dup info: #{duplicates.first.id}"
         Image.destroy(image_id)
-        logger.info "Destroyed duplicates : Image.id=#{image_id} dup=#{duplicates.first.inspect}"
+        logger.info "Destroyed duplicates : dup=#{duplicates.first.inspect}"
       else
         image.save!
         logger.info "Downloaded : Image.id=#{image_id}"

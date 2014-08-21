@@ -19,6 +19,7 @@ require 'rspec/autorun'
 require 'capybara'
 require 'capybara/rspec'
 
+# Initialize webmock gem
 require 'webmock/rspec'
 WebMock.allow_net_connect!
 

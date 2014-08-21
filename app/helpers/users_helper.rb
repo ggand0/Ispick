@@ -5,11 +5,11 @@ module UsersHelper
   def get_total_size_favored(favored_images)
     total_size = 0
     favored_images.each do |n|
-      # まだコピーされていない(生存中のDeliveredImageを参照している)
-      if n.delivered_image_id
-        image = DeliveredImage.find(n.delivered_image_id)
+      # まだコピーされていない(生存中のImageを参照している)
+      if n.image_id
+        image = Image.find(n.image_id)
         total_size += image.data.size
-      # 既にコピーされている(ソース元のDeliveredImageは削除されている)
+      # 既にコピーされている(ソース元のImageは削除されている)
       else
         total_size += n.data.size
       end
@@ -34,40 +34,43 @@ module UsersHelper
   end
 
   # Returns html code for debugging.
-  # @params delivered_image [ActiveRecord::AssociationRelation] A relation object of DeliveredImage class.
+  # @params image [ActiveRecord::AssociationRelation] A relation object of Image class.
   # @return [String] html code with the count of input relation.
-  def get_debug_html(delivered_images)
-    #"<strong>Found #{@delivered_images_all.count} delivered_images.</strong".html_safe
-    "<strong>Found #{delivered_images.count} delivered_images.</strong>".html_safe
+  def get_debug_html(images)
+    #"<strong>Found #{@images_all.count} images.</strong".html_safe
+    "<strong>Found #{images.count} images.</strong>".html_safe
   end
 
   # ===================
   #  Rendering helpers
   # ===================
-  # Renders a delivered_image with the link.
-  # @params delivered_image [DeliveredImage] An object of DeliveredImage.
-  # @params image [Image] An object of Image which is included in the delivered_image.
+  # Renders a image with the link.
+  # @params image [Image] An object of Image.
+  # @params image [Image] An object of Image which is included in the image.
   # @return []
-  def render_delivered_image(delivered_image, image)
-    link_to image_tag(image.data.url(:thumb)), { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  #def render_image(image, image)
+  #  link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  #end
+  def render_image(image)
+    link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
 
   # Renders a bootstrap button with the link.
-  # @params delivered_image [DeliveredImage] An object of DeliveredImage.
-  def render_clip_button(delivered_image)
-    bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: delivered_image.id, id: "popover-board#{delivered_image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{delivered_image.id}"
+  # @params image [Image] An object of Image.
+  def render_clip_button(image)
+    bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
   end
 
   # Renders a bootstrap button with the link.
-  # @params delivered_image [DeliveredImage] An object of DeliveredImage.
-  def render_hide_button(delivered_image)
-    bs_button_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put, class: 'btn-default btn-sm'
+  # @params image [Image] An object of Image.
+  def render_hide_button(image)
+    bs_button_to 'Hide', hide_image_path(image), method: :put, class: 'btn-default btn-sm'
   end
 
   # Renders a bootstrap button with the link.
-  # @params delivered_image [DeliveredImage] An object of DeliveredImage.
-  def render_show_button(delivered_image)
-    bs_button_to 'Show', { controller: 'delivered_images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
+  # @params image [Image] An object of Image.
+  def render_show_button(image)
+    bs_button_to 'Show', { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
   end
 
 end

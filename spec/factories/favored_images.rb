@@ -22,11 +22,20 @@ FactoryGirl.define do
     end
   end
 
+=begin
   factory :favored_image_with_delivered, class: FavoredImage do
     title "MyText"
     caption "MyText"
     src_url "MyText"
 
     association :delivered_image, factory: :delivered_image_favored
+  end
+=end
+  factory :favored_image_with_image, class: FavoredImage do
+    title "MyText"
+    caption "MyText"
+    src_url "MyText"
+
+    association :image, factory: :image
   end
 end

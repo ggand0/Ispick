@@ -50,6 +50,7 @@ describe "deliver:user" do
   end
 end
 
+=begin
 describe "deliver:update" do
   before do
     IO.any_instance.stub(:puts)
@@ -67,3 +68,4 @@ describe "deliver:update" do
     subject.invoke
   end
 end
+=end

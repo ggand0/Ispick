@@ -11,7 +11,7 @@ describe "Deliver" do
     Resque.stub(:enqueue).and_return nil    # resqueのjobを実際に実行しないように
     @logger = Logger.new('log/deliver.log')
   end
-
+=begin
   describe "deliver function" do
     it "calls proper functions" do
       user = FactoryGirl.create(:user_with_target_words)
@@ -88,7 +88,6 @@ describe "Deliver" do
     end
 
     # DLし終えたものから配信する仕様に改良するまで凍結
-=begin
     it "ignores images without paperclip attachment" do
       user = FactoryGirl.create(:twitter_user)
       target_word = FactoryGirl.create(:target_word)
@@ -98,7 +97,6 @@ describe "Deliver" do
       Deliver.deliver_images(user, images, target_word, true)
       expect(user.delivered_images.count).to eq(0)
     end
-=end
 
     # 配信済みの場合target.delivered_imagesに追加されている事
     it "adds to target.delivered_images when it has already delivered" do
@@ -164,4 +162,5 @@ describe "Deliver" do
       Deliver.update
     end
   end
+=end
 end

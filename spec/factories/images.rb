@@ -1,10 +1,12 @@
 require "#{Rails.root}/spec/support/consts"
 
 FactoryGirl.define do
+  # validationを通るだけのimage
   factory :image_min, class: Image do
     sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
 
+  # The main factory. it generates Image objects with various attributes.
   factory :image, class: Image do
     title 'test'
     caption 'test'
@@ -40,9 +42,10 @@ FactoryGirl.define do
     to_create do |instance|
       instance.save validate: false
     end
+    #association :targetable, factory: :target_word, strategy: :build
   end
 
-  factory :image_for_delivered_image, class: Image do
+  factory :image_dif_time, class: Image do
     title 'test'
     caption 'test'
     sequence(:src_url) { |n| "test#{n}@example.com" }
@@ -59,6 +62,7 @@ FactoryGirl.define do
       instance.save validate: false
     end
   end
+
 
   factory :image_tag_only, class: Image do
     title 'test'

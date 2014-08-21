@@ -4,16 +4,15 @@
 <%= render 'shared/modal_image' %>
 
 <p>
-  「好みの設定」=>「登録ワード一覧」からタグを登録すると１分弱で抽出画像がホーム画面に表示されます。<br>
   <%= get_debug_html(@delivered_images_all) if @delivered_images_all %>
   <br>
-  <%= bs_dropdown_button_to 'フィルター' do %>
-    配信日で絞り込む：
+  <%= bs_dropdown_button_to 'Filters' do %>
+    Filter by date
     <div class="input-group date" style="width: 200px;" align="right">
       <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
     </div>
     <li role="presentation" class="divider"></li>
-    <li><%= link_to '投稿日時順にする', home_users_path(sort: true) %></li>
+    <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
   <% end %>
 </p>
 
@@ -21,22 +20,21 @@
 
 <div class="wrap">
   <% @delivered_images.each_with_index do |delivered_image, index| %>
-    <% image = delivered_image.image %>
-    <% next if delivered_image.avoided %>
+    <% image = delivered_image %>
 
     <div class="box">
       <div class="boxInner">
         <%= get_jst_string(delivered_image.created_at) + '配信' %>
         <br>
         <%= get_jst_string(image.posted_at) + '投稿' %>
-        <%= render_delivered_image(delivered_image, image) %>
+        <%= render_image(delivered_image) %>
 
         <div class="titleBox">
           <div class="id"><%= delivered_image.id %></div>
 
           <%= button_group class: 'pull-right blocks' do %>
             <%= render_clip_button(delivered_image) %>
-            <%= render_hide_button(delivered_image) %>
+            <%# render_hide_button(delivered_image) %>
             <%= render_show_button(delivered_image) %>
           <% end %>
           <br />

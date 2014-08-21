@@ -155,6 +155,7 @@ GEM
     docile (1.1.5)
     domain_name (0.5.19)
       unf (>= 0.0.5, < 1.0.0)
+    engtagger (0.2.0)
     equalizer (0.0.9)
     erubis (2.7.0)
     execjs (2.2.1)
@@ -498,6 +499,7 @@ DEPENDENCIES
   daemon-spawn!
   devise
   diffy
+  engtagger
   factory_girl_rails
   fakeweb (~> 1.3)
   futaba!
