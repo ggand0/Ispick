@@ -71,6 +71,20 @@ module Deliver::Words
     end
   end
 
+  def self.associate_words_with_images!
+    TargetWord.all.each do |target_word|
+      query = Scrape.get_query target_word
+      images = Image.includes(:tags).
+        where.not(is_illust: nil).
+        where(tags: { name: query }).
+        references(:tags)
+
+      target_word.images.clear
+      target_word.images = images
+      puts "Associated #{images.count} images to target_word: #{target_word.word}"
+    end
+  end
+
 
 
   # =================
