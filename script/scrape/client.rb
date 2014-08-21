@@ -123,7 +123,7 @@ module Scrape
     # @param [Boolean] 大きいサイズの画像かどうか
     # @param [Boolean] ログ出力を行うかどうか
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
-    def self.save_image(target_word, attributes, logger, tags=[], options={})
+    def self.save_image(attributes, logger, target_word=nil, tags=[], options={})
       # 予め（ダウンロードする前に）src_urlの重複を確認
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
         logger.info 'Skipping a duplicate image...' if options[:verbose]
@@ -142,8 +142,10 @@ module Scrape
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
         logger.debug "saved image: #{image.id}"
+
         # target_wordオブジェクトに関連づける
-        target_word.images << image
+        # nilの場合(RSSのスクレイピング時等)は後でスクリプトを走らせて関連づける
+        target_word.images << image unless target_word.nil?
 
         Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else

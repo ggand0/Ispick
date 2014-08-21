@@ -67,7 +67,7 @@ describe Scrape::Client do
         Image.any_instance.stub(:image_from_url).and_return nil
         count = Image.count
 
-        id = Scrape::Client.save_image(@target_word, { title: 'title', src_url: 'src_url' }, @logger)
+        id = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
         image = Image.find(id)
 
         Image.count.should eq(count+1)                  # DBに保存されるはず
@@ -80,7 +80,7 @@ describe Scrape::Client do
           Image.any_instance.stub(:image_from_url).and_return nil
           #Rails.logger.should_receive(:info).with('Image model saving failed.')
 
-          Scrape::Client.save_image(@target_word, { title: 'title', src_url: 'src_url' }, @logger)
+          Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
         end
       end
 
@@ -89,7 +89,7 @@ describe Scrape::Client do
           Image.any_instance.stub(:save).and_return(false)
 
           count = Image.count
-          result = Scrape::Client.save_image(@target_word, { title: 'title', src_url: 'src_url' }, @logger)
+          result = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
           expect(result).to eq(nil)
           expect(Image.count).to eq(count)
         end
@@ -100,7 +100,7 @@ describe Scrape::Client do
       it "should not save an invalid image when validation param is true" do
         image = FactoryGirl.create(:image)
         count = Image.count
-        Scrape::Client.save_image(@target_word, { title: 'test', src_url: 'test1@example.com' }, @logger, [])
+        Scrape::Client.save_image({ title: 'test', src_url: 'test1@example.com' }, @logger, @target_word, [])
         Image.count.should eq(count)
       end
 
@@ -108,7 +108,7 @@ describe Scrape::Client do
         image = FactoryGirl.create(:image_min)
         count = Image.count
 
-        Scrape::Client.save_image(@target_word, { title: 'title', src_url: image.src_url }, @logger)
+        Scrape::Client.save_image({ title: 'title', src_url: image.src_url }, @logger, @target_word)
         Image.count.should eq(count)
       end
     end

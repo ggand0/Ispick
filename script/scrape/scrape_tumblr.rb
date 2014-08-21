@@ -74,7 +74,7 @@ module Scrape
           verbose: false,
           resque: (not user_id.nil?)
         }
-        image_id = self.class.save_image(target_word, image_data, @logger, Scrape.get_tags(image['tags']), options)
+        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
 
         # 抽出情報の更新
         duplicates += image_id ? 0 : 1
