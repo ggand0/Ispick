@@ -4,16 +4,14 @@ require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 namespace :deliver do
-  # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
-  @MAX_DELIVER_NUM = 100
-  # [MB]
-  @MAX_DELIVER_SIZE = 100
+  @MAX_DELIVER_NUM = 100  # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
+  @MAX_DELIVER_SIZE = 100 # 1回の配信で、1ユーザーに対して配信するイラストのサイズ[MB]
 
   desc "Associate all target_words with images"
   task associate: :environment do
     start = Time.now
     Deliver::Words.associate_words_with_images
-    puts 'Elapsed time: ' + (Time.now - start).to_s
+    puts "Elapsed time: #{(Time.now - start).to_s}"
     puts 'DONE!'
   end
 
@@ -21,7 +19,7 @@ namespace :deliver do
   task associate!: :environment do
     start = Time.now
     Deliver::Words.associate_words_with_images!
-    puts 'Elapsed time: ' + (Time.now - start).to_s
+    puts "Elapsed time: #{(Time.now - start).to_s}"
     puts 'DONE!'
   end
 
@@ -41,33 +39,33 @@ namespace :deliver do
 
   desc "個々のユーザーにイラストを配信"
   task :user, [:user_id] =>  :environment do |t, args|
-    puts 'Delivering to user_id: ' + args[:user_id].to_s
+    puts "Delivering to user_id: #{args[:user_id].to_s}"
     start = Time.now
     Deliver.deliver(args[:user_id])
 
     puts '-----------------------------------'
-    puts 'Elapsed time: ' + (Time.now - start).to_s
+    puts "Elapsed time: #{(Time.now - start).to_s}"
     puts 'DONE!'
   end
 
   desc "１つのキーワードのみに注目して画像を配信"
   task :keyword, [:user_id, :target_word_id] =>  :environment do |t, args|
-    t0 = Time.now
+    start = Time.now
     Deliver.deliver_keyword(args[:user_id], args[:target_word_id])
-    t1 = Time.now
+
     puts '-----------------------------------'
-    puts 'Elapsed time: ' + (t1-t0).to_s
+    puts "Elapsed time: #{(Time.now - start).to_s}"
     puts 'DONE!'
   end
 
 
   desc "全てのdelivered_imagesのfavoritesをupdateする"
   task :update, [:user_id] =>  :environment do |t, args|
-    t0 = Time.now
+    start = Time.now
     Deliver.update
-    t1 = Time.now
+
     puts '-----------------------------------'
-    puts 'Elapsed time: ' + (t1-t0).to_s
+    puts "Elapsed time: #{(Time.now - start).to_s}"
     puts 'DONE!'
   end
 end
