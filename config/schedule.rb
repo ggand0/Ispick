@@ -53,3 +53,4 @@ end
 every 6.hours do
   # 指定枚数を超えたらその分Imagesから削除
   rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
+end
