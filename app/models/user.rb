@@ -32,14 +32,19 @@ class User < ActiveRecord::Base
   def get_images
     images = target_words.first.images
     target_words.all.each_with_index do |target_word, count|
-      next if count == 1
-      images.merge(target_word.images)
+      next if count == 0
+      #images = images.merge(target_word.images)
+      #images += target_word.images
+      images = images + target_word.images
     end
+
+    images = Image.where("id IN (#{images.map(&:id).join(',')})")
 
     images.
       where.not(is_illust: nil).        # Already downloaded
       where.not(site_name: 'twitter').
-      reorder('posted_at DESC')         # Sort by posted_at value
+      #reorder('posted_at DESC')         # Sort by posted_at value
+      reorder('created_at DESC')         # Sort by posted_at value
   end
 
   # @return [ActiveRecord::AssociationRelation]
