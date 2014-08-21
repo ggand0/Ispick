@@ -1,13 +1,11 @@
 require 'spec_helper'
-require "#{Rails.root}/app/helpers/delivered_images_helper"
 
 describe "Default feature" do
   describe "User home page" do
     before do
-      #FactoryGirl.create(:user_with_delivered_images_file, images_count: 1)
-      #FactoryGirl.create(:user_with_target_words)
       FactoryGirl.create(:user_with_target_word_image_file)
-      #DeliveredImagesHelper.stub(:show_targetable).and_return('madoka')
+
+      # TODO: デバッグ用のリンクではなく通常のログインフォームからアクセスするようにする
       visit root_path
       mock_auth_hash
       click_link 'twitterでログイン'

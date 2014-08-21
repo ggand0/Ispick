@@ -176,6 +176,7 @@ describe TargetWordsController do
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
       expect(assigns(:search)).to be_a(Ransack::Search)
     end
+
     it "assigns search result properly" do
       FactoryGirl.create(:person_madoka)
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
@@ -184,13 +185,12 @@ describe TargetWordsController do
   end
 
   describe "show_delivered action" do
-    it "assigns delivered_images" do
-      target_word = FactoryGirl.create(:word_with_delivered_images, images_count: 5)
+    it "assigns associated images" do
+      target_word = FactoryGirl.create(:word_with_images)
       get :show_delivered, { id: target_word.to_param }, valid_session
 
-      # count = target_word.delivered_images.count
-      count = target_word.delivered_images.joins(:image).
-        where.not(images: { site_name: 'twitter' }).count
+      count = target_word.images.where.not({ site_name: 'twitter' }).count
+
       expect(assigns(:delivered_images).count).to eq(count)
     end
   end

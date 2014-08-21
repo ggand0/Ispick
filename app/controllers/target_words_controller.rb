@@ -106,9 +106,9 @@ class TargetWordsController < ApplicationController
   # 特定のタグに配信されている画像のみを表示する。UsersControllerに移動予定
   def show_delivered
     if signed_in?
-      delivered_images = @target_word.delivered_images.where.not(images: { site_name: 'twitter' }).
-        where('avoided IS NULL or avoided = false').
-        joins(:image).
+      delivered_images = @target_word.images.where.not({ site_name: 'twitter' }).
+        #where('avoided IS NULL or avoided = false').
+        #joins(:image).
         reorder('created_at DESC')
 
       # Filter by created_at attribute

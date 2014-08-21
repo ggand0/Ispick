@@ -12,10 +12,12 @@ class UsersController < ApplicationController
     session[:sort] = params[:sort] if params[:sort]
 
     # Get delivered_images
+    # For a new user, display the newer images
     if current_user.target_words.nil? or current_user.target_words.empty?
-      delivered_images = Image.where("created_at>?", DateTime.now)
+      delivered_images = Image.where("created_at>?", DateTime.now-1)
+    # Otherwise, display images from user.target_words relation
     else
-      delivered_images = current_user.get_delivered_images
+      delivered_images = current_user.get_images
       delivered_images.reorder!('posted_at DESC') if params[:sort]
 
       # Filter delivered_images by date
@@ -125,9 +127,9 @@ class UsersController < ApplicationController
 
     # Get delivered_images
     if session[:all]
-      delivered_images = current_user.get_delivered_images_all
+      delivered_images = current_user.get_images_all
     else
-      delivered_images = current_user.get_delivered_images
+      delivered_images = current_user.get_images
     end
 
     # Filter by is_an_illustration value
