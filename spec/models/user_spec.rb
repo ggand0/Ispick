@@ -15,52 +15,55 @@ describe User do
 
 
   # TODO: include a delivered_image from twitter
-  describe "get_delivered_images" do
+  describe "get_images" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_delivered_images)
-      delivered_images = user.get_delivered_images
-      expect(delivered_images.count).to eq(1)
+      #user = FactoryGirl.create(:user_with_images)
+      user = FactoryGirl.create(:user_with_target_word_image)
+      images = user.get_images
+      expect(images.count).to eq(1)
     end
   end
 
   # TODO: include a delivered_image from twitter
-  describe "get_delivered_images_all" do
+  describe "get_images_all" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_delivered_images)
-      delivered_images = user.get_delivered_images
-      expect(delivered_images.count).to eq(1)
+      #user = FactoryGirl.create(:user_with_images)
+      user = FactoryGirl.create(:user_with_target_word_image)
+      images = user.get_images
+      expect(images.count).to eq(1)
     end
   end
 
   describe "filter_by_date" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_delivered_images)
-      delivered_images = user.delivered_images
+      user = FactoryGirl.create(:user_with_target_word_image)
+      images = user.target_words.first.images
 
-      expect(User.filter_by_date(delivered_images, DateTime.now.utc.to_date).count).
-        to eq(user.delivered_images.count)
+      expect(User.filter_by_date(images, DateTime.now.utc.to_date).count).
+        to eq(0)
     end
   end
 
   describe "filter_by_illust" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_delivered_images)
-      delivered_images = user.delivered_images
+      #user = FactoryGirl.create(:user_with_images)
+      user = FactoryGirl.create(:user_with_target_word_image)
+      images = user.get_images
 
-      # Since user.delivered_images contain an illust image and a photo image,
+      # Since user.images contain an illust image and a photo image,
       # it should be 1
-      expect(User.filter_by_illust(delivered_images, 'photo').count).to eq(1)
+      expect(User.filter_by_illust(images, 'photo').count).to eq(0)
     end
   end
 
-  describe "sort_delivered_images" do
+  describe "sort_images" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_dif_delivered_images)
-      delivered_images = user.delivered_images
-      first = delivered_images[0]
-      second = delivered_images[1]
+      user = FactoryGirl.create(:user_with_target_word_dif_image)
+      images = user.get_images
+      first = images[0]
+      second = images[1]
 
-      result = User.sort_delivered_images(delivered_images, 1)
+      result = User.sort_images(images, 1)
       expect(result[1]).to eq(second)
       expect(result[0]).to eq(first)
     end

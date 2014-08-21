@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   # Set this variabale true during testing.
   cattr_accessor :skip_callbacks
 
-  has_many :delivered_images, dependent: :destroy
+  has_many :images, dependent: :destroy
   has_many :target_images, dependent: :destroy
   has_many :image_boards, dependent: :destroy
 
@@ -29,63 +29,59 @@ class User < ActiveRecord::Base
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def get_delivered_images
-    delivered_images = target_words.first.images
+  def get_images
+    images = target_words.first.images
     target_words.all.each_with_index do |target_word, count|
       next if count == 1
-      delivered_images.merge(target_word.images)
+      images.merge(target_word.images)
     end
 
-    delivered_images.
+    images.
       where.not(is_illust: nil).        # Already downloaded
       where.not(site_name: 'twitter').
       reorder('posted_at DESC')         # Sort by posted_at value
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def get_delivered_images_all
-    delivered_images.joins(:image).order('images.posted_at')
+  def get_images_all
+    images.joins(:image).order('images.posted_at')
   end
 
-  # @param delivered_images [ActiveRecord::CollectionProxy]
+  # @param images [ActiveRecord::CollectionProxy]
   # @param date [Date] date
   # @return [ActiveRecord::CollectionProxy]
-  def self.filter_by_date(delivered_images, date)
-    delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+  def self.filter_by_date(images, date)
+    images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
   end
 
-  # Return delivered_images which is filtered by is_illust data.
+  # Return images which is filtered by is_illust data.
   # How the filter is applied depends on the session[:illust] value.
   # イラストと判定されてるかどうかでフィルタをかけるメソッド。
-  # @param delivered_images [ActiveRecord::Association::CollectionProxy]
+  # @param images [ActiveRecord::Association::CollectionProxy]
   # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
-  def self.filter_by_illust(delivered_images, illust)
+  def self.filter_by_illust(images, illust)
     case illust
     when 'all'
-      return delivered_images
+      return images
     when 'illust'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: true }).references(:images)
+      return images.where({ is_illust: true })
     when 'photo'
-      return delivered_images.includes(:image).
-        where(images: { is_illust: false }).references(:images)
+      return images.where({ is_illust: false })
     end
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def self.sort_delivered_images(delivered_images, page)
-    delivered_images = delivered_images.includes(:image).
-      reorder('images.favorites desc').references(:images)
-    #delivered_images.page(params[:page]).per(25)
-    delivered_images.page(page).per(25)
+  def self.sort_images(images, page)
+    images = images.reorder('images.favorites desc')
+    images.page(page).per(25)
   end
 
   # @return [ActiveRecord::AssociationRelation]
-  def self.sort_by_quality(delivered_images, page)
-    delivered_images = delivered_images.includes(:image).
+  def self.sort_by_quality(images, page)
+    images = images.includes(:image).
       reorder('images.quality desc').references(:images)
-    #delivered_images.page(params[:page]).per(25)
-    delivered_images.page(page).per(25)
+    #images.page(params[:page]).per(25)
+    images.page(page).per(25)
   end
 
   # @return The path where default thumbnail file is.
