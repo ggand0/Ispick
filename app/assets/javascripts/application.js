@@ -15,6 +15,6 @@
 //= require jquery.infinitescroll.min
 //= require jquery.remotipart
 //= require bootstrap
-//= require bootstrap-sprockets
+// require bootstrap-sprockets
 //= require bootstrap-datepicker
 //= require turbolinks
