@@ -146,7 +146,7 @@ namespace :scrape do
   end
 
   desc "Giphyから画像抽出する"
-  task giphy: :environment do
+  task :giphy, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 720 : args[:interval]
     Scrape::Giphy.new.scrape(interval.to_i)
   end
