@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
   # Get images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
+=begin
     images = target_words.first.images
     target_words.all.each_with_index do |target_word, count|
       next if count == 0
@@ -53,7 +54,9 @@ class User < ActiveRecord::Base
       #reorder('posted_at DESC')         # Sort by posted_at value
       reorder('created_at DESC')         # Sort by posted_at value
       .limit(200)
-
+=end
+    words = target_words.map{ |target_word| target_word.word }
+    Image.joins(:target_words).where("target_words.word IN (?)", words).references(:target_words)
   end
 
   # @return [ActiveRecord::AssociationRelation]
