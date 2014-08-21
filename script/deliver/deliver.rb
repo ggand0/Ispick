@@ -5,6 +5,8 @@ require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
+# Delivers extracted images to users.
+# ユーザへの画像配信処理を行う
 module Deliver
   require "#{Rails.root}/script/deliver/deliver_images"
   require "#{Rails.root}/script/deliver/deliver_words"
@@ -15,6 +17,7 @@ module Deliver
   MISSING_URL = '/data/original/missing.png'    # attachmentが無いレコードに割り当てられる画像url（画像ファイルの有無判定に使用）
 
 
+  # Main function. Delivers all matched images to registered images or text tags.
   # 全ての登録タグ/登録画像に対してImagesテーブル内のマッチした画像を配信する
   # @param [Integer] 配信対象のUserオブジェクト
   def self.deliver(user_id)
@@ -30,6 +33,8 @@ module Deliver
     #end
   end
 
+
+  #
   # 特定のTargetWordを持つ画像を特定のユーザに配信する
   # 呼ばれた段階でDBに存在している画像のみ配信
   # @param [Integer] 配信するUserレコードのID
@@ -65,6 +70,8 @@ module Deliver
     user.delivered_images << delivered_image
   end
 
+  # Create delivereed_images instances from iamges relation object,
+  # and add them to user.delivered_images 1 by 1.
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
   # @param user [User] 配信対象のUserオブジェクト
   # @param images [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
@@ -103,7 +110,7 @@ module Deliver
     end
 
 
-    # 投稿日時順（posted_at）に配信される画像群をソートしてから配信する
+    # user.delivered_imagesへ配信する
     tmp_images.each do |image|
       user.delivered_images << image
       user.save

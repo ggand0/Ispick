@@ -50,24 +50,24 @@ module Deliver::Words
     end
   end
 
+  # Associate all images which is related to a TargetWord record
   # TargetWord.wordを持つImage全てをそのレコードと関連づける
   def self.associate_words_with_images
     TargetWord.all.each do |target_word|
-      puts "#{target_word.inspect}"
-
-      # 漏れなく関連づけるために一度初期化する
-      target_word.images.clear
-
       # target_word.wordと同名のタグを持つimagesを取得
       query = Scrape.get_query target_word
       images = Image.includes(:tags).
-        where.not(is_illust: nil).
+        where.not(is_illust: nil).                        # イラスト判定情報が無いものを除外する
         where(tags: { name: query }).
-        #where("images.created_at>?", DateTime.now - 1).  # 全て取得
         references(:tags)
 
-      puts "#{images.all}"
-      target_word.images = images
+      if images.count != target_word.images.count
+        target_word.images.clear
+        target_word.images = images
+        puts "Associated #{images.count} images to target_word: #{target_word.word}"
+      end
+
+      puts "Skiped target_word: #{target_word.word}"
     end
   end
 

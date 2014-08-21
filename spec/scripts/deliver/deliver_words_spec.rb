@@ -89,13 +89,14 @@ describe "Deliver::Words" do
     end
   end
 
-
+=begin
   describe "get_images function" do
     it "get images relation which have tags" do
       FactoryGirl.create(:image_min)                        # tag無
       # @image => tag有
       expect(Deliver::Words.get_images(@target_word, @logger).count).to eql(1)
     end
+
     it "includes images which have nil value in is_illust column with true flag" do
       # Imageを２レコード作成
       # @image => is_illust: true
@@ -104,4 +105,5 @@ describe "Deliver::Words" do
       expect(Deliver::Words.get_images(@target_word, @logger).count).to eql(1)
     end
   end
+=end
 end
