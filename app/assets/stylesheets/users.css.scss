@@ -2,9 +2,38 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+// Image.idをhtmlに埋め込むために使用
 .id {
   display: none;
 }
+
+// titleBox内の時間表記用
+.time_string {
+  font-size: 8px;
+  line-height: 8px;
+  text-align: right;
+}
+
+// クリップする際に表示させるモーダル内で使用
+.favored_board {
+  background-color: #5B9B9B;
+}
+.image-buttons {
+  text-align: right;
+}
+
+// Bootstrapのbutton関連
+.blocks .btn-default {
+  margin: 0 5px;
+  border-radius: 0;
+}
+.blocks .btn-info {
+  margin: 0 5px;
+  border-radius: 0;
+}
+
+
+// [OLD]buttonではなく文字列を使っていた時に使用していたクラス
 .favored {
   float: left;
   margin-right: 5px;
@@ -22,19 +51,4 @@
   &:hover {
     background-color: #fff;
   }
-}
-
-.favored_board {
-  background-color: #5B9B9B;
-}
-.image-buttons {
-  text-align: right;
-}
-.blocks .btn-default {
-    margin: 0 5px;
-    border-radius: 0;
-}
-.blocks .btn-info {
-    margin: 0 5px;
-    border-radius: 0;
 }
