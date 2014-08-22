@@ -40,6 +40,9 @@
 
         <div class="title">
           <%= image.title.to_s %><br />
+          <div class="image_label">
+            <%= bs_label image.target_words.first.word, :default, class: 'label label-default' %>
+          </div>
           <div class="time_string">
             <%= "created at #{get_jst_string(delivered_image.created_at)}" %><br />
             <%= "posted at #{get_jst_string(image.posted_at)}" %>

@@ -12,6 +12,14 @@
   font-size: 8px;
   line-height: 8px;
   text-align: right;
+  align: right;
+  float: right;
+  width: 150px;
+}
+.image_label {
+  float: left;
+  align: left;
+  width: 150px;
 }
 
 // クリップする際に表示させるモーダル内で使用
