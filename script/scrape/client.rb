@@ -57,6 +57,8 @@ module Scrape
         begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
           if (not target_word.word.nil?) and (not target_word.word.empty?)
+
+            # デフォルトのパラメータで実行
             result = scrape_using_api(target_word)
             @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
@@ -115,7 +117,7 @@ module Scrape
 
     def self.is_adult(tags)
       tags.each do |tag|
-        return true if tag.word.casecmp('R18')
+        return true if tag.name.casecmp('R18')
       end
       false
     end
@@ -136,8 +138,9 @@ module Scrape
         logger.info 'Skipping a duplicate image...' if options[:verbose]
         return
       end
+
       # アダルト画像ならばskip
-      return if (not tags.nil?) and self.is_adult(tags)
+      return unless (not tags.nil?) and self.is_adult(tags)
 
       # Remove 4 bytes chars
       # Because with the old version of the MySQL we cannot save them to any columns.
@@ -150,7 +153,6 @@ module Scrape
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-        logger.debug "saved image: #{image.id}"
 
         # target_wordオブジェクトに関連づける
         # nilの場合(RSSのスクレイピング時等)は後でスクリプトを走らせて関連づける
