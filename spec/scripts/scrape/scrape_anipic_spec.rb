@@ -30,6 +30,16 @@ describe Scrape::Anipic do
       time = Scrape::Anipic.get_time(time)
 
       expect(time).to eq('2014/8/14/14:52')
+
+      time = '8/16/14, 5:31 PM'
+      time = Scrape::Anipic.get_time(time)
+
+      expect(time).to eq('2014/8/16/17:31')
+
+      time = '8/16/14, 12:31 PM'
+      time = Scrape::Anipic.get_time(time)
+
+      expect(time).to eq('2014/8/16/0:31')
     end
   end
 
