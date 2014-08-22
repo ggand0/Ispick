@@ -45,12 +45,11 @@ every 60.minutes do
 
   # 全てのユーザーに推薦イラストを配信
   #rake 'deliver:all', output: 'log/deliver.log'
-
-
-  rake 'deliver:associate', output: 'log/deliver.log'
 end
-
 every 6.hours do
+  # TargetWordと同名のTagを持つImageをTargetWordと関連づける処理
+  rake 'deliver:associate', output: 'log/deliver.log'
+
   # 指定枚数を超えたらその分Imagesから削除
   rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
 end
