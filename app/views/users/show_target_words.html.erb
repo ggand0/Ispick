@@ -1,38 +1,44 @@
-<h1>登録タグ一覧</h1>
-カスタムキーワードを登録する：
-<br>
-<%= link_to 'New Target word', new_target_word_path %>
-<br>
-<br>
-データベースからタグを検索する：
-<br>
-<%= link_to 'Search Target words', search_target_words_path %>
-<br>
-<br>
-<br>
-<table>
+<%= stylesheet_link_tag 'users' %>
+
+
+<h3>Follow a tag</h3>
+Follow a custom tag:
+<br />
+<%= bs_button_to 'Create a target_word', new_target_word_path, class: 'btn-default' %>
+<br />
+<br />
+Find a tag from the database:
+<br />
+<%= bs_button_to 'Search a target_word', search_target_words_path, class: 'btn-default' %>
+<br />
+<br />
+<br />
+
+<h3>List of following tags</h3>
+<div class="tag-list">
+<table class="table table-striped">
   <thead>
     <tr>
-      <th>Word</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>Tag</th>
+      <th>Actions</th>
     </tr>
   </thead>
 
   <tbody>
     <% @words.each do |target_word| %>
       <tr>
-        <td><%= link_to target_word.word, target_word %></td>
-        <td><%= link_to 'このタグへの配信画像を見る', show_delivered_target_word_path(target_word) %></td>
-        <td><%= link_to 'Unfollow', delete_target_word_users_path({id: target_word.id}), method: :delete %></td>
+        <td><%= link_to target_word.word, show_delivered_target_word_path(target_word) %></td>
+        <td>
+          <%= bs_button_to 'Unfollow', delete_target_word_users_path({id: target_word.id}), method: :delete, class: 'btn-default' %>
+          <%= bs_button_to 'debug', target_word, class: 'btn-default' %>
+        </td>
       </tr>
     <% end %>
   </tbody>
 </table>
 <br>
 <br>
+</div>
+
 
 <%= paginate_target_images(@message, @words) %>
