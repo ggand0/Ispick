@@ -3,9 +3,10 @@
 <%= stylesheet_link_tag 'users' %>
 <%= render 'shared/modal_image' %>
 
+
+<!-- 表示する画像数とフィルタに関するdropdownを描画 -->
 <p>
-  <%= get_debug_html(@delivered_images_all) if @delivered_images_all %>
-  <br>
+  <%= "You don't seem to follow a tag yet. Let\'s follow them at the Preferences page! <br />".html_safe if current_user.target_words.count == 0 %>
   <%= bs_dropdown_button_to 'Filters' do %>
     Filter by date
     <div class="input-group date" style="width: 200px;" align="right">
@@ -14,24 +15,21 @@
     <li role="presentation" class="divider"></li>
     <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
   <% end %>
+  <%= "  #{get_debug_html(@delivered_images_all)}".html_safe if @delivered_images_all %>
 </p>
 
+<!-- ここから画像表示 -->
 <%= paginate @delivered_images %>
-
 <div class="wrap">
   <% @delivered_images.each_with_index do |delivered_image, index| %>
     <% image = delivered_image %>
 
     <div class="box">
       <div class="boxInner">
-        <%= get_jst_string(delivered_image.created_at) + '配信' %>
-        <br>
-        <%= get_jst_string(image.posted_at) + '投稿' %>
         <%= render_image(delivered_image) %>
 
         <div class="titleBox">
           <div class="id"><%= delivered_image.id %></div>
-
           <%= button_group class: 'pull-right blocks' do %>
             <%= render_clip_button(delivered_image) %>
             <%# render_hide_button(delivered_image) %>
@@ -39,8 +37,16 @@
           <% end %>
           <br />
         </div>
+
         <div class="title">
           <%= image.title.to_s %><br />
+          <div class="image-tag">
+            <%# bs_label image.target_words.first.word, :default, class: 'label label-default' %>
+          </div>
+          <div class="time-string">
+            <%= "CA: #{get_jst_string(delivered_image.created_at)}" %><br />
+            <%= "PA: #{get_jst_string(image.posted_at)}" %>
+          </div>
         </div>
 
       </div>

@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
       .limit(200)
 =end
     words = target_words.map{ |target_word| target_word.word }
-    Image.joins(:target_words).where("target_words.word IN (?)", words).references(:target_words)
+    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
   end
 
   # @return [ActiveRecord::AssociationRelation]

@@ -3,7 +3,7 @@ module ApplicationHelper
   # @param [Integer] byte[B]
   # @return [Integer] kilobyte[KB]
   def bytes_to_kilobytes(byte)
-    return 0 if not byte      # nilの場合0を返す
+    return 0 unless byte      # nilの場合0を返す
     (byte / 1024.0).round(3)
   end
 
@@ -11,21 +11,21 @@ module ApplicationHelper
   # @param [Integer] byte[B]
   # @return [Integer] megabyte[MB]
   def bytes_to_megabytes(byte)
-    return 0 if not byte
+    return 0 unless byte
     (byte / (1024.0*1024.0)).round(3)
   end
 
   # @param [Integer] byte[B]
   # @return [Integer] kilobyte[KB]
   def bytes_to_kilobytes_mac(byte)
-    return 0 if not byte
+    return 0 unless byte
     (byte / 1000.0).round(3)
   end
 
   # @param [Integer] byte[B]
   # @return [Integer] megabyte[MB]
   def bytes_to_megabytes_mac(byte)
-    return 0 if not byte
+    return 0 unless byte
     (byte / (1000.0*1000.0)).round(3)
   end
 
@@ -44,21 +44,33 @@ module ApplicationHelper
     total_size
   end
 
-  # @param [DateTime]
+  # @param datetime [DateTime]
   # @return [DateTime]
   def utc_to_jst(datetime)
-    datetime ? datetime.in_time_zone('Asia/Tokyo') : 'nil'
+    datetime ? datetime.in_time_zone('Asia/Tokyo') : 'unknown'
   end
 
-  # @param [DateTime]
+  # @param datetime [DateTime]
   # @return [String]
   def get_time_string(datetime)
-    datetime ? datetime.strftime("%Y年%m月%d日%H時%M分") : 'nil'
+    datetime ? datetime.strftime("%d %B %Y, %H:%M") : 'unknown'
   end
 
-  # @param [DateTime]
+  # @param datetime [DateTime]
   # @return [String]
   def get_jst_string(datetime)
-    datetime ? get_time_string(utc_to_jst(datetime)) : 'nil'
+    datetime ? get_time_string(utc_to_jst(datetime)) : 'unknown'
+  end
+
+  # @param datetime [DateTime]
+  # @return [String]
+  def get_time_string_ja(datetime)
+    datetime ? datetime.strftime("%Y年%m月%d日%H時%M分") : 'unknown'
+  end
+
+  # @param datetime [DateTime]
+  # @return [String]
+  def get_jst_string_ja(datetime)
+    datetime ? get_time_string_ja(utc_to_jst(datetime)) : 'unknown'
   end
 end

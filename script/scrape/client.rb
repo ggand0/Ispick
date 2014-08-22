@@ -113,6 +113,13 @@ module Scrape
       end
     end
 
+    def self.is_adult(tags)
+      tags.each do |tag|
+        return true if tag.word.casecmp('R18')
+      end
+      false
+    end
+
 
     # TODO: Associate the target_word to the image here.
     # Create new image instanace and save it to the database.
@@ -124,11 +131,13 @@ module Scrape
     # @param [Boolean] ログ出力を行うかどうか
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
     def self.save_image(attributes, logger, target_word=nil, tags=[], options={})
-      # 予め（ダウンロードする前に）src_urlの重複を確認
+      # src_urlが重複していればskip
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
         logger.info 'Skipping a duplicate image...' if options[:verbose]
         return
       end
+      # アダルト画像ならばskip
+      return if (not tags.nil?) and self.is_adult(tags)
 
       # Remove 4 bytes chars
       # Because with the old version of the MySQL we cannot save them to any columns.

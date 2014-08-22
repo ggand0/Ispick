@@ -37,7 +37,6 @@ module UsersHelper
   # @params image [ActiveRecord::AssociationRelation] A relation object of Image class.
   # @return [String] html code with the count of input relation.
   def get_debug_html(images)
-    #"<strong>Found #{@images_all.count} images.</strong".html_safe
     "<strong>Found #{images.count} images.</strong>".html_safe
   end
 
@@ -48,9 +47,6 @@ module UsersHelper
   # @params image [Image] An object of Image.
   # @params image [Image] An object of Image which is included in the image.
   # @return []
-  #def render_image(image, image)
-  #  link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
-  #end
   def render_image(image)
     link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
@@ -59,6 +55,12 @@ module UsersHelper
   # @params image [Image] An object of Image.
   def render_clip_button(image)
     bs_button_to 'Clip', { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
+  end
+
+  # Renders a bootstrap button with the link.
+  # @params image [Image] An object of Image.
+  def render_unclip_button(image)
+    bs_button_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete, class: 'popover-board btn-info btn-sm'
   end
 
   # Renders a bootstrap button with the link.
