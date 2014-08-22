@@ -22,15 +22,15 @@
 #set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
 
-every 2.hours do
-  #rake 'scrape:twitter[60]', output: { error: 'log/scrape_twitter_error.log', standard: 'log/scrape_twitter_cron.log' }
+every 6.hours do
+  rake 'scrape:anipic[720]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
-every 12.hours do
+every 6.hours do
   rake 'scrape:nico[720]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
-every 12.hours do
+every 6.hours do
   rake 'scrape:tumblr[720]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
