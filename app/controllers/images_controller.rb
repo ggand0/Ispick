@@ -31,10 +31,10 @@ class ImagesController < ApplicationController
   # imageをお気に入り画像として追加する。
   def favor
     board_name = params[:board]
-    #@image.update_attributes!(favored: true) unless @image.favored
 
     # FavoredImageオブジェクト作成
     # src_urlが重複していた場合はvalidationでfalseが返る
+    # Board名のリンクをクリックして呼ばれるので必ず対応するboardがあると仮定
     board = current_user.image_boards.where(name: board_name).first
     favored_image = board.favored_images.build(
       title: @image.title,
@@ -57,7 +57,7 @@ class ImagesController < ApplicationController
     end
   end
 
-  # PUT avoid
+  # PUT hide
   def hide
     if not @image.avoided
       @image.update_attributes!(avoided: true)

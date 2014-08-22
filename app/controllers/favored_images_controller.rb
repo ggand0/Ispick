@@ -6,6 +6,7 @@ class FavoredImagesController < ApplicationController
   def show
     respond_to do |format|
       format.html
+      # Render views/favored_images/show.js.erb, then _favored_image.html.erb
       format.js { render partial: 'show' }
     end
   end
