@@ -59,6 +59,12 @@ module UsersHelper
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
+  def render_unclip_button(image)
+    bs_button_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete, class: 'popover-board btn-info btn-sm'
+  end
+
+  # Renders a bootstrap button with the link.
+  # @params image [Image] An object of Image.
   def render_hide_button(image)
     bs_button_to 'Hide', hide_image_path(image), method: :put, class: 'btn-default btn-sm'
   end

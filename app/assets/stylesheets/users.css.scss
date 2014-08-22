@@ -40,6 +40,17 @@
   border-radius: 0;
 }
 
+// glyphiconがbutton上で微妙にずれる問題への対策
+// from: http://stackoverflow.com/questions/14082826/bootstrap-icons-glyphicons-are-positioned-slightly-up-when-using-google-fonts
+span.glyphicon {
+  vertical-align: middle;
+  margin-top: -5px;
+}
+
+.after-header { padding: -500px 0px; }
+.tag-list {
+  width: 600px;
+}
 
 // [OLD]buttonではなく文字列を使っていた時に使用していたクラス
 .favored {

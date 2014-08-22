@@ -1,20 +1,21 @@
 <%= render 'shared/modal_image' %>
-<h1>Clipped Images</h1>
-<br>
+<%= stylesheet_link_tag 'users' %>
+
+
+<!-- 統計情報とボード選択dropdownを描画 -->
 <p>
   <strong>Clipped images count:</strong>
   <%= @favored_images.count %>
 </p>
 <p>
-  <strong>Total size of clipped images in bytes:</strong><br>
-  <%= bytes_to_kilobytes(get_total_size(@favored_images)) %> KB<br>
-  <%= bytes_to_megabytes(get_total_size(@favored_images)) %> MB<br>
+  <strong>Total size of clipped images in bytes:</strong>
+  <%= bytes_to_megabytes(get_total_size(@favored_images)) %> MB<br />
 </p>
 <%= link_to 'Download zip(Debug)', controller: 'users', action: 'download_favored_images' %>
 <br />
 <br />
 <%= button_group do %>
-  <%= bs_dropdown_button_to 'Board選択' do %>
+  <%= bs_dropdown_button_to 'Select a board' do %>
     <% current_user.image_boards.each do |board| %>
       <li>
         <%= link_to board.name, { controller: 'users', action: 'show_favored_images', board: board.id }, class: 'btn-default' %>
@@ -22,19 +23,39 @@
     <% end %>
   <% end %>
 
-  <%= link_to(@image_board, method: :delete, data: { confirm: '本当に消してもよろしいですか？この操作は取り消せません。' }, class: 'btn btn-default') do %>
-    <i class="glyphicon glyphicon-remove">このボードを削除する</i>
+  <!--<% link_to(@image_board, method: :delete, data: { confirm: 'Are you sure to delete this board? This operation cannot be undone.' }, class: 'btn btn-default') do %>
+    <i class="glyphicon glyphicon-remove">Delete</i>
   <% end %>
+  <%# '本当に消してもよろしいですか？この操作は取り消せません。' %>-->
+
+  <button class="btn btn-default">
+    <span class="glyphicon glyphicon-remove" style="vertical-align:middle"></span> Delete
+  </button>
 <% end %>
 
+
+<!-- お気に入り画像を表示 -->
 <div class="wrap">
   <% @favored_images.each do |image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete %>
-
         <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
-        <div class="titleBox"><%= image.title.to_s %></div>
+        <div class="titleBox">
+          <%= button_group class: 'pull-right blocks' do %>
+            <%= render_unclip_button(image) %>
+            <%# render_show_button(image) %>
+          <% end %>
+        </div>
+        <div class="title">
+          <%= image.title.to_s %><br />
+          <div class="image-tag">
+            <%# bs_label image.target_words.first.word, :default, class: 'label label-default' %>
+          </div>
+          <div class="time-string">
+            <%# "CA: #{get_jst_string(image.created_at)}" %><br />
+            <%# "PA: #{get_jst_string(image.image.posted_at)}" %>
+          </div>
+        </div>
       </div>
     </div>
   <% end %>
