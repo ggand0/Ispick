@@ -62,12 +62,13 @@ module Scrape
             result = scrape_using_api(target_word)
             @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
-            # [保留中]英語対応サイトの場合は英名でも検索する
-            #if module_type == 'Scrape::Tumblr'
-            #  # english=trueで呼ぶ
-            #  result = child_module.scrape_using_api(target_word, limit, logger, true, false, true)
-            #  logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
-            #end
+            # 英語サイトの場合は英名でも検索する
+            if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
+              # english=trueで呼ぶ
+              #@logger.info "detect"
+              result = scrape_using_api(target_word, nil, true, false, true)
+              @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+            end
           end
         rescue => e
           @logger.info e
@@ -117,7 +118,7 @@ module Scrape
 
     def self.is_adult(tags)
       tags.each do |tag|
-        return true if tag.name.casecmp('R18')
+        return true if tag.name.casecmp('R18') == 0
       end
       false
     end
@@ -140,7 +141,11 @@ module Scrape
       end
 
       # アダルト画像ならばskip
-      return unless (not tags.nil?) and self.is_adult(tags)
+      #return unless tags.nil? or self.is_adult(tags)
+      if (not tags.nil?) and (not tags.empty?) and self.is_adult(tags)
+        logger.debug self.is_adult(tags)
+        return
+      end
 
       # Remove 4 bytes chars
       # Because with the old version of the MySQL we cannot save them to any columns.
