@@ -37,11 +37,21 @@ describe Scrape do
 
       expect(result).to eq('鹿目まどか')
     end
+
     it "returns proper string when target_word doesn't have a person model" do
       target_word = FactoryGirl.create(:target_word)
       result = Scrape.get_query target_word
 
       expect(result).to eq('鹿目 まどか（かなめ まどか）1')
+    end
+  end
+
+  describe "get_query_en function" do
+    it "returns proper string" do
+      target_word = TargetWord.create(word: 'Madoka Kaname')
+      result = Scrape.get_query_en target_word, true
+
+      expect(result).to eq('Madoka Kaname')
     end
   end
 

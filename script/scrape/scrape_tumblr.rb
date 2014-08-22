@@ -47,7 +47,8 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
-      query = self.class.get_query(target_word, english)
+      #query = self.class.get_query(target_word, english)
+      query = Scrape.get_query_en(target_word, english)
       return if query.nil? or query.empty?
 
       @logger.info "query=#{query}"
@@ -129,14 +130,6 @@ module Scrape
       ::Tumblr::Client.new
     end
 
-    def self.get_query(target_word, english)
-      if english
-        query = target_word.person.name_english if target_word.person
-      else
-        query = Scrape.get_query target_word
-      end
-      query
-    end
 
     # 画像１枚に関する情報をHashにして返す。
     # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。

@@ -63,11 +63,12 @@ describe Scrape::Client do
     end
 
     describe "with valid attributes" do
-      it "should create a new Image model" do
+      it "creates a new Image record" do
         Image.any_instance.stub(:image_from_url).and_return nil
         count = Image.count
 
         id = Scrape::Client.save_image({ title: 'title', src_url: 'src_url' }, @logger, @target_word)
+        puts id
         image = Image.find(id)
 
         Image.count.should eq(count+1)                  # DBに保存されるはず

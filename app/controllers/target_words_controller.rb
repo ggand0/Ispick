@@ -109,6 +109,7 @@ class TargetWordsController < ApplicationController
       delivered_images = @target_word.images.where.not({ site_name: 'twitter' }).
         #where('avoided IS NULL or avoided = false').
         #joins(:image).
+        where.not(is_illust: nil).        # Already downloaded
         reorder('created_at DESC')
 
       # Filter by created_at attribute

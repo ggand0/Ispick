@@ -16,10 +16,10 @@
       <%= navbar_item 'Boards', show_favored_images_users_path %>
       <%= navbar_item 'Preferences', show_target_words_users_path %>
       <%= navbar_dropdown 'DEBUG' do %>
-        <%= navbar_item '抽出画像一覧', images_path %>
-        <%= navbar_item 'イラスト判定のデバッグを行う', debug_illust_detection_users_path %>
-        <%= navbar_item '使い方', '/tutorial' %>
-        <%= navbar_item 'トップページ', '/' %>
+        <%= navbar_item 'View all images', images_path %>
+        <%= navbar_item 'Debug illust detection', debug_illust_detection_users_path %>
+        <%= navbar_item 'Tutorial', '/tutorial' %>
+        <%= navbar_item 'Top page', '/' %>
         <%= navbar_item 'Resque', '/resque_web/overview' %>
       <% end %>
     <% end %>

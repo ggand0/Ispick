@@ -1,5 +1,5 @@
-<h1><strong>Ispick prototype v3</strong></h1>
-<p>Ispick is an illustration curation service!</p>
+<h1><strong>Ispick v0.3</strong></h1>
+<p>Ispick is an illustration aggregation service!</p>
 
 <div class="top-image">
   <%= link_to (image_tag asset_path('top_madoka.jpg')), 'http://ispick.tumblr.com/', style: " z-index: 1;"%>
@@ -7,13 +7,13 @@
 
 <div class="wrapper-oauth">
   <div class="btn-group-vertical btn-group-oauth">
-    <%= bs_button_to 'Facebookでアカウント作成', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Twitterでアカウント作成', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Pinterestでアカウント作成', '/', class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'メールアドレスでアカウント作成', '/sign_up', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Continue with Pinterest', '/', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
   </div>
   <div align="center">
-    <%= link_to '既にアカウントをお持ちの方はこちら', '/signin_with_password' %>
+    <%= link_to 'Login', '/signin_with_password' %>
   </div>
 </div>
 <br>
@@ -22,9 +22,9 @@
   <!-- デバッグ用OAuthログイン -->
   <h3>Debug</h3>
   <% if user_signed_in? %>
-    <%= link_to 'ログアウト', destroy_user_session_path %>
+    <%= link_to 'Logout', destroy_user_session_path %>
   <% else %>
-    <%= link_to "twitterでログイン", user_omniauth_authorize_path(:twitter) %><br>
-    <%= link_to "facebookでログイン", '/' %>
+    <%= link_to "Login with twitter", user_omniauth_authorize_path(:twitter) %><br>
+    <%= link_to "Login with facebook", '/' %>
   <% end %>
 </div>
