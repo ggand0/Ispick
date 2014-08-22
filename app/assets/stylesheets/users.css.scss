@@ -8,7 +8,7 @@
 }
 
 // titleBox内の時間表記用
-.time_string {
+.time-string {
   font-size: 8px;
   line-height: 8px;
   text-align: right;
@@ -16,10 +16,10 @@
   float: right;
   width: 150px;
 }
-.image_label {
+.image-tag {
   float: left;
   align: left;
-  width: 150px;
+  width: 10px;
 }
 
 // クリップする際に表示させるモーダル内で使用
