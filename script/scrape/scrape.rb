@@ -12,6 +12,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_twitter"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
   require "#{Rails.root}/script/scrape/scrape_giphy"
+  require "#{Rails.root}/script/scrape/scrape_anipic"
 
   # 全てのTargetWordに基づき画像抽出する
   def self.scrape_all
@@ -35,8 +36,8 @@ module Scrape
   # タグ登録直後の配信用
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
   def self.scrape_target_word(user_id, target_word, logger)
-    Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
-    Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
+    #Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
+    #Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
     #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
 
     # 英名が存在する場合はさらに検索
@@ -44,8 +45,9 @@ module Scrape
       query = target_word.person.name_english
       logger.debug "name_english: #{query}"
 
-      Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word, true)
-      Scrape::Giphy.new(logger).scrape_target_word(user_id, target_word)
+      Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word, true)
+      #Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word, true)
+      #Scrape::Giphy.new(logger).scrape_target_word(user_id, target_word)
     end
     logger.info 'scrape_target_word DONE!!'
   end
