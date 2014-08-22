@@ -39,8 +39,10 @@ module Scrape
     #Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
     #Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
     #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
+    Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word)
 
     # 英名が存在する場合はさらに検索
+    # Englishかどうかはscrape_using_api内で判定し、にほんご
     if target_word.person and target_word.person.name_english and not target_word.person.name_english.empty?
       query = target_word.person.name_english
       logger.debug "name_english: #{query}"
@@ -69,11 +71,26 @@ module Scrape
     Image.where(src_url: src_url).length > 0
   end
 
-  # TargetWordのレコードから、API使用時に用いるクエリを取得する
+  # TargetWordから、API使用時に用いるクエリを取得する
   # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
   def self.get_query(target_word)
     return nil if target_word.nil?
     target_word.person ? target_word.person.name : target_word.word
+  end
+
+  # TargetWordから、API使用時に用いるクエリを取得する
+  # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
+  def self.get_query_en(target_word, english)
+    if english
+      if target_word.person
+        query = target_word.person.name_english  # word:'鹿目まどか', person.name_english:'Madoka Kaname'
+      elsif target_word.word.ascii_only?
+        query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+      end
+    else
+      query = Scrape.get_query target_word
+    end
+    query
   end
 
   def self.get_titles (target_word)
