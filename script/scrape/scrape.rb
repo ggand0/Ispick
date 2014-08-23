@@ -36,8 +36,8 @@ module Scrape
   # タグ登録直後の配信用
   # @param [TargetWord] 配信対象であるTargetWordインスタンス
   def self.scrape_target_word(user_id, target_word, logger)
-    #Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
-    #Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
+    Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
+    Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
     #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
     Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word)
 
@@ -48,8 +48,8 @@ module Scrape
       logger.debug "name_english: #{query}"
 
       Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word, true)
-      #Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word, true)
-      #Scrape::Giphy.new(logger).scrape_target_word(user_id, target_word)
+      Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word, true)
+      Scrape::Giphy.new(logger).scrape_target_word(user_id, target_word)
     end
     logger.info 'scrape_target_word DONE!!'
   end
