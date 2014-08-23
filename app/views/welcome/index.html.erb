@@ -2,7 +2,7 @@
 <p>Ispick is an illustration aggregation service!</p>
 
 <div class="top-image">
-  <%= link_to (image_tag asset_path('top_madoka.jpg')), 'http://ispick.tumblr.com/', style: " z-index: 1;"%>
+  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
 </div>
 
 <div class="wrapper-oauth">
@@ -13,7 +13,7 @@
     <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
   </div>
   <div align="center">
-    <%= link_to 'Login', '/signin_with_password' %>
+    <%= bs_button_to 'Login', '/signin_with_password', class: 'btn-mini btn-default' %>
   </div>
 </div>
 <br>

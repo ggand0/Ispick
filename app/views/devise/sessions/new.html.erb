@@ -1,3 +1,10 @@
+<h1><strong>Ispick v0.3</strong></h1>
+<p>Ispick is an illustration aggregation service!</p>
+
+<div class="top-image">
+  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
+</div>
+
 <div class="wrapper-sign-in">
   <div class="btn-group-vertical btn-group-oauth">
     <%= button_group do %>
@@ -18,7 +25,7 @@
   </div>
   <br>
   <br>
-  <div align="center">
+  <div class="link-sign-in" align="center">
     <%= link_to 'Forgot password?', '/reset_password' %><br>
     <%= link_to 'Sign up', '/signup_with_password' %>
   </div>
