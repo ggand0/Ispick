@@ -22,6 +22,9 @@ gem 'kaminari'                                    # Enable pagination
 gem 'jquery-fileupload-rails'                     # Upload multiple files
 gem 'remotipart', '~> 1.2'                        # Enable ajax request with form_tag
 gem 'high_voltage', '~> 2.1.0'                    # Handles static pages
+gem "bourbon"
+gem "neat"
+gem "font-awesome-rails"
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'

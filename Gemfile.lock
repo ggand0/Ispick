@@ -101,6 +101,9 @@ GEM
     bootstrap-sass (3.2.0.0)
       sass (~> 3.2)
     bootstrap_form (2.1.1)
+    bourbon (4.0.2)
+      sass (~> 3.3)
+      thor
     buftok (0.2.0)
     builder (3.1.4)
     capistrano (3.1.0)
@@ -175,6 +178,8 @@ GEM
       faraday_middleware (~> 0.8)
       oj (~> 2.0)
     ffi (1.9.3)
+    font-awesome-rails (4.1.0.0)
+      railties (>= 3.2, < 5.0)
     formatador (0.2.5)
     fuubar (1.3.3)
       rspec (>= 2.14.0, < 3.1.0)
@@ -253,6 +258,9 @@ GEM
     natto (0.9.6)
       ffi (>= 1.9.0)
     naught (1.0.0)
+    neat (1.6.0)
+      bourbon (>= 3.1)
+      sass (>= 3.3)
     net-http-digest_auth (1.4)
     net-http-persistent (2.9.4)
     net-scp (1.2.1)
@@ -490,6 +498,7 @@ DEPENDENCIES
   bootstrap-datepicker-rails
   bootstrap-sass (~> 3.2.0)
   bootstrap_form
+  bourbon
   capistrano (~> 3.1.0)
   capistrano-bundler (~> 1.1.2)
   capistrano-ext
@@ -505,6 +514,7 @@ DEPENDENCIES
   engtagger
   factory_girl_rails
   fakeweb (~> 1.3)
+  font-awesome-rails
   futaba!
   fuubar
   giphy
@@ -521,6 +531,7 @@ DEPENDENCIES
   mechanize
   mysql2
   natto
+  neat
   nokogiri
   omniauth
   omniauth-facebook
