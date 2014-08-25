@@ -9,7 +9,7 @@
     </div>
     <div id="auth-form">
       <p class="btn-facebook">
-        <%= link_to("#") do %>
+        <%= link_to(user_omniauth_authorize_path(:facebook)) do %>
           <i class="fa fa-facebook"></i>Continue with Facebook
         <% end %>
       </p>
