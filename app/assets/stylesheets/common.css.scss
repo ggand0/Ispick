@@ -1,6 +1,8 @@
 @charset "UTF-8";
 @import "bourbon";
 @import "neat";
+@import 'base/variables';
+@import "base/forms";
 @import "_color";
 @import url(http://fonts.googleapis.com/css?family=Montserrat);
 
@@ -27,7 +29,7 @@ $defaultFontSize: 16px;
       @include media($tablet) { font-size: $padding - 2; }
       @include media($mobile) { font-size: $padding - 4; }
     } @else {
-      font-size: $defaultFontSize + 2;
+      font-size: $defaultFontSize + 1;
       padding: $padding;
       border-radius: 4px;
       box-shadow: 0 4px 0 darken($bgColor, 10%);
@@ -55,6 +57,24 @@ $defaultFontSize: 16px;
       background: $gray;
       box-shadow: 1px 1px 0 darken($gray, 20%);
     }
+  }
+}
+
+@mixin btn-submit($bgColor, $fontColor, $padding: '10px 20px', $margin: '50px 0 10px', $circle: '', $left: '') {
+  display: inline-block;
+  margin: $margin;
+  font-size: $defaultFontSize + 2;
+  text-align: center;
+  padding: $padding;
+  background: $bgColor;
+	color: $fontColor;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 darken($bgColor, 10%);
+  border: none;
+  @include media($tablet) { font-size: $defaultFontSize; }
+  @include media($mobile) { font-size: $defaultFontSize - 2; }
+  &:hover {
+    background: lighten($bgColor, 5%);
   }
 }
 
@@ -103,7 +123,7 @@ body {
   color: $gray;
   font-size: $defaultFontSize;
   background: {
-    color: $milky-white;
+    color: $white;
   }
   @include media($tablet) { font-size: $defaultFontSize - 2; }
 }

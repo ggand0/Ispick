@@ -1,18 +1,24 @@
+<% @pageId = "devise" %>
 
+<%= render "shared/welcome_header" %>
 
-<div class="btn-group-oauth">
-  <%= bootstrap_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-    <%= devise_error_messages! %>
+<div id="auth-container">
+  <div class="outer-container">
+    <div id="auth-form">
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+        <%= devise_error_messages! %>
+        <%= f.text_field :name, autofocus: true, placeholder: "Name" %>
+        <%= f.email_field :email, placeholder: "Email" %>
+        <%= f.password_field :password, autocomplete: "off", placeholder: "Password" %>
+        <%= f.password_field :password_confirmation, autocomplete: "off", placeholder: "Password confirmation" %>
 
-    <%= f.text_field :name, autofocus: true %>
-    <%= f.email_field :email %>
-    <%= f.password_field :password, autocomplete: "off" %>
-    <%= f.password_field :password_confirmation, autocomplete: "off" %>
+        <%= f.submit 'Create account' %>
+      <% end %>
 
-    <%= f.submit 'アカウントを作成' %>
-  <% end %>
-
-  <br>
-  <br>
-  <%= link_to '既にアカウントをお持ちの方はこちら', '/signin_with_password' %>
+      <ul id="other-paths">
+        <li><%= link_to "Already have an account?", "/signin_with_password" %></li>
+        <li><%= link_to "Home", "/" %></li>
+      </ul>
+    </div>
+  </div>
 </div>

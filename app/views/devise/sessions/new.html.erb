@@ -1,32 +1,36 @@
-<h1><strong>Ispick v0.3</strong></h1>
-<p>Ispick is an illustration aggregation service!</p>
+<% @pageId = "devise" %>
 
-<div class="top-image">
-  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
-</div>
+<%= render "shared/welcome_header" %>
 
-<div class="wrapper-sign-in">
-  <div class="btn-group-vertical btn-group-oauth">
-    <%= button_group do %>
-      <%= bs_button_to 'Login with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Pinterest', '/', class: "btn btn-default btn-block" %><br>
-      <br>
-
-      <div align="center">
-        <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name) do |f| %>
-          <%= f.email_field :email, autofocus: true, placeholder: 'email' %>
-          <%= f.password_field :password, autocomplete: 'off', placeholder: 'password' %>
-          <%= f.submit 'Submit' %>
+<div id="auth-container">
+  <div class="outer-container">
+    <div id="auth-form">
+      <p class="btn-facebook">
+        <%= link_to(user_omniauth_authorize_path(:facebook)) do %>
+          <i class="fa fa-facebook"></i>Log in with Facebook
         <% end %>
-      </div>
-
-    <% end %>
-  </div>
-  <br>
-  <br>
-  <div class="link-sign-in" align="center">
-    <%= link_to 'Forgot password?', '/reset_password' %><br>
-    <%= link_to 'Sign up', '/signup_with_password' %>
+      </p>
+      <p class="btn-twitter">
+        <%= link_to(user_omniauth_authorize_path(:twitter)) do %>
+          <i class="fa fa-twitter"></i>Log in with Twitter
+        <% end %>
+      </p>
+      <p class="btn-pinterest">
+        <%= link_to("/") do %>
+          <i class="fa fa-pinterest"></i>Log in with Pinterest
+        <% end %>
+      </p>
+      <h2><i class="fa fa-envelope"></i>Log in with email</h2>
+      <%= form_for resource, as: resource_name, url: session_path(resource_name) do |f| %>
+        <%= devise_error_messages! %>
+        <%= f.email_field :email, autofocus: true, placeholder: 'Email' %>
+        <%= f.password_field :password, autocomplete: 'off', placeholder: 'Password' %>
+        <%= f.submit 'Submit' %>
+      <% end %>
+      <ul id="other-paths">
+        <li><%= link_to 'Forgot password?', '/reset_password' %></li>
+        <li><%= link_to 'Sign up', '/signup_with_password' %></li>
+      </ul>
+    </div>
   </div>
 </div>
