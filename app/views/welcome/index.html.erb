@@ -70,9 +70,9 @@
 <div class="outer-container">
   <h3>Debug</h3>
   <% if user_signed_in? %>
-    <%= link_to 'Logout', destroy_user_session_path %>
+    <%= link_to 'Log out', destroy_user_session_path %>
   <% else %>
-    <%= link_to "Login with twitter", user_omniauth_authorize_path(:twitter) %><br>
-    <%= link_to "Login with facebook", '/' %>
+    <%= link_to "Log in with twitter", user_omniauth_authorize_path(:twitter) %><br>
+    <%= link_to "Log in with facebook", '/' %>
   <% end %>
 </div>
