@@ -76,9 +76,12 @@ namespace :deploy do
     on roles(:all) do
       #execute "echo #{fetch(:default_env)}"
       #execute "cat ~/.bash_profile"
-      execute "export LD_LIBRARY_PATH='/usr/local/lib'"
-      execute "echo $LD_LIBRARY_PATH"
-      execute "printenv"
+
+      #execute "export LD_LIBRARY_PATH='/usr/local/lib'"
+      #execute "echo $LD_LIBRARY_PATH"
+      #execute "printenv"
+
+      test 'crontab -r'
     end
   end
 
@@ -112,7 +115,8 @@ namespace :whenever do
   desc "update crontab tasks"
   task :update do
     on roles(:all) do
-      execute "cd #{current_path} && crontab -r"
+      #execute "cd #{current_path} && crontab -r"
+      test 'crontab -r'
 
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab"

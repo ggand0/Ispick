@@ -18,7 +18,7 @@ module Scrape::Wiki::Character
     page_hash.each do |anime_title, url|
       next if url[:ja].empty?                     # str.empty?はstr=''だったらtrueを返す
       html_ja = Scrape::Wiki.open_html url[:ja]   # まずは日本語の概要ページを開く
-      next if html_ja.nil?                        # obj.nil?はobj=nilだったらtrueを返すメソッド
+      next if html_ja.nil?                       # obj.nil?はobj=nilだったらtrueを返すメソッド
       html_en = Scrape::Wiki.open_html url[:en]
 
       # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
@@ -163,6 +163,7 @@ module Scrape::Wiki::Character
     name_array = []
 
     html.css('h2').each do |item|
+      # 基本的に１回だけ実行される
       if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text
         current = item.next_element
 
@@ -202,6 +203,7 @@ module Scrape::Wiki::Character
           end
 
           # next_elementが存在するかどうかの判定
+          # 登場人物タグの中をnext_elementで全部回してみる
           if current.respond_to?(:next_element)
             current = current.next_element
           else
@@ -316,7 +318,7 @@ module Scrape::Wiki::Character
                 res[:en] = self.convert_macrons(names[2])
                 name_array.push(res)
               end
-
+              puts "#{$1}, #{$2}"
             # Yūri (ユウリ?) / Airi Anri (杏里 あいり Anri Airi?)
             elsif /(.*?) \((.*?)\) \/ (.*?) \((.*?)\)/ =~ tmp
               tmp_array = tmp.split(' / ')

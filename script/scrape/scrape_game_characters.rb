@@ -76,6 +76,8 @@ module Scrape::Wiki::GameCharacter
         # 見出しがキャラクター一覧を表す語であれば、その親タグ以降のdlタグに注目
         if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item2.inner_text
 
+            # 自分自身が終わった、その次のタグ。階層を無視した次のタグ
+            # <h2> => <h3>など。
             current = item2.parent.next_element
                # タグの抽出
             while true
