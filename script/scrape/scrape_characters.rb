@@ -54,6 +54,7 @@ module Scrape::Wiki::Character
   # Get the characters list page from the overview page in English.
   # 英語の概要ページから、登場人物一覧ページを取得する
   # @param [String] アニメのタイトル
+  
   # @param [String] 概要ページのURL
   # @param [Nokogiri::HTML] 概要ページを開いて生成したHTMLオブジェクト
   # @return [Hash] アニメタイトルをkey、人物一覧ページをvalueとするHash
@@ -140,6 +141,10 @@ module Scrape::Wiki::Character
       # 英名追加後のHashのArrayが返される
       if html_en
         name_array = self.get_character_name_en(anime_title, html_en, name_ja)
+          # 英名追加失敗時
+        if(name_array==nil and name_ja != nil)
+          name_array=name_ja
+        end
       else
         name_array = name_ja
       end
@@ -162,10 +167,9 @@ module Scrape::Wiki::Character
   def self.get_character_name_ja(anime_title, html)
     name_array = []
 
-    html.css('h2').each do |item|
+    html.css("span[class='mw-headline']").each do |item|
       if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item.inner_text
-        current = item.next_element
-
+        current = item.parent.next_element
         while true
           if current.respond_to?(:name) and current.name == 'dl'
             # dtタグの抽出。多くのキャラクタ一覧のページでは、dl-dt-ddの構造でキャラクタ名を列挙している。
@@ -197,7 +201,7 @@ module Scrape::Wiki::Character
                 end
               end
             end
-          elsif current.respond_to?(:name) and (current.name == 'h2' or current.name == 'script')
+          elsif current.respond_to?(:name) and (current.name == item.parent.name or current.name == 'script')
             break
           end
 
@@ -222,15 +226,24 @@ module Scrape::Wiki::Character
   # @return [Hash] { match: boolean, list: 削除後のcharacters_list }
   def self.match_character_name(name_string, characters_list)
     return '' if characters_list.nil?
-
+    puts name_string
     characters_list.each do |character_name|
-      if /#{character_name[:name]}/ =~ name_string
+      if self.match_english_name(character_name[:name],name_string)
+        puts character_name.inspect
         return character_name
       end
     end
     ''
   end
-
+  
+  
+  def self.match_english_name(name1, name2)
+      if /#{name1}/ =~ name2
+        return true
+      else
+        return false
+      end
+  end
   # Convert macron characters to alphabets.
   # @param name [String] The name of a character in English.
   # @return [String] The name with no macrons.
@@ -267,7 +280,7 @@ module Scrape::Wiki::Character
   def self.get_character_name_en(anime_title, html, characters_list)
     name_array = []
 
-    html.css('h2').each do |item|
+    html.css("span[class='mw-headline']").each do |item|
       begin
         tmp, characters_list = self.scrape_character_name_en(anime_title, html, characters_list, item)
         name_array += tmp
@@ -288,13 +301,13 @@ module Scrape::Wiki::Character
     name_array = []
 
     if /((main|Main)*(characters|Characters))|((characters|Characters)*(of).*)/ =~ item.inner_text
-      current = item.next_element
+      current = item.parent.next_element
+
       # dtタグの抽出
       while true
         if current.respond_to?(:name) and current.name == 'dl'
           current.css('dt').each do |dt|
             next if dt.inner_text.empty?
-
             tmp = dt.inner_text
             tmp.gsub!(/\?/, '')
             tmp_array = []
@@ -337,6 +350,8 @@ module Scrape::Wiki::Character
               # Madoka Kaname (鹿目 まどか Kaname Madoka?)
               if /(.*?) \((.*?)\)/ =~ tmp
                 names = [ $1, $2 ]
+                # names : ["Honoka Kōsaka", "高坂 穂乃果, Kōsaka Honoka"]
+                puts characters_list
                 res = self.match_character_name(names[1], characters_list)
                 if not res.empty?
                   characters_list.delete(res)
@@ -351,10 +366,9 @@ module Scrape::Wiki::Character
                   name_array.push(res)
                 end
               end
-
             end # if /(.*?) \((.*?)\) and (.*?) \((.*?)\)/ =~ tmp
           end # each
-        elsif current.respond_to?(:name) and (current.name == 'h2' or current.name == 'script')
+        elsif current.respond_to?(:name) and (current.name == item.parent.name or current.name == 'script')
           break
         end
 

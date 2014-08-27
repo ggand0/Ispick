@@ -11,42 +11,6 @@ describe "Scrape" do
     IO.any_instance.stub(:puts)
   end
 
-# start of scrape wiki for game
-=begin
-  describe "get_game_character_name function" do
-    it "get_game_character_name" do
-      game_character_page = {"ドラゴンクエストエデンの戦士たち"=>
-                    {:ja=>"http://ja.wikipedia.org/wiki/%E5%A4%A7%E4%B9%B1%E9%97%98%E3%82%B9%E3%83%9E%E3%83%83%E3%82%B7%E3%83%A5%E3%83%96%E3%83%A9%E3%82%B6%E3%83%BC%E3%82%BAX",
-                    :en=>"http://en.wikipedia.org/wiki/Dragon_Warrior_VII"}
-                }
-
-      game_character = Scrape::Wiki::Character.get_game_character_name(game_character_page)
-      #puts(game_character)
-    end
-  end
-
-  describe "scrape_wiki_for_game_characters function" do
-    it "scrape_wiki_for_game_characters" do
-      game_page = Scrape::Wiki.scrape_wiki_for_game_characters
-    end
-  end
-
-  describe "get_game_page function" do
-    it "get_game_page" do
-      game_page = Scrape::Wiki.get_game_page
-    end
-  end
-
-  describe "detect_having_characters function" do
-    it "detect_having_characters" do
-      url = 'http://ja.wikipedia.org/wiki/%E3%81%84%E3%81%A3%E3%81%8D'
-      boolean = Scrape::Wiki.detect_having_characters(url)
-      puts(boolean)
-    end
-  end
-=end
-# end of scrape wiki for game
-
   describe "scrape function" do
     it "calls proper functions" do
       Scrape::Wiki.stub(:get_anime_page).and_return nil
@@ -75,10 +39,15 @@ describe "Scrape" do
       Nokogiri::HTML::Document.stub(:parse)
       Nokogiri::HTML::Document.should_receive(:parse).and_return(doc)
 
-      url = 'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      url = 'http://ja.wikipedia.org/wiki/Category:2014%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
       puts result = Scrape::Wiki.get_anime_page(url, true)
-
+ 
       expect(result).to be_a(Hash)
+    end
+    
+    it "returns valid hash" do
+      url = 'http://ja.wikipedia.org/wiki/Category:2014%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      puts result = Scrape::Wiki.get_anime_page(url, true)
     end
   end
 

@@ -134,7 +134,7 @@ module Scrape::Wiki
     html.css('li > a').each do |item|
       break if /アカウント/ =~ item.inner_text
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
-
+      puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org#{item['href']}"
         page_url_en = self.get_anime_page_en page_url_ja
@@ -143,11 +143,10 @@ module Scrape::Wiki
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
-
+=begin
     # spanタグ->aタグの順にネストされているパターン
     html.css('span > a').each do |item|
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
-
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org#{item['href']}"
         page_url_en = self.get_anime_page_en page_url_ja
@@ -156,7 +155,7 @@ module Scrape::Wiki
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
-
+=end
     anime_page
   end
 

@@ -77,6 +77,7 @@ module Scrape::Wiki::GameCharacter
         if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item2.inner_text
 
             current = item2.parent.next_element
+
                # タグの抽出
             while true
               if current.respond_to?(:name) and current.name == 'dl'
