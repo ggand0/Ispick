@@ -26,7 +26,7 @@ module Scrape::Wiki::Character
       title_en = page_title if /#{page_title}/ =~ anime_title
       title_en = anime_title if title_en.nil?
       page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
-      
+
 =begin
       # 英語版の登場人物一覧ページを取得する
       if (not url[:en].empty?) and (not html_en.nil?)
@@ -56,7 +56,7 @@ module Scrape::Wiki::Character
   # Get the characters list page from the overview page in English.
   # 英語の概要ページから、登場人物一覧ページを取得する
   # @param [String] アニメのタイトル
-  
+
   # @param [String] 概要ページのURL
   # @param [Nokogiri::HTML] 概要ページを開いて生成したHTMLオブジェクト
   # @return [Hash] アニメタイトルをkey、人物一覧ページをvalueとするHash
@@ -237,8 +237,8 @@ module Scrape::Wiki::Character
     end
     ''
   end
-  
-  
+
+
   def self.match_english_name(name1, name2)
       if /#{name1}/ =~ name2
         return true
@@ -334,7 +334,7 @@ module Scrape::Wiki::Character
                 name_en2 = name_en.split(" ")
                 name_ja = names[1].split(',')[0]
                 name_en = self.convert_macrons(name_en)
-                name_array.push({name:name_ja,query:name_ja.gsub!(/ /,""),en:name_en})
+                name_array.push({ name: name_ja, query: name_ja.gsub(/\s/,""), en: name_en })
 
               else
                 name_en = tmp

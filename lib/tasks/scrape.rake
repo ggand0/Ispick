@@ -83,8 +83,9 @@ namespace :scrape do
     Scrape.redownload
   end
 
+  # people関連テーブルを完全に抹消する（デバッグ時に使用）
   desc "Delete all people related tables completely"
-  task delete_people :environment do
+  task delete_people: :environment do
     puts 'Deleting all people related tables...'
     Person.delete_all
     Title.delete_all
