@@ -8,7 +8,7 @@ describe "Default feature" do
       # TODO: デバッグ用のリンクではなく通常のログインフォームからアクセスするようにする
       visit root_path
       mock_auth_hash
-      click_link 'twitterでログイン'
+      click_link 'Login with twitter'
 
       # /users/homeに移動すること
       uri = URI.parse(current_url)

@@ -12,14 +12,17 @@ require "#{Rails.root}/script/scrape/scrape_giphy.rb"
 require "#{Rails.root}/script/scrape/scrape_matome.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
 require "#{Rails.root}/script/scrape/scrape_tinami.rb"
+require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
 namespace :scrape do
   @DEFAULT = 10000
 
-  # ----------------------------------
-  #  General tasks
-  # ----------------------------------
-  desc "指定された時期より古いImageを削除"
+  # ==================================
+  #           General tasks
+  # ==================================
+
+  # 指定された時期より古いImageを削除
+  desc "Delete images older than a certain date"
   task delete_old: :environment do
     puts 'Deleting old images...'
     before_count = Image.count
@@ -33,7 +36,8 @@ namespace :scrape do
   end
 
   # @params limit [Integer] 最大保存数
-  desc "最大保存数を超えている場合古いImageから順に削除"
+  # 最大保存数を超えている場合古いImageから順に削除
+  desc "Delete images if its the count of all images exceeds the limit"
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
 
@@ -42,13 +46,14 @@ namespace :scrape do
     else
       limit = @DEFAULT
     end
-    puts 'limit: ' + limit.to_s
+    puts "limit: #{limit.to_s}"
 
     before_count = Image.count
     if Image.count > limit
       delete_num = Image.count - limit
       Image.limit(delete_num).order(:created_at).destroy_all
     end
+
     puts "Deleted: #{(before_count - Image.count).to_s} images"
     puts "Current image count: #{Image.count.to_s}"
   end
@@ -71,30 +76,28 @@ namespace :scrape do
     Scrape.scrape_keyword(TargetWord.last)
   end
 
-  desc "dataがnilのレコードにsrc_urlから再DLさせる"
+  # dataがnilのレコードにsrc_urlから再DLさせる
+  desc "Redownload an image data which has nil src_url attribute"
   task redownload: :environment do
     puts 'Downloading for images with nil data...'
     Scrape.redownload
   end
 
+  # people関連テーブルを完全に抹消する（デバッグ時に使用）
+  desc "Delete all people related tables completely"
+  task delete_people: :environment do
+    puts 'Deleting all people related tables...'
+    Person.delete_all
+    Title.delete_all
+    Keyword.delete_all
+    PeopleKeyword.delete_all
+    PeopleTitle.delete_all
+  end
 
-  # -----------------------------
-  # 特定のサイトから画像抽出するタスク
-  # -----------------------------
-  require "#{Rails.root}/script/scrape/scrape_nico.rb"
-  require "#{Rails.root}/script/scrape/scrape_2ch.rb"
-  require "#{Rails.root}/script/scrape/scrape_futaba.rb"
-  require "#{Rails.root}/script/scrape/scrape_piapro.rb"
-  require "#{Rails.root}/script/scrape/scrape_4chan.rb"
-  require "#{Rails.root}/script/scrape/scrape_twitter.rb"
-  require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
-  require "#{Rails.root}/script/scrape/scrape_deviant.rb"
-  require "#{Rails.root}/script/scrape/scrape_giphy.rb"
-  require "#{Rails.root}/script/scrape/scrape_matome.rb"
-  require "#{Rails.root}/script/scrape/scrape_wiki.rb"
-  require "#{Rails.root}/script/scrape/scrape_tinami.rb"
-  require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
+  # =======================================
+  #  Tasks to scrape on the specific sites
+  # =======================================
   desc "キャラクタに関する静的なDBを構築する"
   task wiki: :environment do
     puts 'Scraping character names...'

@@ -27,10 +27,29 @@ describe "Scrape::Wiki::Character" do
       # キャラクタ名の一覧配列を取得
       puts anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page, false)
     end
+
+    it "returns an anime_character_page" do
+          anime_page = {
+        "ラブライブ!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}
+      }
+
+      #
+      #url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
+      #puts CGI.unescape(url)
+      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E%203%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
+      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
+
+      puts anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page, false)
+
+      # キャラクタ名の一覧配列を取得
+      puts anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page, false)
+
+    end
   end
 
 
   describe "get_anime_character_page function" do
+=begin
     it "returns a valid hash" do
       url_ja = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
       url_en = 'http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica'
@@ -48,6 +67,15 @@ describe "Scrape::Wiki::Character" do
           }
       }
 
+      puts result = Scrape::Wiki::Character.get_anime_character_page(page_hash)
+      expect(result).to be_a(Hash)
+      expect(result).to eq(valid_hash)
+    end
+=end
+
+    it "return a valid hash for english" do
+      page_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}}
+      valid_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!"}}
       puts result = Scrape::Wiki::Character.get_anime_character_page(page_hash)
       expect(result).to be_a(Hash)
       expect(result).to eq(valid_hash)
@@ -103,15 +131,18 @@ describe "Scrape::Wiki::Character" do
       expect(result['魔法少女まどか☆マギカ'][:characters].first[:en]).to eq('Madoka Kaname')
     end
 
-=begin
-    it "test" do
-     hash = {'FF10' => {ja:"http://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%8A%E3%83%AB%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B8%E3%83%BCX",
-      en:"http://en.wikipedia.org/wiki/Characters_of_Final_Fantasy_X_and_X-2"}}
-     puts(hash)
-     result = Scrape::Wiki::Character.get_anime_character_name(hash)
-     puts(result)
+    it "returns a valid hash value for english" do
+      #url_ja = nil
+      #url_en = 'http://en.wikipedia.org/wiki/Love_Live!'
+      wiki_url = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!"},
+                  "Love Live!2"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!2"}}
+
+      puts result = Scrape::Wiki::Character.get_anime_character_name(wiki_url)
+      expect(result).to be_a(Hash)
+      puts result['Love Live!']
+      expect(result['Love Live!'][:characters].first[:en]).to eq('Honoka Kousaka')
+
     end
-=end
   end
 
   describe "get_character_name_ja funciton" do
@@ -142,19 +173,36 @@ describe "Scrape::Wiki::Character" do
       ]
 
       puts result = Scrape::Wiki::Character.get_character_name_en(
-        '魔法少女まどか☆マギカ', html, characters_list)
+        '魔法少女まどか☆マギカ', html)
       #result.each { |n| puts "#{n.count}, #{n}" }
       expect(result).to be_a(Array)
-      expect(result.count).to eq(6)
+      expect(result.count).to eq(73)
     end
   end
 
   describe "match_character_name function" do
     it "returns a valid hash" do
-      name_string = '(鹿目 まどか, Kaname Madoka)'
+      name_string = '(鹿目 まどか Kaname Madoka)'
       characters_list =[{ name: '鹿目 まどか' }, { name: '美樹 さやか' }]
       puts result = Scrape::Wiki::Character.match_character_name(name_string, characters_list)
       expect(result).to eq({ name: '鹿目 まどか' })
     end
+
+    it "returns a valid hash for livelive" do
+      name_string = '高坂 穂乃果 Kōsaka Honoka'
+      characters_list =[{ name: '高坂 穂乃果' }, { name: '高坂 穂乃果2' }]
+      puts result = Scrape::Wiki::Character.match_character_name(name_string, characters_list)
+      expect(result).to eq({ name: '高坂 穂乃果' })
+    end
   end
+
+  describe "match_english_name function" do
+    it "returns a valid hash" do
+      name1 = "高坂 穂乃果"
+      name2 = "高坂 穂乃果 Kōsaka Honoka"
+      puts result = Scrape::Wiki::Character.match_english_name(name1, name2)
+      #expect(result).to eq({ name: '鹿目 まどか' })
+    end
+  end
+
 end

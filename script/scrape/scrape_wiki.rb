@@ -20,14 +20,7 @@ module Scrape::Wiki
     # The array of Wikipedia pages that list up anime titles.
     # アニメタイトル一覧ページの配列：
     url = [
-      'http://ja.wikipedia.org/wiki/Category:2007%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2008%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2009%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2010%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2012%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1',
-      'http://ja.wikipedia.org/wiki/Category:2014%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
+      'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
     ]
 
 
@@ -48,7 +41,7 @@ module Scrape::Wiki
     end
 
     # ゲームキャラクタ名を取得する
-    self.scrape_wiki_for_game_characters
+    #self.scrape_wiki_for_game_characters
   end
 
   def self.scrape_wiki_for_game_characters
@@ -134,20 +127,19 @@ module Scrape::Wiki
     html.css('li > a').each do |item|
       break if /アカウント/ =~ item.inner_text
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
-
+      puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
-        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
-        page_url_en = self.get_anime_page_en page_url_ja
+        page_url_ja = nil#"http://ja.wikipedia.org#{item['href']}"
+        page_url_en = "http://en.wikipedia.org#{item['href']}"#self.get_anime_page_en page_url_ja
         puts page_url_ja if logging
 
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
-
+=begin
     # spanタグ->aタグの順にネストされているパターン
     html.css('span > a').each do |item|
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
-
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_ja = "http://ja.wikipedia.org#{item['href']}"
         page_url_en = self.get_anime_page_en page_url_ja
@@ -156,7 +148,7 @@ module Scrape::Wiki
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
-
+=end
     anime_page
   end
 
@@ -202,6 +194,8 @@ module Scrape::Wiki
     rescue Errno::ENOENT => e
       return puts e
     rescue SocketError => e
+      return puts e
+     rescue => e
       return puts e
     end
   end
@@ -254,8 +248,8 @@ module Scrape::Wiki
         person.titles << title
 
         # よみがなをaliasとして追加
-        keyword = self.get_keyword(name_hash[:_alias], true)
-        person.keywords << keyword
+        #keyword = self.get_keyword(name_hash[:_alias], true)
+        #person.keywords << keyword
 
         # keywords保存の例
         #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される

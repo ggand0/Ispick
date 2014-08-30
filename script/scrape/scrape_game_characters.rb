@@ -79,6 +79,7 @@ module Scrape::Wiki::GameCharacter
             # 自分自身が終わった、その次のタグ。階層を無視した次のタグ
             # <h2> => <h3>など。
             current = item2.parent.next_element
+
                # タグの抽出
             while true
               if current.respond_to?(:name) and current.name == 'dl'
