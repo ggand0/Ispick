@@ -8,7 +8,7 @@ describe "Scrape" do
   let(:years) { 8 }
 
   before do
-    #IO.any_instance.stub(:puts)
+    IO.any_instance.stub(:puts)
   end
 
   describe "scrape function" do
@@ -41,10 +41,10 @@ describe "Scrape" do
 
       url = 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
       puts result = Scrape::Wiki.get_anime_page(url, true)
- 
+
       expect(result).to be_a(Hash)
     end
-    
+
     it "returns valid hash" do
       url = 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
       puts result = Scrape::Wiki.get_anime_page(url, true)
