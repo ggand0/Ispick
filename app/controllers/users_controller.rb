@@ -143,6 +143,13 @@ class UsersController < ApplicationController
     @delivered_images = delivered_images.page(params[:page]).per(25)
   end
 
+  # Just an old version of 'show_target_words' template,
+  # which contains the 'create a target_word' link.
+  def debug_crawling
+    return redirect_to '/signin_with_password' unless signed_in?
+    @words = current_user.target_words
+  end
+
 
   private
 

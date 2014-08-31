@@ -2,15 +2,11 @@
 
 
 <h3>Follow a tag</h3>
-Follow a custom tag:
-<br />
-<%= bs_button_to 'Create a target_word', new_target_word_path, class: 'btn-default' %>
-<br />
-<br />
 Find a tag from the database:
 <br />
 <%= bs_button_to 'Search a target_word', search_target_words_path, class: 'btn-default' %>
 <br />
+<i>You can still follow a custom tag at the "<%= link_to 'debug_crawling', debug_crawling_users_path %>" page.</i><br />
 <br />
 <br />
 
