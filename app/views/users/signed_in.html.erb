@@ -15,13 +15,13 @@
     <li role="presentation" class="divider"></li>
     <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
   <% end %>
-  <%= "  #{get_debug_html(@delivered_images_all)}".html_safe if @delivered_images_all %>
+  <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>
 
 <!-- ここから画像表示 -->
-<%= paginate @delivered_images %>
+<%= paginate @images %>
 <div class="wrap">
-  <% @delivered_images.each_with_index do |delivered_image, index| %>
+  <% @images.each_with_index do |delivered_image, index| %>
     <% image = delivered_image %>
 
     <div class="box">
@@ -54,4 +54,4 @@
   <% end %>
 </div>
 
-<%= paginate @delivered_images %>
+<%= paginate @images %>

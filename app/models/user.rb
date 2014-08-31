@@ -61,7 +61,8 @@ class User < ActiveRecord::Base
 
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
-    images.joins(:image).order('images.posted_at')
+    words = target_words.map{ |target_word| target_word.word }
+    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
   end
 
   # @param images [ActiveRecord::CollectionProxy]
@@ -95,9 +96,7 @@ class User < ActiveRecord::Base
 
   # @return [ActiveRecord::AssociationRelation]
   def self.sort_by_quality(images, page)
-    images = images.includes(:image).
-      reorder('images.quality desc').references(:images)
-    #images.page(params[:page]).per(25)
+    images = images.reorder('quality desc')
     images.page(page).per(25)
   end
 
