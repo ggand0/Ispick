@@ -1,8 +1,9 @@
 class TargetWordsUser < ActiveRecord::Base
-  belongs_to :target_word
+  belongs_to :target_word, counter_cache: :users_count
   belongs_to :user
 
   validates :target_word_id, uniqueness: { scope: :user_id }
+  validates :user_id, uniqueness: { scope: :target_word_id }
   #after_create :search_keyword, unless: :skip_callbacks
 
   # Scrape and deliver a small amount of images from each target websites.

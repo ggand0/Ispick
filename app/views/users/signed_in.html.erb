@@ -6,7 +6,7 @@
 
 <!-- 表示する画像数とフィルタに関するdropdownを描画 -->
 <p>
-  <%= "You don't seem to follow a tag yet. Let\'s follow them at the Preferences page! <br />".html_safe if current_user.target_words.count == 0 %>
+  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.target_words.count == 0 %>
   <%= bs_dropdown_button_to 'Filters' do %>
     Filter by date
     <div class="input-group date" style="width: 200px;" align="right">

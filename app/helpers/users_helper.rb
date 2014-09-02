@@ -1,4 +1,7 @@
 module UsersHelper
+  # ===================
+  #   Utility helpers
+  # ===================
   # Calculates the file size of a favored_image relation.
   # @params favored_images [ActiveRecord::AssociationRelation]
   # @return [Integer] Total file size[bytes] of the relation
@@ -17,6 +20,14 @@ module UsersHelper
     total_size
   end
 
+  # @param size [Integer]
+  def get_popular_tags(size)
+    TargetWord.order('users_count DESC').limit(size)
+  end
+
+  # ======================
+  #  HTML related helpers
+  # ======================
   # Returns html code for debugging.
   # @params image [Image] An Image object.
   # @return [String] html code with is_illust value.

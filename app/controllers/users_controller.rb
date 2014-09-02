@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     # Get images
     # For a new user, display the newer images
     if current_user.target_words.nil? or current_user.target_words.empty?
-      images = Image.where("created_at>?", DateTime.now - 1)
+      images = Image.where("created_at>?", DateTime.now - 1).limit(500)
     # Otherwise, display images from user.target_words relation
     else
       images = current_user.get_images

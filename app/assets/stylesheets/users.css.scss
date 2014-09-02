@@ -52,22 +52,7 @@ span.glyphicon {
   width: 600px;
 }
 
-// [OLD]buttonではなく文字列を使っていた時に使用していたクラス
-.favored {
-  float: left;
-  margin-right: 5px;
-}
-.favored span {
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-}
-.favored a {
-  color: #02C293;
-  float: left;
-  margin-right: 5px;
-  &:hover {
-    background-color: #fff;
-  }
+// popular tagsを表示する際に使用
+.popular-tags {
+  width: 600px;
 }
