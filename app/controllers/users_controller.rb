@@ -11,24 +11,24 @@ class UsersController < ApplicationController
     return redirect_to '/signin_with_password' unless signed_in?
     session[:sort] = params[:sort] if params[:sort]
 
-    # Get delivered_images
+    # Get images
     # For a new user, display the newer images
     if current_user.target_words.nil? or current_user.target_words.empty?
-      delivered_images = Image.where("created_at>?", DateTime.now - 1)
+      images = Image.where("created_at>?", DateTime.now - 1)
     # Otherwise, display images from user.target_words relation
     else
-      delivered_images = current_user.get_images
-      delivered_images.reorder!('posted_at DESC') if params[:sort]
+      images = current_user.get_images
+      images.reorder!('posted_at DESC') if params[:sort]
 
-      # Filter delivered_images by date
+      # Filter images by date
       if params[:date]
         date = DateTime.parse(params[:date]).to_date
-        delivered_images = User.filter_by_date(delivered_images, date)
+        images = User.filter_by_date(images, date)
       end
     end
 
-    @delivered_images = delivered_images.page(params[:page]).per(25)
-    @delivered_images_all = delivered_images
+    @images = images.page(params[:page]).per(25)
+    @images_all = images
     render action: 'signed_in'
   end
 
@@ -95,7 +95,7 @@ class UsersController < ApplicationController
 
 
   # An action for debug.
-  # This feature will be deleted in the production version.
+  # This feature will be deleted in future.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     return redirect_to :back unless signed_in?
@@ -122,25 +122,30 @@ class UsersController < ApplicationController
   # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
     return redirect_to :back unless signed_in?
-
     update_session(params)
 
-    # Get delivered_images
+    # Get images
     if session[:all]
-      delivered_images = current_user.get_images_all
+      images = current_user.get_images_all
     else
-      delivered_images = current_user.get_images
+      images = current_user.get_images
     end
 
     # Filter by is_an_illustration value
     @debug = get_session_data
-    delivered_images = User.filter_by_illust(delivered_images, session[:illust])
+    images = User.filter_by_illust(images, session[:illust])
 
-    # Sort delivered_images if any requests exist.
-    delivered_images = User.sort_delivered_images(delivered_images, params[:page]) if session[:sort] == 'favorites'
-    delivered_images = User.sort_by_quality(delivered_images, params[:page]) if session[:sort] == 'quality'
+    # Sort images if any requests exist.
+    images = User.sort_images(images, params[:page]) if session[:sort] == 'favorites'
+    images = User.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
+    @images = images.page(params[:page]).per(25)
+  end
 
-    @delivered_images = delivered_images.page(params[:page]).per(25)
+  # Just an old version of 'show_target_words' template,
+  # which contains the 'create a target_word' link.
+  def debug_crawling
+    return redirect_to '/signin_with_password' unless signed_in?
+    @words = current_user.target_words
   end
 
 

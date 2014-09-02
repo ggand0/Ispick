@@ -36,6 +36,7 @@ Ispic::Application.routes.draw do
       # routes for debug
       get 'download_favored_images'
       get 'debug_illust_detection'
+      get 'debug_crawling'
     end
   end
 

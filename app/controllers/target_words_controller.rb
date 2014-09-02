@@ -45,6 +45,10 @@ class TargetWordsController < ApplicationController
       # If the id equals to nil, which means @target_word is newly initialized, redirect after saving it.
       # IDがnilである=新しくTargetWordをbuildしている場合は、保存してからリダイレクト
       elsif @target_word.id.nil? and current_user.save
+        # Call the SearchImage callback method if you need it for debugging purpose
+        # デバッグ用のparamsがある場合はSearchImageのjobをenqueueする
+        current_user.search_keyword(@target_word) if params[:debug]
+
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
         format.json { render action: 'show', status: :created, location: @target_word }
 
