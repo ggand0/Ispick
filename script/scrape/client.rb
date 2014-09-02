@@ -75,9 +75,15 @@ module Scrape
           logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
         end
 
-        sleep_time = local_interval*60
-        logger.info "Sleeping #{local_interval} minutes."
-        sleep(sleep_time) unless @sleep_debug
+        begin
+          sleep_time = local_interval*60
+          logger.info "Sleeping #{local_interval} minutes."
+          sleep(sleep_time) unless @sleep_debug
+        rescue => e
+          # TODO: Check that this block can catch "SignalException: SIGTERM"
+          puts e.inspect
+        end
+
       end
       @logger.info '--------------------------------------------------'
     end
