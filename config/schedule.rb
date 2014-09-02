@@ -19,26 +19,26 @@
 
 # Learn more: http://github.com/javan/whenever
 
-#set :output, { error: 'log/error.log', standard: 'log/cron.log'}
 
-
-every 6.hours do
-  rake 'scrape:anipic[720]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
+# Scraping processes
+every 1.days do
+  rake 'scrape:anipic[1440]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
-every 6.hours do
-  rake 'scrape:nico[720]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+every 1.days do
+  rake 'scrape:nico[1440]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
-every 6.hours do
-  rake 'scrape:tumblr[720]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+every 1.days do
+  rake 'scrape:tumblr[1440]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
 every 6.hours do
   #rake 'scrape:fchan'
 end
 
-# 配信システム系
+
+# Delivery and deletion processes
 every 60.minutes do
   # 指定枚数を超えたらその分Imagesから削除
   #rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
