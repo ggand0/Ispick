@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140902144735) do
+ActiveRecord::Schema.define(version: 20140903184249) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -134,6 +134,7 @@ ActiveRecord::Schema.define(version: 20140902144735) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "users_count",       default: 0, null: false
+    t.integer  "crawl_count",       default: 0, null: false
   end
 
   create_table "target_words_users", force: true do |t|
