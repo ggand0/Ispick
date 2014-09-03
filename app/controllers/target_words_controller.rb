@@ -106,11 +106,11 @@ class TargetWordsController < ApplicationController
     @people = @search.result(distinct: true).page(params[:page]).per(50)
   end
 
-  # Show delivered_images associated by a specific tag. Will be moved to the UsersController class.
+  # Show images associated by a specific tag. Will be moved to the UsersController class.
   # 特定のタグに配信されている画像のみを表示する。UsersControllerに移動予定
   def show_delivered
     if signed_in?
-      delivered_images = @target_word.images.where.not({ site_name: 'twitter' }).
+      images = @target_word.images.where.not({ site_name: 'twitter' }).
         #where('avoided IS NULL or avoided = false').
         #joins(:image).
         where.not(is_illust: nil).        # Already downloaded
@@ -121,11 +121,11 @@ class TargetWordsController < ApplicationController
       if params[:date]
         date = params[:date]
         date = DateTime.parse(date).to_date
-        delivered_images = delivered_images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+        images = images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
       end
 
-      @delivered_images = delivered_images.page(params[:page]).per(25)
-      @delivered_images_all = delivered_images
+      @images = images.page(params[:page]).per(25)
+      @images_all = images
       render action: '../users/signed_in'
     else
       render action: 'not_signed_in'
