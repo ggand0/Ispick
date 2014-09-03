@@ -1,17 +1,15 @@
 <h1>Search target_word</h1>
 
 <%= search_form_for @search, url: search_target_words_path, html: { method: :post } do |f| %>
-  <%= f.label :name_display_cont, 'キャラクタ名' %>
+  <%= f.label :name_display_cont, 'Character name' %>
   <div class="row">
     <div class="col-lg-2">
-      <%# f.text_field :name_display_or_name_or_name_english_or_titles_name_or_titles_name_english_cont, class: "form-control" %>
-      <%# f.text_field :name_or_name_or_name_english_or_titles_name_cont, class: "form-control" %>
       <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
 
     </div>
   </div>
   <div class="actions">
-    <%= f.submit '検索する', class: "btn btn-default" %>
+    <%= f.submit 'Search', class: "btn btn-default" %>
   </div>
 <% end %>
 
