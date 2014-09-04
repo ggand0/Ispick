@@ -57,7 +57,7 @@ module Deliver::Words
       # target_word.wordと同名のタグを持つimagesを取得
       query = Scrape.get_query target_word
       images = Image.includes(:tags).
-        where.not(is_illust: nil).                        # イラスト判定情報が無いものを除外する
+        where.not(data_updated_at: nil).                        # ダウンロード済みでない者を除外する
         where(tags: { name: query }).
         references(:tags)
 
