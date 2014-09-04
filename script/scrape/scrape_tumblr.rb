@@ -9,7 +9,6 @@ module Scrape
 
     def initialize(logger=nil, limit=20)
       self.limit = limit
-
       if logger.nil?
         self.logger = Logger.new('log/scrape_tumblr_cron.log')
       else
@@ -58,6 +57,7 @@ module Scrape
       scraped = 0
       avg_time = 0
 
+      @logger.debug "memsize_of_all1:#{ObjectSpace.memsize_of_all}"
       # タグ検索：limitで指定された数だけ画像を取得
       client.tagged(query).each_with_index do |image, count|
         # 画像のみを対象とする
@@ -65,6 +65,7 @@ module Scrape
           skipped += 1
           next
         end
+
 
         # API responseから画像情報を取得してDBへ保存する
         start = Time.now
@@ -75,7 +76,9 @@ module Scrape
           verbose: false,
           resque: (not user_id.nil?)
         }
+
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
+        @logger.debug "memsize_of_all3:#{ObjectSpace.memsize_of_all}"
 
         # 抽出情報の更新
         duplicates += image_id ? 0 : 1
@@ -87,7 +90,6 @@ module Scrape
         # 登録直後の配信の場合は、ここでResqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id and (not user_id.nil?)
-          #@logger.debug "scrape_tumblr: user=#{user_id}"
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
           self.class.generate_jobs(image_id, image_data[:src_url], false,
             user_id, target_word.class.name, target_word.id, @logger)

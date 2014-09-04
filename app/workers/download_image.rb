@@ -33,7 +33,7 @@ class DownloadImage
         logger.info "Downloaded : Image.id=#{image_id}"
 
         # 画像解析処理
-        Resque.enqueue(DetectIllust, image.id)
+        #Resque.enqueue(DetectIllust, image.id) # 14/09/04一時停止
         #Resque.enqueue(ImageFace, image.id)  # 14/07/05停止中
 
         # ===================================

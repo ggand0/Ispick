@@ -25,6 +25,18 @@ module Scrape
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     end
 
+    def _print
+      require 'objspace'
+      @logger.debug "count_objects:#{ObjectSpace.count_objects}" #=> {:TOTAL=>55298, :FREE=>10289, :T_OBJECT=>3371, ...}
+      @logger.debug "memsize_of_all:#{ObjectSpace.memsize_of_all}"
+
+      #ObjectSpace.memsize_of(o) #=> 0 /* additional bytes allocated by object */
+      #@logger.debug ObjectSpace.count_tdata_objects #=> {Encoding=>100, Time=>87, RubyVM::Env=>17, ...}
+      #@logger.debug ObjectSpace.count_nodes #=> {:NODE_SCOPE=>2, :NODE_BLOCK=>688, :NODE_IF=>9, ...}
+      #ObjectSpace.reachable_objects_from(o) #=> [referenced, objects, ...]
+      #@logger.debug ObjectSpace.reachable_objects_from_root #=> {"symbols"=>..., "global_tbl"=>...} /
+    end
+
 
     # 定時配信時、タグ検索APIを用いて抽出するサイト用の関数
     # Scrape images from websites which has api. The latter two params are used for testing.
@@ -39,48 +51,66 @@ module Scrape
         raise Exception.new('the interval argument must be more than 10!')
         return
       end
-
-      #child_module = Object::const_get(module_type)
       reserved_time = 10
       local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
-
       @logger.info '--------------------------------------------------'
       @logger.info "Start extracting from #{self.class::ROOT_URL}"
       @logger.info "interval=#{interval} local_interval=#{local_interval}"
 
       # PIDファイルを用いて多重起動を防ぐ
-      #Scrape.detect_multiple_running(module_type, false)
       detect_multiple_running(false)
 
+
       # １タグごとにタグ検索APIを用いて画像取得
-      TargetWord.all.each do |target_word|
+      #TargetWord.all.each do |target_word|
+      count=0
+      target_word = TargetWord.first
+      while (count < TargetWord.count) do
+        #======
+        # THIS BLOCK MUST BE REMOVED AFTER DEBUGGING
+        #=======
+        if target_word.images.count > 0 or target_word.crawl_count > 0
+          @logger.debug "skipping: #{target_word.word}"
+          target_word = target_word.next
+          count+=1
+          next
+        end
+        _print
+        @logger.debug "self: #{ObjectSpace.memsize_of(self)}"
+
         begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
           if (not target_word.word.nil?) and (not target_word.word.empty?)
+            @logger.debug "target_word_id: #{target_word.id}"
 
             # デフォルトのパラメータで実行
             result = scrape_using_api(target_word)
             @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
 
-            # 英語サイトの場合は英名でも検索する
+            # 英語メインのサイトの場合は英名でも検索する
             if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
               # english=trueで呼ぶ
-              #@logger.info "detect"
               result = scrape_using_api(target_word, nil, true, false, true)
               @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
             end
+
+            target_word.crawl_count += 1
+            target_word.save!
           end
+          @logger.debug "memsize_of_all4:#{ObjectSpace.memsize_of_all}"
         rescue => e
           @logger.info e
           logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
         end
 
         begin
+          target_word = target_word.next
+          count+=1
+
           sleep_time = local_interval*60
           logger.info "Sleeping #{local_interval} minutes."
           sleep(sleep_time) unless @sleep_debug
         rescue => e
-          # TODO: Check that this block can catch "SignalException: SIGTERM"
           puts e.inspect
         end
 
@@ -147,7 +177,6 @@ module Scrape
       end
 
       # アダルト画像ならばskip
-      #return unless tags.nil? or self.is_adult(tags)
       if (not tags.nil?) and (not tags.empty?) and self.is_adult(tags)
         logger.debug self.is_adult(tags)
         return
@@ -157,17 +186,20 @@ module Scrape
       # Because with the old version of the MySQL we cannot save them to any columns.
       attributes[:caption] = Scrape.remove_4bytes(attributes[:caption])
 
+      logger.debug "memsize_of_all2:#{ObjectSpace.memsize_of_all}"
       # Create a new instance and associate tags
       image = Image.new attributes
       tags.each { |tag| image.tags << tag }
+      logger.debug "memsize_of_all21:#{ObjectSpace.memsize_of_all}"
 
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-
+        logger.debug "memsize_of_all22:#{ObjectSpace.memsize_of_all}"
         # target_wordオブジェクトに関連づける
-        # nilの場合(RSSのスクレイピング時等)は後でスクリプトを走らせて関連づける
+        # nilの場合(RSSのスクレイピング時等)は、後でスクリプトを走らせて別途関連づける
         target_word.images << image unless target_word.nil?
+        logger.debug "memsize_of_all23:#{ObjectSpace.memsize_of_all}"
 
         Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else
