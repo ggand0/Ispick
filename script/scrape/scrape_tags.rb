@@ -2,8 +2,8 @@
 # coding: utf-8
 require 'open-uri'
 require 'securerandom'
-MAX_PAGES=5
-MAX_TAGS=200
+MAX_PAGES=10
+MAX_TAGS=1000
 COUNT_MIN=10
 
 module Scrape::Tags
@@ -14,6 +14,7 @@ module Scrape::Tags
     # { "rumia"=>{:en=>"rumia", :rs=>"", :jp=>"ルーミア"}, "miku hatsune"=>{:en=>"miku hatsune", :rs=>"", :jp=>"初音ミク"}  }
     #puts tags
 
+    puts tags.count
     self.save_to_database(tags)
   end
 
@@ -31,7 +32,7 @@ module Scrape::Tags
   end
 
 
-   # Anipicのキャラクター名のカウント順タグ一覧ページからタグを抽出（１ページあたり100タグ）
+  # Anipicのキャラクター名のカウント順タグ一覧ページからタグを抽出（１ページあたり100タグ）
   # @return [Hash] キーが英名で英名・ロシア名・和名を持つ
   def self.from_anipic()
     root_url= "http://anime-pictures.net/"
