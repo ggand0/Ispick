@@ -106,7 +106,7 @@ module Scrape
           sleep_time = local_interval*60
           logger.info "Sleeping #{local_interval} minutes."
           sleep(sleep_time) unless @sleep_debug
-        rescue => e
+        rescue Exception => e
           # Standard errorのみcatchするので、メモリーリークした場合はここでkernelにkillされる
           puts e.inspect
         end
