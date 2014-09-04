@@ -12,25 +12,38 @@ module Scrape::Tags
     tags = self.from_anipic()
 
     # { "rumia"=>{:en=>"rumia", :rs=>"", :jp=>"ルーミア"}, "miku hatsune"=>{:en=>"miku hatsune", :rs=>"", :jp=>"初音ミク"}  }
-    puts tags
+    #puts tags
 
+    self.save_to_database(tags)
   end
-  
-  
-  
+
+  def self.save_to_database(tags)
+    tags.each do |key, value|
+      Person.create(
+        name: value[:jp],
+        name_display: value[:jp],
+        name_english: value[:en],
+        name_type: 'Character'
+      )
+
+      puts "Seeded: #{key}"
+    end
+  end
+
+
    # Anipicのキャラクター名のカウント順タグ一覧ページからタグを抽出（１ページあたり100タグ）
   # @return [Hash] キーが英名で英名・ロシア名・和名を持つ
   def self.from_anipic()
     root_url= "http://anime-pictures.net/"
     tags = {}
     url = "http://anime-pictures.net/pictures/view_all_tags/0?search_text=&tag_desc=&sort_by_num=1&filter_by=1&lang=en"
-    
+
     html = Nokogiri::HTML(open(url))
     table = html.css("table[class='all_tags']")
-    
+
     page_count = 0;
     name_count = 0;
-    
+
     # 最大でMAX＿PAGES分だけタグを抽出
     while page_count <= MAX_PAGES do
 
@@ -58,21 +71,21 @@ module Scrape::Tags
             name_count = name_count+1
           end
         end
-        
+
          # 最大タグ数を越えたら終了
         if name_count >= MAX_TAGS then
           page_count = MAX_PAGES
           break
         end
       end
- 
+
       page_count=page_count+1
-      
+
     end
 
     return tags
   end
-  
+
   # @return [Hash]
   def self.get_name(td)
     name_hash ={}
@@ -86,13 +99,13 @@ module Scrape::Tags
         when 3 then
           key = :jp
         else
-        end        
+        end
           #()内は除去
         name_hash[key] = td[i].content.gsub(/\(.*?\)+/,"")
     end
-    
+
     return name_hash
   end
- 
+
   self.scrape()
 end
