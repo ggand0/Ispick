@@ -25,16 +25,11 @@ module Scrape
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     end
 
+    # Print debugging info
     def _print
       require 'objspace'
       @logger.debug "count_objects:#{ObjectSpace.count_objects}" #=> {:TOTAL=>55298, :FREE=>10289, :T_OBJECT=>3371, ...}
-      @logger.debug "memsize_of_all:#{ObjectSpace.memsize_of_all}"
-
-      #ObjectSpace.memsize_of(o) #=> 0 /* additional bytes allocated by object */
-      #@logger.debug ObjectSpace.count_tdata_objects #=> {Encoding=>100, Time=>87, RubyVM::Env=>17, ...}
-      #@logger.debug ObjectSpace.count_nodes #=> {:NODE_SCOPE=>2, :NODE_BLOCK=>688, :NODE_IF=>9, ...}
-      #ObjectSpace.reachable_objects_from(o) #=> [referenced, objects, ...]
-      #@logger.debug ObjectSpace.reachable_objects_from_root #=> {"symbols"=>..., "global_tbl"=>...} /
+      @logger.debug "memsize_of_all:#{ObjectSpace.memsize_of_all}" # Display all memory usage in bytes
     end
 
 
@@ -66,17 +61,17 @@ module Scrape
       count=0
       target_word = TargetWord.first
       while (count < TargetWord.count) do
-        #======
-        # THIS BLOCK MUST BE REMOVED AFTER DEBUGGING
-        #=======
+        # =====================
+        #  BLOCK FOR DEBUGGING
+        # =====================
+=begin
         if target_word.images.count > 0 or target_word.crawl_count > 0
           @logger.debug "skipping: #{target_word.word}"
           target_word = target_word.next
           count+=1
           next
         end
-        _print
-        @logger.debug "self: #{ObjectSpace.memsize_of(self)}"
+=end
 
         begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
@@ -97,20 +92,22 @@ module Scrape
             target_word.crawl_count += 1
             target_word.save!
           end
-          @logger.debug "memsize_of_all4:#{ObjectSpace.memsize_of_all}"
         rescue => e
           @logger.info e
           logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
         end
 
         begin
+          # nextメソッドを使用してtarget_wordの次にidの若いレコードを取得
           target_word = target_word.next
           count+=1
 
+          # 計算した時間分sleep
           sleep_time = local_interval*60
           logger.info "Sleeping #{local_interval} minutes."
           sleep(sleep_time) unless @sleep_debug
         rescue => e
+          # Standard errorのみcatchするので、メモリーリークした場合はここでkernelにkillされる
           puts e.inspect
         end
 
@@ -186,20 +183,17 @@ module Scrape
       # Because with the old version of the MySQL we cannot save them to any columns.
       attributes[:caption] = Scrape.remove_4bytes(attributes[:caption])
 
-      logger.debug "memsize_of_all2:#{ObjectSpace.memsize_of_all}"
       # Create a new instance and associate tags
       image = Image.new attributes
       tags.each { |tag| image.tags << tag }
-      logger.debug "memsize_of_all21:#{ObjectSpace.memsize_of_all}"
 
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
       # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
-        logger.debug "memsize_of_all22:#{ObjectSpace.memsize_of_all}"
+
         # target_wordオブジェクトに関連づける
         # nilの場合(RSSのスクレイピング時等)は、後でスクリプトを走らせて別途関連づける
         target_word.images << image unless target_word.nil?
-        logger.debug "memsize_of_all23:#{ObjectSpace.memsize_of_all}"
 
         Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else

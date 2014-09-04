@@ -46,7 +46,6 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
-      #query = self.class.get_query(target_word, english)
       query = Scrape.get_query_en(target_word, english)
       return if query.nil? or query.empty?
 
@@ -57,7 +56,6 @@ module Scrape
       scraped = 0
       avg_time = 0
 
-      @logger.debug "memsize_of_all1:#{ObjectSpace.memsize_of_all}"
       # タグ検索：limitで指定された数だけ画像を取得
       client.tagged(query).each_with_index do |image, count|
         # 画像のみを対象とする
@@ -77,8 +75,8 @@ module Scrape
           resque: (not user_id.nil?)
         }
 
+        # Save images to the database using parent's class method
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
-        @logger.debug "memsize_of_all3:#{ObjectSpace.memsize_of_all}"
 
         # 抽出情報の更新
         duplicates += image_id ? 0 : 1
