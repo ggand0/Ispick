@@ -1,30 +1,78 @@
-<h1><strong>Ispick v0.3</strong></h1>
-<p>Ispick is an illustration aggregation service!</p>
+<% @pageId = "welcome" %>
 
-<div class="top-image">
-  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
+<%= render "shared/welcome_header" %>
+
+<div id="auth-container">
+  <div class="outer-container">
+    <div id="welcome-image">
+      <%= image_tag "welcome-image.png", alt: "" %>
+    </div>
+    <div id="auth-form">
+      <p class="btn-facebook">
+        <%= link_to(user_omniauth_authorize_path(:facebook)) do %>
+          <i class="fa fa-facebook"></i>Continue with Facebook
+        <% end %>
+      </p>
+      <p class="btn-twitter">
+        <%= link_to(user_omniauth_authorize_path(:twitter)) do %>
+          <i class="fa fa-twitter"></i>Continue with Twitter
+        <% end %>
+      </p>
+      <p class="btn-pinterest">
+        <%= link_to("#") do %>
+          <i class="fa fa-pinterest"></i>Continue with Pinterest
+        <% end %>
+      </p>
+      <p class="btn-email">
+        <%= link_to("/sign_up") do %>
+          <i class="fa fa-envelope"></i>Continue with Email
+        <% end %>
+      </p>
+      <ul id="other-paths">
+        <li><%= link_to "Log in", "/signin_with_password" %></li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<div class="wrapper-oauth">
-  <div class="btn-group-vertical btn-group-oauth">
-    <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Continue with Pinterest', '/', class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
-  </div>
-  <div align="center">
-    <%= bs_button_to 'Login', '/signin_with_password', class: 'btn-mini btn-default' %>
-  </div>
+<div id="features">
+  <ul>
+    <li>
+      <%#= FIXME %>
+      <h2>自動で好みの<br>イラストを配信</h2>
+      <p class="description">
+        お気に入りにの画像をボードに追加できます。
+        <br>
+        ボードは公開、プライベートの設定ができます。
+      </p>
+      <%= image_tag "feature-image.svg", alt: "" %>
+    </li>
+    <li>
+      <%#= FIXME %>
+      <h2>好みのタイプを<br>キャラクターで設定</h2>
+      <p class="description">
+        99,999以上あるキャラクターから指定すると、近い画像を集めてくれるようになります。
+      </p>
+      <%= image_tag "feature-image.svg", alt: "" %>
+    </li>
+    <li>
+      <%#= FIXME %>
+      <h2>FIX ME</h2>
+      <p class="description">
+        FIX ME...
+      </p>
+      <%= image_tag "feature-image.svg", alt: "" %>
+    </li>
+  </ul>
 </div>
-<br>
-<br>
-<div>
-  <!-- デバッグ用OAuthログイン -->
+
+<!-- デバッグ用OAuthログイン -->
+<div class="outer-container">
   <h3>Debug</h3>
   <% if user_signed_in? %>
-    <%= link_to 'Logout', destroy_user_session_path %>
+    <%= link_to 'Log out', destroy_user_session_path %>
   <% else %>
-    <%= link_to "Login with twitter", user_omniauth_authorize_path(:twitter) %><br>
-    <%= link_to "Login with facebook", '/' %>
+    <%= link_to "Log in with twitter", user_omniauth_authorize_path(:twitter) %><br>
+    <%= link_to "Log in with facebook", '/' %>
   <% end %>
 </div>

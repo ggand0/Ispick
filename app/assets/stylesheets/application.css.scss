@@ -13,14 +13,16 @@
  *= require scaffolds
  *= require users
  *= require core
- *= require welcome
  *= require bootstrap-datepicker3
  *= require rails_bootstrap_forms
+ *= require font-awesome
+ *= require common
+ *= require welcome
  *
  */
 
-@import "bootstrap-sprockets";
-@import "bootstrap";
+//@import "bootstrap-sprockets";
+//@import "bootstrap";
 
 #footer {
   clear:  left;

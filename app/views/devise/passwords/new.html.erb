@@ -1,17 +1,26 @@
-<h2>パスワードをお忘れの方</h2>
-<p>パスワードのリセット方法を、ご登録メールアドレスへお送りします。</p>
+<% @pageId = "devise" %>
 
-<div class="btn-group-oauth">
-  <%= bootstrap_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-    <%= devise_error_messages! %>
-    <%= f.email_field :email, autofocus: true, placeholder: 'メールアドレス'  %>
-    <%= f.submit '送信' %>
-  <% end %>
+<%= render "shared/welcome_header" %>
 
-  <br>
-  <div align="left">
-    <%= link_to '既にアカウントをお持ちの方はこちら', '/signin_with_password' %><br>
-    <%= link_to 'はじめて方はこちら', '/signup_with_password' %>
+
+<div id="auth-container">
+  <div class="outer-container">
+    <div class="description">
+      <h2>Reset password</h2>
+      <p>Give us the email address you use to log in to Ispick, we'll send you instructions for resetting your password.</p>
+    </div>
+    <div id="auth-form">
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+        <%= devise_error_messages! %>
+        <%= f.email_field :email, autofocus: true, placeholder: 'Email'  %>
+        <%= f.submit 'Reset password' %>
+      <% end %>
+      <ul id="other-paths">
+        <li><%= link_to "Already have an account?", "/signin_with_password" %></li>
+        <li><%= link_to "Create an account", "/signup_with_password" %></li>
+        <li><%= link_to "Home", "/" %></li>
+      </ul>
+    </div>
   </div>
 </div>
 
