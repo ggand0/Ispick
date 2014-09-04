@@ -13,4 +13,9 @@ class TargetWord < ActiveRecord::Base
   has_many :images, :through => :images_target_words
 
   validates_uniqueness_of :word
+
+
+  def next
+    TargetWord.where("id > ?", id).first
+  end
 end
