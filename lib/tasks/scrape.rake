@@ -95,6 +95,26 @@ namespace :scrape do
     PeopleTitle.delete_all
   end
 
+  desc "Delete images and target_words related tables completely"
+  task delete_all: :environment do
+    puts 'Deleting all images / target_words related tables and image files...'
+
+    # First, delete images and its files
+    Image.delete_all
+    require 'fileutils'
+    begin
+      FileUtils.rm_rf("#{Rails.root}/public/system/images")
+    rescue => e
+      puts "Failed to delete image files.\nPerhaps its already deleted."
+    end
+
+    # Then, delete other tables
+    Tag.delete_all
+    ImagesTag.delete_all
+    TargetWord.delete_all
+    TargetWordsUser.delete_all
+  end
+
 
   # =======================================
   #  Tasks to scrape on the specific sites
