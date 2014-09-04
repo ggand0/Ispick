@@ -9,7 +9,6 @@ module Scrape
 
     def initialize(logger=nil, limit=20)
       self.limit = limit
-
       if logger.nil?
         self.logger = Logger.new('log/scrape_tumblr_cron.log')
       else
@@ -47,7 +46,6 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
-      #query = self.class.get_query(target_word, english)
       query = Scrape.get_query_en(target_word, english)
       return if query.nil? or query.empty?
 
@@ -66,6 +64,7 @@ module Scrape
           next
         end
 
+
         # API responseから画像情報を取得してDBへ保存する
         start = Time.now
         image_data = Scrape::Tumblr.get_data(image)
@@ -75,6 +74,8 @@ module Scrape
           verbose: false,
           resque: (not user_id.nil?)
         }
+
+        # Save images to the database using parent's class method
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
 
         # 抽出情報の更新
@@ -87,7 +88,6 @@ module Scrape
         # 登録直後の配信の場合は、ここでResqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id and (not user_id.nil?)
-          #@logger.debug "scrape_tumblr: user=#{user_id}"
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
           self.class.generate_jobs(image_id, image_data[:src_url], false,
             user_id, target_word.class.name, target_word.id, @logger)

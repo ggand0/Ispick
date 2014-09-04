@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'development'
+set :branch, 'crawl/249'#'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -109,19 +109,24 @@ namespace :deploy do
 end
 
 #========================
-#CUSTOM
+#        CUSTOM
 #========================
 namespace :whenever do
   desc "update crontab tasks"
   task :update do
     on roles(:all) do
-      #execute "cd #{current_path} && crontab -r"
+      # Remove all cron tasks
       test 'crontab -r'
 
+      # Kill all scraping processes, picking them up by name
+      test 'pkill -f scrape'
+
+      # Update whenever and crontab tasks
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab"
     end
   end
+
   desc "clear crontab tasks"
   task :clear do
     on roles(:all) do
@@ -129,6 +134,7 @@ namespace :whenever do
     end
   end
 end
+
 namespace :resque do
   desc "restart resque daemons"
   task :restart do
@@ -149,6 +155,7 @@ namespace :resque do
     end
   end
 end
+
 namespace :seed do
   desc "seeds database"
   task :people do
@@ -157,6 +164,7 @@ namespace :seed do
     end
   end
 end
+
 namespace :check do
   desc "check paths"
   task :path do
@@ -170,7 +178,6 @@ end
 
 
 after 'deploy:started', 'check:path'
-#after 'deploy:finished', 'seed:people'
 after 'deploy:stop', 'resque:stop'
 after 'deploy:stop', 'whenever:clear'
 after 'deploy:start', 'resque:start'

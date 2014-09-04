@@ -19,7 +19,8 @@
 </p>
 
 <!-- ここから画像表示 -->
-<%= paginate @images %>
+<%= paginate @images unless @images.nil? %>
+
 <div class="wrap">
   <% @images.each_with_index do |delivered_image, index| %>
     <% image = delivered_image %>

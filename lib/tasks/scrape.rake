@@ -11,6 +11,7 @@ require "#{Rails.root}/script/scrape/scrape_deviant.rb"
 require "#{Rails.root}/script/scrape/scrape_giphy.rb"
 require "#{Rails.root}/script/scrape/scrape_matome.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
+require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_tinami.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
@@ -94,6 +95,26 @@ namespace :scrape do
     PeopleTitle.delete_all
   end
 
+  desc "Delete images and target_words related tables completely"
+  task delete_all: :environment do
+    puts 'Deleting all images / target_words related tables and image files...'
+
+    # First, delete images and its files
+    Image.delete_all
+    require 'fileutils'
+    begin
+      FileUtils.rm_rf("#{Rails.root}/public/system/images")
+    rescue => e
+      puts "Failed to delete image files.\nPerhaps its already deleted."
+    end
+
+    # Then, delete other tables
+    Tag.delete_all
+    ImagesTag.delete_all
+    TargetWord.delete_all
+    TargetWordsUser.delete_all
+  end
+
 
   # =======================================
   #  Tasks to scrape on the specific sites
@@ -102,6 +123,12 @@ namespace :scrape do
   task wiki: :environment do
     puts 'Scraping character names...'
     Scrape::Wiki.scrape
+  end
+
+  desc "キャラクタ名をAnime-picturesから抽出する"
+  task tags: :environment do
+    puts 'Scraping character names from anime-pictures.net...'
+    Scrape::Tags.scrape
   end
 
   desc "2chから画像抽出する"

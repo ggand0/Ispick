@@ -41,13 +41,14 @@ class User < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = target_words.map{ |target_word| target_word.word }
-    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
+    #Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
   end
 
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
     words = target_words.map{ |target_word| target_word.word }
-    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
   end
 
   # @param images [ActiveRecord::CollectionProxy]
