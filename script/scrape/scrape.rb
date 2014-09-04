@@ -121,6 +121,4 @@ module Scrape
     string.each_char.select{|c| c.bytes.count < 4 }.join('')
   end
 
-
-
 end

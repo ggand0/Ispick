@@ -11,6 +11,7 @@ require "#{Rails.root}/script/scrape/scrape_deviant.rb"
 require "#{Rails.root}/script/scrape/scrape_giphy.rb"
 require "#{Rails.root}/script/scrape/scrape_matome.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
+require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_tinami.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
@@ -102,6 +103,12 @@ namespace :scrape do
   task wiki: :environment do
     puts 'Scraping character names...'
     Scrape::Wiki.scrape
+  end
+
+  desc "キャラクタ名をAnime-picturesから抽出する"
+  task tags: :environment do
+    puts 'Scraping character names from anime-pictures.net...'
+    Scrape::Tags.scrape
   end
 
   desc "2chから画像抽出する"

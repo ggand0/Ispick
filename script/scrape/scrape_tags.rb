@@ -107,5 +107,4 @@ module Scrape::Tags
     return name_hash
   end
 
-  self.scrape()
 end
