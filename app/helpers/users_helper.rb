@@ -25,6 +25,11 @@ module UsersHelper
     TargetWord.order('users_count DESC').limit(size)
   end
 
+  # @param size [Integer]
+  def get_tags_with_images(size)
+    TargetWord.order('images_count DESC').limit(size)
+  end
+
   # ======================
   #  HTML related helpers
   # ======================
