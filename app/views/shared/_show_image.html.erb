@@ -10,12 +10,8 @@
 </p>
 
 <p>
-
   <strong>Source URL:</strong>
-<!--<div style="word-wrap: break-word;">
   <%= link_to "#{image.src_url}", image.src_url %>
-</div>-->
-<%= link_to "#{image.src_url}", image.src_url %>
 </p>
 
 <p>
@@ -57,9 +53,11 @@
     </tr>
     <tr>
       <th align="left">Tags</th>
-      <td><% image.tags.each do |tag| %>
-        <%= tag.name %>
-      <% end %></td>
+      <td>
+        <% image.tags.each do |tag| %>
+          <%= link_to tag.name, { controller: 'users', action: 'search', query: "#{tag.name}" } %>
+        <% end %>
+      </td>
     </tr>
     <tr>
       <th align="left">Size in bytes[KB]</th>

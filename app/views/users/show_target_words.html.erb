@@ -18,6 +18,14 @@ Find a tag from the database:
     <%= target_word.users_count %>
   <% end %>
 </div>
+<br />
+<div class="popular-tags">
+  Tags with images:<br />
+  <% get_tags_with_images(20).each do |target_word| %>
+    <%= bs_button_to target_word.word, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { word: target_word.word }}, method: :post, class: 'btn btn-default' %>
+    <%= target_word.images_count %>
+  <% end %>
+</div>
 
 
 <h3>List of followed tags</h3>

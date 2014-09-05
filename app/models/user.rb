@@ -45,6 +45,12 @@ class User < ActiveRecord::Base
     #Image.joins(:target_words).where("target_words.word IN (?)", words).where.not(is_illust: nil).references(:target_words)
   end
 
+  # Search images which is shown at user's home page.
+  # @return [ActiveRecord::AssociationRelation]
+  def search_images(query)
+    Image.joins(:tags).where(tags: { name: query }).references(:tags)
+  end
+
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
     words = target_words.map{ |target_word| target_word.word }

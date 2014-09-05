@@ -33,6 +33,25 @@ class UsersController < ApplicationController
   end
 
   # GET
+  def search
+    return redirect_to '/signin_with_password' unless signed_in?
+    session[:sort] = params[:sort] if params[:sort]
+
+    images = current_user.search_images(params[:query])
+    images.reorder!('posted_at DESC') if params[:sort]
+
+    # Filter images by date
+    if params[:date]
+      date = DateTime.parse(params[:date]).to_date
+      images = User.filter_by_date(images, date)
+    end
+
+    @images = images.page(params[:page]).per(25)
+    @images_all = images
+    render action: 'signed_in'
+  end
+
+  # GET
   def new_avatar
     respond_to do |format|
       format.html
