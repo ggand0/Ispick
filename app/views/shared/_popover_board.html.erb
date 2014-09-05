@@ -7,7 +7,7 @@
 
 <!-- new boardを作るフォーム -->
 <div class="id"><%= image.id %></div>
-<div class="html-id"><%# html %></div>
+<div class="html-id"><%# html %></div><!-- debug value -->
 <%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
   <%= f.text_field :name, layout: :default, placeholder: 'Enter a board name', class: 'new_board_input' %>
   <%= f.submit 'New board', class: "btn btn-primary" %>
