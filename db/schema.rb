@@ -133,9 +133,9 @@ ActiveRecord::Schema.define(version: 20140902144735) do
     t.datetime "oldest_scraped_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "users_count",       default: 0, null: false
-    t.integer  "images_count",      default: 0, null: false
     t.integer  "crawl_count",       default: 0, null: false
+    t.integer  "images_count",      default: 0, null: false
+    t.integer  "users_count",       default: 0, null: false
   end
 
   create_table "target_words_users", force: true do |t|
