@@ -35,7 +35,7 @@ module Deliver::Words
     #（例えば同じタグが付いた画像が1万件あるとwhere文で全てのレコードを含むrelationを作るのにはかなり時間がかかる）。
     if title.nil? or title.name.nil? or title.name.empty?
       images = Image.includes(:tags).
-        where.not(is_illust: nil).
+        where.not(data_updated_at: nil).
         where(tags: { name: query }).
         where("images.created_at>?", DateTime.now - 1).
         references(:tags)
@@ -43,14 +43,14 @@ module Deliver::Words
       # まとめサイト由来の画像のみ広くマッチさせる
       logger.debug "#{title.name}"
       images = Image.includes(:tags).
-        where.not(is_illust: nil).
+        where.not(data_updated_at: nil).
         #where(module_name: 'Scrape::Matome').
         where('tags.name=? OR (tags.name=? AND module_name=? AND  data_content_type=?)', query, title.name, 'Scrape::Matome', 'image/gif').
         references(:tags)
     end
   end
 
-  # Associate all images which is related to a TargetWord record
+  # Associate all images which is related to a TargetWord record.
   # TargetWord.wordを持つImage全てをそのレコードと関連づける
   def self.associate_words_with_images
     TargetWord.all.each do |target_word|
@@ -75,7 +75,7 @@ module Deliver::Words
     TargetWord.all.each do |target_word|
       query = Scrape.get_query target_word
       images = Image.includes(:tags).
-        where.not(is_illust: nil).
+        where.not(data_updated_at: nil).
         where(tags: { name: query }).
         references(:tags)
 
