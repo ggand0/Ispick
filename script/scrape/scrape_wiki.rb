@@ -129,26 +129,14 @@ module Scrape::Wiki
       next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
       puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
-        page_url_ja = nil#"http://ja.wikipedia.org#{item['href']}"
-        page_url_en = "http://en.wikipedia.org#{item['href']}"#self.get_anime_page_en page_url_ja
-        puts page_url_ja if logging
+        page_url_en = "http://en.wikipedia.org#{item['href']}"
+        page_url_ja = self.get_anime_page_ja page_url_en
 
+        puts page_url_ja if logging
         anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
       end
     end
-=begin
-    # spanタグ->aタグの順にネストされているパターン
-    html.css('span > a').each do |item|
-      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text
-      if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
-        page_url_ja = "http://ja.wikipedia.org#{item['href']}"
-        page_url_en = self.get_anime_page_en page_url_ja
-        puts page_url_ja if logging
 
-        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
-      end
-    end
-=end
     anime_page
   end
 
@@ -166,6 +154,21 @@ module Scrape::Wiki
      end
 
     item = html.css("li[class='interlanguage-link interwiki-en']").first
+
+    # liタグ内のaタグのリンクを調べる
+    if item.nil?
+      return ''
+    else
+      url = item.css('a').first.attr('href')
+      return "http:#{url}"
+    end
+  end
+
+  def self.get_anime_page_ja(anime_page)
+    html = self.open_html anime_page
+    return if html.nil?
+
+    item = html.css("li[class='interlanguage-link interwiki-ja']").first
 
     # liタグ内のaタグのリンクを調べる
     if item.nil?
@@ -195,7 +198,7 @@ module Scrape::Wiki
       return puts e
     rescue SocketError => e
       return puts e
-     rescue => e
+    rescue => e
       return puts e
     end
   end
@@ -244,7 +247,7 @@ module Scrape::Wiki
         person.keywords << keyword
 
         # Titleレコード追加
-        title = self.get_title(anime, title_en)
+        title = self.get_title(value[:title_ja], value[:title_en])
         person.titles << title
 
         # よみがなをaliasとして追加
