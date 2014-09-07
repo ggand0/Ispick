@@ -5,7 +5,7 @@ file_path = "#{Rails.root}/script/anime_titles.xml"           # 10000件のア�
 
 # 出力用のXML::Documentオブジェクトを手っ取り早く作るために読み込むファイル。
 # Nokogiri::XML::Elementを追加して新しいxmlを作成する
-output_path = "#{Rails.root}/script/anime_titles_output.xml"
+output_path = "#{Rails.root}/script/anime_titles_template.xml"
 
 # 実際に出力するファイルのpath
 test_path = "#{Rails.root}/script/anime_titles_test.xml"
