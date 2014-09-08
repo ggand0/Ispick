@@ -19,7 +19,7 @@ module Scrape::Wiki::Character
       next if url[:en].empty?                     # str.empty?はstr=''だったらtrueを返す
       html_en = Scrape::Wiki.open_html url[:en]   # まずは日本語の概要ページを開く
       next if html_en.nil?                        # obj.nil?はobj=nilだったらtrueを返すメソッド
-      #html_en = Scrape::Wiki.open_html url[:en]
+      html_ja = Scrape::Wiki.open_html url[:ja]
 
       # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
       page_title = html_en.css('h1[class="firstHeading"]').first.content
@@ -27,19 +27,13 @@ module Scrape::Wiki::Character
       title_en = anime_title if title_en.nil?
       page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
 
-=begin
-      # 英語版の登場人物一覧ページを取得する
-      if (not url[:en].empty?) and (not html_en.nil?)
-        title_en = html_en.css('h1[class="firstHeading"]').first.content
-        puts "DEBUG: #{title_en}" if logging
-        page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
-      else
-        page_url_en = { title: title_en, url: '' }
+      if (not url[:ja].empty?) and (not html_ja.nil?)
+        title_ja = html_ja.css('h1[class="firstHeading"]').first.content
+        puts "DEBUG: #{title_ja}" if logging
       end
-=end
 
       # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
-      anime_character_page_url[title_en] = { ja: nil, en: page_url_en[:url], title_en: title_en }
+      anime_character_page_url[title_en] = { ja: nil, en: page_url_en[:url], title_en: title_en, title_ja: title_ja }
       #puts anime_character_page_url[title_en] if logging
       puts anime_character_page_url.to_a.last if logging
     end
@@ -139,20 +133,8 @@ module Scrape::Wiki::Character
 
       # => [ ['鹿目 まどか', 'かなめ まどか'], ... ]
       name_array = self.get_character_name_en(anime_title, html_en) if html_en
-=begin
-      # 英名追加後のHashのArrayが返される
-      if html_en
-        name_array = self.get_character_name_en(anime_title, html_en, name_ja)
-          # 英名追加失敗時
-        if(name_array==nil and name_ja != nil)
-          name_array=name_ja
-        end
-      else
-        name_array = name_ja
-      end
-=end
       puts name_array if logging
-      anime_character[anime_title] = { title_en: url[:title_en], characters: name_array }
+      anime_character[anime_title] = { title_en: url[:title_en], title_ja: url[:title_ja], characters: name_array }
     end
 
     anime_character
