@@ -118,7 +118,7 @@ module Deliver::Words
   end
 
   def self.get_query_keywords(target_word)
-    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.word } : []
+    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.name } : []
   end
 
   def self.match_word(image, word)
