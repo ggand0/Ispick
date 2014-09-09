@@ -63,7 +63,6 @@ module Scrape
 
       # Mecanizeによりクエリ検索結果のページを取得
       page = self.get_search_result(query)
-      #@logger.debug "d1: #{page.search("span[class='img_block_big']").count}"
 
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
       page.search("span[class='img_block_big']").each_with_index do |image, count|
@@ -88,7 +87,6 @@ module Scrape
           verbose: false,
           resque: (not user_id.nil?)
         }
-
         tags = self.get_tags_original(xml)
         #@logger.debug tags.inspect
 
@@ -192,10 +190,7 @@ module Scrape
 
       # posted_atの取得( 8/13/14, 7:26 PM\n\t\t)
       time = xml.css("div[class='post_content']").css("b")[2].next.content
-      @logger.debug "d1: #{time}"
       time = self.class.get_time(time)
-
-      @logger.debug "d2: #{time}, #{page_url}"
       time = Time.parse(time)
 
       # src_urlの取得
@@ -203,7 +198,6 @@ module Scrape
 
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
-
       hash = {
         title: title,
         caption: caption,
@@ -211,10 +205,7 @@ module Scrape
         posted_at: time,
         views: nil,
         src_url: src_url,
-
-        # votesの数
-        favorites: votes,
-
+        favorites: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
       }
