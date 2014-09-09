@@ -76,16 +76,17 @@ ActiveRecord::Schema.define(version: 20140902144735) do
 
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
-    t.text     "word"
+    t.text     "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "keywords", ["word"], name: "index_keywords_on_word", length: {"word"=>10}, using: :btree
+  add_index "keywords", ["name"], name: "index_keywords_on_name", length: {"name"=>10}, using: :btree
 
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "name_display"
+    t.string   "name_roman"
     t.string   "name_english"
     t.string   "name_type"
     t.integer  "target_word_id"
@@ -145,6 +146,7 @@ ActiveRecord::Schema.define(version: 20140902144735) do
 
   create_table "titles", force: true do |t|
     t.text     "name"
+    t.text     "name_roman"
     t.text     "name_english"
     t.datetime "created_at"
     t.datetime "updated_at"

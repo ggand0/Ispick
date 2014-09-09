@@ -21,15 +21,15 @@
 
 
 # Scraping processes
-every 1.days do
+every 12.hours do
   rake 'scrape:anipic[1440]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
-every 1.days do
+every 6.hours do
   rake 'scrape:nico[1440]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
-every 1.days do
+every 6.hours do
   rake 'scrape:tumblr[1440]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
@@ -41,7 +41,7 @@ end
 # Delivery and deletion processes
 every 6.hours do
   # TargetWordと同名のTagを持つImageをTargetWordと関連づける処理
-  rake 'deliver:associate', output: 'log/deliver.log'
+  #rake 'deliver:associate', output: 'log/deliver.log'
 
   # 指定枚数を超えたらその分Imagesから削除
   rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
