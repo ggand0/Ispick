@@ -54,7 +54,7 @@ module Deliver::Words
   # TargetWord.wordを持つImage全てをそのレコードと関連づける
   def self.associate_words_with_images
     TargetWord.all.each do |target_word|
-      # target_word.wordと同名のタグを持つimagesを取得
+      # target_word.nameと同名のタグを持つimagesを取得
       query = Scrape.get_query target_word
       images = Image.includes(:tags).
         where.not(data_updated_at: nil).                        # ダウンロード済みでない者を除外する
@@ -64,10 +64,10 @@ module Deliver::Words
       if images.count != target_word.images.count
         target_word.images.clear
         target_word.images = images
-        puts "Associated #{images.count} images to target_word: #{target_word.word}"
+        puts "Associated #{images.count} images to target_word: #{target_word.name}"
       end
 
-      puts "Skiped target_word: #{target_word.word}"
+      puts "Skiped target_word: #{target_word.name}"
     end
   end
 
@@ -81,7 +81,7 @@ module Deliver::Words
 
       target_word.images.clear
       target_word.images = images
-      puts "Associated #{images.count} images to target_word: #{target_word.word}"
+      puts "Associated #{images.count} images to target_word: #{target_word.name}"
     end
   end
 
@@ -110,7 +110,7 @@ module Deliver::Words
   end
 
   def self.get_query_ja(target_word)
-    target_word.person ? target_word.person.name : target_word.word
+    target_word.person ? target_word.person.name : target_word.name
   end
 
   def self.get_query_en(target_word)
@@ -118,7 +118,7 @@ module Deliver::Words
   end
 
   def self.get_query_keywords(target_word)
-    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.word } : []
+    target_word.person ? target_word.person.keywords.map{ |keyword| keyword.name } : []
   end
 
   def self.match_word(image, word)

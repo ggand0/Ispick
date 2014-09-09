@@ -4,10 +4,10 @@ describe "target_words/index" do
   before(:each) do
     assign(:target_words, [
       stub_model(TargetWord,
-        :word => "Word"
+        :name => "Word"
       ),
       stub_model(TargetWord,
-        :word => "Word"
+        :name => "Word"
       )
     ])
   end

@@ -30,7 +30,7 @@ class TargetWordsController < ApplicationController
 
     # If the user has already registerd the target_word, flash it as an error at the 'new' template.
     # もしユーザが既に同名のタグを登録していた場合はそれを通知する
-    unless current_user.target_words.where(word: @target_word.word).empty?
+    unless current_user.target_words.where(name: @target_word.name).empty?
       @target_word.errors.add(:base, "That target_word is already registered!!")
       return render action: 'new'
     end
@@ -67,8 +67,8 @@ class TargetWordsController < ApplicationController
   # @param target_word_params [Hash]
   # @return [TargetWord]
   def get_target_word(target_word_params)
-    word = target_word_params['word']
-    target_word = TargetWord.where(word: word)
+    name = target_word_params['name']
+    target_word = TargetWord.where(name: name)
     target_word = target_word.empty? ? current_user.target_words.build(target_word_params) : target_word.first
 
     target_word.person = Person.find(params[:id]) if params[:id]
@@ -141,6 +141,6 @@ class TargetWordsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def target_word_params
-      params.require(:target_word).permit(:word, :id)
+      params.require(:target_word).permit(:name, :id)
     end
 end

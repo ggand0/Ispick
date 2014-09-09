@@ -23,7 +23,7 @@ describe TargetWordsController do
   # This should return the minimal set of attributes required to create a valid
   # TargetWord. As you add validations to TargetWord, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "word" => "MyString" } }
+  let(:valid_attributes) { { "name" => "MyString" } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -119,8 +119,8 @@ describe TargetWordsController do
         # specifies that the TargetWord created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        TargetWord.any_instance.should_receive(:update).with({ "word" => "MyString" })
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "MyString" }}, valid_session
+        TargetWord.any_instance.should_receive(:update).with({ "name" => "MyString" })
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "MyString" }}, valid_session
       end
 
       it "assigns the requested target_word as @target_word" do
@@ -141,7 +141,7 @@ describe TargetWordsController do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetWord.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "invalid value" }}, valid_session
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
         assigns(:target_word).should eq(target_word)
       end
 
@@ -149,7 +149,7 @@ describe TargetWordsController do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetWord.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "invalid value" }}, valid_session
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
         response.should render_template("edit")
       end
     end

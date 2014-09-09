@@ -12,7 +12,7 @@ class TargetWord < ActiveRecord::Base
   has_many :images_target_words
   has_many :images, :through => :images_target_words
 
-  validates_uniqueness_of :word
+  validates_uniqueness_of :name
 
 
   def next

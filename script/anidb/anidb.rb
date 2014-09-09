@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'open-uri'
 require 'builder'
 
@@ -35,8 +36,6 @@ xml.search('anime').each_with_index do |anime, count|
     anime_ens.each do |anime_en|
       if not anime_en.nil? and (anime_en.content.downcase.include? title.name_english.downcase or
         title.name_english.downcase.include? anime_en.content.downcase)
-      #if anime_en.content.casecmp(title.name_english) == 1 or anime_title.content.casecmp(title.name_english) == 0
-      #if anime_en.content.any?{ |s| s.casecmp(title.name_english)==0 }
         output.root.add_child anime
         puts "Added an en element: #{anime_en.content}"
         match_count += 1

@@ -79,7 +79,7 @@ module Scrape
   # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
   def self.get_query(target_word)
     return nil if target_word.nil?
-    target_word.person ? target_word.person.name : target_word.word
+    target_word.person ? target_word.person.name : target_word.name
   end
 
   # TargetWordから、API使用時に用いるクエリを取得する
@@ -89,14 +89,14 @@ module Scrape
       when 'english' then
         if target_word.person
           query = target_word.person.name_english  # word:'鹿目まどか', person.name_english:'Madoka Kaname'
-        elsif target_word.word.ascii_only?
-          query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+        elsif target_word.name.ascii_only?
+          query = target_word.name                 # word:'Madoka Kaname', person.name_english:nil
         end
       when 'roman' then
         if target_word.person
           query = target_word.person.name_roman    # word:'鹿目まどか', person.name_roman:'Kaname Madoka'
-        elsif target_word.word.ascii_only?
-          query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+        elsif target_word.name.ascii_only?
+          query = target_word.name                 # word:'Madoka Kaname', person.name_english:nil
         end
       else
         query = Scrape.get_query target_word
