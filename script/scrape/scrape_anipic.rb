@@ -47,7 +47,11 @@ module Scrape
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
       @logger.debug "#{target_word.inspect}"
-      query = Scrape.get_query_en(target_word, english)
+      if english
+        query = Scrape.get_query_en(target_word, 'roman')
+      else
+        query = Scrape.get_query_en(target_word, '')
+      end
       return if query.nil? or query.empty?
       @logger.info "query=#{query}"
 
@@ -167,15 +171,15 @@ module Scrape
     # @return [Hash]
     def get_data(xml, page_url)
       # titleの取得
-        # 改行の除去
+      # 改行の除去
       title = xml.css("div[class='post_content']").css("h1").first.content.gsub!(/\n/,'')
-        # タブのスペースへの変換
+      # タブのスペースへの変換
       title.gsub!(/\t/,' ')
 
       # captionの取得
-        # 改行の除去
+      # 改行の除去
       caption = xml.css('title').first.content.gsub!(/\n/,'')
-        # タブのスペースへの変換
+      # タブのスペースへの変換
       caption.gsub!(/\t/,' ')
 
       # posted_atの取得( 8/13/14, 7:26 PM\n\t\t)

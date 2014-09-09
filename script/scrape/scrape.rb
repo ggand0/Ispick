@@ -4,12 +4,8 @@ require "#{Rails.root}/app/workers/images_face"
 module Scrape
   require "#{Rails.root}/script/scrape/scrape_nico"
   require "#{Rails.root}/script/scrape/scrape_piapro"
-  require "#{Rails.root}/script/scrape/scrape_pixiv"
   require "#{Rails.root}/script/scrape/scrape_deviant"
-  require "#{Rails.root}/script/scrape/scrape_futaba"
-  require "#{Rails.root}/script/scrape/scrape_2ch"
   require "#{Rails.root}/script/scrape/scrape_4chan"
-  require "#{Rails.root}/script/scrape/scrape_twitter"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
   require "#{Rails.root}/script/scrape/scrape_giphy"
   require "#{Rails.root}/script/scrape/scrape_anipic"
@@ -80,16 +76,24 @@ module Scrape
 
   # TargetWordから、API使用時に用いるクエリを取得する
   # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
-  def self.get_query_en(target_word, english)
-    if english
-      if target_word.person
-        query = target_word.person.name_english  # word:'鹿目まどか', person.name_english:'Madoka Kaname'
-      elsif target_word.word.ascii_only?
-        query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+  def self.get_query_en(target_word, key)
+    case key
+      when 'english' then
+        if target_word.person
+          query = target_word.person.name_english  # word:'鹿目まどか', person.name_english:'Madoka Kaname'
+        elsif target_word.word.ascii_only?
+          query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+        end
+      when 'roman' then
+        if target_word.person
+          query = target_word.person.name_roman    # word:'鹿目まどか', person.name_roman:'Kaname Madoka'
+        elsif target_word.word.ascii_only?
+          query = target_word.word                 # word:'Madoka Kaname', person.name_english:nil
+        end
+      else
+        query = Scrape.get_query target_word
       end
-    else
-      query = Scrape.get_query target_word
-    end
+
     query
   end
 

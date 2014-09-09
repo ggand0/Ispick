@@ -46,7 +46,11 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
-      query = Scrape.get_query_en(target_word, english)
+      if english
+        query = Scrape.get_query_en(target_word, 'english')
+      else
+        query = Scrape.get_query_en(target_word, '')
+      end
       return if query.nil? or query.empty?
 
       @logger.info "query=#{query}"
