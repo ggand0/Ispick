@@ -42,7 +42,7 @@
         <div class="title">
           <%= image.title.to_s %><br />
           <div class="image-tag">
-            <%# bs_label image.target_words.first.word, :default, class: 'label label-default' %>
+            <%# bs_label image.target_words.first.name, :default, class: 'label label-default' %>
           </div>
           <div class="time-string">
             <%= "CA: #{get_jst_string(delivered_image.created_at)}" %><br />

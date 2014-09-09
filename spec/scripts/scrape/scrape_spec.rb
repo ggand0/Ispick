@@ -48,7 +48,7 @@ describe Scrape do
 
   describe "get_query_en function" do
     it "returns proper string" do
-      target_word = TargetWord.create(word: 'Madoka Kaname')
+      target_word = TargetWord.create(name: 'Madoka Kaname')
       result = Scrape.get_query_en target_word, true
 
       expect(result).to eq('Madoka Kaname')

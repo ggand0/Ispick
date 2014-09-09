@@ -3,7 +3,7 @@
 FactoryGirl.define do
 
   factory :target_word do
-    sequence(:word) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
+    sequence(:name) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     factory :word_with_run_callback do
       after(:create) { |user| user.send(:search_keyword) }
@@ -45,6 +45,7 @@ FactoryGirl.define do
         end
       end
     end
+
     factory :word_with_image_photo do
       after(:create) do |target_word|
         1.times do
@@ -69,11 +70,11 @@ FactoryGirl.define do
 
   # A TagetWord object which is associated with a Title record
   factory :target_word_title, class: TargetWord do
-    word '魔法少女まどか☆マギカ'
+    name '魔法少女まどか☆マギカ'
   end
 
   factory :target_words, class: TargetWord do
-    sequence(:word) { |n| "鹿目 まどか#{n}" }
+    sequence(:name) { |n| "鹿目 まどか#{n}" }
     after(:create) do |target_word|
       5.times do
         target_word.images << create(:image)

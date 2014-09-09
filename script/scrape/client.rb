@@ -57,25 +57,13 @@ module Scrape
 
 
       # １タグごとにタグ検索APIを用いて画像取得
-      #TargetWord.all.each do |target_word|
       count=0
       target_word = TargetWord.first
       while (count < TargetWord.count) do
-        # =====================
-        #  BLOCK FOR DEBUGGING
-        # =====================
-=begin
-        if target_word.images.count > 0 or target_word.crawl_count > 0
-          @logger.debug "skipping: #{target_word.word}"
-          target_word = target_word.next
-          count+=1
-          next
-        end
-=end
 
-        begin
+       # begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
-          if (not target_word.word.nil?) and (not target_word.word.empty?)
+          if (not target_word.name.nil?) and (not target_word.name.empty?)
             @logger.debug "target_word_id: #{target_word.id}"
 
             # デフォルトのパラメータで実行
@@ -92,10 +80,10 @@ module Scrape
             target_word.crawl_count += 1
             target_word.save!
           end
-        rescue => e
-          @logger.info e
-          logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
-        end
+        #rescue => e
+        #  @logger.info e
+        #  logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
+        #end
 
         begin
           # nextメソッドを使用してtarget_wordの次にidの若いレコードを取得
