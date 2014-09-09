@@ -1,6 +1,5 @@
 # coding: utf-8
 require 'open-uri'
-require "#{Rails.root}/script/pixiv"
 require 'net/http'
 require 'uri'
 

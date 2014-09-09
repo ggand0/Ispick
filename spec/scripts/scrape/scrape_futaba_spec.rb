@@ -1,5 +1,5 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrape/scrape_2ch"
+require "#{Rails.root}/script/scrape/scrape"
 
 describe Scrape::Futaba do
   before do

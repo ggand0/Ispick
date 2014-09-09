@@ -1,6 +1,5 @@
 require 'spec_helper'
 require "#{Rails.root}/script/scrape/scrape"
-require "#{Rails.root}/script/scrape/scrape_twitter"
 
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }

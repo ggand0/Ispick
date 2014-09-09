@@ -10,6 +10,14 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_giphy"
   require "#{Rails.root}/script/scrape/scrape_anipic"
 
+  require "#{Rails.root}/script/scrape/_legacy/scrape_2ch"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_futaba"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_matome"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_tinami"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_pixiv"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
+
+
   # 全てのTargetWordに基づき画像抽出する
   def self.scrape_all
     TargetWord.all.each do |target_word|
