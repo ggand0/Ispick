@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140909112222) do
+ActiveRecord::Schema.define(version: 20140909160103) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -25,6 +25,11 @@ ActiveRecord::Schema.define(version: 20140909112222) do
     t.datetime "data_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "views"
+    t.integer  "favorites"
+    t.datetime "posted_at"
   end
 
   create_table "features", force: true do |t|
