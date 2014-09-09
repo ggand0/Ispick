@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140902144735) do
+ActiveRecord::Schema.define(version: 20140909112222) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -128,7 +128,7 @@ ActiveRecord::Schema.define(version: 20140902144735) do
   end
 
   create_table "target_words", force: true do |t|
-    t.string   "word"
+    t.string   "name"
     t.datetime "last_delivered_at"
     t.datetime "newest_scraped_at"
     t.datetime "oldest_scraped_at"
