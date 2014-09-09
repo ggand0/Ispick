@@ -7,6 +7,8 @@ class CreatePeople < ActiveRecord::Migration
       t.string :name_english    # "Madoka Kaname"
       t.string :name_type       # "Character"
 
+      t.integer :target_word_id # TargetWordにhas_oneされている
+
       t.timestamps
     end
   end
