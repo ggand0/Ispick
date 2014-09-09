@@ -1,18 +1,13 @@
 # encoding: utf-8
 require "#{Rails.root}/script/scrape/scrape"
 require "#{Rails.root}/script/scrape/scrape_nico.rb"
-require "#{Rails.root}/script/scrape/scrape_2ch.rb"
-require "#{Rails.root}/script/scrape/scrape_futaba.rb"
 require "#{Rails.root}/script/scrape/scrape_piapro.rb"
 require "#{Rails.root}/script/scrape/scrape_4chan.rb"
-require "#{Rails.root}/script/scrape/scrape_twitter.rb"
 require "#{Rails.root}/script/scrape/scrape_tumblr.rb"
 require "#{Rails.root}/script/scrape/scrape_deviant.rb"
 require "#{Rails.root}/script/scrape/scrape_giphy.rb"
-require "#{Rails.root}/script/scrape/scrape_matome.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
 require "#{Rails.root}/script/scrape/scrape_tags.rb"
-require "#{Rails.root}/script/scrape/scrape_tinami.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
 namespace :scrape do
@@ -95,6 +90,7 @@ namespace :scrape do
     PeopleTitle.delete_all
   end
 
+  # images, tags, target_wordsのレコード、画像ファイルを完全に消す
   desc "Delete images and target_words related tables completely"
   task delete_all: :environment do
     puts 'Deleting all images / target_words related tables and image files...'
@@ -122,18 +118,19 @@ namespace :scrape do
   desc "キャラクタに関する静的なDBを構築する"
   task wiki: :environment do
     puts 'Scraping character names...'
-    Scrape::Wiki.scrape
+    Scrape::Wiki.scrape_all
+  end
+
+  desc "キャラクタに関する静的なDBを構築する"
+  task wiki_title: :environment do
+    puts 'Scraping anime titles...'
+    Scrape::Wiki.scrape_titles
   end
 
   desc "キャラクタ名をAnime-picturesから抽出する"
   task tags: :environment do
     puts 'Scraping character names from anime-pictures.net...'
     Scrape::Tags.scrape
-  end
-
-  desc "2chから画像抽出する"
-  task nichan: :environment do
-    Scrape::Nichan.scrape
   end
 
   desc "ニコ静から画像抽出する"
@@ -153,17 +150,6 @@ namespace :scrape do
     Scrape::Fourchan.scrape
   end
 
-  desc "2chanから画像抽出する"
-  task futaba: :environment do
-    Scrape::Futaba.scrape
-  end
-
-  desc "Twitterから画像抽出する"
-  task :twitter, [:interval] => :environment do |t, args|
-    interval = args[:interval].nil? ? 60 : args[:interval]
-    Scrape::Twitter.new.scrape(interval.to_i)
-  end
-
   desc "Tumblrから画像抽出する"
   task :tumblr, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
@@ -175,25 +161,15 @@ namespace :scrape do
     Scrape::Deviant.scrape
   end
 
-  desc "Giphyから画像抽出する"
+  # Giphyから画像抽出する
+  desc "Scrape images from Giphy"
   task :giphy, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 720 : args[:interval]
     Scrape::Giphy.new.scrape(interval.to_i)
   end
 
-  desc "まとめサイトから画像抽出する"
-  task matome: :environment do
-    Scrape::Matome.scrape
-  end
-
-  desc "TINAMIから画像抽出する"
-  task :tinami, [:interval] => :environment do |t, args|
-    interval = args[:interval].nil? ? 240 : args[:interval]
-
-    Scrape::Tinami.new.scrape(interval.to_i)
-  end
-
-  desc "Anime pictures and wallpapersから画像抽出する"
+  # Anime pictures and wallpapersから画像抽出する
+  desc "Scrape images from 'Anime pictures and wallpapers'"
   task :anipic, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Anipic.new.scrape(interval.to_i)
