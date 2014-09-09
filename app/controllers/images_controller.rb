@@ -40,7 +40,12 @@ class ImagesController < ApplicationController
       title: @image.title,
       caption: @image.caption,
       data: @image.data,
-      src_url: @image.src_url
+      src_url: @image.src_url,
+      page_url: @image.page_url,
+      site_name: @image.site_name,
+      views: @image.views,
+      favorites: @image.favorites,
+      posted_at: @image.posted_at,
     )
 
     # save出来たらimageへの参照も追加
