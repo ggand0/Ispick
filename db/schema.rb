@@ -89,6 +89,7 @@ ActiveRecord::Schema.define(version: 20140902144735) do
     t.string   "name_roman"
     t.string   "name_english"
     t.string   "name_type"
+    t.integer  "target_word_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

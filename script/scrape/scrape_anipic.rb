@@ -73,7 +73,15 @@ module Scrape
         xml = Nokogiri::XML(open(page_url))
         # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-        image_data = self.get_data(xml, page_url)
+
+        begin
+          image_data = self.get_data(xml, page_url)
+        rescue => e
+          # R18画像はloginしないと見れないのでerrorになる？
+          puts e.inspect
+          next
+        end
+
         options = {
           validation: validation,
           large: false,

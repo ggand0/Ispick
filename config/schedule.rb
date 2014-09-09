@@ -21,7 +21,7 @@
 
 
 # Scraping processes
-every 6.hours do
+every 12.hours do
   rake 'scrape:anipic[1440]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
