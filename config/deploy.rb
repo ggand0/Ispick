@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'development'
+set :branch, 'db/263'#'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -86,12 +86,18 @@ namespace :deploy do
   end
 
 
-  # 上記linked_filesで使用するファイルをアップロードするタスク
-  # deployが行われる前に実行する必要がある。
+  # 上記linked_filesで使用するファイルをアップロードするタスク、deployが行われる前に実行する必要がある。
+  # 既に同名ファイルがremoteにある場合は上書きされる。
   desc 'upload .yml files manually'
-  task :upload do
+  task :upload_conf do
     on roles(:app) do |host|
       upload!('config/config.yml',"#{shared_path}/config/config.yml")
+    end
+  end
+
+  # config.ymlだけuploadさせたい事が多いので分けた
+  task :upload_db do
+    on roles(:app) do |host|
       upload!('config/database.yml', "#{shared_path}/config/database.yml")
     end
   end
