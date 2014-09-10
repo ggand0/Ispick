@@ -49,7 +49,6 @@ module Scrape
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false)
       query = Scrape.get_query target_word
       return if query.nil? or query.empty?
-
       # Get the xml file with api response
       @logger.info "query=#{query}"
       agent = self.class.get_client
@@ -64,11 +63,11 @@ module Scrape
       # 画像情報を取得してlimit枚DBヘ保存する
       xml.search('image').take(@limit).each_with_index do |item, count|
         begin
-          if item.css('adult_level').first.content.to_i > 1  # 春画画像をskip
+          if item.css('adult_level').first.content.to_i > 1 || item.css('clip_count').first.content.to_i == 0  # 春画画像、クリップ数0をskip
             skipped += 1
             next
           end
-
+          
           start = Time.now
           image_data = self.class.get_data(item)             # APIの結果から画像情報取得
           options = {
