@@ -6,53 +6,25 @@ Find a tag from the database:
 <br />
 <%= bs_button_to 'Search a target_word', search_target_words_path, class: 'btn-default' %>
 <br />
-<i>You can still follow a custom tag at the "<%= link_to 'debug_crawling', debug_crawling_users_path %>" page.</i><br />
+<i>You can still follow a custom tag at the "<%= link_to 'debug_crawling', debug_crawling_users_path %>" page.</i>
 <br />
 <br />
-
 <h3>Popular tags</h3>
 <div class="popular-tags">
-  Tags frequently followed:<br />
-  <% get_popular_tags(20).each do |target_word| %>
-    <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, class: 'btn btn-default' %>
-    <%= target_word.users_count %>
-  <% end %>
-</div>
-<br />
-<div class="popular-tags">
-  Tags with images:<br />
   <% get_tags_with_images(20).each do |target_word| %>
     <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, class: 'btn btn-default' %>
-    <%= target_word.images_count %>
+    <%# target_word.images_count %>
   <% end %>
 </div>
 
 
 <h3>List of followed tags</h3>
 <div class="tag-list">
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @words.each do |target_word| %>
-      <tr>
-        <td><%= link_to target_word.name, show_delivered_target_word_path(target_word) %></td>
-        <td>
-          <%= bs_button_to 'Unfollow', delete_target_word_users_path({ id: target_word.id }), method: :delete, class: 'btn-default' %>
-          <%= bs_button_to 'debug', target_word, class: 'btn-default' %>
-        </td>
-      </tr>
+  <% @words.each do |target_word| %>
+    <%= button_group do %>
+      <%= bs_button_to target_word.name, show_delivered_target_word_path(target_word), class: 'btn-default' %>
+      <%= bs_button_to 'X', delete_target_word_users_path({ id: target_word.id }), method: :delete, class: 'btn-default' %>
+      <%= bs_button_to 'D', target_word, class: 'btn-default' %>
     <% end %>
-  </tbody>
-</table>
-<br>
-<br>
+  <% end %>
 </div>
-
-
-<%= paginate_target_images(@message, @words) %>
