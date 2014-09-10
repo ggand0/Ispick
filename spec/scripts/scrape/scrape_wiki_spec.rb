@@ -5,7 +5,7 @@ require "#{Rails.root}/script/scrape/scrape_wiki"
 include Scrape::Wiki
 
 describe "Scrape" do
-  let(:years) { 8 }
+  let(:years) { 1 }
 
   before do
     IO.any_instance.stub(:puts)
@@ -99,6 +99,18 @@ describe "Scrape" do
       expect(Person.first.titles.count).to eq(1)
       expect(Person.last.titles.count).to eq(1)
       expect(Title.count).to eq(1)              # 英名・和名共に１つのTitleレコードに格納されるため
+    end
+  end
+
+  describe "get_keyword method" do
+    it "returns a valid keyword object" do
+
+    end
+  end
+
+  describe "get_title method" do
+    it "returns a valid title object" do
+
     end
   end
 end

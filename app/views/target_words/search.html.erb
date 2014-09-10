@@ -26,10 +26,10 @@
   <tbody>
     <% @people.each do |person| %>
       <tr>
-        <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { word: person.name_display }}, method: :post %></td>
+        <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post %></td>
         <td><%= person.name_english %></td>
-        <td><%= link_to person.titles.first.name, { action: 'create', target_word: { word: person.titles.first.name }}, method: :post unless person.titles.empty? %></td>
-        <td><%= link_to person.titles.first.name_english, { action: 'create', target_word: { word: person.titles.first.name_english }}, method: :post unless person.titles.empty? or person.titles.first.name_english.nil? %></td>
+        <td><%= link_to person.titles.first.name, { action: 'create', target_word: { name: person.titles.first.name }}, method: :post unless person.titles.empty? %></td>
+        <td><%= link_to person.titles.first.name_english, { action: 'create', target_word: { name: person.titles.first.name_english }}, method: :post unless person.titles.empty? or person.titles.first.name_english.nil? %></td>
       </tr>
     <% end %>
   </tbody>
