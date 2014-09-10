@@ -22,13 +22,14 @@ module UsersHelper
 
   # @param size [Integer]
   def get_popular_tags(size)
-    TargetWord.order('users_count DESC').limit(size)
+    TargetWord.where.not(users_count: 0).order('users_count DESC').limit(size)
   end
 
   # @param size [Integer]
   def get_tags_with_images(size)
-    TargetWord.order('images_count DESC').limit(size)
+    TargetWord.where.not(images_count: 0).order('images_count DESC').limit(size)
   end
+
 
   # ======================
   #  HTML related helpers
