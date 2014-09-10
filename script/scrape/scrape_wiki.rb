@@ -4,6 +4,7 @@ require 'open-uri'
 require 'natto'
 
 
+# Scrape anime characters names from Wikipedia
 # wikipediaからアニメのキャラクター名を抽出する
 module Scrape::Wiki
   require "#{Rails.root}/script/scrape/scrape_characters"
@@ -11,106 +12,51 @@ module Scrape::Wiki
   include Character
   include GameCharacter
 
-  # 日本版Wikipedia URL
-  ROOT_URL = 'http://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8'
+  ROOT_URL = 'http://en.wikipedia.org/wiki/Main_Page'
 
-  def self.scrape
+  def self.scrape_all
     puts "Extracting: #{ROOT_URL}"
 
     # The array of Wikipedia pages that list up anime titles.
-    # アニメタイトル一覧ページの配列：
+    # アニメタイトル一覧ページの配列
     url = [
       'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
     ]
 
-
     url.each do |value|
+      # Scrape anime titles and urls pairs.
       # アニメの概要ページのURL/タイトルのHashを取得
       anime_page = self.get_anime_page(value)
 
-      # 登場人物の一覧ページの配列を取得、
-      # 一覧ページが無い場合は概要ページを配列に追加
+      # Get another page that describes characters. If not, get overview page instead.
+      # 登場人物の一覧ページの配列を取得、一覧ページが無い場合は概要ページを配列に追加
       anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page)
 
+      # From character info pages, get character names an array.
       # キャラクタ名の一覧配列を取得
       anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page)
 
+      # Finally save them to the database, into the people table.
       # キャラクタ名をDBヘ保存
       #self.hash_output(anime_character)
       self.save_to_database(anime_character)
     end
 
-    # ゲームキャラクタ名を取得する
+    # Option: Scrape major game character names
     #self.scrape_wiki_for_game_characters
   end
 
-  def self.scrape_wiki_for_game_characters
+  # Scrape titles only
+  def self.scrape_titles
+    puts "Extracting: #{ROOT_URL}"
 
-    # アニメの概要ページのURL/タイトルのHashを取得
-    game_page = self.get_game_page
+    # The array of Wikipedia pages that list up anime titles.
+    url = [ 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series' ]
 
-    # 登場人物の一覧ページの配列を取得、
-    # 一覧ページが無い場合は概要ページを配列に追加
-    game_character_page = Scrape::Wiki::Character.get_anime_character_page(game_page)
-
-    # 有名タイトルを手動で追加
-    #game_character_page = self.get_spc_game_character_page(game_character_page)
-
-    # キャラクタ名の一覧配列を取得
-    game_character = Scrape::Wiki::GameCharacter.get_game_character_name(game_character_page)
-
-    # キャラクタ名をDBヘ保存
-    #self.hash_output(anime_character)
-    self.save_to_database(game_character)
-  end
-
-=begin
-  def self.get_spc_game_character_page(game_character_page)
-
-     # アニメタイトルがkey、それぞれの言語の人物一覧ページのHashがvalueであるようなペアを追加
-    game_character_page["東方Projects"] = {ja:"http://ja.wikipedia.org/wiki/%E6%9D%B1%E6%96%B9Project%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9",
-                                          en:"http://en.wikipedia.org/wiki/List_of_Touhou_Project_characters"}
-
-    return game_character_page
-
-  end
-=end
-
-  # ミリオンセラーのゲーム概要ページを取得
-  # @return [hash] ゲームページのURLのハッシュ
-  def self.get_game_page
-    url = 'http://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%AA%E3%82%AA%E3%83%B3%E3%82%BB%E3%83%A9%E3%83%BC%E3%81%AE%E3%82%B2%E3%83%BC%E3%83%A0%E3%82%BD%E3%83%95%E3%83%88%E4%B8%80%E8%A6%A7'
-
-    html = self.open_html(url)
-    game_page = {}
-
-    html.css("table[class='sortable wikitable']").first.css('tr').each do |item|
-      if !item.css('td').first.nil?
-        page_url_ja = "http://ja.wikipedia.org#{item.css("td > a").first.attr('href')}"
-        page_url_en = self.get_anime_page_en(page_url_ja)
-        if page_url_en != 'no_characters'
-          title = item.css('td > a').first.attr('title')
-          puts(title)
-          game_page[title] = { ja: page_url_ja, en: page_url_en }
-        end
-      end
+    url.each do |value|
+      anime_pages = self.get_anime_page(value)
+      puts anime_pages.count
     end
-    return game_page
-  end
-
-  # キャラクターを持つゲームか判定
-  # @param [html] Nokogiriでパースされたhtml
-  # @return [boolean] 登場人物を持てばtrue
-  def self.detect_having_characters(html)
-    html.css("span[class='mw-headline']").each do |item|
-
-      if /(主な|主要|登場)*(人物|キャラクター)(一覧)*/ =~ item.content
-        return true
-      end
-
-    end
-
-    return false
   end
 
 
@@ -122,11 +68,8 @@ module Scrape::Wiki
     html = self.open_html url
 
     # ページ一覧からアニメURLを取得
-    # html.css("div[id='mw-pages']").css('a').each { |item| puts item.content }
     # liタグ->aタグの順にネストされているパターン
-    html.css('li > a').each do |item|
-      break if /アカウント/ =~ item.inner_text
-      next if /年(代)*の(テレビ)*(アニメ|番組)/ =~ item.inner_text or /履歴/ =~ item.inner_text
+    html.css("div[id='mw-pages']").css('li > a').each do |item|
       puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_en = "http://en.wikipedia.org#{item['href']}"
@@ -255,8 +198,8 @@ module Scrape::Wiki
         #person.keywords << keyword
 
         # keywords保存の例
-        #person.keywords.create(word: 'まど', is_alias: true)     # createと同時に保存される
-        #person.keywords.create(word: 'ピンク', is_alias: false)
+        #person.keywords.create(name: 'まど', is_alias: true)     # createと同時に保存される
+        #person.keywords.create(name: 'ピンク', is_alias: false)
 
         # mecab使用例
         # ref : http://qiita.com/k-shogo/items/0f8a98c52913c729c7eb
@@ -272,17 +215,17 @@ module Scrape::Wiki
   end
 
   # 既存のKeywordレコードを調べて、既存のものか新規作成してインスタンスを返す
-  # @param [String]
-  # @param [Boolean]
+  # @param name [String]
+  # @param is_alias [Boolean]
   # @return [Keyword]
-  def self.get_keyword(word, is_alias)
-    keyword = Keyword.where(word: word)
-    keyword.empty? ? Keyword.new(word: word, is_alias: is_alias) : keyword.first
+  def self.get_keyword(name, is_alias)
+    keyword = Keyword.where(name: name)
+    keyword.empty? ? Keyword.new(name: name, is_alias: is_alias) : keyword.first
   end
 
   # 既存のTitleレコードを調べて、既存のものか新規作成してインスタンスを返す
-  # @param [String]
-  # @param [Boolean]
+  # @param name [String]
+  # @param name_en [Boolean]
   # @return [Title]
   def self.get_title(name, name_en)
     title = Title.where(name: name)
