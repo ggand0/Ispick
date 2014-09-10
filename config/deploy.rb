@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'db/263'#'development'
+set :branch, 'oauth/268'#'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -82,6 +82,12 @@ namespace :deploy do
       #execute "printenv"
 
       test 'crontab -r'
+    end
+  end
+
+  task :stop_scraping do
+    on roles(:app) do |host|
+      test 'pkill -f scrape'
     end
   end
 
