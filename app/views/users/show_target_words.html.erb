@@ -4,8 +4,7 @@
 <h2>Preferences</h2>
 You can follow a tag to make an image feed related to the tag.
 <br />
-<%= search_form_for @search, url: show_target_words_users_path, html: { method: :post } do |f| %>
-  <%# f.label :name_display_cont, 'Character name' %>
+<%= search_form_for @search, url: show_target_words_users_path, html: { method: :post }, remote: true do |f| %>
   <div class="row">
     <div class="col-lg-2">
       <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
@@ -18,19 +17,7 @@ You can follow a tag to make an image feed related to the tag.
 <br />
 
 <div class="wrapper-popular-tags">
-  <h3>Popular tags</h3>
-  <div class="popular-tags">
-    <% if @people.nil? %>
-      <%# get_tags_with_images(20).each do |target_word| %>
-      <% TargetWord.all.limit(50).each do |target_word| %>
-        <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, remote: true, class: 'btn btn-default' unless target_word.person.nil? %>
-      <% end %>
-    <% else %>
-      <% @people.each do |person| %>
-        <%= bs_button_to person.name_display, { controller: 'target_words', action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post, remote: true, class: 'btn btn-default' %>
-      <% end %>
-    <% end %>
-  </div>
+  <%= render partial: 'users/popular_tags', locals: { people: @people } %>
 </div>
 
 <div class="arrow">></div>

@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :authenticate
   before_filter :configure_permitted_parameters, if: :devise_controller?
+  before_filter :miniprofiler
 
   protected
 
@@ -30,5 +31,11 @@ class ApplicationController < ActionController::Base
   # Sign up時にname attributeを関連づける
   def configure_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) << :name
+  end
+
+  # Run miniprofiler also in production environment
+  def miniprofiler
+    Rack::MiniProfiler.authorize_request
+    Rack::MiniProfiler.config.position = 'left'
   end
 end
