@@ -92,4 +92,8 @@ module UsersHelper
     bs_button_to 'Show', { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
   end
 
+  def render_show_debug_button(image)
+    bs_button_to 'Debug', { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
+  end
+
 end

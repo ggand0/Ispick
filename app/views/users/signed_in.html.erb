@@ -1,6 +1,7 @@
 <%= javascript_include_tag 'users_home' %>
 <%= javascript_include_tag 'core' %>
 <%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
 <%= render 'shared/modal_image' %>
 
 
@@ -33,7 +34,7 @@
           <div class="id"><%= delivered_image.id %></div>
           <%= button_group class: 'pull-right blocks' do %>
             <%= render_clip_button(delivered_image) %>
-            <%= render_show_button(delivered_image) %>
+            <%= render_show_debug_button(delivered_image) %>
           <% end %>
           <br />
         </div>

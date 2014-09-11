@@ -1,0 +1,80 @@
+<%= render partial: 'shared/render_image', locals: { image: @image } %>
+
+<p>
+  <strong>Source URL:</strong>
+  <%= link_to "#{image.src_url}", image.src_url %>
+</p>
+
+<p>
+  <strong>ImageNet categories:</strong>
+  <%# image.feature.categ_imagenet if image.feature %>
+</p>
+
+<h2>Detail:</h2>
+<table>
+  <thead>
+    <tr>
+      <th align="left">Is an illustration</th>
+      <td><%= image.is_illust %></td>
+    </tr>
+    <tr>
+      <th align="left">Views</th>
+      <td><%= image.views %></td>
+    </tr>
+    <tr>
+      <th align="left">Favorites</th>
+      <td><strong><%= image.favorites %></strong></td>
+    </tr>
+    <tr>
+      <th align="left">Created_at</th>
+      <td><%= get_jst_string(image.created_at) %></td>
+    </tr>
+    <tr>
+      <th align="left">Updated_at</th>
+      <td><%= get_jst_string(image.updated_at) %></td>
+    </tr>
+    <tr>
+      <th align="left">Posted_at</th>
+      <td><%= get_jst_string(image.posted_at) %></td>
+    </tr>
+    <tr>
+      <th align="left">Tags</th>
+      <td>
+        <% image.tags.each do |tag| %>
+          <%= link_to tag.name, { controller: 'users', action: 'search', query: "#{tag.name}" } %>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <th align="left">Size in bytes[KB]</th>
+      <td><%= bytes_to_kilobytes(image.data.size) %> KB</td>
+    </tr>
+    <tr>
+      <th align="left">Size in bytes[MB]</th>
+      <td><%= bytes_to_megabytes(image.data.size) %> MB</td>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Debug:</h2>
+<table>
+  <thead>
+    <tr>
+      <th align="left">id of image</th>
+      <td><%= image.id %></td>
+    </tr>
+    <tr>
+      <th align="left">id of image</th>
+      <td><%= image.id %></td>
+    </tr>
+    <tr>
+      <th align="left">raw image size</th>
+      <td><%= image.data.size if image.data %></td>
+    </tr>
+  </thead>
+</table>

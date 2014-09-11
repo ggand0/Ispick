@@ -1,5 +1,5 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide, :show_debug]
 
   # GET /images
   # GET /images.json
@@ -11,8 +11,15 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     respond_to do |format|
-      format.html
+      format.html {}
       format.js { render partial: 'show' }
+    end
+  end
+
+  def show_debug
+    respond_to do |format|
+      format.js { render partial: 'layouts/show_image_debug' }
+      #format.js { render partial: 'show' }
     end
   end
 
