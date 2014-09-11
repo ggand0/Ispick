@@ -75,6 +75,7 @@ Ispick::Application.routes.draw do
     member do
       put 'favor'
       put 'hide'
+      get 'show_debug'
     end
   end
 
