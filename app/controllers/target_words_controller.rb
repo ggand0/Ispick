@@ -58,6 +58,7 @@ class TargetWordsController < ApplicationController
       # それ以外の場合は何らかの問題が起きている可能性が高いのでフォームを再描画
       else
         format.html { render action: 'new' }
+        format.js { render nothing: true }
         format.json { render json: @target_word.errors, status: :unprocessable_entity }
       end
     end

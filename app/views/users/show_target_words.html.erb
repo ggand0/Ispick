@@ -27,7 +27,7 @@ You can follow a tag to make an image feed related to the tag.
       <% end %>
     <% else %>
       <% @people.each do |person| %>
-        <%= bs_button_to person.name_display, { controller: 'target_words', action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post, class: 'btn btn-default' %>
+        <%= bs_button_to person.name_display, { controller: 'target_words', action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post, remote: true, class: 'btn btn-default' %>
       <% end %>
     <% end %>
   </div>
