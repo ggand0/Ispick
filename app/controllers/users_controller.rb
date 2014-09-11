@@ -51,6 +51,7 @@ class UsersController < ApplicationController
     render action: 'signed_in'
   end
 
+
   # GET
   def new_avatar
     respond_to do |format|
@@ -86,6 +87,9 @@ class UsersController < ApplicationController
     return redirect_to '/signin_with_password' unless signed_in?
 
     @words = current_user.target_words
+    @target_word = TargetWord.new
+    @search = Person.search(params[:q])
+    @people = @search.result(distinct: true).page(params[:page]).per(50)
     render action: 'show_target_words'
   end
 
