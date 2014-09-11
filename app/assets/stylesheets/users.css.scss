@@ -48,11 +48,35 @@ span.glyphicon {
 }
 
 .after-header { padding: -500px 0px; }
-.tag-list {
-  width: 600px;
-}
 
-// popular tagsを表示する際に使用
+// タグ登録ページで使用
+.arrow {
+  position: relative;
+  top: 175px;
+  left: 10px;
+  float: left;
+  width: 80px;
+  font-size: 50pt;
+}
+.wrapper-popular-tags {
+  float: left;
+  width: 400px;
+}
+.wrapper-followed-tags {
+  float: left;
+  width: 400px;
+}
 .popular-tags {
-  width: 600px;
+  width: 400px;
+  height: 300px;
+  border-style: solid;
+  border-color: #C3C3C3;
+  overflow-y: scroll;
+}
+.followed-tags {
+  width: 400px;
+  height: 300px;
+  border-style: solid;
+  border-color: #C3C3C3;
+  overflow-y: scroll;
 }

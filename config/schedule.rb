@@ -22,15 +22,15 @@
 
 # Scraping processes
 every 12.hours do
-  rake 'scrape:anipic[1440]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
+  rake 'scrape:anipic[720]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
 every 6.hours do
-  rake 'scrape:nico[1440]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+  rake 'scrape:nico[360]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
 every 6.hours do
-  rake 'scrape:tumblr[1440]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+  rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
 every 6.hours do

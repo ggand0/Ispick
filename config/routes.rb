@@ -1,6 +1,6 @@
 require 'resque_web'
 
-Ispic::Application.routes.draw do
+Ispick::Application.routes.draw do
   # RequeWeb
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
@@ -28,6 +28,7 @@ Ispic::Application.routes.draw do
       get 'show_illusts'
       get 'show_target_images'
       get 'show_target_words'
+      post 'show_target_words'
       get 'show_favored_images'
       delete 'delete_target_word'
 

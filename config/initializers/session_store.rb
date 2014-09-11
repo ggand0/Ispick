@@ -1,3 +1,3 @@
 # Be sure to restart your server when you modify this file.
 
-Ispic::Application.config.session_store :cookie_store, key: '_Ispic_session'
+Ispick::Application.config.session_store :cookie_store, key: '_Ispick_session'

@@ -6,7 +6,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
-module Ispic
+module Ispick
   class Application < Rails::Application
     # http://goo.gl/RPV0p4
     config.i18n.enforce_available_locales = true

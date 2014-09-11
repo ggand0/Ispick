@@ -1,4 +1,4 @@
-Ispic::Application.configure do
+Ispick::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Better errors gem

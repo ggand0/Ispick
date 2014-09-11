@@ -1,58 +1,47 @@
 <%= stylesheet_link_tag 'users' %>
 
 
-<h3>Follow a tag</h3>
-Find a tag from the database:
+<h2>Preferences</h2>
+You can follow a tag to make an image feed related to the tag.
 <br />
-<%= bs_button_to 'Search a target_word', search_target_words_path, class: 'btn-default' %>
-<br />
-<i>You can still follow a custom tag at the "<%= link_to 'debug_crawling', debug_crawling_users_path %>" page.</i><br />
-<br />
+<%= search_form_for @search, url: show_target_words_users_path, html: { method: :post } do |f| %>
+  <%# f.label :name_display_cont, 'Character name' %>
+  <div class="row">
+    <div class="col-lg-2">
+      <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
+    </div>
+  </div>
+  <div class="actions">
+    <%= f.submit 'Search', class: "btn btn-default" %>
+  </div>
+<% end %>
 <br />
 
-<h3>Popular tags</h3>
-<div class="popular-tags">
-  Tags frequently followed:<br />
-  <% get_popular_tags(20).each do |target_word| %>
-    <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, class: 'btn btn-default' %>
-    <%= target_word.users_count %>
-  <% end %>
-</div>
-<br />
-<div class="popular-tags">
-  Tags with images:<br />
-  <% get_tags_with_images(20).each do |target_word| %>
-    <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, class: 'btn btn-default' %>
-    <%= target_word.images_count %>
-  <% end %>
-</div>
-
-
-<h3>List of followed tags</h3>
-<div class="tag-list">
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @words.each do |target_word| %>
-      <tr>
-        <td><%= link_to target_word.name, show_delivered_target_word_path(target_word) %></td>
-        <td>
-          <%= bs_button_to 'Unfollow', delete_target_word_users_path({ id: target_word.id }), method: :delete, class: 'btn-default' %>
-          <%= bs_button_to 'debug', target_word, class: 'btn-default' %>
-        </td>
-      </tr>
+<div class="wrapper-popular-tags">
+  <h3>Popular tags</h3>
+  <div class="popular-tags">
+    <% if @people.nil? %>
+      <%# get_tags_with_images(20).each do |target_word| %>
+      <% TargetWord.all.limit(50).each do |target_word| %>
+        <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, remote: true, class: 'btn btn-default' unless target_word.person.nil? %>
+      <% end %>
+    <% else %>
+      <% @people.each do |person| %>
+        <%= bs_button_to person.name_display, { controller: 'target_words', action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post, remote: true, class: 'btn btn-default' %>
+      <% end %>
     <% end %>
-  </tbody>
-</table>
-<br>
-<br>
+  </div>
 </div>
 
+<div class="arrow">></div>
 
-<%= paginate_target_images(@message, @words) %>
+<!-- Render followed tags from the partial -->
+<div class="wrapper-followed-tags">
+  <%= render partial: 'users/followed_tags', locals: { target_words: @target_words } %>
+</div>
+
+<div style="clear: both;">
+  <br />
+  <br />
+  <br />
+</div>

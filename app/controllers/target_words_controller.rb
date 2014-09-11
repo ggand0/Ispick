@@ -41,6 +41,7 @@ class TargetWordsController < ApplicationController
       if @target_word.id
         current_user.target_words << @target_word
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
+        format.js { @target_words = current_user.target_words; render partial: 'reload_followed_tags' }
 
       # If the id equals to nil, which means @target_word is newly initialized, redirect after saving it.
       # IDがnilである=新しくTargetWordをbuildしている場合は、保存してからリダイレクト
@@ -50,12 +51,14 @@ class TargetWordsController < ApplicationController
         current_user.search_keyword(@target_word) if params[:debug]
 
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
-        format.json { render action: 'show', status: :created, location: @target_word }
+        format.js { @target_words = current_user.target_words; render partial: 'reload_followed_tags' }
+        format.json { render partial: 'create' }
 
       # Otherwise, probablly it has some problems, rerender the 'new' template
       # それ以外の場合は何らかの問題が起きている可能性が高いのでフォームを再描画
       else
         format.html { render action: 'new' }
+        format.js { render nothing: true }
         format.json { render json: @target_word.errors, status: :unprocessable_entity }
       end
     end

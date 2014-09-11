@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Ispic::Application.load_tasks
+Ispick::Application.load_tasks
