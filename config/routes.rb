@@ -39,6 +39,7 @@ Ispick::Application.routes.draw do
       get 'download_favored_images'
       get 'debug_illust_detection'
       get 'debug_crawling'
+      get 'toggle_miniprofiler'
     end
   end
 

@@ -178,6 +178,11 @@ class UsersController < ApplicationController
     @words = current_user.target_words
   end
 
+  def toggle_miniprofiler
+    Rack::MiniProfiler.config.auto_inject = Rack::MiniProfiler.config.auto_inject ? false : true
+    redirect_to home_users_path
+  end
+
 
   private
 
