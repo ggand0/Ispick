@@ -23,8 +23,7 @@ You can follow a tag to make an image feed related to the tag.
     <% if @people.nil? %>
       <%# get_tags_with_images(20).each do |target_word| %>
       <% TargetWord.all.limit(50).each do |target_word| %>
-        <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, class: 'btn btn-default' unless target_word.person.nil? %>
-        <%# target_word.images_count %>
+        <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, remote: true, class: 'btn btn-default' unless target_word.person.nil? %>
       <% end %>
     <% else %>
       <% @people.each do |person| %>
@@ -36,17 +35,9 @@ You can follow a tag to make an image feed related to the tag.
 
 <div class="arrow">></div>
 
+<!-- Render followed tags from the partial -->
 <div class="wrapper-followed-tags">
-  <h3>Followed tags</h3>
-  <div class="followed-tags">
-    <% @words.each do |target_word| %>
-      <%= button_group do %>
-        <%= bs_button_to target_word.name, show_delivered_target_word_path(target_word), class: 'btn-default' %>
-        <%= bs_button_to 'X', delete_target_word_users_path({ id: target_word.id }), method: :delete, class: 'btn-default' %>
-        <%= bs_button_to 'D', target_word, class: 'btn-default' %>
-      <% end %>
-    <% end %>
-  </div>
+  <%= render partial: 'users/followed_tags', locals: { target_words: @target_words } %>
 </div>
 
 <div style="clear: both;">

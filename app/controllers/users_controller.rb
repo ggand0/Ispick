@@ -86,7 +86,7 @@ class UsersController < ApplicationController
   def show_target_words
     return redirect_to '/signin_with_password' unless signed_in?
 
-    @words = current_user.target_words
+    @target_words = current_user.target_words
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
     @people = @search.result(distinct: true).page(params[:page]).per(50)
@@ -111,9 +111,12 @@ class UsersController < ApplicationController
   # 登録タグの削除：関連のみ削除する
   def delete_target_word
     current_user.target_words.delete(TargetWord.find(params[:id]))
+    @target_words = current_user.target_words
 
-    @words = current_user.target_words
-    render action: 'show_target_words'
+    respond_to do |format|
+      format.html { render action: 'show_target_words' }
+      format.js { render partial: 'target_words/reload_followed_tags' }
+    end
   end
 
 

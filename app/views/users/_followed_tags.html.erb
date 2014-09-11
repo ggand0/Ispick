@@ -1,0 +1,10 @@
+<h3>Followed tags</h3>
+<div class="followed-tags">
+  <% target_words.each do |target_word| %>
+    <%= button_group do %>
+      <%= bs_button_to target_word.name, show_delivered_target_word_path(target_word), class: 'btn-default' %>
+      <%= bs_button_to '<span class="glyphicon glyphicon-remove" style="vertical-align:middle"></span>'.html_safe, delete_target_word_users_path({ id: target_word.id }), method: :delete, remote: true, class: 'btn-default' %>
+      <%= bs_button_to '<span class="glyphicon glyphicon-wrench" style="vertical-align:middle"></span>'.html_safe, target_word, class: 'btn-default' %>
+    <% end %>
+  <% end %>
+</div>
