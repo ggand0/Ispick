@@ -6,4 +6,4 @@ require File.expand_path('../application', __FILE__)
 CONFIG = Hashie::Mash.new YAML.load_file("#{Rails.root}/config/config.yml")[Rails.env]
 
 # Initialize the Rails application.
-Ispic::Application.initialize!
+Ispick::Application.initialize!

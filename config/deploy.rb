@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'oauth/268'#'development'
+set :branch, 'tag/213'#'development'
 set :rails_env, 'production'
 
 # Default branch is :master

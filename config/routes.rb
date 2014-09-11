@@ -1,6 +1,6 @@
 require 'resque_web'
 
-Ispic::Application.routes.draw do
+Ispick::Application.routes.draw do
   # RequeWeb
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!

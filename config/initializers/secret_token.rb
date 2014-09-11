@@ -9,4 +9,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-Ispic::Application.config.secret_key_base = '865688c24dd35c24f59deb5ece29402ec8c84502751e065765bfe343233aced10886b53bfffcc33ddab6221670683c83d8fd4d6c846237d8290ddcad1b6e814f'
+Ispick::Application.config.secret_key_base = '865688c24dd35c24f59deb5ece29402ec8c84502751e065765bfe343233aced10886b53bfffcc33ddab6221670683c83d8fd4d6c846237d8290ddcad1b6e814f'
