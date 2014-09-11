@@ -90,7 +90,11 @@ class UsersController < ApplicationController
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
     @people = @search.result(distinct: true).page(params[:page]).per(50)
-    render action: 'show_target_words'
+
+    respond_to do |format|
+      format.html { render action: 'show_target_words' }
+      format.js { render partial: 'layouts/reload_popular_tags' }
+    end
   end
 
   # Render the list of clipped images.
@@ -115,7 +119,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html { render action: 'show_target_words' }
-      format.js { render partial: 'target_words/reload_followed_tags' }
+      format.js { render partial: 'layouts/reload_followed_tags' }
     end
   end
 

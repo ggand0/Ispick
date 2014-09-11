@@ -41,7 +41,7 @@ class TargetWordsController < ApplicationController
       if @target_word.id
         current_user.target_words << @target_word
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
-        format.js { @target_words = current_user.target_words; render partial: 'reload_followed_tags' }
+        format.js { @target_words = current_user.target_words; render partial: 'layouts/reload_followed_tags' }
 
       # If the id equals to nil, which means @target_word is newly initialized, redirect after saving it.
       # IDがnilである=新しくTargetWordをbuildしている場合は、保存してからリダイレクト
@@ -51,7 +51,7 @@ class TargetWordsController < ApplicationController
         current_user.search_keyword(@target_word) if params[:debug]
 
         format.html { redirect_to controller: 'users', action: 'show_target_words' }
-        format.js { @target_words = current_user.target_words; render partial: 'reload_followed_tags' }
+        format.js { @target_words = current_user.target_words; render partial: 'layouts/reload_followed_tags' }
         format.json { render partial: 'create' }
 
       # Otherwise, probablly it has some problems, rerender the 'new' template
