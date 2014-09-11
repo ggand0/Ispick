@@ -62,7 +62,9 @@ body {
 .boxInner img {
    width: 100%;
 }
-.boxInner .titleBox {
+
+// old version
+/*.boxInner .titleBox {
    position: absolute;
    //visibility: hidden;
    //top: 0px;
@@ -84,7 +86,27 @@ body {
 }
 .title {
   text-align: center;
-  /*position: absolute;
+}
+body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
+   margin-bottom: 0;
+}*/
+
+// new version
+.boxInner .titleBox {
+   position: absolute;
+   visibility: hidden;
+   top: 0px;
+   //bottom: 0px;
+   left: 0px;
+   right: 0px;
+
+   margin-bottom: 0px;
+   color: #FFF;
+   padding: 10px;
+}
+.title {
+  text-align: center;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
@@ -92,12 +114,9 @@ body {
   background: #000;
   background: rgba(0, 0, 0, 0.5);
   color: #FFF;
-  padding: 10px;*/
+  padding: 10px;
 }
 body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
-   margin-bottom: 0;
-}
-/*body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
    margin-bottom: 0;
    color: #FFF;
    visibility: visible;
@@ -106,7 +125,7 @@ body.no-touch .boxInner.hovered .titleBox, body.touch .boxInner.touchFocus .titl
    margin-bottom: 0;
    color: #FFF;
    visibility: visible;
-}*/
+}
 
 
 @media only screen and (max-width : 480px) {
