@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'tag/213'#'development'
+set :branch, 'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -91,7 +91,6 @@ namespace :deploy do
     end
   end
 
-
   # 上記linked_filesで使用するファイルをアップロードするタスク、deployが行われる前に実行する必要がある。
   # 既に同名ファイルがremoteにある場合は上書きされる。
   desc 'upload .yml files manually'
@@ -131,7 +130,7 @@ namespace :whenever do
       test 'crontab -r'
 
       # Kill all scraping processes, picking them up by name
-      test 'pkill -f scrape'
+      #test 'pkill -f scrape'
 
       # Update whenever and crontab tasks
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
