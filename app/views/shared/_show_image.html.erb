@@ -2,16 +2,19 @@
 <div class="image-title">
   <%= image.title %>
 </div>
+<button class="btn btn-default" style="text-align: right;">
+  <span class="glyphicon glyphicon-paperclip" style="vertical-align:middle"></span>
+</button>
 
 <hr>
 
 <div class="image-detail">
-  <%= image.caption.html_safe if image.caption %><br />
+  Caption: <%= image.caption.html_safe if image.caption %><br />
   From: <%= link_to "#{image.page_url}", image.page_url.html_safe if image.page_url %>
 </div>
 
 <div class="image-share">
-  <%= "CA: #{get_jst_string(image.created_at)}".html_safe %><br />
+  <%# "CA: #{get_jst_string(image.created_at)}".html_safe %><br />
   <%= "PA: #{get_jst_string(image.posted_at)}".html_safe %><br />
   <%= image_tag(asset_path('icons/facebook_32.png'))%>
   <%= image_tag(asset_path('icons/twitter_32.png')) %>
