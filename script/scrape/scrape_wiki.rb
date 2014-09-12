@@ -54,28 +54,39 @@ module Scrape::Wiki
     url = [ 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series' ]
     url.each do |value|
       anime_pages = self.get_anime_page(value)
+      puts anime_pages.inspect
       puts anime_pages.count
     end
+  end
+
+  # Get an anime titles based on a html object.
+  # @param html [Nokogiri::HTML] A HTML object parsed through Nokogiri gem.
+  # @return [String] The title of the anime
+  def self.get_anime_titles(url)
+    html = Scrape::Wiki.open_html url
+    return '' if html.nil?
+
+    html.css('h1[class="firstHeading"]').first.content
   end
 
 
   # アニメ名のハッシュを取得する
   # @param [String] 「20xx年のアニメ一覧」ページのurl
   # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
-  def self.get_anime_page(url, logging=true)
+  def self.get_anime_page(url, logging=false)
     anime_page = {}
     html = self.open_html url
 
     # Scrape the list of anime overview pages in the page.
     # ページ一覧からアニメURLを取得。liタグ->aタグの順にネストされているパターンを探す。
     html.css("div[id='mw-pages']").css('li > a').each do |item|
-      puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_en = "http://en.wikipedia.org#{item['href']}"
         page_url_ja = self.get_anime_page_ja page_url_en
+        title_ja = self.get_anime_titles(page_url_ja)
 
         puts page_url_ja if logging
-        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
+        anime_page[item.inner_text] = { title_ja: title_ja, ja: page_url_ja, en: page_url_en }
       end
     end
 

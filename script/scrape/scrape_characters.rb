@@ -17,9 +17,9 @@ module Scrape::Wiki::Character
 
     # 登場人物・キャラクターページのURLを取得
     page_hash.each do |anime_title, url|
-      next if url[:en].empty?                     # str.empty?はstr=''だったらtrueを返す
-      html_en = Scrape::Wiki.open_html url[:en]   # まずは日本語の概要ページを開く
-      next if html_en.nil?                        # obj.nil?はobj=nilだったらtrueを返すメソッド
+      next if url[:en].empty?
+      html_en = Scrape::Wiki.open_html url[:en]
+      next if html_en.nil?
       html_ja = Scrape::Wiki.open_html url[:ja]
 
       # 抽出してきたタイトルと、アニメタイトルを比べて冗長でない方を採用
