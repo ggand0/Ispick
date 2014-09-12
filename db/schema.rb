@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140909160103) do
+ActiveRecord::Schema.define(version: 20140912002052) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -69,10 +69,15 @@ ActiveRecord::Schema.define(version: 20140909160103) do
     t.datetime "updated_at"
   end
 
+  add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
+  add_index "images", ["src_url"], name: "index_images_on_src_url", length: {"src_url"=>255}, using: :btree
+
   create_table "images_tags", force: true do |t|
     t.integer "image_id", null: false
     t.integer "tag_id",   null: false
   end
+
+  add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
 
   create_table "images_target_words", force: true do |t|
     t.integer "image_id",       null: false
@@ -100,6 +105,7 @@ ActiveRecord::Schema.define(version: 20140909160103) do
   end
 
   add_index "people", ["name", "name_english", "name_display"], name: "index_people_on_name_and_name_english_and_name_display", using: :btree
+  add_index "people", ["target_word_id"], name: "index_people_on_target_word_id", using: :btree
 
   create_table "people_keywords", force: true do |t|
     t.integer "keyword_id", null: false
@@ -119,6 +125,8 @@ ActiveRecord::Schema.define(version: 20140909160103) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
 
   create_table "target_images", force: true do |t|
     t.string   "data_file_name"
