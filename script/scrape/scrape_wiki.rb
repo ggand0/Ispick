@@ -12,7 +12,7 @@ module Scrape::Wiki
   include Character
   include GameCharacter
 
-  ROOT_URL = 'http://en.wikipedia.org/wiki/Main_Page'
+  ROOT_URL = 'http://en.wikipedia.org/'
 
   def self.scrape_all
     puts "Extracting: #{ROOT_URL}"
@@ -49,13 +49,21 @@ module Scrape::Wiki
   # Scrape only anime titles and save them to the database.
   def self.scrape_titles
     puts "Extracting anime titles from: #{ROOT_URL}"
+    anime_pages = {}
 
     # The array of Wikipedia pages that list up anime titles.
     url = [ 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series' ]
     url.each do |value|
       anime_pages = self.get_anime_page(value)
+
+
       puts anime_pages.inspect
       puts anime_pages.count
+    end
+
+    anime_pages.each do |key, value|
+      # Save them to titles table:
+      Title.create(name: value[:title_ja], name_english: key)
     end
   end
 
@@ -70,6 +78,7 @@ module Scrape::Wiki
   end
 
 
+  # Scrape anime titles and related Wikipedia article urls.
   # アニメ名のハッシュを取得する
   # @param [String] 「20xx年のアニメ一覧」ページのurl
   # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
@@ -83,7 +92,7 @@ module Scrape::Wiki
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_en = "http://en.wikipedia.org#{item['href']}"
         page_url_ja = self.get_anime_page_ja page_url_en
-        title_ja = self.get_anime_titles(page_url_ja)
+        title_ja = self.get_anime_titles(page_url_ja) unless page_url_ja.nil?
 
         puts page_url_ja if logging
         anime_page[item.inner_text] = { title_ja: title_ja, ja: page_url_ja, en: page_url_en }
