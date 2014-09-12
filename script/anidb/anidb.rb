@@ -3,19 +3,19 @@ require 'open-uri'
 require 'builder'
 
 # 10000件のアニメ情報があるinput用xml
-file_path = "#{Rails.root}/script/anime_titles.xml"
-#file_path = "#{Rails.root}/script/anime_titles_2014.xml"
+file_path = "#{Rails.root}/script/anidb/anime-titles.xml"
 
-# 出力用のXML::Documentオブジェクトを手っ取り早く作るために読み込むファイル。
-# Nokogiri::XML::Elementを追加して新しいxmlを作成する
-output_path = "#{Rails.root}/script/anime_titles_template.xml"
+# 出力用のXML::Documentオブジェクトを読み込むファイル。
+# Nokogiri::XML::Elementを追加して新しいxmlを作成する。
+output_path = "#{Rails.root}/script/anidb/anime_titles_template.xml"
 
 # 実際に出力するファイルのpath
-test_path = "#{Rails.root}/script/anime_titles_test.xml"
-hash_path = "#{Rails.root}/script/anidb_match_status"
+test_path = "#{Rails.root}/script/anidb/anime_titles_2014.xml"
+hash_path = "#{Rails.root}/script/anidb/anidb_match_status"
+
+
 xml = Nokogiri::XML(open file_path)
 output = Nokogiri::XML(open output_path)
-
 titles = Title.all
 match_count = 0
 hash = {}
@@ -32,7 +32,6 @@ xml.search('anime').each_with_index do |anime, count|
 
   matched = false
   titles.each do |title|
-
     anime_ens.each do |anime_en|
       if not anime_en.nil? and (anime_en.content.downcase.include? title.name_english.downcase or
         title.name_english.downcase.include? anime_en.content.downcase)
@@ -46,12 +45,17 @@ xml.search('anime').each_with_index do |anime, count|
     end
     break if matched
 
-    if title.name
+=begin
+=end
+    unless title.name.nil? or title.name.empty?
       anime_jas.each do |anime_ja|
         if not anime_ja.nil? and (anime_ja.content.downcase.include? title.name.downcase or
           title.name.downcase.include? anime_ja.content.downcase)
           output.root.add_child anime
+
           puts "Added an ja element: #{anime_ja.content}"
+          puts "DEBUG: #{title.name}"
+
           match_count += 1
           hash[title.name_english] = true
           matched = true
@@ -60,6 +64,7 @@ xml.search('anime').each_with_index do |anime, count|
       end
       break if matched
     end
+
 
     anime_mains.each do |anime_main|
       if not anime_main.nil? and (anime_main.content.downcase.include? title.name_english.downcase or
@@ -92,12 +97,17 @@ xml.search('anime').each_with_index do |anime, count|
   puts "count: #{count}" if count % 1000 == 0
 end
 
-puts "matched titles: #{match_count}"
-#puts "unmatched titles: #{Title.count - match_count}"
+matched_count = 0
 unmatched_count = 0
-hash.map { |k,v| unmatched_count+=1 if !v }
+hash.map { |k,v| unmatched_count +=1 if !v }
+hash.map { |k,v| matched_count +=1 if v }
 puts "unmatched titles: #{unmatched_count}"
-puts "match status: #{hash}"
+puts "matched titles: #{matched_count}"
+
+hash = hash.map { |k,v| k if !v }
+hash.compact!
+puts "Unmatched titles:"
+hash.each { |k,v| puts "#{k}\n" }
 File.open(test_path, 'w') { |f| f.print(output.to_xml) }
 File.open(hash_path, 'w') do |f|
   hash.each do |key, value|
