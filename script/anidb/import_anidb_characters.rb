@@ -9,17 +9,14 @@ class Import
   attr_accessor :people, :hash
   def initialize
     @people = Person.all
-    @hash = {}
   end
 
   def main
-    #CSV.foreach(LIST_PATH, { :headers => false }) do |row|
-      #next if $. == 1
     File.open(LIST_PATH, 'r') do |row|
       row.each_line.with_index do |line, count|
         next if count == 0
         attributes = line.split(/(?<!\\),/)
-        #puts line.split(/[^\\,],/)
+        #puts line.split(/[^\\,],/)         # doesn't work
 
         name_ja = attributes[1]
         name_en = attributes[2]
@@ -39,12 +36,6 @@ class Import
         end
         puts "unmatched character: #{name_ja}/#{name_en}" unless matched
 
-      end
-    end
-
-    File.open(HASH_PATH, 'w') do |f|
-      @hash.each do |key, value|
-        f.write("#{key}: #{value}\n")
       end
     end
 
