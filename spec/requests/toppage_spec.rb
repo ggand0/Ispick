@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Top page" do
-  let(:site_title) { 'Ispick prototype v3' }
+  let(:site_title) { 'Ispick v0.3' }
 
   it "display title" do
     visit root_path
@@ -12,7 +12,7 @@ describe "Top page" do
   it "login with oauth" do
     visit root_path
     mock_auth_hash
-    click_link 'twitterでログイン'
+    click_link 'Login with twitter'
 
     # users/homeに移動しているはず
     uri = URI.parse(current_url)

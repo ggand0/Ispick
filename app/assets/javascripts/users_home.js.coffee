@@ -6,6 +6,10 @@
 $ ->
   # クリップ機能
   window.Clip.addClipEvents(true)
+  # 'Clip'ボタンを押下した時にボタンを表示したままにする
+  $(document).on('click', '.popover-board', () ->
+    $(this).parents('.boxInner').addClass('hovered')
+  )
 
 
   # 無限スクロール
@@ -36,4 +40,18 @@ $ ->
   )
   $("body").on("click", ".filter-button", () ->
     $(selector).datepicker('show')
+  )
+
+
+  # Popovers
+  # Close popover on click wherever except popover windows
+  $('body').on('click', (e) ->
+    $('[data-toggle="popover"]').each(() ->
+      # the 'is' for buttons that trigger popups
+      # the 'has' for icons within a button that triggers a popup
+      if (!$(this).is(e.target) && ($(this).has(e.target).length is 0) && $('.popover').has(e.target).length is 0)
+        $(this).popover('hide')
+        # Clip buttonもついでに消す
+        $('.boxInner').removeClass('hovered')
+    )
   )

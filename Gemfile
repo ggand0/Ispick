@@ -10,7 +10,9 @@ gem 'mysql2'
 gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 
 # View related gems
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 3.2.0'
+gem 'autoprefixer-rails'
+
 gem 'bootstrap-datepicker-rails'
 gem 'rails-bootstrap-helpers'
 gem 'bootstrap_form'
@@ -20,6 +22,7 @@ gem 'kaminari'                                    # Enable pagination
 gem 'jquery-fileupload-rails'                     # Upload multiple files
 gem 'remotipart', '~> 1.2'                        # Enable ajax request with form_tag
 gem 'high_voltage', '~> 2.1.0'                    # Handles static pages
+gem 'rack-mini-profiler'                          # For debugging loading times
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
@@ -56,8 +59,9 @@ end
 gem 'puma'
 
 # Console
-gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
-gem 'pry-rails'                                  # Improve the console
+gem 'rb-readline', require: false
+#gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
+
 
 # OAuth
 gem 'devise'
@@ -72,10 +76,14 @@ gem 'mechanize'
 gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
 gem 'resque'                                     # For background jobs
 gem 'resque-web', require: 'resque_web'          # Web interface for resque
-gem 'daemon-spawn', require: 'daemon_spawn'
+gem 'resque-logger'
+gem 'daemon-spawn', require: 'daemon_spawn', git: 'git@github.com:pentiumx/daemon-spawn.git'
+gem 'pidfile'
 gem 'whenever', require: false                   # Support crontab
 gem 'rubyzip'
 gem 'ransack'
+gem 'factory_girl_rails'                          # A fixtures replacement
+gem 'engtagger'
 
 # API clients
 gem 'natto'
@@ -84,16 +92,22 @@ gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
 gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
 gem 'giphy'
+gem 'tinami'
 
 group :test do
   gem 'webmock'                                     # developmentからは外す必要有り
+  gem 'fakeweb', '~> 1.3'                           # Mock urls
 end
 
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'fakeweb', '~> 1.3'                           # Mock urls
+#  gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
+  gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
+  #gem 'pry-rails'                                   # Improve the console
+  #gem 'pry-nav'
+  gem 'diffy'
 
   gem 'spring'
   gem 'spring-commands-rspec'
@@ -105,8 +119,9 @@ group :development, :test do
 
 
   # Rails testing
-  gem 'rspec-rails', '~> 2.99.0'                     # Testing framework
-  gem 'factory_girl_rails'                          # A fixtures replacement
+  gem 'rspec-rails', '~> 2.99.0'                    # Testing framework
+  gem 'rspec-its'                                   # Provides the 'its' method
+  gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
   gem 'simplecov'                                   # カバレッジ測定
   gem 'simplecov-rcov'
   gem 'fuubar'                                      # テスト進行状況可視化

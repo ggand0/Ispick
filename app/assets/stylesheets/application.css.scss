@@ -19,8 +19,8 @@
  *
  */
 
+@import "bootstrap-sprockets";
 @import "bootstrap";
-
 
 #footer {
   clear:  left;
@@ -29,6 +29,7 @@
   height: 100px;
 }
 
+// headerのロゴ部分
 a.logo {
   float:left;
   display:block;

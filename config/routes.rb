@@ -1,6 +1,6 @@
 require 'resque_web'
 
-Ispic::Application.routes.draw do
+Ispick::Application.routes.draw do
   # RequeWeb
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
@@ -24,10 +24,13 @@ Ispic::Application.routes.draw do
       get 'home'
       get 'new_avatar'
       post 'create_avatar'
+      get 'search'
       get 'show_illusts'
       get 'show_target_images'
       get 'show_target_words'
+      post 'show_target_words'
       get 'show_favored_images'
+      delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
@@ -35,16 +38,8 @@ Ispic::Application.routes.draw do
       # routes for debug
       get 'download_favored_images'
       get 'debug_illust_detection'
-    end
-  end
-
-  resources :delivered_images do
-    collection do
-      get 'show_user_image'
-    end
-    member do
-      put 'favor'
-      put 'avoid'
+      get 'debug_crawling'
+      get 'toggle_miniprofiler'
     end
   end
 
@@ -55,6 +50,7 @@ Ispic::Application.routes.draw do
       get 'switch'
     end
   end
+
   resources :target_words do
     collection do
       match 'search' => 'target_words#search', via: [:get, :post], as: :search
@@ -62,18 +58,27 @@ Ispic::Application.routes.draw do
     member do
       get 'prefer'
       get 'show_delivered'
-      get 'switch'
     end
   end
+
   resources :image_boards do
     collection do
       get 'boards'
       get 'reload'
     end
   end
+
   resources :favored_images, only: [:show, :destroy]
 
   resources :images, only: [:index, :show, :destroy]
+  resources :images do
+    member do
+      put 'favor'
+      put 'hide'
+      get 'show_debug'
+    end
+  end
+
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search

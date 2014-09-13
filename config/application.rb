@@ -6,7 +6,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
-module Ispic
+module Ispick
   class Application < Rails::Application
     # http://goo.gl/RPV0p4
     config.i18n.enforce_available_locales = true
@@ -15,7 +15,11 @@ module Ispic
     config.eager_load_paths += ["#{Rails.root}/lib"]
 
     # for bootsrap-sass
-    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+    # http://d.hatena.ne.jp/kovaio/20140405
+    #config.assets.precompile += %w(*.eot *.svg *.ttf *.woff)
+    #config.assets.precompile += %w( *.js *.css *.eot *.woff *.ttf *.svg )
+    config.assets.paths << "#{Rails}/vendor/assets/fonts"
+
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

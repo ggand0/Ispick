@@ -10,7 +10,7 @@ describe "Default feature" do
       # ログインする
       visit root_path
       mock_auth_hash
-      click_link 'twitterでログイン'
+      click_link 'Login with twitter'
 
       # 登録イラスト一覧へのページへ進む
       visit show_target_images_users_path
@@ -19,7 +19,7 @@ describe "Default feature" do
 
     # 登録した画像を閲覧出来ること
     it "Watch target images list" do
-      expect(page).to have_css("img[@alt='Madoka']")
+      expect(page).to have_css("img[@alt='Madoka0']")
     end
 
     # 新たに画像登録出来ること
@@ -28,10 +28,9 @@ describe "Default feature" do
       expect(page).to have_content('New target_image')
 
       attach_file 'Data', "#{Rails.root}/spec/files/target_images/madoka0.jpg"
-      Resque.stub(:enqueue).and_return
+      Resque.stub(:enqueue).and_return nil
       click_on 'Create Target image'
 
-      #save_and_open_page
       expect(page).to have_content page_title
       expect(page.all('.box').count).to eq(2)
       expect(page.all('.boxInner').count).to eq(2)

@@ -1,15 +1,15 @@
 require 'spec_helper'
-require "#{Rails.root}/script/scrape/scrape_2ch"
+require "#{Rails.root}/script/scrape/scrape"
 
 describe Scrape::Nichan do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
+    Resque.stub(:enqueue).and_return nil # resqueにenqueueしないように
   end
 
   describe "scrape function" do
     it "calls valid functions" do
-      Scrape::Nichan.stub(:scrape_boards).and_return
+      Scrape::Nichan.stub(:scrape_boards).and_return nil
       Scrape::Nichan.should_receive(:scrape_boards).exactly(1).times
 
       Scrape::Nichan.scrape

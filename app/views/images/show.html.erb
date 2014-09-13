@@ -1,3 +1,8 @@
+<!--
+  現在の所使ってない。
+  モーダル表示をせずに直接templateを描画する場合に使う。
+-->
+
 <p id="notice"><%= notice %></p>
 
 <p>
@@ -52,16 +57,21 @@
 </p>
 
 <p>
-  <strong>MD5:</strong><br>
-  <%= @image.md5_checksum %> <br>
-</p>
-<p>
-  <strong>Size in bytes:</strong><br>
-  <%= bytes_to_kilobytes(@image.data.size) %> KB<br>
-  <%= bytes_to_megabytes(@image.data.size) %> MB<br>
+  <strong>MD5:</strong><br />
+  <%= @image.md5_checksum %> <br />
 </p>
 
-<br>
-<%= image_tag @image.data.url(:medium) %>
-<br>
+<p>
+  <strong>Size in bytes:</strong><br />
+  <%= bytes_to_kilobytes(@image.data.size) %> KB<br />
+  <%= bytes_to_megabytes(@image.data.size) %> MB<br />
+</p>
+
+<br />
+<% if @image.page_url %>
+  <%= link_to image_tag(@image.data.url(:medium)), @image.page_url.html_safe %>
+<% else %>
+  <%= image_tag @image.data.url(:medium) %>
+<% end %>
+<br />
 <%= link_to 'Back', images_path %>

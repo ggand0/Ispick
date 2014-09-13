@@ -1,41 +1,34 @@
-<h1>登録タグ一覧</h1>
-カスタムキーワードを登録する：
-<br>
-<%= link_to 'New Target word', new_target_word_path %>
-<br>
-<br>
-データベースからタグを検索する：
-<br>
-<%= link_to 'Search Target words', search_target_words_path %>
-<br>
-<br>
-<br>
-<table>
-  <thead>
-    <tr>
-      <th>Word</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
+<%= stylesheet_link_tag 'users' %>
 
-  <tbody>
-    <% @words.each do |target_word| %>
-      <tr>
-        <td><%= target_word.word %></td>
-        <td><%# link_to 'Show', target_word %></td>
-        <td><%= link_to 'このタグへの配信画像を見る', show_delivered_target_word_path(target_word) %></td>
 
-        <!--<td><%= link_to get_enabled_html(target_word.enabled).html_safe, switch_target_word_path(target_word) %></td>-->
-        <td><%= link_to 'Destroy', target_word, method: :delete %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-<br>
-<br>
+<h2>Preferences</h2>
+You can follow a tag to make an image feed related to the tag.
+<br />
+<%= search_form_for @search, url: show_target_words_users_path, html: { method: :post }, remote: true do |f| %>
+  <div class="row">
+    <div class="col-lg-2">
+      <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
+    </div>
+  </div>
+  <div class="actions">
+    <%= f.submit 'Search', class: "btn btn-default" %>
+  </div>
+<% end %>
+<br />
 
-<%= paginate_target_images(@message, @words) %>
+<div class="wrapper-popular-tags">
+  <%= render partial: 'users/popular_tags', locals: { people: @people } %>
+</div>
+
+<div class="arrow">></div>
+
+<!-- Render followed tags from the partial -->
+<div class="wrapper-followed-tags">
+  <%= render partial: 'users/followed_tags', locals: { target_words: @target_words } %>
+</div>
+
+<div style="clear: both;">
+  <br />
+  <br />
+  <br />
+</div>

@@ -1,6 +1,12 @@
 require "#{Rails.root}/spec/support/consts"
 
 FactoryGirl.define do
+  # validationを通るだけのimage
+  factory :image_min, class: Image do
+    sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
+  end
+
+  # The main factory. it generates Image objects with various attributes.
   factory :image, class: Image do
     title 'test'
     caption 'test'
@@ -13,6 +19,16 @@ FactoryGirl.define do
     posted_at DateTime.now
     is_illust true
 
+    # sequenceされていないタグのみ必要な場合
+    factory :image_with_specific_tags do
+      after(:create) do |image|
+        image.tags << create(:tag)
+        image.tags << create(:tag_en)
+        image.tags << create(:tag_title)
+      end
+    end
+
+    # sequenceされたタグがさらに必要な場合
     factory :image_with_tags do
       ignore do
         tags_count 5
@@ -26,9 +42,10 @@ FactoryGirl.define do
     to_create do |instance|
       instance.save validate: false
     end
+    #association :targetable, factory: :target_word, strategy: :build
   end
 
-  factory :image_for_delivered_image, class: Image do
+  factory :image_dif_time, class: Image do
     title 'test'
     caption 'test'
     sequence(:src_url) { |n| "test#{n}@example.com" }
@@ -37,13 +54,15 @@ FactoryGirl.define do
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
     views 10000
-    posted_at DateTime.now
+    posted_at DateTime.now - 2.day
+    #created_at DateTime.now - 1.day
     is_illust true
 
     to_create do |instance|
       instance.save validate: false
     end
   end
+
 
   factory :image_tag_only, class: Image do
     title 'test'
@@ -55,7 +74,8 @@ FactoryGirl.define do
         tags_count 5
       end
       after(:create) do |image, evaluator|
-        create_list(:tags, evaluator.tags_count, images: [image])
+        #create_list(:tags, evaluator.tags_count, images: [image])
+        create_list(:images_tag, evaluator.tags_count, tag: create(:tags), image: image)
       end
     end
     to_create do |instance|
@@ -78,13 +98,6 @@ FactoryGirl.define do
     to_create do |instance|
       instance.save validate: false
     end
-  end
-  factory :image_url, class: Image do
-    title 'test'
-    src_url 'http://lohas.nicoseiga.jp/thumb/3804029i'
-  end
-  factory :image_min, class: Image do
-    src_url 'http://lohas.nicoseiga.jp/thumb/3804029i'
   end
 
   factory :image_old, class: Image do
@@ -111,11 +124,7 @@ FactoryGirl.define do
     end
   end
 
-  factory :image_tag do
-    image_id
-    tag_id
-  end
-
+  # Scrape::Nico.get_stats用
   factory :image_nicoseiga, class: Image do
     src_url 'http://lohas.nicoseiga.jp/thumb/3932299i'
     page_url 'http://seiga.nicovideo.jp/seiga/im3932299'
@@ -124,9 +133,9 @@ FactoryGirl.define do
     end
   end
 
-  # Image with no tags
+  # Image with related title and caption
   factory :image_madoka, class: Image do
-    title 'Madoka Kaname'
+    title 'Madoka Kaname(鹿目まどか)'
     caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
     src_url 'http://i.4cdn.org/c/1399620027799.jpg'
     page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'

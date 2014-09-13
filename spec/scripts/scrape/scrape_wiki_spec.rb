@@ -5,31 +5,27 @@ require "#{Rails.root}/script/scrape/scrape_wiki"
 include Scrape::Wiki
 
 describe "Scrape" do
+  let(:years) { 1 }
+
   before do
     IO.any_instance.stub(:puts)
   end
 
-  describe "point test" do
-    it "point test" do
-      hash = {"toho" => {ja:'http://ja.wikipedia.org/wiki/STEINS;GATE%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9',
-        en:''}}
-      name = Scrape::Wiki::Character.get_anime_character_name(hash)
-      #puts("name:"+name.to_s)
-    end
-  end
-
   describe "scrape function" do
     it "calls proper functions" do
-      years = 5
       Scrape::Wiki.stub(:get_anime_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_name).and_return nil
+      Scrape::Wiki.stub(:scrape_wiki_for_game_characters).and_return nil
+      #Scrape::Wiki::GameCharacter.stub(:get_game_character_name).and_return nil
       Scrape::Wiki.stub(:save_to_database).and_return nil
 
       expect(Scrape::Wiki).to receive(:get_anime_page).exactly(years).times
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_page).exactly(years).times
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(years).times
+      #expect(Scrape::Wiki::GameCharacter).to receive(:get_game_character_name).exactly(1).times
       expect(Scrape::Wiki).to receive(:save_to_database).exactly(years).times
+      expect(Scrape::Wiki).to receive(:scrape_wiki_for_game_characters).exactly(1).times
 
       Scrape::Wiki.scrape
     end
@@ -38,13 +34,20 @@ describe "Scrape" do
   describe "get_anime_page function" do
     it "returns a hash" do
       Scrape::Wiki.stub(:get_english_anime_page).and_return ''
+      # アニメタイトル数を減らした、remoteと同様の構造を持ったhtmlファイルを使用する：
+      doc = Nokogiri::HTML(open("#{Rails.root}/spec/fixtures/2011_animes.html"))
+      Nokogiri::HTML::Document.stub(:parse)
+      Nokogiri::HTML::Document.should_receive(:parse).and_return(doc)
 
-      #url = 'http://ja.wikipedia.org/wiki/Category:2013%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
-      url = 'http://ja.wikipedia.org/wiki/Category:2011%E5%B9%B4%E3%81%AE%E3%83%86%E3%83%AC%E3%83%93%E3%82%A2%E3%83%8B%E3%83%A1'
-      puts result = Scrape::Wiki.get_anime_page(url, false)
-      #result = Scrape::Wiki.get_anime_page(url, true)
+      url = 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
+      puts result = Scrape::Wiki.get_anime_page(url, true)
 
       expect(result).to be_a(Hash)
+    end
+
+    it "returns valid hash" do
+      url = 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
+      puts result = Scrape::Wiki.get_anime_page(url, true)
     end
   end
 
@@ -86,31 +89,28 @@ describe "Scrape" do
   end
 
   describe "save_to_database function" do
-    let(:hash) {{
-      Prisma_Illya:[
-          { name: 'イリヤスフィール・フォン・アインツベルン',
-            query: 'イリヤスフィール',
-            _alias: 'イリヤ',
-            en: 'Illyasviel von Einzbern'},
-          { name: '美遊・エーデルフェルト',
-            query: '美遊',
-            _alias: 'ミユ',
-            en: 'Miyu Edelfelt'},
-        ],
-      Madoka: [
-        { name: '鹿目 まどか', query: '鹿目まどか', _alias: 'かなめ まどか', en: 'Madoka Kaname' },
-        {:name=>"美樹 さやか", :query=>"美樹さやか", :_alias=>"みき さやか", :en=>"Sayaka Miki"}
-      ]
-    }}
+    let(:hash) {{"Love Live!"=>{:title_en=>"Love Live!", :characters=>[{:name=>"高坂穂乃果", :query=>"高坂穂乃果", :en=>"Honoka Kousaka"}, {:name=>"園田海未", :query=>"園田海未", :en=>"Umi Sonoda"}, {:name=>"南ことり", :query=>"南ことり", :en=>"Kotori Minami"}, {:name=>"矢澤にこ", :query=>"矢澤にこ", :en=>"Nico Yazawa"}, {:name=>"絢瀬絵里", :query=>"絢瀬絵里", :en=>"Eli Ayase"}, {:name=>"東條希", :query=>"東條希", :en=>"Nozomi Tojo"}, {:name=>"西木野真姫", :query=>"西木野真姫", :en=>"Maki Nishikino"}, {:name=>"小泉花陽", :query=>"小泉花陽", :en=>"Hanayo Koizumi"}, {:name=>"星空凛", :query=>"星空凛", :en=>"Rin Hoshizora"}]}, "Love Live!2"=>{:title_en=>"Love Live!2", :characters=>[{:name=>"高坂穂乃果", :query=>"高坂穂乃果", :en=>"Honoka Kousaka"}, {:name=>"園田海未", :query=>"園田海未", :en=>"Umi Sonoda"}, {:name=>"南ことり", :query=>"南ことり", :en=>"Kotori Minami"}, {:name=>"矢澤にこ", :query=>"矢澤にこ", :en=>"Nico Yazawa"}, {:name=>"絢瀬絵里", :query=>"絢瀬絵里", :en=>"Eli Ayase"}, {:name=>"東條希", :query=>"東條希", :en=>"Nozomi Tojo"}, {:name=>"西木野真姫", :query=>"西木野真姫", :en=>"Maki Nishikino"}, {:name=>"小泉花陽", :query=>"小泉花陽", :en=>"Hanayo Koizumi"}, {:name=>"星空凛", :query=>"星空凛", :en=>"Rin Hoshizora"}]}}}
 
     it "save valid values to database" do
       Scrape::Wiki.save_to_database(hash)
-
-      expect(Person.count).to eq(4)
-      expect(Person.first.keywords.count).to eq(2)
+      puts "hogehoge   :   #{Person.first.keywords.inspect}"
+      expect(Person.count).to eq(9)
+      expect(Person.first.keywords.count).to eq(1)
       expect(Person.first.titles.count).to eq(1)
       expect(Person.last.titles.count).to eq(1)
-      expect(Title.count).to eq(4)
+      expect(Title.count).to eq(1)              # 英名・和名共に１つのTitleレコードに格納されるため
+    end
+  end
+
+  describe "get_keyword method" do
+    it "returns a valid keyword object" do
+
+    end
+  end
+
+  describe "get_title method" do
+    it "returns a valid title object" do
+
     end
   end
 end

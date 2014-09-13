@@ -1,31 +1,28 @@
-<%# javascript_include_tag 'core' %>
 <%= render 'shared/modal' %>
 
-<%# navbar fixed: :top, role: "navigation" do navbar-fixed-top %>
 <nav class="navbar navbar-default" role="navigation">
   <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: home_users_path, class: 'logo' %>
   <%= navbar_collapse do %>
     <%= navbar_group class: 'User', id: 'menu' do %>
       <%= navbar_dropdown 'User' do %>
         <li>
-          <%= link_to 'プロフィール画像を変更する', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window', class: 'dropdown-user' } %>
+          <%= link_to 'Change avatar image', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window', class: 'dropdown-user' } %>
         </li>
         <%= navbar_dropdown_divider %>
-        <%= navbar_item 'ログアウト', destroy_user_session_path %>
+        <%= navbar_item 'Log out', destroy_user_session_path %>
       <% end %>
 
       <%= navbar_item 'Home', home_users_path %>
       <%= navbar_item 'Boards', show_favored_images_users_path %>
-      <%= navbar_dropdown '好みの設定' do %>
-        <%= navbar_item '登録ワード一覧', show_target_words_users_path %>
-        <%= navbar_item '登録イラスト一覧', show_target_images_users_path %>
-      <% end %>
+      <%= navbar_item 'Preferences', show_target_words_users_path %>
       <%= navbar_dropdown 'DEBUG' do %>
-        <%= navbar_item '抽出画像一覧', images_path %>
-        <%= navbar_item 'うpされた嗜好画像一覧', target_images_path %>
-        <%= navbar_item 'イラスト判定のデバッグを行う', debug_illust_detection_users_path %>
-        <%= navbar_item 'トップページ', '/' %>
-        <%= navbar_item 'Resque', '/resque_web/overview#show' %>
+        <%= navbar_item 'View all images', images_path %>
+        <%= navbar_item 'Debug illust detection', debug_illust_detection_users_path %>
+        <%= navbar_item 'Debug crawling', debug_crawling_users_path %>
+        <%= navbar_item 'Tutorial', '/tutorial' %>
+        <%= navbar_item 'Top page', '/' %>
+        <%= navbar_item 'Resque', '/resque_web/overview' %>
+        <%= navbar_item 'Toggle miniprofiler', toggle_miniprofiler_users_path %>
       <% end %>
     <% end %>
 

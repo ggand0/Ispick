@@ -8,38 +8,38 @@ include ApplicationHelper
 describe "Deliver" do
   before do
     IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return nil  # resqueのjobを実際に実行しないように
+    Resque.stub(:enqueue).and_return nil    # resqueのjobを実際に実行しないように
+    @logger = Logger.new('log/deliver.log')
   end
-
+=begin
   describe "deliver function" do
     it "calls proper functions" do
       user = FactoryGirl.create(:user_with_target_words)
       Deliver.stub(:deliver_from_word).and_return nil
-      Deliver.stub(:delete_excessed_records).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(user.target_words.count).times
-      expect(Deliver).to receive(:delete_excessed_records).exactly(1).times
 
       Deliver.deliver(user.id)
     end
   end
+
   describe "deliver_keyword function" do
     it "calls proper functions" do
-      user = FactoryGirl.create(:user_with_target_words)
+      user = FactoryGirl.create(:user_with_target_words, words_count: 5)
       target_word = user.target_words.first
       Deliver::Words.stub(:deliver_from_word).and_return nil
       expect(Deliver::Words).to receive(:deliver_from_word).exactly(1).times
 
-      Deliver.deliver_keyword(user.id, target_word.id)
+      Deliver.deliver_keyword(user.id, target_word.id, @logger)
     end
   end
+
   describe "deliver_from_word function" do
     it "deliver properly" do
       FactoryGirl.create(:image)
       FactoryGirl.create(:user_with_target_words, words_count: 5)
-      Deliver.should_receive(:limit_images).exactly(1).times
       Deliver.should_receive(:deliver_images).exactly(1).times
 
-      Deliver::Words.deliver_from_word(1, User.first.target_words.first, true)
+      Deliver::Words.deliver_from_word(1, User.first.target_words.first, @logger)
     end
   end
 
@@ -77,29 +77,17 @@ describe "Deliver" do
     end
   end
 
-  describe "limit_images function" do
-    it "limits images when its count excess max num" do
-      stub_const('Deliver::MAX_DELIVER_NUM', 1)
-      images = FactoryGirl.create_list(:image, 3)
-      user = FactoryGirl.create(:user_with_delivered_images, images_count: 1)
-
-      images = Deliver.limit_images(user, images)
-      expect(images.count).to eq(1)
-    end
-  end
-
   describe "deliver_images function" do
     it "adds images to user.delivered_images" do
       user = FactoryGirl.create(:twitter_user)
       target_word = FactoryGirl.create(:target_word)  # 仮にtarget_wordとする
       images = [ FactoryGirl.create(:image_file) ]
 
-      Deliver.deliver_images(user, images, target_word, true)
+      Deliver.deliver_images(user, images, target_word)
       expect(user.delivered_images.count).to eq(images.count)
     end
 
     # DLし終えたものから配信する仕様に改良するまで凍結
-=begin
     it "ignores images without paperclip attachment" do
       user = FactoryGirl.create(:twitter_user)
       target_word = FactoryGirl.create(:target_word)
@@ -109,7 +97,6 @@ describe "Deliver" do
       Deliver.deliver_images(user, images, target_word, true)
       expect(user.delivered_images.count).to eq(0)
     end
-=end
 
     # 配信済みの場合target.delivered_imagesに追加されている事
     it "adds to target.delivered_images when it has already delivered" do
@@ -117,7 +104,7 @@ describe "Deliver" do
       target_word = TargetWord.first
       images = [ FactoryGirl.create(:image_for_delivered_image) ]
 
-      images = Deliver.deliver_images(user, images, target_word, true)
+      images = Deliver.deliver_images(user, images, target_word)
       expect(target_word.delivered_images.count).to eq(1)
     end
   end
@@ -149,7 +136,7 @@ describe "Deliver" do
       user = FactoryGirl.create(:user_with_delivered_images_file, images_count: 5)
       user.delivered_images << DeliveredImage.none  # 空のrelationを追加
 
-      Deliver.update()
+      Deliver.update
     end
     # 当日配信された画像のみ更新する
     it "updates delivered_image which is delivered in the day" do
@@ -160,7 +147,7 @@ describe "Deliver" do
 
       Object.const_get(delivered_image.image.module_name).should_receive(:get_stats).exactly(1).times
 
-      Deliver.update()
+      Deliver.update
     end
     it "ignore delivered_image which is delivered in the other days" do
       user = FactoryGirl.create(:twitter_user)
@@ -172,7 +159,8 @@ describe "Deliver" do
       Scrape::Tumblr.should_not_receive(:get_stats)
       Scrape::Nico.should_not_receive(:get_stats)
 
-      Deliver.update()
+      Deliver.update
     end
   end
+=end
 end

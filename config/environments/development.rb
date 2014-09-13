@@ -1,7 +1,12 @@
-Ispic::Application.configure do
+Ispick::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Better errors gem
   BetterErrors::Middleware.allow_ip! ENV['TRUSTED_IP'] if ENV['TRUSTED_IP']
+
+  # logger formatter config
+  config.logger = Logger.new(config.paths["log"].first)
+  config.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development

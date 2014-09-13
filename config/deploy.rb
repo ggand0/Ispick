@@ -5,7 +5,7 @@ lock '3.1.0'
 
 set :application, 'Ispick'
 set :repo_url, 'git@github.com:pentiumx/Ispic.git'
-set :branch, 'release-0.2'
+set :branch, 'development'
 set :rails_env, 'production'
 
 # Default branch is :master
@@ -15,15 +15,14 @@ set :rails_env, 'production'
 set :deploy_to, '/var/www/Ispick'
 set :use_sudo, true
 
-set :rbenv_type, :user # or :system, depends on your rbenv setup
+set :rbenv_type, :user                               # or :system, depends on your rbenv setup
 set :rbenv_ruby, '2.0.0-p353'
-#set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rbenv_ruby)} #{fetch(:rbenv_path)}/bin/rbenv exec"
 set :rbenv_map_bins, %w{rake gem bundle ruby rails}
-set :rbenv_roles, :all # default value
+set :rbenv_roles, :all                               # default value
 
 #set :bundle_bins, fetch(:bundle_bins, []).push %w(my_new_binary)
-set :bundle_path, -> { shared_path.join('bundle') }      # this is default
-set :bundle_gemfile, "Gemfile"
+set :bundle_path, -> { shared_path.join('bundle') }  # this is default
+set :bundle_gemfile, 'Gemfile'
 
 # Default value for :scm is :git
 set :scm, :git
@@ -45,7 +44,6 @@ set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
-#set :default_env, { path: "/opt/ruby/bin:$PATH" }
 SSHKit.config.command_map[:rake] = "bundle exec rake"
 
 # Default value for keep_releases is 5
@@ -73,30 +71,41 @@ namespace :deploy do
       #execute "/etc/init.d/puma stop"
     end
   end
+  desc 'Debug the env variables'
+  task :debug do
+    on roles(:all) do
+      #execute "echo #{fetch(:default_env)}"
+      #execute "cat ~/.bash_profile"
 
+      #execute "export LD_LIBRARY_PATH='/usr/local/lib'"
+      #execute "echo $LD_LIBRARY_PATH"
+      #execute "printenv"
 
-  # 上記linked_filesで使用するファイルをアップロードするタスク
-  # deployが行われる前に実行する必要がある。
+      test 'crontab -r'
+    end
+  end
+
+  task :stop_scraping do
+    on roles(:app) do |host|
+      test 'pkill -f scrape'
+    end
+  end
+
+  # 上記linked_filesで使用するファイルをアップロードするタスク、deployが行われる前に実行する必要がある。
+  # 既に同名ファイルがremoteにある場合は上書きされる。
   desc 'upload .yml files manually'
-  task :upload do
+  task :upload_conf do
     on roles(:app) do |host|
       upload!('config/config.yml',"#{shared_path}/config/config.yml")
-      upload!('config/database.yml', "#{shared_path}/config/database.yml")
     end
   end
-  # 自動化したい時用(多分無い)
-  desc 'upload .yml files automatically'
-  task :auto_upload do
-    on roles(:app) do |host|
-      if test "[ ! -d #{shared_path}/config ]"
-        execute "mkdir -p #{shared_path}/config"
-      end
-      upload!('config/database.yml', "#{shared_path}/config/database.yml")
-      upload!('config/config.yml', "#{shared_path}/config/config.yml")
-    end
-  end
-  #before :starting, 'deploy:auto_upload'
 
+  # config.ymlだけuploadさせたい事が多いので分けた
+  task :upload_db do
+    on roles(:app) do |host|
+      upload!('config/database.yml', "#{shared_path}/config/database.yml")
+    end
+  end
 
   after :publishing, :restart
   after :restart, :clear_cache do
@@ -111,17 +120,24 @@ namespace :deploy do
 end
 
 #========================
-#CUSTOM
+#        CUSTOM
 #========================
 namespace :whenever do
   desc "update crontab tasks"
   task :update do
     on roles(:all) do
-      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --clear-crontab"
+      # Remove all cron tasks
+      test 'crontab -r'
+
+      # Kill all scraping processes, picking them up by name
+      #test 'pkill -f scrape'
+
+      # Update whenever and crontab tasks
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever"
       execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ~/.rbenv/bin/rbenv exec bundle exec whenever --update-crontab"
     end
   end
+
   desc "clear crontab tasks"
   task :clear do
     on roles(:all) do
@@ -129,6 +145,7 @@ namespace :whenever do
     end
   end
 end
+
 namespace :resque do
   desc "restart resque daemons"
   task :restart do
@@ -149,6 +166,7 @@ namespace :resque do
     end
   end
 end
+
 namespace :seed do
   desc "seeds database"
   task :people do
@@ -157,6 +175,7 @@ namespace :seed do
     end
   end
 end
+
 namespace :check do
   desc "check paths"
   task :path do
@@ -170,14 +189,9 @@ end
 
 
 after 'deploy:started', 'check:path'
-# デプロイ直後に開始
-#after 'deploy:finished', 'seed:people'
-# stop
 after 'deploy:stop', 'resque:stop'
 after 'deploy:stop', 'whenever:clear'
-# start
 after 'deploy:start', 'resque:start'
 after 'deploy:start', 'whenever:update'
-# restart
 after 'deploy:restart', 'resque:restart'
 after 'deploy:restart', 'whenever:update'

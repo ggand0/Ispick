@@ -21,8 +21,9 @@ SearchImagesDaemon.spawn!({
   processes: 1,
   working_dir: Rails.root,
   pid_file: File.join(Rails.root, 'tmp', 'pids', 'search_images.pid'),
-  log_file: File.join(Rails.root, 'log', 'search_images.log'),
-  sync_log: true,
+  log: false,
+  #log_file: File.join(Rails.root, 'log', 'search_images.log'),
+  #sync_log: true,
   singleton: true,
   signal: 'QUIT'
 })

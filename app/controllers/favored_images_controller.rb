@@ -6,6 +6,7 @@ class FavoredImagesController < ApplicationController
   def show
     respond_to do |format|
       format.html
+      # Render views/favored_images/show.js.erb, then _favored_image.html.erb
       format.js { render partial: 'show' }
     end
   end
@@ -15,7 +16,7 @@ class FavoredImagesController < ApplicationController
   def destroy
     @favored_image.destroy
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path }
+      format.html { redirect_to show_favored_images_users_path(board: params[:board]) }
       format.json { head :no_content }
     end
   end

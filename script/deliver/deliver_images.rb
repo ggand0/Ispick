@@ -1,4 +1,6 @@
 
+# Delivers images based on uploaded images.
+# Currently not in use.
 module Deliver::Images
   THRESHOLD = 70
 
@@ -20,7 +22,7 @@ module Deliver::Images
     puts "Got images: #{images.count.to_s}"
 
     #images = images.map{ |image| image[:image] }             # Hashのarrayではなく単純なImageのarrayにする
-    images = Deliver.limit_images(user, images)               # 配信画像を制限する
+    #images = Deliver.limit_images(user, images)               # 配信画像を制限する
     Deliver.deliver_images(user, images, target_image, true)  # User.delivered_imagesへ追加
     target_image.last_delivered_at = DateTime.now             # 最終配信日時を記録
   end

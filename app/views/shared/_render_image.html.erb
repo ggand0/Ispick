@@ -1,3 +1,7 @@
 <div align="center">
-  <%= image_tag image.data.url(:medium) %>
+  <% if image.page_url %>
+    <%= link_to image_tag(image.data.url), image.page_url.html_safe %>
+  <% else %>
+    <%= image_tag image.data.url %>
+  <% end %>
 </div>

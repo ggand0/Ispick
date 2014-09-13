@@ -13,11 +13,12 @@
 
   <div class="row">
     <div class="col-lg-2">
-      <%= f.text_field :word %>
+      <%= f.text_field :name %>
+      <%= hidden_field_tag :debug, true %>
     </div>
   </div>
 
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit(debug: true) %>
   </div>
 <% end %>

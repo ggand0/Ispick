@@ -1,5 +1,5 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide, :show_debug]
 
   # GET /images
   # GET /images.json
@@ -11,8 +11,15 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     respond_to do |format|
-      format.html
+      format.html {}
       format.js { render partial: 'show' }
+    end
+  end
+
+  def show_debug
+    respond_to do |format|
+      format.js { render partial: 'layouts/show_image_debug' }
+      #format.js { render partial: 'show' }
     end
   end
 
@@ -24,6 +31,52 @@ class ImagesController < ApplicationController
       format.html { redirect_to images_url }
       format.json { head :no_content }
     end
+  end
+
+
+  # PUT favor
+  # imageをお気に入り画像として追加する。
+  def favor
+    board_name = params[:board]
+
+    # FavoredImageオブジェクト作成
+    # src_urlが重複していた場合はvalidationでfalseが返る
+    # Board名のリンクをクリックして呼ばれるので必ず対応するboardがあると仮定
+    board = current_user.image_boards.where(name: board_name).first
+    favored_image = board.favored_images.build(
+      title: @image.title,
+      caption: @image.caption,
+      data: @image.data,
+      src_url: @image.src_url,
+      page_url: @image.page_url,
+      site_name: @image.site_name,
+      views: @image.views,
+      favorites: @image.favorites,
+      posted_at: @image.posted_at,
+    )
+
+    # save出来たらimageへの参照も追加
+    if favored_image.save
+      @image.favored_images << favored_image
+    end
+
+    # format.jsの場合はpopoverをリロードするために'boards' templateを呼ぶ
+    @board = ImageBoard.new
+    @id = params[:html_id]
+    respond_to do |format|
+      format.html { redirect_to show_favored_images_users_path }
+      format.js { render partial: 'image_boards/boards' }
+    end
+  end
+
+  # PUT hide
+  def hide
+    if not @image.avoided
+      @image.update_attributes!(avoided: true)
+    else
+      @image.update_attributes!(avoided: false)
+    end
+    redirect_to :back
   end
 
   private

@@ -1,0 +1,12 @@
+<h3>Popular tags</h3>
+<div class="popular-tags">
+  <% if people.nil? %>
+    <%= get_tags_with_images(20).each do |target_word| %>
+      <%= bs_button_to target_word.name, { controller: 'target_words', action: 'create', id: target_word.person.id, target_word: { name: target_word.name }}, method: :post, remote: true, class: 'btn btn-default' unless target_word.person.nil? %>
+    <% end %>
+  <% else %>
+    <% people.each do |person| %>
+      <%= bs_button_to person.name_display, { controller: 'target_words', action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post, remote: true, class: 'btn btn-default' %>
+    <% end %>
+  <% end %>
+</div>

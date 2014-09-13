@@ -13,7 +13,7 @@
   <tbody>
     <% @target_words.each do |target_word| %>
       <tr>
-        <td><%= target_word.word %></td>
+        <td><%= target_word.name %></td>
         <td><%= link_to 'Show', target_word %></td>
         <td><%= link_to 'Prefer', prefer_target_word_path(target_word) %></td>
         <td><%= link_to 'Edit', edit_target_word_path(target_word) %></td>

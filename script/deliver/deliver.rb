@@ -5,6 +5,8 @@ require "#{Rails.root}/app/services/target_images_service"
 require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
+# Delivers extracted images to users.
+# ユーザへの画像配信処理を行う
 module Deliver
   require "#{Rails.root}/script/deliver/deliver_images"
   require "#{Rails.root}/script/deliver/deliver_words"
@@ -15,41 +17,38 @@ module Deliver
   MISSING_URL = '/data/original/missing.png'    # attachmentが無いレコードに割り当てられる画像url（画像ファイルの有無判定に使用）
 
 
+  # Main function. Delivers all matched images to registered images or text tags.
   # 全ての登録タグ/登録画像に対してImagesテーブル内のマッチした画像を配信する
   # @param [Integer] 配信対象のUserオブジェクト
   def self.deliver(user_id)
     user = User.find(user_id)
+    logger = Logger.new('log/deliver.log')
 
     user.target_words.each do |t|
-      Deliver::Words.deliver_from_word(user, t, true) if t.enabled
+      Deliver::Words.deliver_from_word(user, t, logger)
     end
     # 登録画像に基づく配信処理：14/06/14現在停止中
     #user.target_images.each do |t|
     #  Deliver::Images.deliver_from_image(user, t) if t.enabled
     #end
-
-    # １ユーザーの最大容量を超えていたら古い順に削除
-    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
   end
 
+
+  #
+  # 特定のTargetWordを持つ画像を特定のユーザに配信する
+  # 呼ばれた段階でDBに存在している画像のみ配信
   # @param [Integer] 配信するUserレコードのID
-  # @param [Integer] 配信するTagレコードのID
-  def self.deliver_keyword(user_id, target_word_id)
+  # @param [Integer] 配信するTargetWordレコードのID
+  def self.deliver_keyword(user_id, target_word_id, logger)
     user = User.find(user_id)
     target_word = TargetWord.find(target_word_id)
-    puts "Delivering to target_word=#{target_word_id}"
+    logger.info "Delivering to target_word=#{target_word_id} start=#{DateTime.now}"
 
-    Deliver::Words.deliver_from_word(user, target_word, false)
-
-    # １ユーザーの最大容量を超えていたら古い順に削除
-    Deliver.delete_excessed_records(user.delivered_images, MAX_DELIVER_SIZE)
-    puts "Remain delivered_images: #{user.delivered_images.count.to_s}"
+    Deliver::Words.deliver_from_word(user, target_word, logger)
   end
 
 
-
-  # @param [Image]
+  # @param image [Image]
   # @return [DeliveredImage]
   def self.create_delivered_image(image)
     delivered_image = DeliveredImage.new
@@ -57,19 +56,34 @@ module Deliver
     delivered_image
   end
 
+  # １つのImageオブジェクトをuserに配信する
+  # @param user_id [Integer]
+  # @param target [TargetWord/TargetImage]
+  # @param image_id [Integer]
+  def self.deliver_image(user_id, target, image_id)
+    image = Image.find(image_id)
+    delivered_image = DeliveredImage.new
+    user = User.find(user_id)
+
+    image.delivered_images << delivered_image
+    target.delivered_images << delivered_image
+    user.delivered_images << delivered_image
+  end
+
+  # Create delivereed_images instances from iamges relation object,
+  # and add them to user.delivered_images 1 by 1.
   # 各ImageからDelievredImageを生成し、user.delivered_imagesへ追加
-  # @param [User] 配信対象のUserオブジェクト
-  # @param [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
-  # @param [TargetWord/TargetImage]
-  # @param [Boolean] 定時配信かどうか
-  def self.deliver_images(user, images, target, is_periodic)
+  # @param user [User] 配信対象のUserオブジェクト
+  # @param images [ActiveRecord::Relation::ActiveRecord_Relation_Image] Imageのリレーション
+  # @param target [TargetWord/TargetImage]
+  def self.deliver_images(user, images, target)
     tmp_images = []
 
     images.each_with_index do |image, count|
-      # 定期配信する際、dataが何らかの原因で存在しないImageはskip
-      next if is_periodic and image.data.url == MISSING_URL
+      # dataが何らかの原因で存在しないImageはskip
+      next if image.data.url == MISSING_URL
 
-      # imagesでマッチしているが既に配信済みの場合は、
+      # 先の行程でtarget_word/target_imageにマッチはしたが既に配信済みの画像の場合は、
       # target.delivered_imagesにだけ追加
       delivered = false
       user.delivered_images.each do |d|
@@ -77,6 +91,7 @@ module Deliver
           target.delivered_images << d
           target.delivered_images.uniq!
           delivered = true
+          #puts "[DEBUG] matched but already delivered: #{image.src_url}"
           break
         end
       end
@@ -88,43 +103,19 @@ module Deliver
       # DB保存後にuser.delivered_imagesに追加して配信する
       if image.delivered_images << delivered_image
         target.delivered_images << delivered_image
-        #user.delivered_images << delivered_image
-        #user.save
         tmp_images << delivered_image
       end
 
-      puts "- Creating delivered_images: #{count.to_s} /
-        #{images.count.to_s}" if count % 10 == 0
+      puts "- Creating delivered_images: #{count.to_s} / #{images.count.to_s}" if count % 10 == 0
     end
 
 
-    # 投稿日時順（posted_at）にソートしてから配信する
+    # user.delivered_imagesへ配信する
     tmp_images.each do |image|
       user.delivered_images << image
       user.save
     end
   end
-
-  # 配信画像数を指定枚数に制限する、DL済み前提
-  # @param [User] 配信対象のUserオブジェクト
-  # @param [ActiveRecord_Relation_Image] タグとマッチしたImageのrelation
-  # @return [ActiveRecord_Relation_Image] 制限後のrelation
-  def self.limit_images(user, images)
-    # 最大配信数に絞る（推薦度の高い順に残す）
-    if images.count > MAX_DELIVER_NUM
-      puts 'Removing excessed images...'
-      images = images.take MAX_DELIVER_NUM
-    end
-
-    # posted_atでソートする
-    # Homeではcreated_at順にソートするが、
-    # １回配信分の中ではposted_at順になる
-    images.sort_by! { |image| image.posted_at }
-
-    puts "Limited: #{images.count.to_s} images"
-    images
-  end
-
 
   # max_size以下になるまでdelivered_imagesのレコードを古い順に消す
   # @param [ActiveRecord::Relation] DeliveredImageを想定
@@ -152,7 +143,8 @@ module Deliver
   end
 
 
-  # 全userの配信画像の、元サイトでの統計情報を更新する
+
+  # [OLD]全userの配信画像の、元サイトでの統計情報を更新する
   def self.update
     today = Time.now.in_time_zone('Asia/Tokyo').to_date
 

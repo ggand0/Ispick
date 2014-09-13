@@ -11,31 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140602154729) do
-
-  create_table "delivered_images", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "image_id"
-    t.integer  "favored_image_id"
-    t.integer  "targetable_id"
-    t.string   "targetable_type"
-    t.boolean  "favored"
-    t.boolean  "avoided"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20140912171151) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
     t.text     "src_url"
     t.integer  "image_board_id"
+    t.integer  "image_id"
     t.string   "data_file_name"
     t.string   "data_content_type"
     t.integer  "data_file_size"
     t.datetime "data_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "views"
+    t.integer  "favorites"
+    t.datetime "posted_at"
   end
 
   create_table "features", force: true do |t|
@@ -75,22 +69,34 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.datetime "updated_at"
   end
 
-  create_table "images_tags", id: false, force: true do |t|
+  add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
+  add_index "images", ["src_url"], name: "index_images_on_src_url", length: {"src_url"=>255}, using: :btree
+
+  create_table "images_tags", force: true do |t|
     t.integer "image_id", null: false
     t.integer "tag_id",   null: false
   end
 
+  add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
+
+  create_table "images_target_words", force: true do |t|
+    t.integer "image_id",       null: false
+    t.integer "target_word_id", null: false
+  end
+
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
-    t.text     "word"
-    t.integer  "person_id"
+    t.text     "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "keywords", ["name"], name: "index_keywords_on_name", length: {"name"=>10}, using: :btree
+
   create_table "people", force: true do |t|
     t.string   "name"
     t.string   "name_display"
+    t.string   "name_roman"
     t.string   "name_english"
     t.string   "name_type"
     t.integer  "target_word_id"
@@ -98,10 +104,20 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.datetime "updated_at"
   end
 
-  create_table "people_titles", id: false, force: true do |t|
+  add_index "people", ["name", "name_english", "name_display"], name: "index_people_on_name_and_name_english_and_name_display", using: :btree
+  add_index "people", ["target_word_id"], name: "index_people_on_target_word_id", using: :btree
+
+  create_table "people_keywords", force: true do |t|
+    t.integer "keyword_id", null: false
+    t.integer "person_id",  null: false
+  end
+
+  create_table "people_titles", force: true do |t|
     t.integer "title_id",  null: false
     t.integer "person_id", null: false
   end
+
+  add_index "people_titles", ["person_id", "title_id"], name: "index_people_titles_on_person_id_and_title_id", using: :btree
 
   create_table "tags", force: true do |t|
     t.string   "name"
@@ -109,6 +125,8 @@ ActiveRecord::Schema.define(version: 20140602154729) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
 
   create_table "target_images", force: true do |t|
     t.string   "data_file_name"
@@ -123,19 +141,32 @@ ActiveRecord::Schema.define(version: 20140602154729) do
   end
 
   create_table "target_words", force: true do |t|
-    t.string   "word"
-    t.integer  "user_id"
+    t.string   "name"
     t.datetime "last_delivered_at"
-    t.boolean  "enabled"
+    t.datetime "newest_scraped_at"
+    t.datetime "oldest_scraped_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "crawl_count",       default: 0, null: false
+    t.integer  "images_count",      default: 0, null: false
+    t.integer  "users_count",       default: 0, null: false
+  end
+
+  create_table "target_words_users", force: true do |t|
+    t.integer "target_word_id", null: false
+    t.integer "user_id",        null: false
   end
 
   create_table "titles", force: true do |t|
     t.text     "name"
+    t.text     "name_roman"
+    t.text     "name_english"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "id_anidb"
   end
+
+  add_index "titles", ["name", "name_english"], name: "index_titles_on_name_and_name_english", length: {"name"=>10, "name_english"=>10}, using: :btree
 
   create_table "users", force: true do |t|
     t.string   "avatar_file_name"

@@ -1,74 +1,91 @@
 require 'spec_helper'
 require "#{Rails.root}/script/scrape/scrape"
-require "#{Rails.root}/script/scrape/scrape_twitter"
 
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)       # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return  # resqueにenqueueしないように
+    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
+    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
+
+    @client = Scrape::Twitter.new(nil, 10)
+    @twitter_client = Scrape::Twitter.get_client
   end
 
   describe "scrape function" do
-    it "calls scrape_with_keyword function when targetable is enabled" do
+    it "calls scrape_using_api function when targetable is enabled" do
       FactoryGirl.create(:person_madoka)
-      Scrape::Twitter.should_receive(:scrape_with_keyword)
+      @client.stub(:scrape_target_words).and_return nil
+      expect(@client).to receive(:scrape_target_words)
 
-      Scrape::Twitter.scrape()
-    end
-    it "does not call scrape_with_keyword function when targetable is NOT enabled" do
-      FactoryGirl.create(:target_word_not_enabled)
-      Scrape::Twitter.stub(:scrape_with_keyword).and_return
-      Scrape::Twitter.should_not_receive(:scrape_with_keyword)
-
-      Scrape::Twitter.scrape()
-    end
-    it "skips keywords with nil or empty value" do
-      nil_word = TargetWord.new
-      nil_word.save!
-      Scrape::Twitter.stub(:scrape_with_keyword).and_return
-      Scrape::Twitter.should_not_receive(:scrape_with_keyword)
-
-      Scrape::Twitter.scrape()
-    end
-  end
-  describe "scrape_keyword function" do
-    it "calls scrape_with_keyword function" do
-      Scrape::Twitter.should_receive(:scrape_with_keyword).with('madoka', 200, true)
-      Scrape::Twitter.scrape_keyword('madoka')
+      @client.scrape(60)
     end
   end
 
-  describe "scrape_with_keyword function" do
+  describe "scrape_target_word function" do
+    let(:function_response) { { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 } }
+
+    it "calls scrape_using_api function" do
+      target_word = FactoryGirl.create(:word_with_person)
+      @client.should_receive(:scrape_using_api)
+      @client.stub(:scrape_using_api).and_return(function_response)
+
+      @client.scrape_target_word(1, target_word)
+    end
+  end
+
+  describe "scrape_using_api function" do
+    before do
+      @target_word = FactoryGirl.create(:word_with_person)
+    end
+
     it "calls proper methods" do
-      Scrape::Twitter.stub(:get_contents).and_return()
-      Scrape::Twitter.should_receive(:get_contents).exactly(1).times
+      Scrape::Twitter.stub(:get_contents).and_return nil
+      Scrape::Twitter.any_instance.should_receive(:get_contents).exactly(1).times
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+      @client.scrape_using_api(@target_word)
     end
+
     it "rescues exceptions" do
       Scrape::Twitter.stub(:get_contents).and_raise Twitter::Error::ClientError
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+      @client.scrape_using_api(@target_word)
     end
-    it "rescues TooManyReq exception" do
-      Twitter::RateLimit.stub(:reset_in).and_return(300)
-      Scrape::Twitter.stub(:get_contents).once.and_raise Twitter::Error::TooManyRequests
-      Scrape::Twitter.should_receive(:get_contents)
 
-      Scrape::Twitter.scrape_with_keyword('madoka', 5)
+    it "rescues TooManyRequest exception" do
+      Twitter::RateLimit.any_instance.stub(:reset_in).and_return(300)
+      #Scrape::Twitter.any_instance.stub(:get_contents) {
+      @client.stub(:get_contents) {
+        #Scrape::Twitter.unstub(:get_contents); raise Twitter::Error::TooManyRequests
+        @client.unstub(:get_contents); raise Twitter::Error::TooManyRequests
+      }
+
+      #Scrape::Twitter.any_instance.should_receive(:get_contents).exactly(2).times
+      @client.should_receive(:get_contents).exactly(2).times
+      Scrape::Twitter.any_instance.should_receive(:sleep).with(300)
+
+      @client.scrape_using_api(@target_word)
     end
   end
 
   describe "get_contents function" do
-    it "returns tweet array" do
-      client = Scrape::Twitter.get_client
+    it "returns scarping result hash" do
+      target_word = FactoryGirl.create(:word_with_person)
+      query = Scrape.get_query(target_word)
+      result = @twitter_client.search("#{query} -rt", locale: 'ja', result_type: 'recent', include_entity: true)
+      Twitter::REST::Client.any_instance.stub(:search).and_return(result)
+      Twitter::REST::Client.any_instance.should_receive(:search)
 
-      #Scrape.should_receive(:save_image).exactly(5).times
+      result_hash = @client.get_contents(target_word)
+      expect(result_hash).to be_a(Hash)
+    end
 
-      #Twitter::REST::Client.any_instance.should_receive(:search).exactly(1).times
-      #Scrape::Twitter.should_receive(:get_data)
-      Scrape::Twitter.get_contents(client, '鹿目まどか', 200)
+    it "call save_image function with right arguments" do
+      # TODO: 画像tweetを含むTwitter API responseをTwitter::SearchResultsオブジェクトにパースし、
+      # Scrape.save_imageが画像ツイート数と同じ回数呼ばれている事をassertする
+    end
+
+    it "does something" do
+      # get_contentsをuser_id付きで呼ぶ
     end
   end
 
@@ -79,11 +96,15 @@ describe Scrape::Twitter do
       @tweet = Twitter::Tweet.new({id:1})
     end
     it "returns image_data array" do
-      # APIアクセスしないようにstubしている
+      # 仮のデータをstubを利用してreturnする
+      # FactoryGirlを使用して書き換えても良い
       Twitter::Tweet.any_instance.stub(:media?).and_return(true)
-      Twitter::Tweet.any_instance.stub(:text).and_return('大佐、会議室でよく使うハンドサイン発見しました☆パァ')
+      Twitter::Tweet.any_instance.stub(:text).and_return(
+        '大佐、会議室でよく使うハンドサイン発見しました☆パァ'
+      )
       Twitter::Tweet.any_instance.stub(:url).and_return(
-        'https://twitter.com/wycejezevix/status/454783931636670464')
+        'https://twitter.com/wycejezevix/status/454783931636670464'
+      )
       Twitter::Tweet.any_instance.stub(:retweet_count).and_return(0)
       Twitter::Tweet.any_instance.stub(:favorite_count).and_return(0)
       Twitter::Tweet.any_instance.stub(:created_at).and_return(DateTime.now)
@@ -93,7 +114,8 @@ describe Scrape::Twitter do
 
       expect(image_data).to be_an(Array)
       expect(image_data[0][:page_url]).to eql(
-        'https://twitter.com/wycejezevix/status/454783931636670464')
+        'https://twitter.com/wycejezevix/status/454783931636670464'
+      )
     end
   end
 
@@ -112,27 +134,11 @@ describe Scrape::Twitter do
     end
   end
 
-  describe "get_tags function" do
-    it "returns an array of tags" do
-      tags = Scrape::Twitter.get_tags('Madoka')
-      expect(tags).to be_an(Array)
-      expect(tags.first.name).to eql('Madoka')
-    end
-    it "uses existing tags if tags are duplicate" do
-      image = FactoryGirl.create(:image)
-      tag = FactoryGirl.create(:tag)
-      image.tags << tag
-
-      tags = Scrape::Twitter.get_tags('鹿目まどか')
-      expect(tags.first.images.first.id).to eql(tag.images.first.id)
-    end
-  end
-
   describe "get_stats function" do
     it "returns stats information from a page_url" do
       page_url = 'https://twitter.com/ogipote/status/419125060968804352'
       client = Scrape::Twitter.get_client
-      result = Scrape::Twitter.get_stats(client, page_url)
+      result = @client.get_stats(page_url)
       expect(result).to be_a(Hash)
       expect(result[:views]).to be_a(Integer)
       expect(result[:favorites]).to be_a(Integer)

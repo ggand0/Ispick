@@ -19,6 +19,7 @@ require 'rspec/autorun'
 require 'capybara'
 require 'capybara/rspec'
 
+# Initialize webmock gem
 require 'webmock/rspec'
 WebMock.allow_net_connect!
 
@@ -75,5 +76,15 @@ RSpec.configure do |config|
   config.include Capybara::DSL
   # Integration Test helper
   config.include OmniauthMacros
+
+  # Switching callbacks
+  config.before(:all, callbacks: false) do
+    ActiveRecord::Base.skip_callbacks = false
+  end
+  config.after(:all, callbacks: true) do
+    ActiveRecord::Base.skip_callbacks = true
+  end
+  # Skip callbacks as default
+  ActiveRecord::Base.skip_callbacks = true
 
 end

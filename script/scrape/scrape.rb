@@ -4,22 +4,30 @@ require "#{Rails.root}/app/workers/images_face"
 module Scrape
   require "#{Rails.root}/script/scrape/scrape_nico"
   require "#{Rails.root}/script/scrape/scrape_piapro"
-  require "#{Rails.root}/script/scrape/scrape_pixiv"
   require "#{Rails.root}/script/scrape/scrape_deviant"
-  require "#{Rails.root}/script/scrape/scrape_futaba"
-  require "#{Rails.root}/script/scrape/scrape_2ch"
   require "#{Rails.root}/script/scrape/scrape_4chan"
-  require "#{Rails.root}/script/scrape/scrape_twitter"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
   require "#{Rails.root}/script/scrape/scrape_giphy"
+  require "#{Rails.root}/script/scrape/scrape_anipic"
 
-  # 対象webサイト全てから画像抽出を行う。
+  require "#{Rails.root}/script/scrape/_legacy/scrape_2ch"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_futaba"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_matome"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_tinami"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_pixiv"
+  require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
+
+
+  # 全てのTargetWordに基づき画像抽出する
   def self.scrape_all
     TargetWord.all.each do |target_word|
       self.scrape_keyword target_word
     end
     puts 'DONE!!'
   end
+
+  # ユーザが登録している全てのTargetWordに基づき画像抽出する
+  # （全てのTargetWordレコードとは必ずしも一致しない）
   def self.scrape_users
     User.all.each do |user|
       user.target_words.each do |target_word|
@@ -29,24 +37,29 @@ module Scrape
     puts 'DONE!!'
   end
 
-  def self.scrape_keyword(target_word)
-    puts query = target_word.person ? target_word.person.name : target_word.word
-    Scrape::Nico.scrape_keyword(query)
-    #Scrape::Twitter.scrape_keyword(query)
-    Scrape::Tumblr.scrape_keyword(query)
+  # タグ登録直後の配信用
+  # @param [TargetWord] 配信対象であるTargetWordインスタンス
+  def self.scrape_target_word(user_id, target_word, logger)
+    Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
+    Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
+    #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
+    Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word)
 
     # 英名が存在する場合はさらに検索
-    puts "name_english:#{target_word.person.name_english}" if target_word.person and target_word.person.name_english
-    #if target_word.person.name_english
-    if target_word.person and not target_word.person.name_english.empty?
+    # Englishかどうかはscrape_using_api内で判定し、にほんご
+    if target_word.person and target_word.person.name_english and not target_word.person.name_english.empty?
       query = target_word.person.name_english
-      puts "name_english:#{query}"
-      Scrape::Tumblr.scrape_keyword(query)
-      Scrape::Giphy.scrape_keyword(target_word)
+      logger.debug "name_english: #{query}"
+
+      Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word, true)
+      Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word, true)
+      Scrape::Giphy.new(logger).scrape_target_word(user_id, target_word)
     end
-    puts 'DONE!!'
+    logger.info 'scrape_target_word DONE!!'
   end
 
+
+  # Paperclipのattachmentがnilのレコードを探し再度downloadする
   def self.redownload
     images = Image.where(data_file_size: nil)
     puts "number of images with nil data: #{images.count}"
@@ -57,85 +70,67 @@ module Scrape
   end
 
   # 重複したsrc_urlを持つレコードがDBにあるか調べる
+  # @param [String] 確認するsource url.
   def self.is_duplicate(src_url)
     Image.where(src_url: src_url).length > 0
   end
 
-  def self.save_and_deliver(attributes, user_id, target_word_id, tags=[], validation=true)
-    image_id = self.save_image(attributes, tags, validation)
-    Deliver.deliver_one(user_id, target_word_id, image_id)
+  # TargetWordから、API使用時に用いるクエリを取得する
+  # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
+  def self.get_query(target_word)
+    return nil if target_word.nil?
+    target_word.person ? target_word.person.name : target_word.name
   end
 
-
-  # Imageモデル生成＆DB保存
-  # @param [Hash] Imageレコードに与える属性のHash
-  def self.save_image(attributes, tags=[], validation=true, large=false)
-    # 重複を確認
-    if validation and self.is_duplicate(attributes[:src_url])
-      puts 'Skipping a duplicate image...'
-      return false
-    end
-
-    # 新規レコードを作成
-    begin
-      image = Image.new attributes
-      #image.image_from_url attributes[:src_url]
-      tags.each { |tag| image.tags << tag }
-    rescue Exception => e
-      # URLからImage.dataを設定するのに失敗したら諦める
-      puts e
-      return false
-    end
-
-    # DBに保存する
-    begin
-      # 高頻度で失敗し得るのでsave!を使わない（例外は投げない）ようにする
-      if image.save(validate: validation)
-        # 特徴抽出処理をresqueに投げる
-        if large
-          Resque.enqueue(DownloadImageLarge, image.class.name, image.id, attributes[:src_url])
-        else
-          Resque.enqueue(DownloadImage, image.class.name, image.id, attributes[:src_url])
+  # TargetWordから、API使用時に用いるクエリを取得する
+  # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
+  def self.get_query_en(target_word, key)
+    case key
+      when 'english' then
+        if target_word.person
+          query = target_word.person.name_english  # word:'鹿目まどか', person.name_english:'Madoka Kaname'
+        elsif target_word.name.ascii_only?
+          query = target_word.name                 # word:'Madoka Kaname', person.name_english:nil
+        end
+      when 'roman' then
+        if target_word.person
+          query = target_word.person.name_roman    # word:'鹿目まどか', person.name_roman:'Kaname Madoka'
+        elsif target_word.name.ascii_only?
+          query = target_word.name                 # word:'Madoka Kaname', person.name_english:nil
         end
       else
-        Rails.logger.info('Image model saving failed. (maybe due to duplication)')
-        puts 'Image model saving failed. (maybe due to duplication)'
-        return false
+        query = Scrape.get_query target_word
       end
-    rescue Exception => e
-      puts e
-      return false
+
+    query
+  end
+
+  def self.get_titles (target_word)
+    return nil if target_word.nil?
+    target_word.person.titles if target_word.person and target_word.person.titles
+  end
+
+
+  # タグを取得する。DBに既にある場合はそのレコードを返す
+  # @param [String]
+  def self.get_tag(tag)
+    t = Tag.where(name: tag)
+    t.empty? ? Tag.new(name: tag) : t.first
+  end
+
+  # Tagインスタンスの配列を作成する
+  # @param [Array] タグを表す文字列の配列
+  # @return [Array] Tagオブジェクトの配列
+  def self.get_tags(tags)
+    tags.map do |tag|
+      t = Tag.where(name: tag)
+      t.empty? ? Tag.new(name: tag) : t.first
     end
-    image.id
   end
 
-
-  def self.scrape_5min
-    #Scrape::Futaba.scrape()
-    puts 'DONE!!'
+  def self.remove_4bytes(string)
+    return nil if string.nil?
+    string.each_char.select{|c| c.bytes.count < 4 }.join('')
   end
 
-  def self.scrape_15min()
-    #Scrape::Piapro.scrape()
-    #Scrape::Nichan.scrape()
-    Scrape::Twitter.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_30min()
-    #Scrape::Fourchan.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_60min()
-    Scrape::Nico.scrape()
-    #Scrape::Pixiv.scrape()
-    #Scrape::Deviant.scrape()
-    puts 'DONE!!'
-  end
-
-  def self.scrape_3h()
-    Scrape::Tumblr.scrape()
-    puts 'DONE!!'
-  end
 end

@@ -23,7 +23,7 @@ describe TargetWordsController do
   # This should return the minimal set of attributes required to create a valid
   # TargetWord. As you add validations to TargetWord, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "word" => "MyString" } }
+  let(:valid_attributes) { { "name" => "MyString" } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -83,7 +83,7 @@ describe TargetWordsController do
       end
 
       # ユーザの登録ワード一覧ページへリダイレクトする事
-      it "redirects to the list of target_words" do
+      it "redirects to the list page of target_words" do
         person = FactoryGirl.create(:person)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
         response.should redirect_to(show_target_words_users_path)
@@ -102,7 +102,9 @@ describe TargetWordsController do
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         person = FactoryGirl.create(:person)
+
         TargetWord.any_instance.stub(:save).and_return(false)
+        User.any_instance.stub(:save).and_return(false)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
         response.should render_template("new")
       end
@@ -117,8 +119,8 @@ describe TargetWordsController do
         # specifies that the TargetWord created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        TargetWord.any_instance.should_receive(:update).with({ "word" => "MyString" })
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "MyString" }}, valid_session
+        TargetWord.any_instance.should_receive(:update).with({ "name" => "MyString" })
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "MyString" }}, valid_session
       end
 
       it "assigns the requested target_word as @target_word" do
@@ -139,7 +141,7 @@ describe TargetWordsController do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetWord.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "invalid value" }}, valid_session
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
         assigns(:target_word).should eq(target_word)
       end
 
@@ -147,7 +149,7 @@ describe TargetWordsController do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         TargetWord.any_instance.stub(:save).and_return(false)
-        put :update, {:id => target_word.to_param, :target_word => { "word" => "invalid value" }}, valid_session
+        put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
         response.should render_template("edit")
       end
     end
@@ -174,6 +176,7 @@ describe TargetWordsController do
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
       expect(assigns(:search)).to be_a(Ransack::Search)
     end
+
     it "assigns search result properly" do
       FactoryGirl.create(:person_madoka)
       get :search, {q:{"name_display_cont"=>"まどか"}}, valid_session
@@ -182,35 +185,13 @@ describe TargetWordsController do
   end
 
   describe "show_delivered action" do
-    it "assigns delivered_images" do
-      target_word = FactoryGirl.create(:word_with_delivered_images, images_count: 5)
+    it "assigns associated images" do
+      target_word = FactoryGirl.create(:word_with_images)
       get :show_delivered, { id: target_word.to_param }, valid_session
 
-      # count = target_word.delivered_images.count
-      count = target_word.delivered_images.joins(:image).
-        where.not(images: { site_name: 'twitter' }).count
+      count = target_word.images.where.not({ site_name: 'twitter' }).count
+
       expect(assigns(:delivered_images).count).to eq(count)
     end
   end
-
-  describe "switch action" do
-    before(:each) do
-      request.env['HTTP_REFERER'] = '/'
-    end
-    it "Set 'enabled' attribute to false when it's true" do
-      target_word = FactoryGirl.create(:target_word)
-      target_word.update_attributes(enabled: true)
-
-      expect_any_instance_of(TargetWord).to receive(:update_attributes).with({enabled: false})
-      get :switch, { id: target_word.id }, valid_session
-    end
-    it "Set 'enabled' attribute to true when it's false" do
-      target_word = FactoryGirl.create(:target_word)
-      target_word.update_attributes(enabled: false)
-
-      expect_any_instance_of(TargetWord).to receive(:update_attributes).with({enabled: true})
-      get :switch, { id: target_word.to_param }, valid_session
-    end
-  end
-
 end

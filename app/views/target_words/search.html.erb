@@ -1,15 +1,15 @@
 <h1>Search target_word</h1>
 
 <%= search_form_for @search, url: search_target_words_path, html: { method: :post } do |f| %>
-  <%= f.label :name_display_cont, 'キャラクタ名' %>
+  <%= f.label :name_display_cont, 'Character name' %>
   <div class="row">
     <div class="col-lg-2">
-      <%= f.text_field :name_display_cont, class: "form-control" %>
+      <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
 
     </div>
   </div>
   <div class="actions">
-    <%= f.submit '検索する', class: "btn btn-default" %>
+    <%= f.submit 'Search', class: "btn btn-default" %>
   </div>
 <% end %>
 
@@ -19,15 +19,17 @@
       <th>Name</th>
       <th>Name_en</th>
       <th>Title</th>
+      <th>Title_en</th>
     </tr>
   </thead>
 
   <tbody>
     <% @people.each do |person| %>
       <tr>
-        <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { word: person.name_display }}, method: :post %></td>
+        <td><%= link_to person.name_display, { action: 'create', id: person.id, target_word: { name: person.name_display }}, method: :post %></td>
         <td><%= person.name_english %></td>
-        <td><%= person.titles.first.name if not person.titles.empty? %></td>
+        <td><%= link_to person.titles.first.name, { action: 'create', target_word: { name: person.titles.first.name }}, method: :post unless person.titles.empty? %></td>
+        <td><%= link_to person.titles.first.name_english, { action: 'create', target_word: { name: person.titles.first.name_english }}, method: :post unless person.titles.empty? or person.titles.first.name_english.nil? %></td>
       </tr>
     <% end %>
   </tbody>

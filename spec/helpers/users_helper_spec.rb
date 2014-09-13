@@ -11,42 +11,68 @@ require 'spec_helper'
 #   end
 # end
 describe UsersHelper do
-  describe "get_clip_string method" do
-    it "returns valid string" do
-      image = FactoryGirl.create(:delivered_image)
-      expect(helper.get_clip_string(image)).to eq('Clip')
-
-      image = FactoryGirl.create(:favored_image_with_delivered)
-      expect(helper.get_clip_string(image.delivered_image)).to eq('Clipped')
-    end
-  end
-
-  describe "get_clip_string_styled" do
-    it "returns valid string" do
-      image = FactoryGirl.create(:delivered_image)
-      expect(raw helper.get_clip_string_styled(image)).to eq('<span style="color: #000;">Clip</span>')
-
-      image = FactoryGirl.create(:favored_image_with_delivered)
-      expect(raw helper.get_clip_string_styled(image.delivered_image)).to eq(
-        '<span style="color: #02C293;">Clipped</span>')
-    end
-  end
-  describe "get_enabled_html" do
-    it "returns valid html string" do
-      target_word = FactoryGirl.create(:target_word)
-      result = helper.get_enabled_html(target_word.enabled)
-      expect(raw result).to eql('<strong>on</strong>')
-
-      target_word.enabled = false
-      result = helper.get_enabled_html(target_word.enabled)
-      expect(raw result).to eql('<strong>off</strong>')
-    end
-  end
   describe "get_illust_html method" do
-    it "returns valid html" do
-      delivered_image = FactoryGirl.create(:delivered_image)
-      result = helper.get_illust_html(delivered_image.image)
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      result = helper.get_illust_html(image)
       expect(result).to eql('Illust: <span><strong>true</strong></span>')
+    end
+  end
+
+  describe "get_quality_html method" do
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      result = helper.get_quality_html(image)
+      expect(result).to eql('Quality: <span><strong></strong></span>')
+    end
+  end
+
+  describe "get_debug_html method" do
+    it "returns a valid html" do
+      #user = FactoryGirl.create(:user_with_images)
+      #result = helper.get_debug_html(user.images)
+      #expect(result).to eql("<strong>Found 2 images.</strong>")
+    end
+  end
+
+
+  # ===================
+  #  Rendering helpers
+  # ===================
+  describe "render_image_button" do
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      image = image
+      result = helper.render_image(image)
+      expect(result.class).to eq(ActiveSupport::SafeBuffer)
+    end
+  end
+
+  describe "render_clip_button" do
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      result = helper.render_clip_button(image)
+      expect(result.class).to eq(ActiveSupport::SafeBuffer)
+
+      id = image.id
+      html = "<a class=\"popover-board btn-info btn-sm btn\" data-container=\"body\" data-placement=\"bottom\" data-remote=\"true\" data-toggle=\"popover\" href=\"/image_boards/boards?id=popover-board#{id}&amp;image=#{id}\" id=\"popover-board#{id}\">Clip</a>"
+      expect(result.to_s).to eq(html)
+    end
+  end
+
+  describe "render_hide_button" do
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      result = helper.render_hide_button(image)
+      expect(result.class).to eq(ActiveSupport::SafeBuffer)
+    end
+  end
+
+  describe "render_show_button" do
+    it "returns a valid html" do
+      image = FactoryGirl.create(:image)
+      result = helper.render_show_button(image)
+      expect(result.class).to eq(ActiveSupport::SafeBuffer)
     end
   end
 

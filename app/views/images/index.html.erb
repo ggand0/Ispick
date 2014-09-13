@@ -15,3 +15,5 @@
 <hr>
 <h5>Debug</h5>
 <li><%= "Number of images with nil data: #{Image.where(data_file_size: nil).count}" %></li>
+<li><%= "Count of all images: #{Image.count}" %></li>
+<li><%= "Size of all images: #{get_sizeof_all} MB" %></li>
