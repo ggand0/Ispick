@@ -18,21 +18,27 @@ class Import
     File.open(LIST_PATH, 'r') do |row|
       row.each_line.with_index do |line, count|
         next if count == 0
-        puts attributes = line.split(/(?<!\\),/)
+        attributes = line.split(/(?<!\\),/)
         #puts line.split(/[^\\,],/)
 
         name_ja = attributes[1]
         name_en = attributes[2]
         appearances = attributes[4].split('\'')
+        matched = false
         appearances.each do |appearance|
           aid = appearance.split('\,')[0].to_i
           title = Title.where(id_anidb: aid).first
+          next if title.nil?
 
-          person = Person.create(name: name_ja, name_english: name_en, name_type: 'character_anidb')
-          if person and title
+          person = Person.new(name: name_ja, name_english: name_en, name_type: 'character_anidb')
+          if title and person.save
             person.titles << title
+            matched = true
+            break
           end
         end
+        puts "unmatched character: #{name_ja}/#{name_en}" unless matched
+
       end
     end
 
@@ -44,6 +50,3 @@ class Import
 
   end
 end
-
-importer = Import.new
-importer.main
