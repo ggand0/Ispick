@@ -1,3 +1,4 @@
+=begin
 # Seed person records from the text file.
 File.open("#{Rails.root}/db/seeds/characters_list").read.each_line do |line|
   tmp = line.split(',')
@@ -6,3 +7,9 @@ File.open("#{Rails.root}/db/seeds/characters_list").read.each_line do |line|
   )
   puts "Seeded: #{person.name}"
 end
+=end
+
+# Seed person records from the list that is created by scraping AniDB.
+require "#{Rails.root}/script/anidb/import_anidb_characters"
+importer = Import.new
+importer.main

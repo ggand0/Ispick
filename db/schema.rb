@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140912002052) do
+ActiveRecord::Schema.define(version: 20140912171151) do
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(version: 20140912002052) do
     t.text     "name_english"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "id_anidb"
   end
 
   add_index "titles", ["name", "name_english"], name: "index_titles_on_name_and_name_english", length: {"name"=>10, "name_english"=>10}, using: :btree

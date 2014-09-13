@@ -12,7 +12,7 @@ module Scrape::Wiki
   include Character
   include GameCharacter
 
-  ROOT_URL = 'http://en.wikipedia.org/wiki/Main_Page'
+  ROOT_URL = 'http://en.wikipedia.org/'
 
   def self.scrape_all
     puts "Extracting: #{ROOT_URL}"
@@ -46,37 +46,56 @@ module Scrape::Wiki
     #self.scrape_wiki_for_game_characters
   end
 
-  # Scrape titles only
+  # Scrape only anime titles and save them to the database.
   def self.scrape_titles
-    puts "Extracting: #{ROOT_URL}"
+    puts "Extracting anime titles from: #{ROOT_URL}"
+    anime_pages = {}
 
     # The array of Wikipedia pages that list up anime titles.
     url = [ 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series' ]
-
     url.each do |value|
       anime_pages = self.get_anime_page(value)
+
+
+      puts anime_pages.inspect
       puts anime_pages.count
+    end
+
+    anime_pages.each do |key, value|
+      # Save them to titles table:
+      Title.create(name: value[:title_ja], name_english: key)
     end
   end
 
+  # Get an anime titles based on a html object.
+  # @param html [Nokogiri::HTML] A HTML object parsed through Nokogiri gem.
+  # @return [String] The title of the anime
+  def self.get_anime_titles(url)
+    html = Scrape::Wiki.open_html url
+    return '' if html.nil?
 
+    html.css('h1[class="firstHeading"]').first.content
+  end
+
+
+  # Scrape anime titles and related Wikipedia article urls.
   # アニメ名のハッシュを取得する
   # @param [String] 「20xx年のアニメ一覧」ページのurl
   # @return [Hash] アニメタイトルをkey、該当ページのurlをvalueとするhash
-  def self.get_anime_page(url, logging=true)
+  def self.get_anime_page(url, logging=false)
     anime_page = {}
     html = self.open_html url
 
-    # ページ一覧からアニメURLを取得
-    # liタグ->aタグの順にネストされているパターン
+    # Scrape the list of anime overview pages in the page.
+    # ページ一覧からアニメURLを取得。liタグ->aタグの順にネストされているパターンを探す。
     html.css("div[id='mw-pages']").css('li > a').each do |item|
-      puts(item.inner_text)
       if not item.inner_text.empty? and not anime_page.has_key?(item.inner_text)
         page_url_en = "http://en.wikipedia.org#{item['href']}"
         page_url_ja = self.get_anime_page_ja page_url_en
+        title_ja = self.get_anime_titles(page_url_ja) unless page_url_ja.nil?
 
         puts page_url_ja if logging
-        anime_page[item.inner_text] = { ja: page_url_ja, en: page_url_en }
+        anime_page[item.inner_text] = { title_ja: title_ja, ja: page_url_ja, en: page_url_en }
       end
     end
 
@@ -91,14 +110,13 @@ module Scrape::Wiki
     html = self.open_html anime_page
     return if html.nil?
 
-      # 日本語ページに登場キャラクターがいない
-     if !self.detect_having_characters(html)
+    # 日本語ページに登場キャラクターがいない
+    if !self.detect_having_characters(html)
       return 'no_characters'
-     end
-
-    item = html.css("li[class='interlanguage-link interwiki-en']").first
+    end
 
     # liタグ内のaタグのリンクを調べる
+    item = html.css("li[class='interlanguage-link interwiki-en']").first
     if item.nil?
       return ''
     else
@@ -107,13 +125,14 @@ module Scrape::Wiki
     end
   end
 
+  # Get the url of the japanese version of a Wikipedia article.
+  # @param anime_page [String]
+  # @return [String]
   def self.get_anime_page_ja(anime_page)
     html = self.open_html anime_page
     return if html.nil?
 
     item = html.css("li[class='interlanguage-link interwiki-ja']").first
-
-    # liタグ内のaタグのリンクを調べる
     if item.nil?
       return ''
     else
@@ -123,10 +142,10 @@ module Scrape::Wiki
   end
 
 
+  # Open the given url and returns a Nokogiri::HTML object.
   # HTMLページを開いてNokogiriのHTMLオブジェクトを返す。
-  # 例外が発生した場合はnilを返す
-  # @param [String] 対象url
-  # @return [Nokogiri::HTML] NokogiriでパースされたHTMLオブジェクト
+  # @param url [String] A string object that represents a url.
+  # @return [Nokogiri::HTML] NokogiriでパースされたHTMLオブジェクト。例外が発生した場合はnilを返す
   def self.open_html(url)
     begin
       html = Nokogiri::HTML(open(url))
@@ -138,17 +157,17 @@ module Scrape::Wiki
         raise e
       end
     rescue Errno::ENOENT => e
-      return puts e
+      return puts e.inspect
     rescue SocketError => e
-      return puts e
+      return puts e.inspect
     rescue => e
-      return puts e
+      return puts e.inspect
     end
   end
 
 
-  # ハッシュ内容のファイル出力(未使用)
-  # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
+  # Output the given hash to a file.
+  # @param input_hash [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.hash_output(input_hash)
     f = open("sample.txt", "a")
     input_hash.each do |anime, characters|
@@ -166,7 +185,7 @@ module Scrape::Wiki
 
 
   # キャラクタ情報をparseしてPeopleテーブルへ保存する
-  # @param [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
+  # @param input_hash [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
     puts "Saving character names to database..."
 
