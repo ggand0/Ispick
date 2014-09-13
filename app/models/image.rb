@@ -12,7 +12,7 @@ class Image < ActiveRecord::Base
   paginates_per 100
 
 	has_attached_file :data,
-    styles: { thumb: "300x300#", medium: "600x800>" },
+    styles: { thumb: "300x300#", original: "600x800>" },
     default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
 
