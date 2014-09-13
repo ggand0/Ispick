@@ -3,7 +3,7 @@ require 'csv'
 
 
 class Import
-  LIST_PATH = "#{Rails.root}/script/anidb/extracted_characters1.txt"
+  LIST_PATH = "#{Rails.root}/script/anidb/people_2014_main.txt"
   HASH_PATH = "#{Rails.root}/script/anidb/characters_unmatched"
 
   attr_accessor :people, :hash
