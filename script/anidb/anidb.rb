@@ -28,7 +28,7 @@ class AniDB
   end
 
   def search_attribute(attributes, target, anime, key)
-    matched = false
+    anime_id = nil
 
     attributes.each do |attribute|
       if not attribute.nil? and (attribute.content.downcase.include? target.downcase or
@@ -37,11 +37,12 @@ class AniDB
         @output.root.add_child anime
         puts "Added an en element: #{attribute.content}"
         @hash[key] = true
-        matched = true
+        anime_id = anime.attr('aid').to_i
         break
       end
     end
-    matched
+
+    anime_id
   end
 
   def main
@@ -53,19 +54,31 @@ class AniDB
       next if anime_ens.nil? and x_jats.nil? and x_unks.nil?
 
       @titles.each do |title|
-        matched = search_attribute(anime_ens, title.name_english, anime, title.name_english)
-        break if matched
-
-        unless title.name.nil? or title.name.empty?
-          matched = search_attribute(anime_jas, title.name, anime, title.name_english)
-          break if matched
+        anime_id = search_attribute(anime_ens, title.name_english, anime, title.name_english)
+        if anime_id
+          title.update_attribute(:id_anidb, anime_id)
+          break
         end
 
-        matched = search_attribute(x_jats, title.name_english, anime, title.name_english)
-        break if matched
+        unless title.name.nil? or title.name.empty?
+          anime_id = search_attribute(anime_jas, title.name, anime, title.name_english)
+          if anime_id
+            title.update_attribute(:id_anidb, anime_id)
+            break
+          end
+        end
 
-        matched = search_attribute(x_unks, title.name_english, anime, title.name_english)
-        break if matched
+        anime_id = search_attribute(x_jats, title.name_english, anime, title.name_english)
+        if anime_id
+          title.update_attribute(:id_anidb, anime_id)
+          break
+        end
+
+        anime_id = search_attribute(x_unks, title.name_english, anime, title.name_english)
+        if anime_id
+          title.update_attribute(:id_anidb, anime_id)
+          break
+        end
       end # titles.each
 
       puts "count: #{count}" if count % 1000 == 0
