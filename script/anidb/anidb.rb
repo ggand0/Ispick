@@ -2,22 +2,24 @@
 require 'open-uri'
 require 'builder'
 
+
 class AniDB
   attr_accessor :xml, :output, :titles, :hash
+
   # 10000件のアニメ情報があるinput用xml
-  file_path = "#{Rails.root}/script/anidb/anime-titles.xml"
+  FILE_PATH = "#{Rails.root}/script/anidb/anime-titles.xml"
 
   # 出力用のXML::Documentオブジェクトを読み込むファイル。
   # Nokogiri::XML::Elementを追加して新しいxmlを作成する。
-  output_path = "#{Rails.root}/script/anidb/anime_titles_template.xml"
+  OUTPUT_PATH = "#{Rails.root}/script/anidb/anime_titles_template.xml"
 
   # 実際に出力するファイルのpath
-  test_path = "#{Rails.root}/script/anidb/anime_titles_2014.xml"
-  hash_path = "#{Rails.root}/script/anidb/anidb_match_status"
+  TEST_PATH = "#{Rails.root}/script/anidb/anime_titles_2014.xml"
+  HASH_PATH = "#{Rails.root}/script/anidb/anidb_match_status"
 
   def initialize()
-    @xml = Nokogiri::XML(open file_path)
-    @output = Nokogiri::XML(open output_path)
+    @xml = Nokogiri::XML(open FILE_PATH)
+    @output = Nokogiri::XML(open OUTPUT_PATH)
     @titles = Title.all
     @hash = {}
     @titles.each do |title|
@@ -25,7 +27,7 @@ class AniDB
     end
   end
 
-  def search_attribute(attributes, target)
+  def search_attribute(attributes, target, anime, key)
     matched = false
 
     attributes.each do |attribute|
@@ -33,8 +35,8 @@ class AniDB
         target.downcase.include? attribute.content.downcase)
 
         @output.root.add_child anime
-        puts "Added an en element: #{anime_en.content}"
-        @hash[title.name_english] = true
+        puts "Added an en element: #{attribute.content}"
+        @hash[key] = true
         matched = true
         break
       end
@@ -46,23 +48,23 @@ class AniDB
     @xml.search('anime').each_with_index do |anime, count|
       anime_ens = anime.xpath('title[@xml:lang="en"]')
       anime_jas = anime.xpath('title[@xml:lang="ja"]')
-      x-jats = anime.xpath('title[@xml:lang="x-jat"]')
-      x-unks = anime.xpath('title[@xml:lang="x-unk"]')
-      next if anime_ens.nil? and x-jats.nil? and x-unks.nil?
+      x_jats = anime.xpath('title[@xml:lang="x-jat"]')
+      x_unks = anime.xpath('title[@xml:lang="x-unk"]')
+      next if anime_ens.nil? and x_jats.nil? and x_unks.nil?
 
       @titles.each do |title|
-        matched = search_attribute(anime_ens, title.name_english)
+        matched = search_attribute(anime_ens, title.name_english, anime, title.name_english)
         break if matched
 
         unless title.name.nil? or title.name.empty?
-          matched = search_attribute(anime_jas, title.name)
+          matched = search_attribute(anime_jas, title.name, anime, title.name_english)
           break if matched
         end
 
-        matched = search_attribute(x-jats, title.name_english)
+        matched = search_attribute(x_jats, title.name_english, anime, title.name_english)
         break if matched
 
-        matched = search_attribute(x-unks, title.name_english)
+        matched = search_attribute(x_unks, title.name_english, anime, title.name_english)
         break if matched
       end # titles.each
 
@@ -87,8 +89,8 @@ class AniDB
     @hash.compact!
     puts "Unmatched titles:"
     @hash.each { |k,v| puts "#{k}\n" }
-    File.open(test_path, 'w') { |f| f.print(output.to_xml) }
-    File.open(hash_path, 'w') do |f|
+    File.open(TEST_PATH, 'w') { |f| f.print(@output.to_xml) }
+    File.open(HASH_PATH, 'w') do |f|
       @hash.each do |key, value|
         f.write("#{key}: #{value}\n")
       end
