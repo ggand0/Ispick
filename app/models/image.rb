@@ -13,8 +13,9 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: {
-      thumb: { geometry: "300x300#", :processors => [:custom], :gif_first_frame_only => true },
-      thumb_gif: "300x300#",
+      thumb: "300x300#",
+      #thumb: { geometry: "300x300#", :processors => [:custom], :gif_first_frame_only => true },
+      #thumb_gif: "300x300#",
       original: "600x800>"
     },
     default_url: lambda { |data| data.instance.set_default_url},
