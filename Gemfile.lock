@@ -205,6 +205,12 @@ GEM
       domain_name (~> 0.5)
     http_parser.rb (0.6.0)
     i18n (0.6.9)
+    jasmine (2.0.2)
+      jasmine-core (~> 2.0.0)
+      phantomjs
+      rack (>= 1.2.1)
+      rake
+    jasmine-core (2.0.2)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
       multi_json (>= 1.2.0)
@@ -514,6 +520,7 @@ DEPENDENCIES
   guard-rspec (= 4.2.0)
   guard-teaspoon
   high_voltage (~> 2.1.0)
+  jasmine
   jbuilder (~> 1.2)
   jquery-fileupload-rails
   jquery-rails

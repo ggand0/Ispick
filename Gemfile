@@ -12,7 +12,6 @@ gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 # View related gems
 gem 'bootstrap-sass', '~> 3.2.0'
 gem 'autoprefixer-rails'
-
 gem 'bootstrap-datepicker-rails'
 gem 'rails-bootstrap-helpers'
 gem 'bootstrap_form'
@@ -63,26 +62,26 @@ gem 'rb-readline', require: false
 #gem 'rb-readline', '0.5.0', require: false       # rails consoleを起動するために必要
 
 
-# OAuth
+# OAuth gems
 gem 'devise'
 gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'omniauth-facebook'
 gem 'omniauth-pinterest'
 
-# System
-gem 'nokogiri'                                   # For scraping
+# System related gems
+gem 'nokogiri'                                      # For scraping
 gem 'mechanize'
-gem 'rmagick', require: false                    # Image processing lib. Used by AnimeFace
-gem 'resque'                                     # For background jobs
-gem 'resque-web', require: 'resque_web'          # Web interface for resque
+gem 'rmagick', require: false                       # Image processing lib. Used by AnimeFace
+gem 'resque'                                        # For background jobs
+gem 'resque-web', require: 'resque_web'             # Web interface for resque
 gem 'resque-logger'
 gem 'daemon-spawn', require: 'daemon_spawn', git: 'git@github.com:pentiumx/daemon-spawn.git'
 gem 'pidfile'
-gem 'whenever', require: false                   # Support crontab
+gem 'whenever', require: false                      # Support crontab
 gem 'rubyzip'
 gem 'ransack'
-gem 'factory_girl_rails'                          # A fixtures replacement
+gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
 
 # API clients
@@ -102,7 +101,6 @@ end
 group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-#  gem 'fakeweb', '~> 1.3'                           # Mock urls
   gem 'rails-erd'                                   # モデル関連図生成
   gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
   #gem 'pry-rails'                                   # Improve the console
@@ -127,14 +125,14 @@ group :development, :test do
   gem 'fuubar'                                      # テスト進行状況可視化
   gem 'rake_shared_context'                         # Enable rake task testing
   gem 'capybara'
-  gem 'launchy'                                     # save_and_open_page
+  gem 'launchy'                                     # Enable save_and_open_page method
 
   # JS testing
   gem 'teaspoon'                                    # JS test runner
-  gem 'phantomjs', '>= 1.8.1.1'
-  #gem 'mocha', '~> 0.14.0', :require => false      # rspecと競合するので凍結中
+  gem 'phantomjs', '>= 1.8.1.1'                     # A headless WebKit
+  gem 'jasmine'                                     # JS testing framework
 
-  # Deploy
+  # Deploying
   gem 'capistrano', '~> 3.1.0'
   gem 'capistrano-rails'
   gem 'capistrano-rbenv', '~> 2.0'
