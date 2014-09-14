@@ -14,7 +14,7 @@ Teaspoon.configure do |config|
 
   # Fixtures are rendered through a standard controller. This means you can use things like HAML or RABL/JBuilder, etc.
   # to generate fixtures within this path.
-  config.fixture_paths = "spec/javascripts/fixtures"
+  config.fixture_paths = ["spec/javascripts/fixtures"]
 
   # You can modify the default suite configuration and create new suites here. Suites can be isolated from one another.
   # When defining a suite you can provide a name and a block. If the name is left blank, :default is assumed. You can
@@ -42,7 +42,7 @@ Teaspoon.configure do |config|
     # Available frameworks: teaspoon-jasmine, teaspoon-mocha, teaspoon-qunit
     #
     # Note: To use the CoffeeScript source files use `"teaspoon/mocha"` etc.
-    suite.javascripts = ["teaspoon-mocha"]
+    suite.javascripts = ["teaspoon-jasmine"]
 
     # If you want to change how Teaspoon looks, or include your own stylesheets you can do that here. The default is the
     # stylesheet for the HTML reporter.
