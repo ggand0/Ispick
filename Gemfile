@@ -131,6 +131,7 @@ group :development, :test do
   gem 'teaspoon'                                    # JS test runner
   gem 'phantomjs', '>= 1.8.1.1'                     # A headless WebKit
   gem 'jasmine'                                     # JS testing framework
+  gem 'jasmine-jquery-rails'
 
   # Deploying
   gem 'capistrano', '~> 3.1.0'
