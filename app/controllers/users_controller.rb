@@ -13,18 +13,18 @@ class UsersController < ApplicationController
 
     # Get images
     # For a new user, display the newer images
-    if current_user.target_words.nil? or current_user.target_words.empty?
-      images = Image.where("created_at>?", DateTime.now - 1).where.not(data_updated_at: nil).limit(500)
+    if current_user.target_words.empty?
+      images = User.get_recent_images(500)
     # Otherwise, display images from user.target_words relation
     else
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
+    end
 
-      # Filter images by date
-      if params[:date]
-        date = DateTime.parse(params[:date]).to_date
-        images = User.filter_by_date(images, date)
-      end
+    # Filter images by date
+    if params[:date]
+      date = DateTime.parse(params[:date]).to_date
+      images = User.filter_by_date(images, date)
     end
 
     @images = images.page(params[:page]).per(25)

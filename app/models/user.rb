@@ -45,6 +45,10 @@ class User < ActiveRecord::Base
     #Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(is_illust: nil).references(:target_words)
   end
 
+  def self.get_recent_images(limit)
+    Image.where("created_at>?", DateTime.now - 1).where.not(data_updated_at: nil).limit(limit)
+  end
+
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def search_images(query)
