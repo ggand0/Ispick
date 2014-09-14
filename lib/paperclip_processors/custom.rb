@@ -1,9 +1,10 @@
 module Paperclip
-  class ManualCropper < Thumbnail
+  class Custom < Thumbnail
     def initialize(file, options = {}, attachment = nil)
       super
       #@current_geometry.width  = target.crop_width
       #@current_geometry.height = target.crop_height
+
       @gif_first_frame_only = options.fetch(:gif_first_frame_only, false)
     end
     def target
@@ -21,7 +22,9 @@ module Paperclip
       ]
 =end
       crop_command = []
-      if @gif_first_frame_only
+      puts @gif_first_frame_only
+      if @animated #and @gif_first_frame_only
+        # Remove all frames but the first frame
         crop_command = [
           "-delete",
           "1--1"
