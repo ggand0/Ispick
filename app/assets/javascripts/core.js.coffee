@@ -3,8 +3,9 @@
 $ ->
   # Dropdown:
   # click時にdialogを閉じる
-  window.Component.addDropdownEvents()
+  component = new Component()
+  component.initDropdowns()
 
   # Modal:
   # 特定のクラスを持つモーダルは、背景を消して表示する
-  window.Component.addModalEvents()
+  component.initModals()
