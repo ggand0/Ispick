@@ -4,72 +4,79 @@ describe "user's home page" do
   describe "default features" do
     before do
       FactoryGirl.create(:user_with_target_word_image_file)
-
-      # TODO: デバッグ用のリンクではなく通常のログインフォームからアクセスするようにする
       visit root_path
       mock_auth_hash
-      click_link 'Login with twitter'
+      click_link 'Continue with Twitter'
+    end
 
-      # /users/homeに移動すること
+    it "moves to /users/home" do
       uri = URI.parse(current_url)
       expect(uri.to_s).to include(home_users_path)
     end
 
-
-    # 配信された画像のサムネが見えるはず
-    it "Watch delivered images" do
+    # 配信された画像のサムネを見る事が出来る
+    it "displays crawled images" do
       visit home_users_path
       expect(page).to have_css('.wrap .box .boxInner')
     end
 
-    # クリックすれば詳細も見れるはず
-    it "Watch a delivered image's detail" do
+    # クリックすると画像の詳細情報を閲覧出来る
+    it "displays an image's details by clicking the picture" do
       visit home_users_path
-      find(:xpath, "//a/img[@alt='Madoka']/..").click
-      #expect(page).to have_content('Detail')
-      expect(page).to have_content('Source URL')
+      save_and_open_page
+      find(:xpath, "//a/img[@alt='Madoka0']/..").click
+      expect(page).to have_content('madoka')            # sees the title
+      expect(page).to have_content('madoka dayo!')      # sees the caption
+    end
+  end
+
+  describe "clipping images", :js => true do
+    before do
+      user = FactoryGirl.create(:user_with_target_word_image_file, images_count: 1)
+      @board = user.image_boards.first
+      visit root_path
+      mock_auth_hash
+      click_link 'Continue with Twitter'
+      visit home_users_path
     end
 
+    it "clips an image by clicking the 'Clip' button" do
+      page.find('.boxInner').hover
+      expect(page).to have_content('Clip')
+      click_link 'Clip'
+      windows.length.should == 1
 
+      within_window(windows.last) do
+        form = page.find(:xpath, "//input[@value='New board']")
+        expect(form).to_not eq(nil)
+        expect(page).to have_content('Default')
+
+        click_link 'Default'
+        wait_for_ajax
+      end
+
+      # default one + clipped one = 2 favored_images
+      expect(@board.favored_images.count).to eq(2)
+    end
   end
+
 
   describe "infinite scrolling", :js => true do
     before do
-      #Capybara.current_driver = :webkit
       FactoryGirl.create(:user_with_target_word_image_file, images_count: 26)
-
-
       visit root_path
-      #save_and_open_page
       mock_auth_hash
-      click_link 'Login with twitter'
-      save_and_open_page
-
-      # /users/homeに移動すること
-      uri = URI.parse(current_url)
-      expect(uri.to_s).to include(home_users_path)
-
+      click_link 'Continue with Twitter'
       visit home_users_path
-
-
-
     end
 
-    after do
-      #Capybara.use_default_driver
-    end
-
-    it "Watch more images by infinite scrolling" do
+    it "watches more images by infinite scrolling" do
       default_per_page = Kaminari.config.default_per_page
       Image.count.should > default_per_page
 
       page.should have_css('.box', :count => default_per_page)
-      puts Capybara.javascript_driver
-      puts Capybara.current_driver
       page.execute_script('window.scrollBy(0,100000)')
-
       page.should have_css('.box', :count => Image.count)
-      save_and_open_page
     end
   end
 
