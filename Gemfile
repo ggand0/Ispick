@@ -125,6 +125,9 @@ group :development, :test do
   gem 'fuubar'                                      # テスト進行状況可視化
   gem 'rake_shared_context'                         # Enable rake task testing
   gem 'capybara'
+  gem 'capybara-webkit'
+  gem 'selenium-webdriver'
+  gem 'database_cleaner'
   gem 'launchy'                                     # Enable save_and_open_page method
 
   # JS testing
