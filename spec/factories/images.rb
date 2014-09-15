@@ -94,7 +94,7 @@ FactoryGirl.define do
     views 10000
     posted_at DateTime.now
     is_illust true
-    data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
     to_create do |instance|
       instance.save validate: false
     end

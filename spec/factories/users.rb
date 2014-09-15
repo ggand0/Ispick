@@ -109,9 +109,12 @@ FactoryGirl.define do
 
     factory :user_with_target_word_image_file do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
-      after(:create) do |user|
+      ignore do
+        images_count 1
+      end
+      after(:create) do |user, evaluator|
         1.times do
-          user.target_words << create(:word_with_image_file)
+          user.target_words << create(:word_with_image_file, images_count: evaluator.images_count)
         end
       end
     end
