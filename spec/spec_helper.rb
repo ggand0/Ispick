@@ -20,8 +20,7 @@ require 'capybara'
 require 'capybara/rspec'
 require 'database_cleaner'
 Capybara.javascript_driver = :webkit
-#Capybara.javascript_driver = :selenium
-#Capybara.default_driver = :webkit
+#Capybara.default_wait_time = 5
 
 # Initialize webmock gem
 require 'webmock/rspec'
@@ -75,6 +74,9 @@ RSpec.configure do |config|
   # Devise configuration
   config.include Devise::TestHelpers, :type => :controller
   config.include ControllerMacros, :type => :controller
+  config.include WaitForAjax#, type: :feature
+
+  #config.include WaitForAjax, type: :feature
 
   # Capybara
   config.include Capybara::DSL

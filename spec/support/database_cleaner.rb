@@ -1,16 +1,14 @@
 RSpec.configure do |config|
 
-  # 処理が高速なので、普段はtransactionを使用する
+  # Use transaction as default
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
   end
 
-  # jsオプションが有効な時のテストはtruncationを使用
+  # Use truncation when 'js' option is enabled
   config.before(:each, :js => true) do
     DatabaseCleaner.strategy = :truncation
   end
-
-  # database cleaner の設定
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
