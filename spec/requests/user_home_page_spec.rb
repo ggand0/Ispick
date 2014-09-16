@@ -24,12 +24,16 @@ describe "user's home page" do
     # クリックすると画像の詳細情報を閲覧出来る
     it "displays an image's details by clicking the picture" do
       visit home_users_path
-      save_and_open_page
       find(:xpath, "//a/img[@alt='Madoka0']/..").click
       expect(page).to have_content('madoka')            # sees the title
       expect(page).to have_content('madoka dayo!')      # sees the caption
     end
+
+    it "can sign out" do
+
+    end
   end
+
 
   describe "clipping images", :js => true do
     before do
@@ -39,6 +43,10 @@ describe "user's home page" do
       mock_auth_hash
       click_link 'Continue with Twitter'
       visit home_users_path
+    end
+
+    it "changes the avatar image to another one" do
+
     end
 
     # 'Clip'ボタンをクリックし、ボード名のボタンをさらにクリックする事で
