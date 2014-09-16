@@ -16,7 +16,7 @@ class FavoredImagesController < ApplicationController
   def destroy
     @favored_image.destroy
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path(board: params[:board]) }
+      format.html { redirect_to boards_users_path(board: params[:board]) }
       format.json { head :no_content }
     end
   end

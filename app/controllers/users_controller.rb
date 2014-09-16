@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   include ApplicationHelper
   before_action :render_not_signed_in, only: [:show_favored_images]
 
-  # GET
+  # GET /users/home
   # Render an user's home page.
   # ユーザ個別のホームページを表示する。
   def home
@@ -31,7 +31,6 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(25)
     @images_all = images
-    render action: 'signed_in'
   end
 
   # GET
@@ -50,9 +49,8 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(25)
     @images_all = images
-    render action: 'signed_in'
+    render action: 'home'
   end
-
 
   # GET
   def new_avatar
@@ -76,6 +74,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # [Unused]画像登録画面を表示する
   # Render the index page of target_images.
   def show_target_images
     return redirect_to '/signin_with_password' unless signed_in?
@@ -84,8 +83,9 @@ class UsersController < ApplicationController
     render action: 'show_target_images'
   end
 
+  # タグ登録画面を表示する
   # Render the index page of target_words.
-  def show_target_words
+  def preferences
     return redirect_to '/signin_with_password' unless signed_in?
 
     @popular_tags = TargetWord.get_tags_with_images(20)
@@ -95,13 +95,14 @@ class UsersController < ApplicationController
     @people = @search.result(distinct: true).page(params[:page]).per(50)
 
     respond_to do |format|
-      format.html { render action: 'show_target_words' }
+      format.html { render action: 'preferences' }
       format.js { render partial: 'layouts/reload_popular_tags' }
     end
   end
 
+  # お気に入り画像一覧ページを表示する
   # Render the list of clipped images.
-  def show_favored_images
+  def boards
     board_id = params[:board]
     board = current_user.get_board(board_id)
 
@@ -122,13 +123,17 @@ class UsersController < ApplicationController
     @target_words = current_user.target_words
 
     respond_to do |format|
-      format.html { render action: 'show_target_words' }
+      format.html { render action: 'preferences' }
       format.js { render partial: 'layouts/reload_followed_tags' }
     end
   end
 
 
-  # An action for debug.
+
+  # =======================
+  #  Actions for debugging
+  # =======================
+  # Download images of the default image_board.
   # This feature will be deleted in future.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
@@ -146,13 +151,11 @@ class UsersController < ApplicationController
       end
     end
     send_file temp_file.path, type: 'application/zip',
-                              disposition: 'attachment',
-                              filename: file_name
+      disposition: 'attachment', filename: file_name
     temp_file.close
   end
 
-
-  # A page for debugging illust detection feature.
+  # The page for debugging illust detection feature.
   # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
     return redirect_to :back unless signed_in?
@@ -175,7 +178,7 @@ class UsersController < ApplicationController
     @images = images.page(params[:page]).per(25)
   end
 
-  # Just an old version of 'show_target_words' template,
+  # Just an old version of 'preferences' template,
   # which contains the 'create a target_word' link.
   def debug_crawling
     return redirect_to '/signin_with_password' unless signed_in?
@@ -190,12 +193,12 @@ class UsersController < ApplicationController
 
   private
 
-  # Render the template if an user is not signed in.
+  # Render the 'sign in' template if the user is logged in.
   def render_not_signed_in
     redirect_to '/signin_with_password' unless signed_in?
   end
 
-  # Update session values by request parameters.
+  # Update session values based on request parameters.
   def update_session(params)
     session[:all] = (not session[:all]) if params[:toggle_site]
     session[:sort] = params[:sort] if params[:sort]
@@ -204,6 +207,7 @@ class UsersController < ApplicationController
   end
 
 
+  # Returns the session data for debugging.
   # デバッグ用にsessionの情報を返す。
   # @return [Array] String array of session data
   def get_session_data

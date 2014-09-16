@@ -21,7 +21,7 @@
   <%= bs_dropdown_button_to 'Select a board' do %>
     <% current_user.image_boards.each do |board| %>
       <li>
-        <%= link_to board.name, { controller: 'users', action: 'show_favored_images', board: board.id }, class: 'btn-default' %>
+        <%= link_to board.name, { controller: 'users', action: 'boards', board: board.id }, class: 'btn-default' %>
       </li>
     <% end %>
   <% end %>

@@ -40,7 +40,7 @@ class TargetWordsController < ApplicationController
       # IDが存在する=既存のTargetWordを取ってきている場合は、関連づけてからリダイレクト
       if @target_word.id
         current_user.target_words << @target_word
-        format.html { redirect_to controller: 'users', action: 'show_target_words' }
+        format.html { redirect_to controller: 'users', action: 'preferences' }
         format.js { @target_words = current_user.target_words; render partial: 'layouts/reload_followed_tags' }
 
       # If the id equals to nil, which means @target_word is newly initialized, redirect after saving it.
@@ -50,7 +50,7 @@ class TargetWordsController < ApplicationController
         # デバッグ用のparamsがある場合はSearchImageのjobをenqueueする
         current_user.search_keyword(@target_word) if params[:debug]
 
-        format.html { redirect_to controller: 'users', action: 'show_target_words' }
+        format.html { redirect_to controller: 'users', action: 'preferences' }
         format.js { @target_words = current_user.target_words; render partial: 'layouts/reload_followed_tags' }
         format.json { render partial: 'create' }
 
@@ -97,7 +97,7 @@ class TargetWordsController < ApplicationController
   def destroy
     @target_word.destroy
     respond_to do |format|
-      format.html { redirect_to show_target_words_users_path }
+      format.html { redirect_to preferences_users_path }
       format.json { head :no_content }
     end
   end

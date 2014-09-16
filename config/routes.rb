@@ -22,14 +22,14 @@ Ispick::Application.routes.draw do
   resources :users do
     collection do
       get 'home'
+      get 'preferences'
+      post 'preferences'
+      get 'boards'
       get 'new_avatar'
       post 'create_avatar'
       get 'search'
       get 'show_illusts'
       get 'show_target_images'
-      get 'show_target_words'
-      post 'show_target_words'
-      get 'show_favored_images'
       delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",

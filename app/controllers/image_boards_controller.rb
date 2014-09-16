@@ -22,7 +22,6 @@ class ImageBoardsController < ApplicationController
   end
 
   def boards
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:id]
@@ -33,7 +32,6 @@ class ImageBoardsController < ApplicationController
   end
 
   def reload
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     respond_to do |format|
@@ -82,7 +80,7 @@ class ImageBoardsController < ApplicationController
   def destroy
     @image_board.destroy
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path }
+      format.html { redirect_to boards_users_path }
       format.json { head :no_content }
     end
   end
