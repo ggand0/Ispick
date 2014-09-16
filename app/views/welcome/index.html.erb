@@ -9,7 +9,7 @@
   <div class="btn-group-vertical btn-group-oauth">
     <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
     <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Continue with Pinterest', '/', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br>
     <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
   </div>
   <div align="center">

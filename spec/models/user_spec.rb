@@ -13,7 +13,6 @@ describe User do
     info: {email:'test@example.com'}
   })}
 
-
   # TODO: include a delivered_image from twitter
   describe "get_images" do
     it "returns proper relation object" do
