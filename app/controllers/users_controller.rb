@@ -2,6 +2,7 @@ require 'rubygems'
 require 'zip'
 
 class UsersController < ApplicationController
+  include ApplicationHelper
   before_action :render_not_signed_in, only: [:show_favored_images]
 
   # GET
@@ -15,6 +16,7 @@ class UsersController < ApplicationController
     # For a new user, display the newer images
     if current_user.target_words.empty?
       images = User.get_recent_images(500)
+
     # Otherwise, display images from user.target_words relation
     else
       images = current_user.get_images
@@ -86,6 +88,7 @@ class UsersController < ApplicationController
   def show_target_words
     return redirect_to '/signin_with_password' unless signed_in?
 
+    @popular_tags = TargetWord.get_tags_with_images(20)
     @target_words = current_user.target_words
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
@@ -106,6 +109,7 @@ class UsersController < ApplicationController
       session[:selected_board] = board.id
       @image_board = ImageBoard.find(board.id)
       @favored_images = board.favored_images.page(params[:page]).per(25)
+      @total_size = bytes_to_megabytes(@image_board.get_total_size)
     else
       render action: 'no_boards'
     end

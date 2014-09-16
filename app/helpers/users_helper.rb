@@ -1,36 +1,4 @@
 module UsersHelper
-  # ===================
-  #   Utility helpers
-  # ===================
-  # Calculates the file size of a favored_image relation.
-  # @params favored_images [ActiveRecord::AssociationRelation]
-  # @return [Integer] Total file size[bytes] of the relation
-  def get_total_size_favored(favored_images)
-    total_size = 0
-    favored_images.each do |n|
-      # まだコピーされていない(生存中のImageを参照している)
-      if n.image_id
-        image = Image.find(n.image_id)
-        total_size += image.data.size
-      # 既にコピーされている(ソース元のImageは削除されている)
-      else
-        total_size += n.data.size
-      end
-    end
-    total_size
-  end
-
-  # @param size [Integer]
-  def get_popular_tags(size)
-    TargetWord.where.not(users_count: 0).order('users_count DESC').limit(size)
-  end
-
-  # @param size [Integer]
-  def get_tags_with_images(size)
-    TargetWord.where.not(images_count: 0).order('images_count DESC').limit(size)
-  end
-
-
   # ======================
   #  HTML related helpers
   # ======================
