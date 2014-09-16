@@ -8,7 +8,11 @@ SimpleCov.start do
   add_filter 'config/initializers/reload_lib'
   add_filter 'config/initializers/teaspoon'
   add_filter '/spec/support'
+
+  add_group 'Models', 'app/models'
 end
+SimpleCov.command_name "rspec"
+SimpleCov.command_name "RSpec"
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 #ENV["RAILS_ENV"] ||= 'test'
@@ -20,7 +24,7 @@ require 'capybara'
 require 'capybara/rspec'
 require 'database_cleaner'
 Capybara.javascript_driver = :webkit
-#Capybara.default_wait_time = 5
+#Capybara.current_session.driver.header('Accept-Language', 'ja')
 
 # Initialize webmock gem
 require 'webmock/rspec'

@@ -120,8 +120,8 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.99.0'                    # Testing framework
   gem 'rspec-its'                                   # Provides the 'its' method
   gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
-  gem 'simplecov'                                   # カバレッジ測定
-  gem 'simplecov-rcov'
+  gem 'simplecov', :require => false                                   # カバレッジ測定
+  gem 'simplecov-rcov', :require => false
   gem 'fuubar'                                      # テスト進行状況可視化
   gem 'rake_shared_context'                         # Enable rake task testing
   gem 'capybara'
