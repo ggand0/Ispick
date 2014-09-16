@@ -25,7 +25,8 @@ Devise.setup do |config|
   # API key
   config.omniauth :facebook, CONFIG['facebook_app_id'], CONFIG['facebook_app_secret']
   config.omniauth :twitter,  CONFIG['twitter_consumer_key'], CONFIG['twitter_consumer_secret']
-
+  config.omniauth :tumblr,  CONFIG['tumblr_consumer_key'],CONFIG['tumblr_consumer_secret']
+  
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
   # just :email. You can configure it to use [:username, :subdomain], so for

@@ -7,7 +7,7 @@ Ispick::Application.routes.draw do
 
   # Root path
   root 'welcome#index'
-
+  
   # Devise
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks"

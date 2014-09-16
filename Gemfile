@@ -69,6 +69,7 @@ gem 'omniauth'
 gem 'omniauth-twitter'
 gem 'omniauth-facebook'
 gem 'omniauth-pinterest'
+gem 'omniauth-tumblr'
 
 # System
 gem 'nokogiri'                                   # For scraping
