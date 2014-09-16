@@ -24,17 +24,6 @@ FactoryGirl.define do
       end
       after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     end
-=begin
-    # image(no file)を１つ持つTargetWord
-    # A TargetWord object with an image that have no files
-    factory :word_with_image do
-      after(:create) do |target_word|
-        1.times do
-          target_word.images << create(:image_file)
-        end
-      end
-    end
-=end
 
     # image(with file)を持つTargetWord
     # A TargetWord object with images that have files

@@ -67,4 +67,47 @@ class Image < ActiveRecord::Base
   def self.get_recent_images(limit)
     Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
   end
+
+  # Search images which is shown at user's home page.
+  # @return [ActiveRecord::AssociationRelation]
+  def self.search_images(query)
+    Image.joins(:tags).where(tags: { name: query }).references(:tags)
+  end
+
+  # @param images [ActiveRecord::CollectionProxy]
+  # @param date [Date] date
+  # @return [ActiveRecord::CollectionProxy]
+  def self.filter_by_date(images, date)
+    images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+  end
+
+  # Return images which is filtered by is_illust data.
+  # How the filter is applied depends on the session[:illust] value.
+  # イラストと判定されてるかどうかでフィルタをかけるメソッド。
+  # @param images [ActiveRecord::Association::CollectionProxy]
+  # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
+  def self.filter_by_illust(images, illust)
+    case illust
+    when 'all'
+      return images
+    when 'illust'
+      return images.where({ is_illust: true })
+    when 'photo'
+      return images.where({ is_illust: false })
+    end
+  end
+
+  # Sort images by its favorites attribute.
+  # @return [ActiveRecord::AssociationRelation]
+  def self.sort_images(images, page)
+    images = images.reorder('images.favorites desc')
+    images.page(page).per(25)
+  end
+
+  # Sort images by its quality attribute.
+  # @return [ActiveRecord::AssociationRelation]
+  def self.sort_by_quality(images, page)
+    images = images.reorder('quality desc')
+    images.page(page).per(25)
+  end
 end

@@ -26,7 +26,7 @@ class UsersController < ApplicationController
     # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
-      images = User.filter_by_date(images, date)
+      images = Image.filter_by_date(images, date)
     end
 
     @images = images.page(params[:page]).per(25)
@@ -45,7 +45,7 @@ class UsersController < ApplicationController
     # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
-      images = User.filter_by_date(images, date)
+      images = Image.filter_by_date(images, date)
     end
 
     @images = images.page(params[:page]).per(25)
@@ -167,11 +167,11 @@ class UsersController < ApplicationController
 
     # Filter by is_an_illustration value
     @debug = get_session_data
-    images = User.filter_by_illust(images, session[:illust])
+    images = Image.filter_by_illust(images, session[:illust])
 
     # Sort images if any requests exist.
-    images = User.sort_images(images, params[:page]) if session[:sort] == 'favorites'
-    images = User.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
+    images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
+    images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
     @images = images.page(params[:page]).per(25)
   end
 
