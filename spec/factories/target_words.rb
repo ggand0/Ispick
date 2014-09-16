@@ -6,6 +6,11 @@ FactoryGirl.define do
     #sequence(:name) { |n| "鹿目まどか（かなめ まどか）#{n}" }
     sequence(:name) { |n| "鹿目まどか#{n}" }
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
+    #after(:create) do |target_word|
+    #  target_word.person = create(:person_madokas)
+    #end
+
+
     factory :word_with_run_callback do
       after(:create) { |user| user.send(:search_keyword) }
     end
@@ -78,6 +83,7 @@ FactoryGirl.define do
     after(:create) do |target_word|
       5.times do
         target_word.images << create(:image)
+        target_word.person = create(:person_madokas)
       end
     end
   end

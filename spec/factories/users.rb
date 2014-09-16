@@ -42,7 +42,10 @@ FactoryGirl.define do
 
     # Create a FavoredImage record as default one
     after(:create) do |user|
-      1.times { create(:favored_image_file, image_board: user.image_boards.first) }
+      1.times do
+        create(:favored_image_file, image_board: user.image_boards.first)
+        user.image_boards << create(:image_board_min)
+      end
     end
 
     # ==========================
@@ -64,6 +67,7 @@ FactoryGirl.define do
     # ==============================
     factory :user_with_target_words do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
+      uid '22345678'
       ignore do
         words_count 5
       end
@@ -76,6 +80,7 @@ FactoryGirl.define do
 
     factory :user_with_target_word do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
+      uid '22345678'
       after(:create) do |user|
         1.times do
           user.target_words << create(:target_words)

@@ -4,6 +4,8 @@
 <h2>Preferences</h2>
 You can follow a tag to make an image feed related to the tag.
 <br />
+
+<!-- Render the search form -->
 <%= search_form_for @search, url: show_target_words_users_path, html: { method: :post }, remote: true do |f| %>
   <div class="row">
     <div class="col-lg-2">
@@ -16,17 +18,21 @@ You can follow a tag to make an image feed related to the tag.
 <% end %>
 <br />
 
+
+<!-- Render popular tags or search result in the partial -->
 <div class="wrapper-popular-tags">
   <%= render partial: 'users/popular_tags', locals: { people: @people, popular_tags: @popular_tags } %>
 </div>
 
 <div class="arrow">></div>
 
-<!-- Render followed tags from the partial -->
+<!-- Render followed tags in the partial -->
 <div class="wrapper-followed-tags">
   <%= render partial: 'users/followed_tags', locals: { target_words: @target_words } %>
 </div>
 
+
+<!-- Insert space -->
 <div style="clear: both;">
   <br />
   <br />
