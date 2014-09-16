@@ -41,24 +41,23 @@ class User < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
-    #Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(is_illust: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:target_words)
   end
 
-  def self.get_recent_images(limit)
-    Image.where("created_at>?", DateTime.now - 1).where.not(data_updated_at: nil).limit(limit)
-  end
 
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
-  def search_images(query)
+  def self.search_images(query)
     Image.joins(:tags).where(tags: { name: query }).references(:tags)
   end
 
+  # For now, it's same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
     words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:target_words)
   end
 
   # @param images [ActiveRecord::CollectionProxy]

@@ -7,15 +7,20 @@ describe UsersController do
   end
 
   describe "GET home" do
+    it "renders 'signin_with_password' template when the user is NOT logged in" do
+      get :home, {}, valid_session
+      expect(response).to redirect_to('/signin_with_password')
+    end
+
     it "renders 'signed_in' template when the user is logged in" do
       login_user
       get :home, {}, valid_session
       expect(response).to render_template('signed_in')
     end
 
-    it "renders 'not_signed_in' template when the user is NOT logged in" do
-      get :home, {}, valid_session
-      expect(response).to redirect_to('/signin_with_password')
+    it "does something" do
+      login_user
+      get :home, { date: 'Mon Sep 01 2014 00:00:00 GMT 0900 (JST)' }, valid_session
     end
   end
 

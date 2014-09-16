@@ -3,12 +3,13 @@ require 'spec_helper'
 describe "user's home page" do
   describe "default features" do
     before do
-      FactoryGirl.create(:user_with_target_word_image_file)
+      FactoryGirl.create(:user_with_target_word_images_file)
       visit root_path
       mock_auth_hash
       click_link 'Continue with Twitter'
     end
 
+    # URIが正しい
     it "moves to /users/home" do
       uri = URI.parse(current_url)
       expect(uri.to_s).to include(home_users_path)
@@ -32,7 +33,7 @@ describe "user's home page" do
 
   describe "clipping images", :js => true do
     before do
-      user = FactoryGirl.create(:user_with_target_word_image_file, images_count: 1)
+      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
       @board = user.image_boards.first
       visit root_path
       mock_auth_hash
@@ -40,6 +41,8 @@ describe "user's home page" do
       visit home_users_path
     end
 
+    # 'Clip'ボタンをクリックし、ボード名のボタンをさらにクリックする事で
+    # お気に入り画像をそのボードに登録出来る
     it "clips an image by clicking the 'Clip' button" do
       page.find('.boxInner').hover
       expect(page).to have_content('Clip')
@@ -63,13 +66,14 @@ describe "user's home page" do
 
   describe "infinite scrolling", :js => true do
     before do
-      FactoryGirl.create(:user_with_target_word_image_file, images_count: 26)
+      FactoryGirl.create(:user_with_target_word_images_file, images_count: 26)
       visit root_path
       mock_auth_hash
       click_link 'Continue with Twitter'
       visit home_users_path
     end
 
+    # 無限スクロール機能によってより多くの画像を１画面で見る事が出来る
     it "watches more images by infinite scrolling" do
       default_per_page = Kaminari.config.default_per_page
       Image.count.should > default_per_page
