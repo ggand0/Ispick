@@ -64,7 +64,7 @@ class ImagesController < ApplicationController
     @board = ImageBoard.new
     @id = params[:html_id]
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path }
+      format.html { redirect_to boards_users_path }
       format.js { render partial: 'image_boards/boards' }
     end
   end

@@ -4,7 +4,7 @@ require 'zip'
 class UsersController < ApplicationController
   include ApplicationHelper
   before_action :render_sign_in_page,
-    only: [:home, :boards, :preferences, :search, :target_images,
+    only: [:home, :boards, :preferences, :search, :show_target_images,
       :download_favored_images, :debug_illust_detection, :debug_crawling]
   before_action :update_session, only: [:home, :search, :debug_illust_detection]
 

@@ -186,12 +186,11 @@ describe TargetWordsController do
 
   describe "show_delivered action" do
     it "assigns associated images" do
-      target_word = FactoryGirl.create(:word_with_images)
+      target_word = FactoryGirl.create(:word_with_image_file)
       get :show_delivered, { id: target_word.to_param }, valid_session
 
-      count = target_word.images.where.not({ site_name: 'twitter' }).count
-
-      expect(assigns(:delivered_images).count).to eq(count)
+      count = target_word.images.count
+      expect(assigns(:images).count).to eq(count)
     end
   end
 end

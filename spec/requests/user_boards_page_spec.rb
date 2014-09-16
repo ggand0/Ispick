@@ -7,7 +7,7 @@ describe "Boards page" do
     visit root_path
     mock_auth_hash
     click_link 'Continue with Twitter'
-    visit show_favored_images_users_path
+    visit boards_users_path
     #save_and_open_page
   end
 

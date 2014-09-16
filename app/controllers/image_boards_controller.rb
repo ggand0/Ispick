@@ -27,7 +27,7 @@ class ImageBoardsController < ApplicationController
     @id = params[:id]
     respond_to do |format|
       format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
-      format.js { render partial: 'boards' }  # _boards.js.erbを描画
+      format.js { render partial: 'boards' }  # Render _boards.js.erb
     end
   end
 

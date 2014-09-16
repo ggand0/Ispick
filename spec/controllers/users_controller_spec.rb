@@ -41,25 +41,25 @@ describe UsersController do
   describe "GET show_target_words" do
     it "renders 'preferences' template when logged in" do
       login_user
-      get :show_target_words, {}, valid_session
+      get :preferences, {}, valid_session
       response.should render_template('preferences')
     end
 
     it "renders 'not_signed_in' template when NOT logged in" do
-      get :show_target_words, {}, valid_session
+      get :preferences, {}, valid_session
       expect(response).to redirect_to('/signin_with_password')
     end
   end
 
-  describe "GET show_favored_images" do
+  describe "GET boards" do
     it "renders show_target_images template when logged in" do
       login_user
-      get :show_favored_images, {}, valid_session
+      get :boards, {}, valid_session
       response.should render_template('boards')
     end
 
     it "renders not_signed_in template when NOT logged in" do
-      get :show_favored_images, {}, valid_session
+      get :boards, {}, valid_session
       expect(response).to redirect_to('/signin_with_password')
     end
   end
@@ -71,15 +71,6 @@ describe UsersController do
       controller.stub(:render).and_return nil
       controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
       get :download_favored_images, {}, valid_session
-    end
-
-    it "renders not_signed_in template when NOT logged in" do
-      # rootにいたと仮定
-      request.env['HTTP_REFERER'] = '/'
-      get :download_favored_images, {}, valid_session
-
-      # redirect_to :backされるはず
-      expect(response).to redirect_to '/'
     end
   end
 
