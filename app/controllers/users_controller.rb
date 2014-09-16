@@ -3,17 +3,17 @@ require 'zip'
 
 class UsersController < ApplicationController
   include ApplicationHelper
-  before_action :render_not_signed_in, only: [:show_favored_images]
+  before_action :render_sign_in_page,
+    only: [:home, :boards, :preferences, :search, :target_images,
+      :download_favored_images, :debug_illust_detection, :debug_crawling]
+  before_action :update_session, only: [:home, :search, :debug_illust_detection]
+
 
   # GET /users/home
   # Render an user's home page.
   # ユーザ個別のホームページを表示する。
   def home
-    return redirect_to '/signin_with_password' unless signed_in?
-    session[:sort] = params[:sort] if params[:sort]
-
-    # Get images
-    # For a new user, display the newer images
+    # Get images: For a new user, display the newer images
     if current_user.target_words.empty?
       images = Image.get_recent_images(500)
 
@@ -35,10 +35,7 @@ class UsersController < ApplicationController
 
   # GET
   def search
-    return redirect_to '/signin_with_password' unless signed_in?
-    session[:sort] = params[:sort] if params[:sort]
-
-    images = current_user.search_images(params[:query])
+    images = Image.search_images(params[:query])
     images.reorder!('posted_at DESC') if params[:sort]
 
     # Filter images by date
@@ -77,17 +74,13 @@ class UsersController < ApplicationController
   # [Unused]画像登録画面を表示する
   # Render the index page of target_images.
   def show_target_images
-    return redirect_to '/signin_with_password' unless signed_in?
-
-    @target_images = current_user.target_images
+  @target_images = current_user.target_images
     render action: 'show_target_images'
   end
 
   # タグ登録画面を表示する
   # Render the index page of target_words.
   def preferences
-    return redirect_to '/signin_with_password' unless signed_in?
-
     @popular_tags = TargetWord.get_tags_with_images(20)
     @target_words = current_user.target_words
     @target_word = TargetWord.new
@@ -112,7 +105,7 @@ class UsersController < ApplicationController
       @favored_images = board.favored_images.page(params[:page]).per(25)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
     else
-      render action: 'no_boards'
+      render action: 'boards_no_images'
     end
   end
 
@@ -133,12 +126,10 @@ class UsersController < ApplicationController
   # =======================
   #  Actions for debugging
   # =======================
-  # Download images of the default image_board.
+  # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
-    return redirect_to :back unless signed_in?
-
     @images = current_user.image_boards.first.favored_images
     file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
 
@@ -158,9 +149,6 @@ class UsersController < ApplicationController
   # The page for debugging illust detection feature.
   # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
-    return redirect_to :back unless signed_in?
-    update_session(params)
-
     # Get images
     if session[:all]
       images = current_user.get_images_all
@@ -178,28 +166,29 @@ class UsersController < ApplicationController
     @images = images.page(params[:page]).per(25)
   end
 
-  # Just an old version of 'preferences' template,
+  # [DEBUG]Just an old version of 'preferences' template,
   # which contains the 'create a target_word' link.
   def debug_crawling
-    return redirect_to '/signin_with_password' unless signed_in?
     @words = current_user.target_words
   end
 
+  # [DEBUG]
   def toggle_miniprofiler
     Rack::MiniProfiler.config.auto_inject = Rack::MiniProfiler.config.auto_inject ? false : true
     redirect_to home_users_path
   end
 
 
+
   private
 
   # Render the 'sign in' template if the user is logged in.
-  def render_not_signed_in
+  def render_sign_in_page
     redirect_to '/signin_with_password' unless signed_in?
   end
 
   # Update session values based on request parameters.
-  def update_session(params)
+  def update_session
     session[:all] = (not session[:all]) if params[:toggle_site]
     session[:sort] = params[:sort] if params[:sort]
     session[:illust] ||= 'all'

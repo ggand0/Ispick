@@ -30,4 +30,8 @@ class TargetWord < ActiveRecord::Base
   def self.get_tags_with_images(size)
     TargetWord.where.not(images_count: 0).order('images_count DESC').limit(size)
   end
+
+  def get_images
+    images.where.not(data_updated_at: nil).reorder('created_at DESC')
+  end
 end

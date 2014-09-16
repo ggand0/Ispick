@@ -1,5 +1,5 @@
 class TargetWordsController < ApplicationController
-  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered, :switch]
+  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered]
 
   # GET /target_words
   # GET /target_words.json
@@ -23,6 +23,7 @@ class TargetWordsController < ApplicationController
 
   # POST /target_words
   # POST /target_words.json
+  # TODO: Refactor this if possible
   def create
     # Get the existing target_word object or create a new one.
     # 既に登録されている同名のTargetWordレコードがある場合はそれを取ってくる、無ければ新しくオブジェクトを生成する
@@ -112,27 +113,22 @@ class TargetWordsController < ApplicationController
   # Show images associated by a specific tag. Will be moved to the UsersController class.
   # 特定のタグに配信されている画像のみを表示する。UsersControllerに移動予定
   def show_delivered
-    if signed_in?
-      images = @target_word.images.where.not({ site_name: 'twitter' }).
-        #where('avoided IS NULL or avoided = false').
-        #joins(:image).
-        where.not(data_updated_at: nil).        # Already downloaded
-        reorder('created_at DESC')
+    redirect_to '/signin_with_password' unless signed_in?
 
-      # Filter by created_at attribute
-      # 配信日で絞り込む場合
-      if params[:date]
-        date = params[:date]
-        date = DateTime.parse(date).to_date
-        images = images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
-      end
+    # Get images of the TargetWord record
+    images = @target_word.get_images
 
-      @images = images.page(params[:page]).per(25)
-      @images_all = images
-      render action: '../users/signed_in'
-    else
-      render action: 'not_signed_in'
+    # Filter by created_at attribute
+    # 配信日で絞り込む場合
+    if params[:date]
+      date = params[:date]
+      date = DateTime.parse(date).to_date
+      images = Image.filter_by_date(images, date)
     end
+
+    @images = images.page(params[:page]).per(25)
+    @images_all = images
+    render action: '../users/home'
   end
 
 
