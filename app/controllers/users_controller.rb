@@ -15,7 +15,7 @@ class UsersController < ApplicationController
     # Get images
     # For a new user, display the newer images
     if current_user.target_words.empty?
-      images = User.get_recent_images(500)
+      images = Image.get_recent_images(500)
 
     # Otherwise, display images from user.target_words relation
     else

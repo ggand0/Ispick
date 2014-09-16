@@ -19,4 +19,12 @@ describe Image do
     end
   end
 
+  describe "get_recent_images" do
+    it "returns a relation object that has same length as the limit arg" do
+      FactoryGirl.create_list(:image_file, 6)
+      result = Image.get_recent_images(5)
+      expect(result.count).to eq(5)
+    end
+  end
+
 end
