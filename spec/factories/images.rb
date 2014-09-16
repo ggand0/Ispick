@@ -6,7 +6,7 @@ FactoryGirl.define do
     sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
 
-  # The main factory. it generates Image objects with various attributes.
+  # The main factory. This generates Image objects with various attributes.
   factory :image, class: Image do
     title 'test'
     caption 'test'
@@ -18,6 +18,10 @@ FactoryGirl.define do
     views 10000
     posted_at DateTime.now
     is_illust true
+
+    after(:create) do |image|
+      image.tags << create(:tags)
+    end
 
     # sequenceされていないタグのみ必要な場合
     factory :image_with_specific_tags do
