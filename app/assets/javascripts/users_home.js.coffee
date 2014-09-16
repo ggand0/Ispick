@@ -1,57 +1,23 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
-#= require 'clip'
+# require 'clip'
+#= require 'component'
 
 $ ->
-  # クリップ機能
-  window.Clip.addClipEvents(true)
-  # 'Clip'ボタンを押下した時にボタンを表示したままにする
-  $(document).on('click', '.popover-board', () ->
-    $(this).parents('.boxInner').addClass('hovered')
-  )
+  component = new Component()
+
+  # Initialize buttons related to clipping
+  component.initButtons()
 
 
-  # 無限スクロール
-  $('.pagination').hide()
-  $(".wrap").infinitescroll({
-    navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
-    nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
-    itemSelector: ".box"                        # selector for all items you'll retrieve
-  },
-  (arrayOfNewElems) ->
-    window.Clip.removeClipEvents(true)
-    window.Clip.addClipEvents(true)
-  )
+  # Initialize infinite scroll
+  component.infiniteScroll(true)
 
 
-  # カレンダー(Datepicker)
-  #selector = "[data-behaviour~=datepicker]"
-  selector = ".input-group.date"
-  $(selector).datepicker().on('changeDate', (ev) ->
-    $('.current-date').change()
-
-    date = $(this).datepicker('getDate')
-    $(selector).datepicker('hide')
-
-    url = window.location.href
-    url = url.split('?')[0]+'?date='+date
-    window.location.href = url
-  )
-  $("body").on("click", ".filter-button", () ->
-    $(selector).datepicker('show')
-  )
+  # Display the calender (Datepicker)
+  component.initCalender()
 
 
-  # Popovers
-  # Close popover on click wherever except popover windows
-  $('body').on('click', (e) ->
-    $('[data-toggle="popover"]').each(() ->
-      # the 'is' for buttons that trigger popups
-      # the 'has' for icons within a button that triggers a popup
-      if (!$(this).is(e.target) && ($(this).has(e.target).length is 0) && $('.popover').has(e.target).length is 0)
-        $(this).popover('hide')
-        # Clip buttonもついでに消す
-        $('.boxInner').removeClass('hovered')
-    )
-  )
+  # Popovers: close popover on click wherever except popover windows
+  component.initPopovers()

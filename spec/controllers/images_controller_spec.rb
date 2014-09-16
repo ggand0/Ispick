@@ -83,10 +83,10 @@ describe ImagesController do
 
       # ImageBoardに１枚追加されているはずである
       expect(current_user.image_boards.first.favored_images.count).to eq(count+1)
-      expect(response).to redirect_to show_favored_images_users_path
+      expect(response).to redirect_to boards_users_path
     end
 
-    it "redirects to show_favored_images_users_path" do
+    it "redirects to boards_users_path" do
       favored_image = FactoryGirl.create(:favored_image_with_image)
       put :favor, {
         id: favored_image.image.id,
@@ -95,7 +95,7 @@ describe ImagesController do
         render: 'true'
       }, valid_session
 
-      expect(response).to redirect_to show_favored_images_users_path
+      expect(response).to redirect_to boards_users_path
     end
   end
 

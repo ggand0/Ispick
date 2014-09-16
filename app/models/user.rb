@@ -41,58 +41,18 @@ class User < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
-    #Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(is_illust: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:target_words)
   end
 
-  # Search images which is shown at user's home page.
-  # @return [ActiveRecord::AssociationRelation]
-  def search_images(query)
-    Image.joins(:tags).where(tags: { name: query }).references(:tags)
-  end
-
+  # For now, it's same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
     words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
+    Image.joins(:target_words).where("target_words.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:target_words)
   end
 
-  # @param images [ActiveRecord::CollectionProxy]
-  # @param date [Date] date
-  # @return [ActiveRecord::CollectionProxy]
-  def self.filter_by_date(images, date)
-    images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
-  end
-
-  # Return images which is filtered by is_illust data.
-  # How the filter is applied depends on the session[:illust] value.
-  # イラストと判定されてるかどうかでフィルタをかけるメソッド。
-  # @param images [ActiveRecord::Association::CollectionProxy]
-  # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
-  def self.filter_by_illust(images, illust)
-    case illust
-    when 'all'
-      return images
-    when 'illust'
-      return images.where({ is_illust: true })
-    when 'photo'
-      return images.where({ is_illust: false })
-    end
-  end
-
-  # Sort images by its favorites attribute.
-  # @return [ActiveRecord::AssociationRelation]
-  def self.sort_images(images, page)
-    images = images.reorder('images.favorites desc')
-    images.page(page).per(25)
-  end
-
-  # Sort images by its quality attribute.
-  # @return [ActiveRecord::AssociationRelation]
-  def self.sort_by_quality(images, page)
-    images = images.reorder('quality desc')
-    images.page(page).per(25)
-  end
 
   # @return The path where default thumbnail file is.
   def set_default_url

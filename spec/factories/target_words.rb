@@ -3,36 +3,41 @@
 FactoryGirl.define do
 
   factory :target_word do
-    sequence(:name) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
+    #sequence(:name) { |n| "鹿目まどか（かなめ まどか）#{n}" }
+    sequence(:name) { |n| "鹿目まどか#{n}" }
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
+    #after(:create) do |target_word|
+    #  target_word.person = create(:person_madokas)
+    #end
+
+
     factory :word_with_run_callback do
       after(:create) { |user| user.send(:search_keyword) }
     end
 
 
     # images(no file)を持つTargetWordオブジェクト
+    # A TargetWord object with images that have no files
     factory :word_with_images do
+      ignore do
+        images_count 5
+      end
       after(:create) do |target_word, evaluator|
-        5.times do
+        evaluator.images_count.times do
           target_word.images << create(:image)
         end
       end
       after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     end
 
-    # an image(no file)を持つTargetWord
-    factory :word_with_image do
-      after(:create) do |target_word|
-        1.times do
-          target_word.images << create(:image_file)
-        end
-      end
-    end
-
-    # an image(with file)を持つTargetWord
+    # image(with file)を持つTargetWord
+    # A TargetWord object with images that have files
     factory :word_with_image_file do
-      after(:create) do |target_word|
-        1.times do
+      ignore do
+        images_count 1
+      end
+      after(:create) do |target_word, evaluator|
+        evaluator.images_count.times do
           target_word.images << create(:image_file)
         end
       end
@@ -78,6 +83,7 @@ FactoryGirl.define do
     after(:create) do |target_word|
       5.times do
         target_word.images << create(:image)
+        target_word.person = create(:person_madokas)
       end
     end
   end

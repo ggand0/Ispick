@@ -86,7 +86,7 @@ describe TargetWordsController do
       it "redirects to the list page of target_words" do
         person = FactoryGirl.create(:person)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
-        response.should redirect_to(show_target_words_users_path)
+        response.should redirect_to(preferences_users_path)
       end
     end
 
@@ -166,7 +166,7 @@ describe TargetWordsController do
     it "redirects to the target_words list" do
       target_word = TargetWord.create! valid_attributes
       delete :destroy, {:id => target_word.to_param}, valid_session
-      response.should redirect_to(show_target_words_users_path)
+      response.should redirect_to(preferences_users_path)
     end
   end
 
@@ -186,12 +186,11 @@ describe TargetWordsController do
 
   describe "show_delivered action" do
     it "assigns associated images" do
-      target_word = FactoryGirl.create(:word_with_images)
+      target_word = FactoryGirl.create(:word_with_image_file)
       get :show_delivered, { id: target_word.to_param }, valid_session
 
-      count = target_word.images.where.not({ site_name: 'twitter' }).count
-
-      expect(assigns(:delivered_images).count).to eq(count)
+      count = target_word.images.count
+      expect(assigns(:images).count).to eq(count)
     end
   end
 end

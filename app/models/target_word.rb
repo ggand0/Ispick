@@ -18,4 +18,20 @@ class TargetWord < ActiveRecord::Base
   def next
     TargetWord.where("id > ?", id).first
   end
+
+  # Get popular tags in the order of users_count
+  # @param size [Integer]
+  def self.get_popular_tags(size)
+    TargetWord.where.not(users_count: 0).order('users_count DESC').limit(size)
+  end
+
+  # Get popular tags in the order of images_count
+  # @param size [Integer]
+  def self.get_tags_with_images(size)
+    TargetWord.where.not(images_count: 0).order('images_count DESC').limit(size)
+  end
+
+  def get_images
+    images.where.not(data_updated_at: nil).reorder('created_at DESC')
+  end
 end

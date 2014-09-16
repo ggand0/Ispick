@@ -13,68 +13,23 @@ describe User do
     info: {email:'test@example.com'}
   })}
 
-  # TODO: include a delivered_image from twitter
-  describe "get_images" do
+  describe "get_images method" do
     it "returns proper relation object" do
-      #user = FactoryGirl.create(:user_with_images)
-      user = FactoryGirl.create(:user_with_target_word_image)
+      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
       images = user.get_images
       expect(images.count).to eq(1)
     end
   end
 
-  # TODO: include a delivered_image from twitter
-  describe "get_images_all" do
+  describe "get_images_all method" do
     it "returns proper relation object" do
-      #user = FactoryGirl.create(:user_with_images)
-      user = FactoryGirl.create(:user_with_target_word_image)
-      images = user.get_images
+      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
+      images = user.get_images_all
       expect(images.count).to eq(1)
     end
   end
 
-  describe "filter_by_date" do
-    it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_image)
-      images = user.target_words.first.images
-
-      expect(User.filter_by_date(images, DateTime.now.utc.to_date).count).
-        to eq(0)
-    end
-  end
-
-  describe "filter_by_illust" do
-    it "returns proper relation object" do
-      #user = FactoryGirl.create(:user_with_images)
-      user = FactoryGirl.create(:user_with_target_word_image)
-      images = user.get_images
-
-      # Since user.images contain an illust image and a photo image,
-      # it should be 1
-      expect(User.filter_by_illust(images, 'photo').count).to eq(0)
-    end
-  end
-
-  describe "sort_images" do
-    it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_dif_image)
-      images = user.get_images
-      first = images[0]
-      second = images[1]
-
-      result = User.sort_images(images, 1)
-      expect(result[1]).to eq(second)
-      expect(result[0]).to eq(first)
-    end
-  end
-
-  describe "sort_by_quality" do
-    it "returns proper relation object" do
-
-    end
-  end
-
-  describe "create_default" do
+  describe "create_defaul method" do
     it "returns a certain path" do
       user = User.new(email: 'test@example.com', password: '12345678', name: 'test')
       user.create_default
@@ -82,7 +37,7 @@ describe User do
     end
   end
 
-  describe "get_board" do
+  describe "get_board method" do
     it "return the valid ImageBoard record" do
       user = FactoryGirl.create(:user)
       board_id = user.image_boards.first.id

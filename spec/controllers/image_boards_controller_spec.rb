@@ -141,7 +141,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
     it "redirects to the image_boards list" do
       image_board = ImageBoard.create! valid_attributes
       delete :destroy, {:id => image_board.to_param}, valid_session
-      expect(response).to redirect_to(show_favored_images_users_path)
+      expect(response).to redirect_to(boards_users_path)
     end
   end
 
