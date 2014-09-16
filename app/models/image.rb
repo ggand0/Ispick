@@ -110,4 +110,7 @@ class Image < ActiveRecord::Base
     images = images.reorder('quality desc')
     images.page(page).per(25)
   end
+
+  def self.sort_by_posted_at(images)
+  end
 end

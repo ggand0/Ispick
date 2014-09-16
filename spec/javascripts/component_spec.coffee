@@ -4,7 +4,7 @@
 describe "Component class", ->
   it 'has necessary functions', (done) ->
     component = new Component()
-    expect(component.initButtons).not.toBe(null);
+    expect(component.initButtons).not.toBe(null)
 
   describe "infiniteScroll function", ->
     it "call", ->
