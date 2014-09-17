@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'zip'
+require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
@@ -121,6 +122,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def share_tumblr
+    if current_user.provider == 'tumblr'
+      ::Tumblr.configure do |config|
+        config.oauth_token = session[:oauth_token]
+        config.oauth_token_secret = session[:oauth_token_secret]
+      end
+      client = ::Tumblr::Client.new
+      image = Image.find(params[:image_id])
+      #client.photo("http://anime-cute-girls.tumblr.com/", {:data => ['/path/to/pic.jpg', '/path/to/pic.jpg']})
+      client.photo("anime-cute-girls.tumblr.com", {:data => [image.data.path]})
+    end
+
+    redirect_to home_users_path
+  end
 
 
   # =======================
