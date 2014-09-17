@@ -15,15 +15,17 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
   end
-
-
-  # PATCH/PUT /users/1
+  # PUT /users/1
   def update
     if @user.update_attributes(params[:user])
       redirect_to @user, notice: 'User was successfully updated.'
     else
       render action: 'edit'
     end
+  end
+
+  # GET /users/1/settings
+  def settings
   end
 
 

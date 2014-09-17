@@ -1,25 +1,22 @@
 <%= bootstrap_form_for(@user, control_col: "col-sm-10") do |f| %>
-  <%# f.error_notification %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this target_word from being saved:</h2>
+      <ul>
+      <% @user.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <div class="row">
     <div class="col-lg-2">
       <%= f.text_field :name, :required => true, :autofocus => true %>
     </div>
   </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>
 <% end %>
-
-<div>
-  <h3>Connect Account</h3>
-  <br />
-  <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
-    <% if current_user.authorizations.pluck(:provider).include?(provider.to_s) %>
-      <%= provider.to_s.titleize %> Connected
-    <% else %>
-      <%= link_to "Sign in with #{provider.to_s.titleize}",
-        omniauth_authorize_path('user', provider) %>
-    <% end %>
-  <br/>
-  <% end %>
-</div>

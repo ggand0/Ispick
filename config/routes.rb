@@ -22,6 +22,7 @@ Ispick::Application.routes.draw do
   resources :users do
     collection do
       get 'home'
+      get 'settings'
       get 'preferences'
       post 'preferences'
       get 'boards'

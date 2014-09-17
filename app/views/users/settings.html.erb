@@ -1,0 +1,20 @@
+<!-- nameを変更出来るようにする場合 -->
+<%# render 'form' %>
+
+<!-- linkされているSNSアカウントを表示する -->
+<div style="width: 300px;">
+  <h3>Connect Account</h3>
+  <br />
+  <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
+    <% providers = current_user.authorizations.pluck(:provider) %>
+    <% if providers.include?(provider.to_s) %>
+      <% auth = current_user.authorizations.where(provider: provider).first %>
+      <%= bs_button_to "#{provider.to_s.titleize} Connected / #{auth.user_name}", class: 'btn-default disabled btn-block' %>
+    <% else %>
+      <%= bs_button_to "Sign in with #{provider.to_s.titleize}",
+        omniauth_authorize_path('user', provider), class: 'btn-default btn-block' %>
+    <% end %>
+
+  <br />
+  <% end %>
+</div>
