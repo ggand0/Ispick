@@ -9,6 +9,7 @@
           <%= link_to 'Change avatar image', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window', class: 'dropdown-user' } %>
         </li>
         <%= navbar_dropdown_divider %>
+        <%= navbar_item 'Settings', edit_user_path(id: current_user.id) %>
         <%= navbar_item 'Log out', destroy_user_session_path %>
       <% end %>
 
