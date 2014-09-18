@@ -14,13 +14,14 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
+    render action: 'debug/edit'
   end
   # PUT /users/1
   def update
     if @user.update_attributes(params[:user])
       redirect_to @user, notice: 'User was successfully updated.'
     else
-      render action: 'edit'
+      render action: 'debug/edit'
     end
   end
 
@@ -95,7 +96,7 @@ class UsersController < ApplicationController
   # Render the index page of target_images.
   def show_target_images
   @target_images = current_user.target_images
-    render action: 'show_target_images'
+    render action: 'debug/show_target_images'
   end
 
   # タグ登録画面を表示する
@@ -198,12 +199,16 @@ class UsersController < ApplicationController
     images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
     images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
     @images = images.page(params[:page]).per(25)
+
+    render action: 'debug/debug_illust_detection'
   end
 
   # [DEBUG]Just an old version of 'preferences' template,
   # which contains the 'create a target_word' link.
   def debug_crawling
     @words = current_user.target_words
+
+    render action: 'debug/debug_crawling'
   end
 
   # [DEBUG]
