@@ -72,7 +72,7 @@ class UsersController < ApplicationController
   # GET
   def new_avatar
     respond_to do |format|
-      format.html
+      format.html {}
       format.js { render partial: 'new_avatar' }
     end
   end
