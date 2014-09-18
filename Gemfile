@@ -85,6 +85,10 @@ gem 'ransack'
 gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
 
+# Manages sharing on social networks
+gem 'shareable'
+gem "social-buttons", '~> 0.3'
+
 # API clients
 gem 'natto'
 gem 'x2ch'

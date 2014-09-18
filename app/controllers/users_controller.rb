@@ -1,12 +1,32 @@
 require 'rubygems'
 require 'zip'
+require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
+  before_filter :set_user, only: [:edit, :update]
+  before_filter :validate_authorization_for_user, only: [:edit, :update]
+
   before_action :render_sign_in_page,
     only: [:home, :boards, :preferences, :search, :show_target_images,
       :download_favored_images, :debug_illust_detection, :debug_crawling]
   before_action :update_session, only: [:home, :search, :debug_illust_detection]
+
+  # GET /users/1/edit
+  def edit
+  end
+  # PUT /users/1
+  def update
+    if @user.update_attributes(params[:user])
+      redirect_to @user, notice: 'User was successfully updated.'
+    else
+      render action: 'edit'
+    end
+  end
+
+  # GET /users/1/settings
+  def settings
+  end
 
 
   # GET /users/home
@@ -121,6 +141,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def share_tumblr
+    if current_user.provider == 'tumblr'
+      ::Tumblr.configure do |config|
+        config.oauth_token = session[:oauth_token]
+        config.oauth_token_secret = session[:oauth_token_secret]
+      end
+      client = ::Tumblr::Client.new
+      image = Image.find(params[:image_id])
+      #client.photo("http://anime-cute-girls.tumblr.com/", {:data => ['/path/to/pic.jpg', '/path/to/pic.jpg']})
+      client.photo("anime-cute-girls.tumblr.com", {:data => [image.data.path]})
+    end
+
+    redirect_to home_users_path
+  end
 
 
   # =======================
@@ -181,6 +215,19 @@ class UsersController < ApplicationController
 
 
   private
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  def user_params
+    params.require(:user).permit(:name)
+  end
+
+  def validate_authorization_for_user
+    redirect_to root_path unless @user == current_user
+  end
 
   # Render the 'sign in' template if the user is logged in.
   def render_sign_in_page

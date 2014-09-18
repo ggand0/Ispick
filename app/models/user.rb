@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   # Set this variabale true during testing to skip all callbacks.
   cattr_accessor :skip_callbacks
 
+  has_many :authorizations
+
   # has_many uploaded images
   has_many :target_images, dependent: :destroy
 
@@ -92,52 +94,40 @@ class User < ActiveRecord::Base
     super.tap do |user|
       if data = session['devise.facebook_data'] && session['devise.facebook_data']['extra']['raw_info']
         user.email = data['email']
+        fsd
       end
     end
   end
 
   #
-  # emailを取得したい場合は、migrationにemailを追加する
-  def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
-    user = User.where(provider: auth.provider, uid: auth.uid).first
-    unless user
-      user = User.create(
-        name:auth.extra.raw_info.name,
-        provider:auth.provider,
-        uid:auth.uid,
-        email:auth.info.email,
-        password:Devise.friendly_token[0,20]
-      )
+  def self.from_omniauth(auth, current_user)
+    authorization = Authorization.where(
+      :provider => auth.provider,
+      :uid => auth.uid.to_s,
+      :token => auth.credentials.token,
+      :secret => auth.credentials.secret
+    ).first_or_initialize
+
+    if authorization.user.blank?
+      user = current_user.nil? ? User.where('email = ?', auth["info"]["email"]).first : current_user
+      unless user
+        user = User.create(
+          name:     auth.info.nickname,
+          provider: auth.provider,
+          uid:      auth.uid,
+          email:    User.get_email(auth),
+          password: Devise.friendly_token[0,20]
+        )
+      end
+      authorization.user_name = auth.info.nickname
+      authorization.user_id = user.id
+      authorization.save
     end
-    user
+    authorization.user
   end
 
-  def self.find_for_twitter_oauth(auth, signed_in_resource=nil)
-    user = User.where(provider: auth.provider, uid: auth.uid).first
-    unless user
-      user = User.create(
-        name:     auth.info.nickname,
-        provider: auth.provider,
-        uid:      auth.uid,
-        email:    User.create_unique_email,
-        password: Devise.friendly_token[0,20]
-      )
-    end
-    user
-  end
-
-  def self.find_for_tumblr_oauth(auth, signed_in_resource=nil)
-    user = User.where(provider: auth.provider, uid: auth.uid).first
-    unless user
-      user = User.create(
-        name:     auth.info.nickname,
-        provider: auth.provider,
-        uid:      auth.uid,
-        email:    User.create_unique_email,
-        password: Devise.friendly_token[0,20]
-      )
-    end
-    user
+  def self.get_email(auth)
+    auth.provider == 'twitter' ? User.create_unique_email : auth.info.email
   end
 
   # @return A string that provides an uuid.
