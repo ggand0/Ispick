@@ -14,13 +14,3 @@
   <%= f.select :board, boards, { label: "Choose a board:" }, { class: "selectpicker" } %>
   <%= f.submit 'Clip this', class: "btn btn-primary" %>
 <% end %>
-
-
-
-<!-- 既に存在するboardへの画像追加リンクを描画
-<% current_user.image_boards.each do |board| %>
-  <% existed = check_existed(board.id, image.id) %>
-  <%= button_group do %>
-    <%= bs_button_to board.name.to_s, { controller: 'images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
-  <% end %>
-<% end %>-->

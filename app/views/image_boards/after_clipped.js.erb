@@ -1,0 +1,3 @@
+$(".modal-boards .modal-body").html("<%= escape_javascript(
+  render partial: 'shared/after_clipped', locals: { image: @image, image_board: @board, html: @id }) %>");
+$("#modal-board").modal('show');
