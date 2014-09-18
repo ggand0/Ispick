@@ -20,16 +20,18 @@
 <div class="image-share">
   <%# "CA: #{get_jst_string(image.created_at)}".html_safe %><br />
   <%= "PA: #{get_jst_string(image.posted_at)}".html_safe %><br />
-  <!--<% image_tag(asset_path('icons/facebook_32.png'))%>
-  <% image_tag(asset_path('icons/twitter_32.png')) %>
-  <%= image_tag(asset_path('icons/pinterest_32.png')) %>
-  <%= link_to image_tag(asset_path('icons/tumblr_32.png')), { controller: 'users', action: 'share_tumblr', image_id: image.id } %>-->
 
-
-  <%= pinit_button(url: image.page_url, media: image.src_url, description: image.caption) %>
-
-  <script src="http://platform.tumblr.com/v1/share.js"></script>
-  <a href="http://www.tumblr.com/share/photo?source=<%=u image.src_url %>&caption=<%=u image.caption %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:20px; height:20px; background:url('http://platform.tumblr.com/v1/share_4.png') top left no-repeat transparent;"></a>
-
+  <div class="share_button"><%= tweet_button(count: 'none') %></div>
+  <div class="share_button">
+    <!-- Likeボタンを表示するためにfacebook appをpublicに指定する必要があるので、
+    仮の画像を配置 -->
+    <% image_tag(asset_path('icons/facebook_32.png'))%>
+    <%# like_button(CONFIG['facebook_app_id'].to_i) %>
+  </div>
+  <div class="share_button"><%= pinit_button(url: image.page_url, media: image.src_url, description: image.caption) %></div>
+  <div class="share_button">
+    <script src="http://platform.tumblr.com/v1/share.js"></script>
+    <a href="http://www.tumblr.com/share/photo?source=<%=u image.src_url %>&caption=<%=u image.caption %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:20px; height:20px; background:url('http://platform.tumblr.com/v1/share_4.png') top left no-repeat transparent;"></a>
+  </div>
 
 </div>
