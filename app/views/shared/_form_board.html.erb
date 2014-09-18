@@ -1,16 +1,26 @@
 <!-- new boardを作るフォーム -->
 <div class="id"><%= image.id %></div>
 <div class="html-id"><%# html %></div><!-- debug value -->
+
+
 <%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
   <%= f.text_field :name, layout: :default, placeholder: 'Enter a board name', class: 'new_board_input' %>
   <%= f.submit 'New board', class: "btn btn-primary" %>
 <% end %>
 <br />
+<%= bootstrap_form_tag remote: true, url: { controller: 'images', action: 'favor', id: image.id, remote: true, html_id: html }, method: :put, class: 'new_board' do |f| %>
+  <% boards = current_user.image_boards.map { |board| board.name } %>
 
-<!-- 既に存在するboardへの画像追加リンクを描画 -->
+  <%= f.select :board, boards, { label: "Choose a board:" }, { class: "selectpicker" } %>
+  <%= f.submit 'Clip this', class: "btn btn-primary" %>
+<% end %>
+
+
+
+<!-- 既に存在するboardへの画像追加リンクを描画
 <% current_user.image_boards.each do |board| %>
   <% existed = check_existed(board.id, image.id) %>
   <%= button_group do %>
     <%= bs_button_to board.name.to_s, { controller: 'images', action: 'favor', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
   <% end %>
-<% end %>
+<% end %>-->
