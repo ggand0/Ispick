@@ -158,9 +158,31 @@ class UsersController < ApplicationController
   end
 
 
+
   # =======================
   #  Actions for debugging
   # =======================
+  def home_debug
+    # Get images: For a new user, display the newer images
+    if current_user.target_words.empty?
+      images = Image.get_recent_images(500)
+
+    # Otherwise, display images from user.target_words relation
+    else
+      images = current_user.get_images
+      images.reorder!('posted_at DESC') if params[:sort]
+    end
+
+    # Filter images by date
+    if params[:date]
+      date = DateTime.parse(params[:date]).to_date
+      images = Image.filter_by_date(images, date)
+    end
+
+    @images = images.page(params[:page]).per(25)
+    @images_all = images
+  end
+
   # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
   # 画像のダウンロード：releaseする時にこの機能は削除する。

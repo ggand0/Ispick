@@ -1,0 +1,56 @@
+<%= javascript_include_tag 'users_home' %>
+<%= javascript_include_tag 'core' %>
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_debug' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- 表示する画像数とフィルタに関するdropdownを描画 -->
+<p>
+  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.target_words.count == 0 %>
+  <%= bs_dropdown_button_to 'Filters' do %>
+    Filter by date
+    <div class="input-group date" style="width: 200px;" align="right">
+      <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+    </div>
+    <li role="presentation" class="divider"></li>
+    <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
+  <% end %>
+  <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
+</p>
+
+<!-- ここから画像表示 -->
+<%= paginate @images unless @images.nil? %>
+
+<div class="wrap">
+  <% @images.each_with_index do |delivered_image, index| %>
+    <% image = delivered_image %>
+
+    <div class="box">
+      <div class="boxInner">
+        <%= render_image(delivered_image) %>
+
+        <div class="titleBoxD">
+          <div class="id"><%= delivered_image.id %></div>
+          <%= button_group class: 'pull-right blocks' do %>
+            <%= render_clip_debug_button(delivered_image) %>
+            <%= render_show_another_button(delivered_image) %>
+          <% end %>
+          <br />
+        </div>
+        <div class="titleD">
+          <%= image.title.to_s %> <br /><br />
+          <div class="time-string-debug">
+            <%= "CA: #{get_jst_string(delivered_image.created_at)}" %><br />
+            <%= "PA: #{get_jst_string(image.posted_at)}" %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= paginate @images %>
