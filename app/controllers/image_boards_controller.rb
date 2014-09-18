@@ -27,7 +27,7 @@ class ImageBoardsController < ApplicationController
     @id = params[:id]
     respond_to do |format|
       format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
-      format.js { render partial: 'boards' }  # Render _boards.js.erb
+      format.js { render partial: 'boards' }
     end
   end
 
@@ -51,7 +51,6 @@ class ImageBoardsController < ApplicationController
     @image_board.save!
     current_user.image_boards << @image_board
 
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:html_id]
