@@ -5,6 +5,10 @@
   width: 560px;
   float: left;
 }
+.image-detail {
+  width: 500px;
+  float: left;
+}
 .image-buttons {
   align: right;
 }
@@ -15,7 +19,12 @@
   text-align: right;
   align: right;
 }
+.image-time {
+  text-align: left;
+}
 .share-button {
-  float: left;
+  float: right;
   width: 50px;
+  text-align: right;
+  align: right;
 }

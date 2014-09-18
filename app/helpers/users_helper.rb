@@ -8,36 +8,44 @@ module UsersHelper
   # @params image [Image] An object of Image.
   # @params image [Image] An object of Image which is included in the image.
   # @return []
-  def render_image(image)
+  def render_image(image, size='btn-sm')
     link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_clip_button(image)
-    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}", class: 'popover-board btn-info btn-sm' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
+  def render_clip_button(image, size='btn-sm')
+    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
+      class: "popover-board btn-info #{size}" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_unclip_button(image)
-    bs_button_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete, class: 'popover-board btn-info btn-sm'
+  def render_unclip_button(image, size='btn-sm')
+    bs_button_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete,
+      class: "popover-board btn-info #{size}"
+  end
+
+  def render_like_button(image, size='btn-sm')
+    bs_button_to thumbs_up_glyphicon, like_image_path(image), method: :put, class: "btn-default #{size}"
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_hide_button(image)
-    bs_button_to 'Hide', hide_image_path(image), method: :put, class: 'btn-default btn-sm'
+  def render_hide_button(image, size='btn-sm')
+    bs_button_to 'Hide', hide_image_path(image), method: :put, class: "btn-default #{size}"
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_show_button(image)
-    bs_button_to 'Show', { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
+  def render_show_button(image, size='btn-sm')
+    bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+     class: "btn-default #{size}"
   end
 
-  def render_show_debug_button(image)
-    bs_button_to 'Debug', { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
+  def render_show_debug_button(image, size='btn-sm')
+    bs_button_to wrench_glyphicon, { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+      class: "btn-default #{size}"
   end
 
 
@@ -68,6 +76,18 @@ module UsersHelper
   end
   def wrench_glyphicon
     '<span class="glyphicon glyphicon-wrench" style="vertical-align:middle"></span>'.html_safe
+  end
+  def pencil_glyphicon
+    '<span class="glyphicon glyphicon-pencil" style="vertical-align:middle"></span>'.html_safe
+  end
+  def comment_glyphicon
+    '<span class="glyphicon glyphicon-comment" style="vertical-align:middle"></span>'.html_safe
+  end
+  def user_glyphicon
+    '<span class="glyphicon glyphicon-user" style="vertical-align:middle"></span>'.html_safe
+  end
+  def link_glyphicon
+    '<span class="glyphicon glyphicon-link" style="vertical-align:middle"></span>'.html_safe
   end
 
 
