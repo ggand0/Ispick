@@ -53,6 +53,7 @@ class @Component
     $('.dropdown-user').click (e) ->
       $("body").trigger("click")
 
+  # Initializes the backdrop colors of the modals
   initModals: () ->
     $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
       $('body').toggleClass('modal-color-none')
@@ -62,6 +63,7 @@ class @Component
     )
 
   initBoards = () ->
+    #
     $('.user_boards').on("click", (e, data, status, xhr) ->
       $('#modal-board').modal('hide')
     )

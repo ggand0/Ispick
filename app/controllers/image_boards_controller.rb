@@ -27,7 +27,7 @@ class ImageBoardsController < ApplicationController
     @id = params[:id]
     respond_to do |format|
       format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
-      format.js { render partial: 'boards' }  # Render _boards.js.erb
+      format.js { render partial: 'boards' }
     end
   end
 
@@ -51,7 +51,6 @@ class ImageBoardsController < ApplicationController
     @image_board.save!
     current_user.image_boards << @image_board
 
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:html_id]
@@ -84,6 +83,35 @@ class ImageBoardsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+
+
+  # ===============
+  #  For debugging
+  # ===============
+  # POST /image_boards
+  def create_another
+    @image_board = ImageBoard.new(image_board_params)
+    @image_board.save!
+    current_user.image_boards << @image_board
+    @image = Image.find(params[:image])
+    @board = ImageBoard.new
+    @id = params[:html_id]
+    respond_to do |format|
+      format.html { render nothing: true }
+      format.js { render partial: 'image_boards/boards_another' }
+    end
+  end
+  def boards_another
+    @image = Image.find(params[:image])
+    @board = ImageBoard.new
+    @id = params[:id]
+    respond_to do |format|
+      format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
+      format.js { render partial: 'boards_another' }
+    end
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

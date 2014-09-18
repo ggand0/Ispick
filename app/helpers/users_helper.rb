@@ -64,4 +64,16 @@ module UsersHelper
     bs_button_to 'Debug', { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }, class: 'btn-default btn-sm'
   end
 
+
+  # =======
+  #  DEBUG
+  # =======
+  def render_clip_debug_button(image)
+    bs_button_to 'Clip', { controller: 'image_boards', action: 'boards_another', remote: true, image: image.id, id: "popover-board#{image.id}",
+    class: 'popover-board btn-info btn-xs' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
+  end
+  def render_show_another_button(image)
+    bs_button_to 'Show', { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+    class: 'btn-default btn-xs'
+  end
 end

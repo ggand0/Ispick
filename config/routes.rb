@@ -22,6 +22,7 @@ Ispick::Application.routes.draw do
   resources :users do
     collection do
       get 'home'
+      get 'home_debug'
       get 'settings'
       get 'preferences'
       post 'preferences'
@@ -67,15 +68,17 @@ Ispick::Application.routes.draw do
     collection do
       get 'boards'
       get 'reload'
+      get 'boards_another'
+      post 'create_another'
     end
   end
 
   resources :favored_images, only: [:show, :destroy]
-
   resources :images, only: [:index, :show, :destroy]
   resources :images do
     member do
       put 'favor'
+      put 'favor_another'
       put 'hide'
       get 'show_debug'
     end

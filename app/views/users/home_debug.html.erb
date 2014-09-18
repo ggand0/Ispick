@@ -1,6 +1,7 @@
 <%= javascript_include_tag 'users_home' %>
 <%= javascript_include_tag 'core' %>
 <%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_debug' %>
 <%= stylesheet_link_tag 'images_detail' %>
 <%= render 'shared/modal_image' %>
 <%= render 'shared/modal_board' %>
@@ -31,19 +32,18 @@
       <div class="boxInner">
         <%= render_image(delivered_image) %>
 
-        <div class="titleBox">
+        <div class="titleBoxD">
           <div class="id"><%= delivered_image.id %></div>
           <%= button_group class: 'pull-right blocks' do %>
-            <%= render_clip_button(delivered_image) %>
-            <%= render_show_debug_button(delivered_image) %>
+            <%= render_clip_debug_button(delivered_image) %>
+            <%= render_show_another_button(delivered_image) %>
           <% end %>
           <br />
         </div>
-
-        <div class="title">
-          <%= image.title.to_s %><br />
-          <div class="time-string">
-            <%# "CA: #{get_jst_string(delivered_image.created_at)}" %><br />
+        <div class="titleD">
+          <%= image.title.to_s %> <br /><br />
+          <div class="time-string-debug">
+            <%= "CA: #{get_jst_string(delivered_image.created_at)}" %><br />
             <%= "PA: #{get_jst_string(image.posted_at)}" %>
           </div>
         </div>
