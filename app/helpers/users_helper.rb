@@ -27,7 +27,7 @@ module UsersHelper
   end
 
   def render_like_button(image, size='btn-sm')
-    bs_button_to thumbs_up_glyphicon, like_image_path(image), method: :put, class: "btn-default #{size}"
+    bs_button_to thumbs_up_glyphicon, hide_image_path(image), method: :put, class: "btn-default #{size}"
   end
 
   # Renders a bootstrap button with the link.
@@ -96,11 +96,11 @@ module UsersHelper
   #  will be deleted
   # =================
   def render_clip_debug_button(image)
-    bs_button_to 'Clip', { controller: 'image_boards', action: 'boards_another', remote: true, image: image.id, id: "popover-board#{image.id}",
+    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards_another', remote: true, image: image.id, id: "popover-board#{image.id}",
     class: 'popover-board btn-info btn-xs' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
   end
   def render_show_another_button(image)
-    bs_button_to 'Show', { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+    bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
     class: 'btn-default btn-xs'
   end
 
