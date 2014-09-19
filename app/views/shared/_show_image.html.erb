@@ -9,6 +9,8 @@
 <hr>
 
 <div class="image-detail">
+  <%= pencil_glyphicon %> <%= image.artist ? image.artist.html_safe : 'Unknown artist' %>
+  <br /><br />
   <%= comment_glyphicon %> <%= image.caption.html_safe if image.caption %>
   <br /><br />
   <%= link_glyphicon %> <%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %>
