@@ -43,6 +43,10 @@ class ImageBoardsController < ApplicationController
 
   # GET /image_boards/1/edit
   def edit
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'edit' }
+    end
   end
 
   # POST /image_boards
@@ -65,7 +69,7 @@ class ImageBoardsController < ApplicationController
   def update
     respond_to do |format|
       if @image_board.update(image_board_params)
-        format.html { redirect_to @image_board, notice: 'Image board was successfully updated.' }
+        format.html { redirect_to boards_users_path }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
