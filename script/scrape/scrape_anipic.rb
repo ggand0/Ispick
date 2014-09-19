@@ -6,7 +6,7 @@ require "#{Rails.root}/script/scrape/client"
 
 module Scrape
   class Anipic < Client
-    ROOT_URL = 'http://anime-pictures.net/'
+    ROOT_URL = 'http://anime-pictures.net'
 
     def initialize(logger=nil, limit=20)
       self.limit = limit
@@ -195,6 +195,9 @@ module Scrape
 
       # src_urlの取得
       src_url = xml.css("div[id='big_preview_cont']").css("img").first.attributes['src'].value.gsub!(/ /,'')
+      
+      # original_urlの取得
+      original_url = ROOT_URL + xml.css("div[id='big_preview_cont']").css("a").first.attributes['href'].value
 
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
@@ -205,6 +208,7 @@ module Scrape
         posted_at: time,
         views: nil,
         src_url: src_url,
+        original_url: original_url,
         favorites: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
