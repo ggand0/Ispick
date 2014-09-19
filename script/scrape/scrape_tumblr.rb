@@ -141,6 +141,7 @@ module Scrape
     # @return [Hash]
     def self.get_data(image)
       {
+        author: nil,
         title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
         caption: image['caption'],
         original_url: image['photos'].first['original_size']['url'],

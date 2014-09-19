@@ -8,6 +8,7 @@ module Scrape
     RSS_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
     TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
     ROOT_URL = 'http://seiga.nicovideo.jp'
+    USER_SEARCH_URL= 'http://seiga.nicovideo.jp/api/user/info'
 
 
     def initialize(logger=nil, limit=50)
@@ -109,12 +110,15 @@ module Scrape
     # @return [Hash] Attributes of Image model
     def self.get_data(item)
       nico_image_id = item.css('id').first.content
+
       {
+        author: nil,
         title: item.css('title').first.content,
         caption: item.css('description').first.content,
         src_url: "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i",
         page_url: "http://seiga.nicovideo.jp/seiga/im#{nico_image_id}",
         original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
+
         views: item.css('view_count').first.content,
         favorites: item.css('clip_count').first.content,
         # Parse JST posted_at datetime to utc
