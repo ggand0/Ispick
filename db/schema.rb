@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140919065427) do
+ActiveRecord::Schema.define(version: 20140919192317) do
 
   create_table "authorizations", force: true do |t|
     t.string   "provider"
@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 20140919065427) do
     t.datetime "posted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "author"
     t.text     "original_url"
   end
 
@@ -104,6 +105,13 @@ ActiveRecord::Schema.define(version: 20140919065427) do
   end
 
   add_index "keywords", ["name"], name: "index_keywords_on_name", length: {"name"=>10}, using: :btree
+
+  create_table "likes", force: true do |t|
+    t.integer  "image_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "people", force: true do |t|
     t.string   "name"
@@ -202,6 +210,7 @@ ActiveRecord::Schema.define(version: 20140919065427) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "language"
+    t.integer  "likes_count",                      default: 0,  null: false
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
