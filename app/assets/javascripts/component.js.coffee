@@ -65,9 +65,9 @@ class @Component
     $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
       $('body').toggleClass('modal-color-none')
     )
-    $('#modal-board').on('show.bs.modal hide.bs.modal', (e) ->
-      $('body').toggleClass('modal-color-none')
-    )
+    #$('#modal-board').on('show.bs.modal hide.bs.modal', (e) ->
+    #  $('body').toggleClass('modal-color-none')
+    #)
 
   initBoards = () ->
     #
