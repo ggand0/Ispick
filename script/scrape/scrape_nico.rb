@@ -112,7 +112,8 @@ module Scrape
       nico_image_id = item.css('id').first.content
 
       {
-        author: nil,
+        artist: nil,
+        poster: nil,
         title: item.css('title').first.content,
         caption: item.css('description').first.content,
         src_url: "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i",

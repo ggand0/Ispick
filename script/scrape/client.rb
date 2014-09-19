@@ -175,7 +175,7 @@ module Scrape
       image = Image.new attributes
       tags.each { |tag| image.tags << tag }
 
-      # original_url=nilの場合src_urlを利用
+      # Use src_url as original_url if the latter one is nil
       image.original_url = image.src_url if image.original_url.nil?
 
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する

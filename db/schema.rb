@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140919192317) do
+ActiveRecord::Schema.define(version: 20140919223003) do
 
   create_table "authorizations", force: true do |t|
     t.string   "provider"
@@ -78,8 +78,9 @@ ActiveRecord::Schema.define(version: 20140919192317) do
     t.datetime "posted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "author"
+    t.text     "artist"
     t.text     "original_url"
+    t.text     "poster"
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
@@ -211,6 +212,7 @@ ActiveRecord::Schema.define(version: 20140919192317) do
     t.datetime "updated_at"
     t.string   "language"
     t.integer  "likes_count",                      default: 0,  null: false
+    t.string   "language_preferences"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
