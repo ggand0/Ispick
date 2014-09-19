@@ -48,6 +48,13 @@ class @Component
           $('.boxInner').removeClass('hovered')
       )
     )
+    # Initialize all popovers
+    $('.popover-board').popover({
+      html: true,
+      content: '',
+      #trigger: 'manual'
+    }).popover('hide')
+
 
   initDropdowns: () ->
     $('.dropdown-user').click (e) ->

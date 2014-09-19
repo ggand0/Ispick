@@ -4,7 +4,7 @@
 # require 'clip'
 #= require 'component'
 
-$ ->
+ready = ->
   component = new Component()
 
   # Initialize buttons related to clipping
@@ -21,3 +21,6 @@ $ ->
 
   # Popovers: close popover on click wherever except popover windows
   component.initPopovers()
+
+$(document).ready(ready)
+$(document).on('page:load', ready)
