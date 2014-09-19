@@ -11,7 +11,7 @@
 <div class="image-detail">
   <%= comment_glyphicon %> <%= image.caption.html_safe if image.caption %>
   <br /><br />
-  <%= link_glyphicon %> <%= link_to "#{image.page_url}", image.page_url.html_safe if image.page_url %>
+  <%= link_glyphicon %> <%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %>
   <br /><br />
   <%= tags_glyphicon %>
   <% image.tags.each do |tag| %>
