@@ -30,10 +30,10 @@
     <%= image_tag(asset_path('icons/facebook_24.png'))%>
     <%# like_button(CONFIG['facebook_app_id'].to_i) %>
   </div>
-  <div class="share-button"><%= pinit_button(url: image.page_url, media: image.src_url, description: image.caption) %></div>
+  <div class="share-button"><%= pinit_button(url: image.page_url, media: image.original_url, description: image.caption) %></div>
   <div class="share-button">
     <script src="http://platform.tumblr.com/v1/share.js"></script>
-    <a href="http://www.tumblr.com/share/photo?source=<%=u image.src_url %>&caption=<%=u image.caption %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:20px; height:20px; background:url('http://platform.tumblr.com/v1/share_4.png') top left no-repeat transparent;"></a>
+    <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u image.caption %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:20px; height:20px; background:url('http://platform.tumblr.com/v1/share_4.png') top left no-repeat transparent;"></a>
   </div>
 
 </div>
