@@ -67,7 +67,7 @@ module Scrape
             skipped += 1
             next
           end
-          
+
           start = Time.now
           image_data = self.class.get_data(item)             # APIの結果から画像情報取得
           options = {
@@ -108,11 +108,13 @@ module Scrape
     # @param [Nokogiri::HTML] A html object which you wanna retrieve images
     # @return [Hash] Attributes of Image model
     def self.get_data(item)
+      nico_image_id = item.css('id').first.content
       {
         title: item.css('title').first.content,
         caption: item.css('description').first.content,
-        src_url: "http://lohas.nicoseiga.jp/thumb/#{item.css('id').first.content}i",
-        page_url: "http://seiga.nicovideo.jp/seiga/im#{item.css('id').first.content}",
+        src_url: "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i",
+        page_url: "http://seiga.nicovideo.jp/seiga/im#{nico_image_id}",
+        original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
         views: item.css('view_count').first.content,
         favorites: item.css('clip_count').first.content,
         # Parse JST posted_at datetime to utc
