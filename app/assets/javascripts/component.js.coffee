@@ -53,6 +53,7 @@ class @Component
       html: true,
       content: '',
       #trigger: 'manual'
+      #trigger: 'click'
     }).popover('hide')
 
 

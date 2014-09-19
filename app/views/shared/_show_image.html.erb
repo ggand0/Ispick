@@ -27,7 +27,7 @@
   <div class="share-button"><%= tweet_button(count: 'none') %></div>
   <div class="share-button">
     <!-- Likeボタンを表示するためにfacebook appをpublicに指定する必要があるので、仮の画像を配置 -->
-    <%= image_tag(asset_path('icons/facebook_32.png'))%>
+    <%= image_tag(asset_path('icons/facebook_24.png'))%>
     <%# like_button(CONFIG['facebook_app_id'].to_i) %>
   </div>
   <div class="share-button"><%= pinit_button(url: image.page_url, media: image.src_url, description: image.caption) %></div>

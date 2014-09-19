@@ -8,5 +8,6 @@ $(selector).popover('destroy');
 $(selector).popover({
   html: true,
   content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>",
-  container: 'body'
+  container: 'body',
+  trigger: 'manual'
 }).popover('show');
