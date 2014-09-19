@@ -14,7 +14,6 @@
 //= require jquery_ujs
 //= require jquery.infinitescroll.min
 //= require jquery.remotipart
-// require bootstrap-sprockets			// requireするとdropdownが死ぬので避けている
 //= require bootstrap
 //= require bootstrap-datepicker
 //= require turbolinks
