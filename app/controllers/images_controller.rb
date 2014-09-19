@@ -11,7 +11,7 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     respond_to do |format|
-      format.html {}
+      format.html { }
       format.js { render partial: 'show' }
     end
   end

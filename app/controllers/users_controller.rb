@@ -142,6 +142,7 @@ class UsersController < ApplicationController
     end
   end
 
+  # A temporary method. Will be fixed.
   def share_tumblr
     if current_user.provider == 'tumblr'
       ::Tumblr.configure do |config|
