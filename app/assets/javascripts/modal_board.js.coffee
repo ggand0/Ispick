@@ -1,7 +1,7 @@
 #= require 'component'
 
 
-$ ->
+ready = ->
   # Board追加dialogの更新
   component = new Component()
   component.initBoards()
@@ -11,3 +11,5 @@ $ ->
   #  $('#modal-board').modal('hide')
   #)
 
+$(document).ready(ready)
+$(document).on('page:load', ready)

@@ -48,6 +48,14 @@ class @Component
           $('.boxInner').removeClass('hovered')
       )
     )
+    # Initialize all popovers
+    $('.popover-board').popover({
+      html: true,
+      content: '',
+      #trigger: 'manual'
+      #trigger: 'click'
+    }).popover('hide')
+
 
   initDropdowns: () ->
     $('.dropdown-user').click (e) ->
@@ -58,9 +66,9 @@ class @Component
     $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
       $('body').toggleClass('modal-color-none')
     )
-    $('#modal-board').on('show.bs.modal hide.bs.modal', (e) ->
-      $('body').toggleClass('modal-color-none')
-    )
+    #$('#modal-board').on('show.bs.modal hide.bs.modal', (e) ->
+    #  $('body').toggleClass('modal-color-none')
+    #)
 
   initBoards = () ->
     #
