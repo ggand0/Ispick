@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
 
   # has_many boards for storing clipped images
   has_many :image_boards, dependent: :destroy
+  has_many :likes, dependent: :destroy, counter_cache: :likes_count
 
   # has_many tags for making image feeds
   has_many :target_words_users
