@@ -14,12 +14,6 @@ module Ispick
     config.eager_load_paths += ["#{Rails.root}/app/services"]
     config.eager_load_paths += ["#{Rails.root}/lib"]
 
-    # for bootsrap-sass
-    # http://d.hatena.ne.jp/kovaio/20140405
-    #config.assets.precompile += %w(*.eot *.svg *.ttf *.woff)
-    #config.assets.precompile += %w( *.js *.css *.eot *.woff *.ttf *.svg )
-    #config.assets.paths << "#{Rails}/vendor/assets/fonts"
-
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
