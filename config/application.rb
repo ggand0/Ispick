@@ -17,7 +17,7 @@ module Ispick
     # for bootsrap-sass
     # http://d.hatena.ne.jp/kovaio/20140405
     #config.assets.precompile += %w(*.eot *.svg *.ttf *.woff)
-    config.assets.precompile += %w( *.js *.css *.eot *.woff *.ttf *.svg )
+    #config.assets.precompile += %w( *.js *.css *.eot *.woff *.ttf *.svg )
     #config.assets.paths << "#{Rails}/vendor/assets/fonts"
 
 
