@@ -9,5 +9,13 @@ $(selector).popover({
   html: true,
   content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>",
   container: 'body',
+  placement: 'bottom',
   trigger: 'manual'
 }).popover('show');
+
+// Disable transition temporarily
+console.log($(selector).parentsUntil('.boxInner'));
+console.log($(selector).parents('.boxInner'));
+title = $(selector).parents('.boxInner').children('.titleD');
+console.log(title);
+title.addClass('notransition');

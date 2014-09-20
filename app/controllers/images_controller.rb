@@ -11,7 +11,7 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     respond_to do |format|
-      format.html {}
+      format.html { }
       format.js { render partial: 'show' }
     end
   end
@@ -107,8 +107,7 @@ class ImagesController < ApplicationController
 
   def show_debug
     respond_to do |format|
-      format.js { render partial: 'layouts/show_image_debug' }
-      #format.js { render partial: 'show' }
+      format.js { render partial: 'show_image_debug' }
     end
   end
 

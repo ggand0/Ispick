@@ -1,9 +1,9 @@
-// 以下のクラスは全て画像整列用に使用している：
-// Place all the styles related to the images controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+// =============================
+//  Classes for image alignment
+// =============================
 
-// デバッグ用画面の画像表示に使用
+// デバッグ用の画像一覧ページで使用。
+// Classes used at 'View all images' page (for debugging)
 // from: http://goo.gl/zsi5mT
 ul.boxline {
     padding-left: 0!important;
@@ -33,13 +33,14 @@ ul.boxline li img {
 }
 
 
-// Home画面の画像整列に使用
+
+// Home画面の画像整列で使用している
+// Classes used at 'User's home' page
 // from: http://www.dwuser.com/education/content/creating-responsive-tiled-layout-with-pure-css/
 body {
    margin: 0;
    padding: 0;
    background: #EEE;
-   //font: 10px/13px 'Lucida Sans',sans-serif;
 }
 .wrap {
    overflow: hidden;
@@ -96,7 +97,6 @@ body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleB
    position: absolute;
    visibility: hidden;
    top: 0px;
-   //bottom: 0px;
    left: 0px;
    right: 0px;
 

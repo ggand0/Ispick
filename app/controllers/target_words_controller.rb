@@ -1,5 +1,5 @@
 class TargetWordsController < ApplicationController
-  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered]
+  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered, :attach]
 
   # GET /target_words
   # GET /target_words.json
@@ -19,6 +19,21 @@ class TargetWordsController < ApplicationController
 
   # GET /target_words/1/edit
   def edit
+  end
+
+  # POST
+  # This action only get the existing TargetWord record,
+  # and add it to current_user.target_words.
+  def attach
+    # Get the existing target_word record
+    #@target_word = search_target_word(target_word_params)
+    #@target_word = TargetWord.find()
+    current_user.target_words << @target_word
+
+    respond_to do |format|
+      format.html { redirect_to controller: 'users', action: 'preferences' }
+      format.js { @target_words = current_user.target_words; render partial: 'layouts/reload_followed_tags' }
+    end
   end
 
   # POST /target_words
@@ -76,6 +91,15 @@ class TargetWordsController < ApplicationController
     target_word = target_word.empty? ? current_user.target_words.build(target_word_params) : target_word.first
 
     target_word.person = Person.find(params[:id]) if params[:id]
+    target_word
+  end
+
+  # Used in attach action
+  def search_target_word(target_word_params)
+    # Since all TargetWord records should have (non-nil) name_english value,
+    # use it to get the corresponding record.
+    name_en = target_word_params['name_english']
+    target_word = TargetWord.where(name_english: name_english)
     target_word
   end
 

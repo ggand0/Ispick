@@ -57,6 +57,7 @@ Ispick::Application.routes.draw do
   resources :target_words do
     collection do
       match 'search' => 'target_words#search', via: [:get, :post], as: :search
+      post 'attach'
     end
     member do
       get 'prefer'
