@@ -1,9 +1,9 @@
-<!--
-  モーダル表示をせずに直接templateを描画する場合に使う。
--->
+<!-- モーダル表示をせずに直接templateを描画する場合に使う。-->
 <%= stylesheet_link_tag 'users' %>
 <%= stylesheet_link_tag 'images_detail' %>
 
 <!-- モーダル表示で使用している。２つのpartial templateを描画する。 -->
-<%= render partial: 'shared/render_image', locals: { image: @image } %>
-<%= render partial: 'shared/show_image', locals: { image: @image } %>
+<div class="detail-wrap">
+  <%= render partial: 'shared/render_image', locals: { image: @image } %>
+  <%= render partial: 'shared/show_image', locals: { image: @image } %>
+</div>

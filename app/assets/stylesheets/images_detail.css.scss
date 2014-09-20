@@ -1,5 +1,4 @@
-// 画像詳細画面で使用するクラスを定義
-
+// 画像詳細画面(modal)で使用するクラス
 .image-title {
   font-size: 20pt;
   width: 560px;
@@ -27,4 +26,9 @@
   width: 50px;
   text-align: right;
   align: right;
+}
+
+// 画像詳細画面(html)で使用するクラス
+.detail-wrap {
+  width: 800px;
 }

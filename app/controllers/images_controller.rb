@@ -108,7 +108,6 @@ class ImagesController < ApplicationController
   def show_debug
     respond_to do |format|
       format.js { render partial: 'show_image_debug' }
-      #format.js { render partial: 'show' }
     end
   end
 
