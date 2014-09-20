@@ -46,6 +46,7 @@ class @Component
           $(this).popover('hide')
           # Clip buttonもついでに消す
           $('.boxInner').removeClass('hovered')
+          $('.titleD').removeClass('notransition')
       )
     )
     # Initialize all popovers

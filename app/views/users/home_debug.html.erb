@@ -34,12 +34,16 @@
 
         <div class="titleBoxD">
           <div class="id"><%= delivered_image.id %></div>
+          <% html_id = "popover-board#{image.id}" %>
+
+
           <%= button_group class: 'pull-right blocks' do %>
             <%= render_clip_debug_button(delivered_image) %>
             <%= render_like_button(delivered_image, 'btn-xs') %>
             <%= render_show_another_button(delivered_image) %>
           <% end %>
           <br />
+          <%= "<div class=\"popover-postion\" id=\"#{html_id}\" data-container=\"body\" data-placement=\"bottom\" data-toggle=\"popover\">test</div>".html_safe %>
         </div>
         <div class="titleD">
           <%= image.title.to_s %> <br /><br />
