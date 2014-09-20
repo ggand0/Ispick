@@ -7,6 +7,7 @@ describe "user's home page" do
       visit root_path
       mock_auth_hash
       click_link 'Continue with Twitter'
+      #save_and_open_page
     end
 
     # URIが正しい
@@ -18,6 +19,7 @@ describe "user's home page" do
     # 配信された画像のサムネを見る事が出来る
     it "displays crawled images" do
       visit home_users_path
+      #save_and_open_page
       expect(page).to have_css('.wrap .box .boxInner')
     end
 
