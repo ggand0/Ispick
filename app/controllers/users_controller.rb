@@ -4,8 +4,8 @@ require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
-  before_filter :set_user, only: [:edit, :update]
-  before_filter :validate_authorization_for_user, only: [:edit, :update]
+  before_filter :set_user, only: [:edit, :update, :settings]
+  before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
 
   before_action :render_sign_in_page,
     only: [:home, :boards, :preferences, :search, :show_target_images,
@@ -18,8 +18,8 @@ class UsersController < ApplicationController
   end
   # PUT /users/1
   def update
-    if @user.update_attributes(params[:user])
-      redirect_to @user, notice: 'User was successfully updated.'
+    if @user.update_attributes(user_params)
+      redirect_to settings_users_path(id: @user.id), notice: 'the settings was successfully updated.'
     else
       render action: 'debug/edit'
     end
@@ -130,8 +130,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # Remove a registered text tag from user.target_words.
   # 登録タグの削除：関連のみ削除する
+  # Remove a registered text tag from user.target_words.
   def delete_target_word
     current_user.target_words.delete(TargetWord.find(params[:id]))
     @target_words = current_user.target_words
@@ -230,7 +230,6 @@ class UsersController < ApplicationController
   # which contains the 'create a target_word' link.
   def debug_crawling
     @words = current_user.target_words
-
     render action: 'debug/debug_crawling'
   end
 
@@ -250,7 +249,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name)
+    params.require(:user).permit(:name, :language, :language_preferences)
   end
 
   def validate_authorization_for_user
@@ -269,7 +268,6 @@ class UsersController < ApplicationController
     session[:illust] ||= 'all'
     session[:illust] = params[:illust] if params[:illust]
   end
-
 
   # Returns the session data for debugging.
   # デバッグ用にsessionの情報を返す。

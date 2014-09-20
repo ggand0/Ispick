@@ -1,5 +1,12 @@
-<!-- nameを変更出来るようにする場合 -->
-<%# render 'form' %>
+<!--
+  ユーザ情報の設定ページ
+  - Using gem: https://github.com/Tretti/rails-bootstrap-helpers
+-->
+<p id="notice"><%= notice %></p>
+
+<!-- name/language等の編集フォーム -->
+<h3>Edit Account</h3>
+<%= render 'form' %>
 
 <!-- linkされているSNSアカウントを表示する -->
 <div style="width: 300px;">
