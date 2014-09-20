@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140919223003) do
+ActiveRecord::Schema.define(version: 20140920064614) do
 
   create_table "authorizations", force: true do |t|
     t.string   "provider"
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 20140919223003) do
     t.integer  "crawl_count",       default: 0, null: false
     t.integer  "images_count",      default: 0, null: false
     t.integer  "users_count",       default: 0, null: false
+    t.text     "name_english"
   end
 
   create_table "target_words_users", force: true do |t|
