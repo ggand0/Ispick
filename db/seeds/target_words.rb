@@ -10,8 +10,8 @@ end
 # Seed target_words based on all person records.
 # Assume people table is already seeded.
 Person.all.each do |person|
-  target_word = TargetWord.create(name: person.name)
+  target_word = TargetWord.create(name: person.name, name_english: person.name_english)
   target_word.person = person
 
-  puts "Seeded: #{target_word.name}"
+  puts "Seeded: #{target_word.name} / #{target_word.name_english}"
 end
