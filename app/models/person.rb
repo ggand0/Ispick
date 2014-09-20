@@ -8,4 +8,13 @@ class Person < ActiveRecord::Base
   has_many :titles, :through => :people_titles
 
   validates_uniqueness_of :name
+
+  # Get name for displaying
+  def get_name(language)
+    if language == 'ja'
+      name ? name : name_english
+    else
+      name_english
+    end
+  end
 end

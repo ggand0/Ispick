@@ -14,7 +14,8 @@ class TargetWord < ActiveRecord::Base
 
   validates_uniqueness_of :name
 
-
+  # 自分の次にidが小さいレコードを返す。クロール時に使用
+  # Return the record that has the smalledst id value next to self.
   def next
     TargetWord.where("id > ?", id).first
   end
@@ -31,7 +32,17 @@ class TargetWord < ActiveRecord::Base
     TargetWord.where.not(images_count: 0).order('images_count DESC').limit(size)
   end
 
+  # Get images which refers this record.
   def get_images
     images.where.not(data_updated_at: nil).reorder('created_at DESC')
+  end
+
+  # Get name for displaying
+  def get_name(language)
+    if language == 'ja'
+      name ? name : name_english
+    else
+      name_english
+    end
   end
 end
