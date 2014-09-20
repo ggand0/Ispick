@@ -11,6 +11,7 @@ FactoryGirl.define do
     # Create a default FavoredImage object of an user
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
+      user.authorizations << create(:authorization)
     end
   end
 
@@ -45,6 +46,7 @@ FactoryGirl.define do
       1.times do
         create(:favored_image_file, image_board: user.image_boards.first)
         user.image_boards << create(:image_board_min)
+        user.authorizations << create(:authorization)
       end
     end
 

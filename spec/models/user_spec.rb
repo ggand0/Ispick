@@ -4,7 +4,8 @@ describe User do
   let(:auth_twitter) { OmniAuth::AuthHash.new({
     provider: 'twitter',
     uid: '12345678',
-    info: { nickname: 'John'}
+    info: { nickname: 'ispick_twitter1'},     # Same name as the record produced from the users factory
+    credentials: OmniAuth::AuthHash.new({})
   })}
   let(:auth_facebook) { OmniAuth::AuthHash.new({
     provider: 'facebook',
@@ -50,29 +51,17 @@ describe User do
   # ===============================
   #  Authorization related methods
   # ===============================
-  describe "find_for_facebook_oauth method" do
+  describe "from_omniauth method" do
     it "returns user if persisted" do
-      FactoryGirl.create(:facebook_user)
-      user = User.find_for_twitter_oauth(auth_facebook, nil)
+      user = FactoryGirl.create(:twitter_user)
+      #puts user.authorizations.inspect
+      auth_user = User.from_omniauth(auth_twitter, nil)
       expect(User.count).to eq 1
     end
 
     it "creates a user if not persisted" do
       User.delete_all
-      user = User.find_for_facebook_oauth(auth_facebook, nil)
-      expect(User.count).to eq 1
-    end
-  end
-
-  describe "find_for_twitter_oauth method" do
-    it "returns user if persisted" do
-      FactoryGirl.create(:twitter_user)
-      user = User.find_for_twitter_oauth(auth_twitter, nil)
-      expect(User.count).to eq 1
-    end
-
-    it "creates a user if not persisted" do
-      user = User.find_for_twitter_oauth(auth_twitter, nil)
+      user = User.from_omniauth(auth_twitter, nil)
       expect(User.count).to eq 1
     end
   end
