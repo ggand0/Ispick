@@ -10,7 +10,10 @@ namespace :util do
   desc "Seed target_words.name_english from their person records"
   task :fill_name_english, [:csv_path] => :environment do |t, args|
     TargetWord.all.each do |target_word|
-      target_word.update_attribute(:name_english, target_word.person.name_english)!
+      if target_word.name_english.nil?
+        target_word.update_attribute(:name_english, target_word.person.name_english)
+        puts "filled #{target_word.name_english}"
+      end
     end
   end
 
