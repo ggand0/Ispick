@@ -84,6 +84,8 @@ gem 'rubyzip'
 gem 'ransack'
 gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
+gem 'exception_notification'
+gem 'letter_opener', group: :development
 
 # Manages sharing on social networks
 gem 'shareable'
@@ -107,7 +109,7 @@ group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
   gem 'rails-erd'                                   # モデル関連図生成
-  gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
+  gem 'quiet_assets'                                 # Turns off the Rails asset pipeline log
   #gem 'pry-rails'                                   # Improve the console
   #gem 'pry-nav'
   gem 'diffy'
