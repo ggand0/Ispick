@@ -79,9 +79,11 @@ Ispick::Application.configure do
   #config.log_formatter = ::Logger::Formatter.new
 
   # Configure the logger for fluentd
-  #config.log_level = :info
-  #config.logger = ActFluentLoggerRails::Logger.new
-  #config.lograge.enabled = true
-  #config.lograge.formatter = Lograge::Formatters::Json.new
-  config.logger = LTSV::Logger.open("log/production_ltsv.log")
+  config.log_level = :info
+  config.logger = ActFluentLoggerRails::Logger.new
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+
+  # ltsv gem version
+  #config.logger = LTSV::Logger.open("log/production_ltsv.log")
 end
