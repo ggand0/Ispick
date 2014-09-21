@@ -66,20 +66,23 @@ module Scrape
 
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
       page.search("span[class='img_block_big']").each_with_index do |image, count|
-        # サーチ結果ページから、ソースページのURLを取得
-        page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
-        # ソースページのパース
-        xml = Nokogiri::XML(open(page_url))
-        # ソースページから画像情報を取得してDBへ保存する
-        start = Time.now
-
-        begin
-          image_data = self.get_data(xml, page_url)
-        rescue => e
-          # R18画像はloginしないと見れないのでerrorになる？
-          puts e.inspect
+      
+          # 広告又はR18画像はスキップ
+        if image.children.search('img').first.nil?
+          skipped += 1
           next
+        else      
+            # サーチ結果ページから、ソースページのURLを取得
+         page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
         end
+        
+          # ソースページのパース
+        xml = Nokogiri::XML(open(page_url))
+          # ソースページから画像情報を取得してDBへ保存する
+        start = Time.now
+        
+        image_data = self.get_data(xml, page_url)
+
 
         options = {
           validation: validation,
@@ -122,9 +125,9 @@ module Scrape
       page = agent.get(ROOT_URL)
 
       # login作業
-      page.forms[1]['login'] = 'ul0640id'
-      page.forms[1]['password'] = 'ul0943id'
-      page.forms[1].submit
+      #page.forms[1]['login'] = 'xxx'
+      #page.forms[1]['password'] = 'xxx'
+      #page.forms[1].submit
 
       page.forms[2]['search_tag'] = query
 
@@ -177,27 +180,32 @@ module Scrape
     # @return [Hash]
     def get_data(xml, page_url)
       # titleの取得
-      # 改行の除去
+        # 改行の除去
       title = xml.css("div[class='post_content']").css("h1").first.content.gsub!(/\n/,'')
-      # タブのスペースへの変換
+        # タブのスペースへの変換
       title.gsub!(/\t/,' ')
-
       # captionの取得
-      # 改行の除去
+        # 改行の除去
       caption = xml.css('title').first.content.gsub!(/\n/,'')
-      # タブのスペースへの変換
+        # タブのスペースへの変換
       caption.gsub!(/\t/,' ')
 
       # posted_atの取得( 8/13/14, 7:26 PM\n\t\t)
       time = xml.css("div[class='post_content']").css("b")[2].next.content
       time = self.class.get_time(time)
-      time = Time.parse(time)
-
+      time = Time.parse(time) 
+      
       # src_urlの取得
-      src_url = xml.css("div[id='big_preview_cont']").css("img").first.attributes['src'].value.gsub!(/ /,'')
+      image_url_div = xml.css("div[id='big_preview_cont']")
+      src_url = image_url_div.css("img").first.attributes['src'].value.gsub!(/ /,'')
       
       # original_urlの取得
-      original_url = ROOT_URL + xml.css("div[id='big_preview_cont']").css("a").first.attributes['href'].value
+      # aタグが上手くパース出来なかったときの例外処理
+      if image_url_div.children.css("a").first.nil?
+        original_url = ROOT_URL + xml.css("div[class='post_vote_block']").css("a[rel='nofollow']").first.attributes['href'].value.gsub!(/download_image/,"get_image")
+      else
+        original_url = ROOT_URL + image_url_div.children.search("a").first.attributes['href'].value
+      end
 
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
