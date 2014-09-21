@@ -7,6 +7,13 @@ namespace :util do
     Util.restore_target_words(args.csv_path)
   end
 
+  desc "Seed target_words.name_english from their person records"
+  task :fill_name_english, [:csv_path] => :environment do |t, args|
+    TargetWord.all.each do |target_word|
+      target_word.update_attribute(:name_english, target_word.person.name_english)!
+    end
+  end
+
   task :test => :environment do
     puts "debugging something..."
     #TargetWord.all.each { |t| puts "#{t.inspect} #{t.person.inspect}" if t.nil? or t.name.empty? or t.person.nil? }
