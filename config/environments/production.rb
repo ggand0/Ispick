@@ -75,6 +75,31 @@ Ispick::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
+
+  # Configure SMTP
+  # SMTPの設定
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    authentication: :plain,
+    domain: 'smtp.gmail.com',
+    user_name: CONFIG['gmail_username'],
+    password: CONFIG['gmail_password']
+  }
+
+  # Configuration of exception notification gem
+  # Settings of exception_notification gem
+  config.middleware.use ExceptionNotification::Rack,
+    :ignore_crawlers => %w{Googlebot bingbot},
+    :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
+    email: {
+      sender_address: 'noreply@railscasts.com',
+      exception_recipients: 'ispic6@gmail.com',
+    }
+
+
   # Use default logging formatter so that PID and timestamp are not suppressed.
   #config.log_formatter = ::Logger::Formatter.new
 

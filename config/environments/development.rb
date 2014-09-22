@@ -42,12 +42,12 @@ Ispick::Application.configure do
 
   # Settings of exception_notification gem
   config.middleware.use ExceptionNotification::Rack,
+    :ignore_crawlers => %w{Googlebot bingbot},
     :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
     email: {
       sender_address: 'noreply@railscasts.com',
       exception_recipients: 'ispic6@gmail.com',
     }
-    #ignore_exceptions: ExceptionNotifier.default_ignore_exceptions # + [RuntimeError]
 
   config.action_mailer.delivery_method = :letter_opener
 
