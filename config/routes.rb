@@ -1,6 +1,8 @@
 require 'resque_web'
 
 Ispick::Application.routes.draw do
+  resources :authorizations, only: [:destroy]
+
   # RequeWeb
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
