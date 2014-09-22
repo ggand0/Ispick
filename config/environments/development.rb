@@ -41,6 +41,8 @@ Ispick::Application.configure do
   }
 
   # Settings of exception_notification gem
+  # Uncomment if you need to debug this
+=begin
   config.middleware.use ExceptionNotification::Rack,
     :ignore_crawlers => %w{Googlebot bingbot},
     :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
@@ -48,9 +50,8 @@ Ispick::Application.configure do
       sender_address: 'noreply@ispicks.com',
       exception_recipients: CONFIG['gmail_username'],
     }
-
   config.action_mailer.delivery_method = :letter_opener
-
+=end
 
   config.action_mailer.default_url_options = {:host => "0.0.0.0:3000"}
 
