@@ -84,11 +84,12 @@ gem 'rubyzip'
 gem 'ransack'
 gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
-gem 'exception_notification'                        # Notify errors with emails
-gem 'letter_opener', group: :development
+gem 'letter_opener', group: :development            # Open emails on browser
 
 # Gems for centralized logging
 group :production do
+  gem 'exception_notification'                        # Notify errors with emails
+
   gem 'act-fluent-logger-rails'
   gem 'lograge'
   gem 'fluent-plugin-parser'
