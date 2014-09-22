@@ -121,7 +121,8 @@ class User < ActiveRecord::Base
         )
       end
       authorization.user_name = auth.info.nickname
-      authorization.user_id = user.id
+      #authorization.user_id = user.id
+      authorization.user = user
       authorization.save
     end
     authorization.user

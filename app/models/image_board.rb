@@ -13,7 +13,12 @@ class ImageBoard < ActiveRecord::Base
     self.favored_images.each do |n|
       # まだコピーされていない(生存中のImageを参照している)
       if n.image_id
-        image = Image.find(n.image_id)
+        begin
+          image = Image.find(n.image_id)
+        rescue ActiveRecord::RecordNotFound => e
+          total_size += n.data.size
+          next
+        end
         total_size += image.data.size
       # 既にコピーされている(ソース元のImageは削除されている)
       else

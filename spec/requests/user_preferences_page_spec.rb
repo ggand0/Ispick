@@ -9,7 +9,7 @@ describe "Preferences page", :js => true do
     click_link 'Continue with Twitter'
     visit preferences_users_path
     #save_and_open_page
-    @tag = '鹿目まどか1'#'Madoka Kaname1'
+    @tag = 'Madoka Kaname1'#'鹿目まどか1'
   end
 
   it "sees popular tags" do

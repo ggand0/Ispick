@@ -4,7 +4,7 @@ require 'capistrano/puma'
 lock '3.1.0'
 
 set :application, 'Ispick'
-set :repo_url, 'git@github.com:pentiumx/Ispic.git'
+set :repo_url, 'git@github.com:pentiumx/Ispick.git'
 set :branch, 'development'
 set :rails_env, 'production'
 
@@ -37,7 +37,7 @@ set :scm, :git
 set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/database.yml config/config.yml}
+set :linked_files, %w{config/database.yml config/config.yml config/fluent-logger.yml }
 
 # Default value for linked_dirs is []
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/assets}
@@ -107,6 +107,12 @@ namespace :deploy do
   task :upload_db do
     on roles(:app) do |host|
       upload!('config/database.yml', "#{shared_path}/config/database.yml")
+    end
+  end
+
+  task :upload_fluentd do
+    on roles(:app) do |host|
+      upload!('config/fluent-logger.yml', "#{shared_path}/config/fluent-logger.yml")
     end
   end
 

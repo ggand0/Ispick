@@ -84,6 +84,17 @@ gem 'rubyzip'
 gem 'ransack'
 gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
+gem 'exception_notification'                        # Notify errors with emails
+gem 'letter_opener', group: :development
+
+# Gems for centralized logging
+group :production do
+  gem 'act-fluent-logger-rails'
+  gem 'lograge'
+  gem 'fluent-plugin-parser'
+  #gem 'ltsv-logger'
+end
+
 
 # Manages sharing on social networks
 gem 'shareable'
@@ -107,7 +118,7 @@ group :development, :test do
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
   gem 'rails-erd'                                   # モデル関連図生成
-  gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
+  gem 'quiet_assets'                                 # Turns off the Rails asset pipeline log
   #gem 'pry-rails'                                   # Improve the console
   #gem 'pry-nav'
   gem 'diffy'

@@ -61,7 +61,7 @@ module Scrape
       target_word = TargetWord.first
       while (count < TargetWord.count) do
 
-       # begin
+        begin
           # パラメータに基づいてAPIリクエストを行い結果を得る
           if (not target_word.name.nil?) and (not target_word.name.empty?)
             @logger.debug "target_word_id: #{target_word.id}"
@@ -80,10 +80,15 @@ module Scrape
             target_word.crawl_count += 1
             target_word.save!
           end
-        #rescue => e
-        #  @logger.info e
-        #  logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
-        #end
+        rescue => e
+          @logger.info e
+          logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
+
+          # Send an email manually
+          if Rails.env.production?
+            self.class.send_error_mail(e, module_type, target_word)
+          end
+        end
 
         begin
           # nextメソッドを使用してtarget_wordの次にidの若いレコードを取得
@@ -224,5 +229,14 @@ module Scrape
         end
       end
     end
+
+    def self.send_error_mail(e, module_type, target_word)
+      ActionMailer::Base.mail(
+        :from => "noreply@ispicks.com",
+        :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
+        :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}"
+      ).deliver
+    end
+
   end
 end
