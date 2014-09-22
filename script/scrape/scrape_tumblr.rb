@@ -134,14 +134,41 @@ module Scrape
       ::Tumblr::Client.new
     end
 
+    def self.get_artist_information(caption)
+        # タグの除去
+      caption = caption.gsub(/<.*?>/,"")
+      
+      #Hatsune… Madoka? | hitsu [pixiv]  
+        #「まどかさん」/「かきあげ」のイラスト [pixiv]
+        #「ハサハ」/「ローラ」の作品 [TINAMI] #illustail
+      if /\[pixiv\]|\[TINAMI\]/ =~ caption
+        /「.+」 *[\/|\|] *「(.+)」.+/ =~ caption
+        if $1.nil?
+          /.+ [\/|\|] (.+) \[.+\]/ =~ caption
+          artist = $1
+        else
+          artist = $1
+        end      
+      # Goddess of the Month August by 成瀬まひ
+      elsif caption.scan(/ by /).size == 1
+        /.+[by|By|BY] (.+)/ =~ caption
+        artist = $1
+      else
+          artist = nil
+      end
+      
+      return artist        
+    end
+
 
     # 画像１枚に関する情報をHashにして返す。
     # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
     # @param [Hash]
     # @return [Hash]
     def self.get_data(image)
+      artist = self.get_artist_information(image['caption'])
       {
-        artist: nil,
+        artist: artist,
         poster: image['blog_name'],
         title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
         caption: image['caption'],
