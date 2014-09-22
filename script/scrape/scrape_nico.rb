@@ -29,7 +29,7 @@ module Scrape
 
 
     # Scrape images from nicoseiga, using single TargetWord object.
-    # キーワードによる検索・抽出を行う
+     # キーワードによる検索・抽出を行う
     # @param user_id [Integer]
     # @param target_word [TargetWord]
     def scrape_target_word(user_id, target_word)
@@ -42,7 +42,7 @@ module Scrape
     end
 
     # Scrape images from nicoseiga, using its (probablly unofficial) API.
-    # キーワードからタグ検索してlimit分の画像を保存する
+     # キーワードからタグ検索してlimit分の画像を保存する
     # @param target_word [TargetWord] A TargetWord object to scrape.
     # @param user_id [Integer] An id value of certain user, if necessary.
     # @param validation [Boolean] Whether it needs to validate records or not.
@@ -61,7 +61,7 @@ module Scrape
       skipped = 0
       avg_time = 0
 
-      # 画像情報を取得してlimit枚DBヘ保存する
+       # 画像情報を取得してlimit枚DBヘ保存する
       xml.search('image').take(@limit).each_with_index do |item, count|
         begin
           if item.css('adult_level').first.content.to_i > 1 || item.css('clip_count').first.content.to_i == 0  # 春画画像、クリップ数0をskip
@@ -110,9 +110,8 @@ module Scrape
     # @return [Hash] Attributes of Image model
     def self.get_data(item)
       nico_image_id = item.css('id').first.content
-
       {
-        artist: nil,
+        artist: item.css('nickname').first.content,
         poster: nil,
         title: item.css('title').first.content,
         caption: item.css('description').first.content,

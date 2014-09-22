@@ -206,7 +206,16 @@ module Scrape
       else
         original_url = ROOT_URL + image_url_div.children.search("a").first.attributes['href'].value
       end
-
+      
+      author = "none"
+      # artistの取得
+      xml.css("ul[class='tags']").first.css('span').each do |span|
+        if span.content == "author"
+          author = span.next_element.css('a').first.content.gsub(/\t|\n/,'')
+          break
+        end
+      end
+      
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
       hash = {
@@ -220,6 +229,7 @@ module Scrape
         favorites: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
+        artist: author,
       }
 
       return hash
