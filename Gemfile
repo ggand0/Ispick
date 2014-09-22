@@ -86,10 +86,14 @@ gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
 gem 'exception_notification'                        # Notify errors with emails
 gem 'letter_opener', group: :development
-gem 'act-fluent-logger-rails'                       # Centralized logging
-gem 'lograge'
-gem 'fluent-plugin-parser'
-#gem 'ltsv-logger'
+
+# Gems for centralized logging
+group :production do
+  gem 'act-fluent-logger-rails'
+  gem 'lograge'
+  gem 'fluent-plugin-parser'
+  #gem 'ltsv-logger'
+end
 
 
 # Manages sharing on social networks
