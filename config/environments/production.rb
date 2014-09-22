@@ -95,8 +95,8 @@ Ispick::Application.configure do
     :ignore_crawlers => %w{Googlebot bingbot},
     :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
     email: {
-      sender_address: 'noreply@railscasts.com',
-      exception_recipients: 'ispic6@gmail.com',
+      sender_address: 'noreply@ispicks.com',
+      exception_recipients: CONFIG['gmail_username'],
     }
 
 
