@@ -26,6 +26,7 @@ erd.dot
 # Ignore secret files
 config.yml
 database.yml
+fluent-logger.yml
 
 *.rbc
 *.sassc
