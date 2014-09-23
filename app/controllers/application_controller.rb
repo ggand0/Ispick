@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
       if resource.is_a?(Admin)
         admin_dashboard_path
       else
-        user_path(resource)
+        home_users_path
       end
   end
 
