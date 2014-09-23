@@ -2,6 +2,9 @@ require 'resque_web'
 
 Ispick::Application.routes.draw do
 
+  # Root path
+  root 'welcome#index'
+
   # Debugging paths
   scope "/debug" do
     get "/index" => "debug#index", as: "index_debug"
@@ -12,13 +15,9 @@ Ispick::Application.routes.draw do
     get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
   end
 
-
   # RequeWeb configuration
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
-
-  # Root path
-  root 'welcome#index'
 
 
   # Devise
@@ -61,8 +60,10 @@ Ispick::Application.routes.draw do
   resources :image_boards do
     collection do
       get 'boards'
-      get 'boards_another' # for debug
-      post 'create_another'  # for debug
+
+      # debug paths
+      get 'boards_another'
+      post 'create_another'
     end
   end
   resources :images, only: [:index, :show, :destroy]
@@ -71,8 +72,9 @@ Ispick::Application.routes.draw do
       put 'favor'
       put 'hide'
 
-      put 'favor_another' # for debug
-      get 'show_debug'# for debug
+      # debug paths
+      put 'favor_another'
+      get 'show_debug'
     end
   end
 

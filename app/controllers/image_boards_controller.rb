@@ -31,15 +31,6 @@ class ImageBoardsController < ApplicationController
     end
   end
 
-  def reload
-    @image = Image.find(params[:image])
-    @board = ImageBoard.new
-    respond_to do |format|
-      format.html
-      format.js { render partial: 'reload' }
-    end
-  end
-
 
   # GET /image_boards/1/edit
   def edit

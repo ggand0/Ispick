@@ -8,8 +8,7 @@ class ApplicationController < ActionController::Base
   before_filter :miniprofiler
 
   def authenticate_admin_user!
-    #redirect_to new_user_session_path unless current_admin
-    redirect_to '/' unless current_admin
+    redirect_to new_user_session_path  unless current_admin
   end
 
   protected

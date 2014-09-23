@@ -1,5 +1,6 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :favor_another, :hide, :show_debug]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide,
+    :favor_another, :show_debug]
 
   # GET /images
   # GET /images.json
