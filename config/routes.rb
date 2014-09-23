@@ -2,7 +2,15 @@ require 'resque_web'
 
 Ispick::Application.routes.draw do
 
-  devise_for :admins, ActiveAdmin::Devise.config
+  # Debugging paths
+  scope "/debug" do
+    get "/index" => "debug#index", as: "index_debug"
+    get '/home' => 'debug#home', as: "home_debug"
+    get '/download' => 'debug#download_favored_images', as: "download_debug"
+    get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
+    get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
+    get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
+  end
 
 
   # RequeWeb configuration
@@ -14,6 +22,7 @@ Ispick::Application.routes.draw do
 
 
   # Devise
+  devise_for :admins, ActiveAdmin::Devise.config
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks"
   }, path: '', path_names: {
@@ -30,26 +39,19 @@ Ispick::Application.routes.draw do
   resources :users do
     collection do
       get 'home'
-      get 'home_debug' # for debug
       get 'settings'
       get 'preferences'
       post 'preferences'
       get 'boards'
-      get 'share_tumblr'  # for debug
+      #get 'share_tumblr'  # for debug
       get 'new_avatar'
       post 'create_avatar'
       get 'search'
-      get 'show_target_images'
+      #get 'show_target_images'
       delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
-
-      # routes for debug
-      get 'download_favored_images'
-      get 'debug_illust_detection'
-      get 'debug_crawling'
-      get 'toggle_miniprofiler'
     end
   end
 
