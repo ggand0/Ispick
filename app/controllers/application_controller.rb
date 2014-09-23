@@ -7,6 +7,10 @@ class ApplicationController < ActionController::Base
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
 
+  def authenticate_admin_user!
+    redirect_to new_user_session_path  unless current_admin
+  end
+
   protected
 
   # production環境のみBASIC認証する
@@ -25,7 +29,12 @@ class ApplicationController < ActionController::Base
 
   # ログイン後のリダイレクト先を指定する
   def after_sign_in_path_for(resource)
-    '/users/home'
+    stored_location_for(resource) ||
+      if resource.is_a?(Admin)
+        admin_dashboard_path
+      else
+        home_users_path
+      end
   end
 
   # Sign up時にname attributeを関連づける

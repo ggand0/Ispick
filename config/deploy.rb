@@ -116,6 +116,12 @@ namespace :deploy do
     end
   end
 
+  task :upload_app_env do
+    on roles(:app) do |host|
+      upload!('config/app_environment_variables.rb', "#{shared_path}/config/app_environment_variables.rb")
+    end
+  end
+
   task :assets_clean do
     on roles(:app) do |host|
       within current_path do

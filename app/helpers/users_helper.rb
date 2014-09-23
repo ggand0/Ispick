@@ -12,6 +12,10 @@ module UsersHelper
     link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
   end
 
+  def render_favored_image(image, size='btn-sm')
+    link_to image_tag(image.data.url(:thumb)), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+  end
+
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_clip_button(image, size='btn-sm')
@@ -47,6 +51,7 @@ module UsersHelper
     bs_button_to wrench_glyphicon, { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
       class: "btn-default #{size}"
   end
+
 
 
   # ==========================================

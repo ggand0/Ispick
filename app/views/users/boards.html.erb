@@ -10,7 +10,6 @@
   <strong>Total size of clipped images in bytes:</strong>
   <%= @total_size %> MB
   <br />
-  <%# link_to 'Download zip(Debug)', controller: 'users', action: 'download_favored_images' %>
   <br />
   <br />
 </p>
@@ -30,20 +29,21 @@
 <% end %>
 
 
-<!-- 選択されているBoardの画像一覧を表示 -->
+<!-- 選択されているBoardの画像一覧を表示、home.html.erbと同様 -->
 <div class="wrap">
-  <% @favored_images.each do |image| %>
+  <% @favored_images.each do |favored_image| %>
     <div class="box">
       <div class="boxInner">
-        <%= link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
+        <%# link_to(image_tag(image.data.url), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) %>
+        <%= render_favored_image(favored_image) %>
         <div class="titleBox">
           <%= button_group class: 'pull-right blocks' do %>
-            <%= render_unclip_button(image) %>
-            <%= render_show_button(image) %>
+            <%= render_unclip_button(favored_image) %>
+            <%= render_show_button(favored_image) %>
           <% end %>
         </div>
         <div class="title">
-          <%= image.title.to_s %><br />
+          <%= favored_image.title.to_s %><br />
         </div>
       </div>
     </div>

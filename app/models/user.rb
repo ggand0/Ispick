@@ -2,7 +2,11 @@ class User < ActiveRecord::Base
   # Set this variabale true during testing to skip all callbacks.
   cattr_accessor :skip_callbacks
 
-  has_many :authorizations
+  # ==============
+  #  Associations
+  # ==============
+  # Enable associating multiple social network accounts
+  has_many :authorizations, dependent: :destroy
 
   # has_many uploaded images
   has_many :target_images, dependent: :destroy
@@ -12,9 +16,13 @@ class User < ActiveRecord::Base
   has_many :likes, dependent: :destroy, counter_cache: :likes_count
 
   # has_many tags for making image feeds
-  has_many :target_words_users
+  has_many :target_words_users, dependent: :destroy
   has_many :target_words, :through => :target_words_users
 
+
+  # ================
+  #  Other settings
+  # ================
   # devise configuration
   devise :database_authenticatable, :omniauthable, :recoverable,
          :registerable, :rememberable, :trackable, :validatable, :omniauth_providers=>[:tumblr,:twitter,:facebook]
@@ -56,6 +64,19 @@ class User < ActiveRecord::Base
       where.not(data_updated_at: nil).references(:target_words)
   end
 
+  # Get an optional ImageBoard instance by board_id.
+  # そのUserオブジェクトに関連したImageBoardオブジェクトを取得する。
+  # board_idが指定されない場合はimage_boards内の一番最初のオブジェクトを返す。
+  # @param board_id [Integer] The image_board's id which you want to retrive
+  # @return [ImageBoard]
+  def get_board(board_id=nil)
+    if board_id.nil?
+      board = image_boards.first
+    else
+      board = image_boards.find(board_id)
+    end
+  end
+
 
   # @return The path where default thumbnail file is.
   def set_default_url
@@ -74,33 +95,16 @@ class User < ActiveRecord::Base
     self.save!
   end
 
-  # Get an optional ImageBoard instance by board_id.
-  # そのUserオブジェクトに関連したImageBoardオブジェクトを取得する。
-  # board_idが指定されない場合はimage_boards内の一番最初のオブジェクトを返す。
-  # @param board_id [Integer] The image_board's id which you want to retrive
-  # @return [ImageBoard]
-  def get_board(board_id=nil)
-    if board_id.nil?
-      board = image_boards.first
-    else
-      board = image_boards.find(board_id)
-    end
-  end
 
 
   # ===============================
   #  Authorization related methods
   # ===============================
-  def self.new_with_session(params, session)
-    super.tap do |user|
-      if data = session['devise.facebook_data'] && session['devise.facebook_data']['extra']['raw_info']
-        user.email = data['email']
-        fsd
-      end
-    end
-  end
 
-  #
+  # Called from omniauth_callback_controller.
+  # @param auth [OmniAuth::AuthHash]
+  # @param current_user [User]
+  # @return [User]
   def self.from_omniauth(auth, current_user)
     authorization = Authorization.where(
       :provider => auth.provider,
@@ -120,12 +124,20 @@ class User < ActiveRecord::Base
           password: Devise.friendly_token[0,20]
         )
       end
-      authorization.user_name = auth.info.nickname
-      #authorization.user_id = user.id
+
+      authorization.user_name = User.get_user_name(auth)
       authorization.user = user
       authorization.save
     end
     authorization.user
+  end
+
+  def self.get_user_name(auth)
+    if auth.provider == 'facebook'
+      "#{auth.info.first_name} #{auth.info.last_name}"
+    else
+      auth.info.nickname
+    end
   end
 
   def self.get_email(auth)

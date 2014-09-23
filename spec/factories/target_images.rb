@@ -1,4 +1,6 @@
-include  ActionDispatch::TestProcess
+# Need to attach 'Rails.env.test?' or this crushes activeadmin pages.
+# https://github.com/activeadmin/activeadmin/issues/512
+include  ActionDispatch::TestProcess if Rails.env.test?
 
 FactoryGirl.define do
   factory :target_image, class: TargetImage do

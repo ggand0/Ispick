@@ -92,12 +92,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # [Unused]画像登録画面を表示する
-  # Render the index page of target_images.
-  def show_target_images
-  @target_images = current_user.target_images
-    render action: 'debug/show_target_images'
-  end
 
   # タグ登録画面を表示する
   # Render the index page of target_words.
@@ -142,6 +136,17 @@ class UsersController < ApplicationController
     end
   end
 
+  # ===============================
+  #  Debugging / temporary actions
+  # ===============================
+
+  # [Unused]画像登録画面を表示する
+  # Render the index page of target_images.
+  def show_target_images
+  @target_images = current_user.target_images
+    render action: 'debug/show_target_images'
+  end
+
   # A temporary method. Will be fixed.
   def share_tumblr
     if current_user.provider == 'tumblr'
@@ -157,88 +162,6 @@ class UsersController < ApplicationController
 
     redirect_to home_users_path
   end
-
-
-
-  # =======================
-  #  Actions for debugging
-  # =======================
-  def home_debug
-    # Get images: For a new user, display the newer images
-    if current_user.target_words.empty?
-      images = Image.get_recent_images(500)
-
-    # Otherwise, display images from user.target_words relation
-    else
-      images = current_user.get_images
-      images.reorder!('posted_at DESC') if params[:sort]
-    end
-
-    # Filter images by date
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
-    end
-
-    @images = images.page(params[:page]).per(25)
-    @images_all = images
-  end
-
-  # [DEBUG]Download images of the default image_board.
-  # This feature will be deleted in future.
-  # 画像のダウンロード：releaseする時にこの機能は削除する。
-  def download_favored_images
-    @images = current_user.image_boards.first.favored_images
-    file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
-
-    temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
-    Zip::OutputStream.open(temp_file.path) do |zos|
-      @images.each do |image|
-        title = "#{image.title}#{File.extname(image.data.path)}"
-        zos.put_next_entry(title)
-        zos.print IO.read(image.data.path)
-      end
-    end
-    send_file temp_file.path, type: 'application/zip',
-      disposition: 'attachment', filename: file_name
-    temp_file.close
-  end
-
-  # The page for debugging illust detection feature.
-  # イラスト判定ツールのデバッグ用ページを表示する。
-  def debug_illust_detection
-    # Get images
-    if session[:all]
-      images = current_user.get_images_all
-    else
-      images = current_user.get_images
-    end
-
-    # Filter by is_an_illustration value
-    @debug = get_session_data
-    images = Image.filter_by_illust(images, session[:illust])
-
-    # Sort images if any requests exist.
-    images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
-    images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
-    @images = images.page(params[:page]).per(25)
-
-    render action: 'debug/debug_illust_detection'
-  end
-
-  # [DEBUG]Just an old version of 'preferences' template,
-  # which contains the 'create a target_word' link.
-  def debug_crawling
-    @words = current_user.target_words
-    render action: 'debug/debug_crawling'
-  end
-
-  # [DEBUG]
-  def toggle_miniprofiler
-    Rack::MiniProfiler.config.auto_inject = Rack::MiniProfiler.config.auto_inject ? false : true
-    redirect_to home_users_path
-  end
-
 
 
   private

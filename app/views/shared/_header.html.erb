@@ -17,16 +17,21 @@
       <%= navbar_item 'Home', home_users_path %>
       <%= navbar_item 'Boards', boards_users_path %>
       <%= navbar_item 'Preferences', preferences_users_path %>
+
+
+      <!-- DEBUG paths. Will be removed. -->
       <%= navbar_dropdown 'DEBUG' do %>
+        <%= navbar_item 'DEBUG TOP', index_debug_path %>
         <%= navbar_item 'View all images', images_path %>
-        <%= navbar_item 'Debug design', home_debug_users_path %>
-        <%= navbar_item 'Debug illust detection', debug_illust_detection_users_path %>
-        <%= navbar_item 'Debug crawling', debug_crawling_users_path %>
+        <%= navbar_item 'Debug design', home_debug_path %>
+        <%= navbar_item 'Debug illust detection', illust_detection_debug_path %>
+        <%= navbar_item 'Debug crawling', crawling_debug_path %>
         <%= navbar_item 'Tutorial', '/tutorial' %>
         <%= navbar_item 'Top page', '/' %>
         <%= navbar_item 'Resque', '/resque_web/overview' %>
-        <%= navbar_item 'Toggle miniprofiler', toggle_miniprofiler_users_path %>
+        <%= navbar_item 'Toggle miniprofiler', miniprofiler_debug_path %>
       <% end %>
+
     <% end %>
 
     <%= image_tag(current_user.avatar.url(:thumb), align: 'right', class: 'current-avatar') %>

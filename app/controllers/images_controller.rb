@@ -1,5 +1,6 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :favor_another, :hide, :show_debug]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide,
+    :favor_another, :show_debug]
 
   # GET /images
   # GET /images.json
@@ -11,7 +12,7 @@ class ImagesController < ApplicationController
   # GET /images/1.json
   def show
     respond_to do |format|
-      format.html { }
+      format.html {}
       format.js { render partial: 'show' }
     end
   end
@@ -37,16 +38,22 @@ class ImagesController < ApplicationController
     # Board名のリンクをクリックして呼ばれるので必ず対応するboardがあると仮定
     board = current_user.image_boards.where(name: board_name).first
     favored_image = board.favored_images.build(
+      artist: @image.artist,
+      poster: @image.poster,
       title: @image.title,
       caption: @image.caption,
       data: @image.data,
       src_url: @image.src_url,
+      original_url: @image.original_url,
       page_url: @image.page_url,
       site_name: @image.site_name,
       views: @image.views,
       favorites: @image.favorites,
       posted_at: @image.posted_at,
     )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
 
     # save出来たらimageへの参照も追加
     if favored_image.save
@@ -59,7 +66,6 @@ class ImagesController < ApplicationController
     @id = params[:html_id]
     respond_to do |format|
       format.html { redirect_to boards_users_path }
-      #format.js { render partial: 'image_boards/boards' }
       format.js { render partial: 'image_boards/after_clipped' }
     end
   end
@@ -76,9 +82,9 @@ class ImagesController < ApplicationController
 
 
 
-  # =======
-  #  DEBUG
-  # =======
+  # ===============
+  #  DEBUG actions
+  # ===============
   def favor_another
     board_name = params[:board]
     board = current_user.image_boards.where(name: board_name).first
@@ -93,6 +99,10 @@ class ImagesController < ApplicationController
       favorites: @image.favorites,
       posted_at: @image.posted_at,
     )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
+
     if favored_image.save
       @image.favored_images << favored_image
     end

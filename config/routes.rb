@@ -1,14 +1,27 @@
 require 'resque_web'
 
 Ispick::Application.routes.draw do
-  # RequeWeb
-  mount ResqueWeb::Engine => '/resque_web'
-  ResqueWeb::Engine.eager_load!
 
   # Root path
   root 'welcome#index'
 
+  # Debugging paths
+  scope "/debug" do
+    get "/index" => "debug#index", as: "index_debug"
+    get '/home' => 'debug#home', as: "home_debug"
+    get '/download' => 'debug#download_favored_images', as: "download_debug"
+    get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
+    get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
+    get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
+  end
+
+  # RequeWeb configuration
+  mount ResqueWeb::Engine => '/resque_web'
+  ResqueWeb::Engine.eager_load!
+
+
   # Devise
+  devise_for :admins, ActiveAdmin::Devise.config
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks"
   }, path: '', path_names: {
@@ -17,35 +30,55 @@ Ispick::Application.routes.draw do
   devise_scope :user do
     get 'reset_password' => 'devise/passwords#new'
   end
+  ActiveAdmin.routes(self)
 
   # Resources
+  resources :authorizations, only: [:destroy]
+
   resources :users do
     collection do
       get 'home'
-      get 'home_debug'
       get 'settings'
+      get 'new_avatar'
+      post 'create_avatar'
       get 'preferences'
       post 'preferences'
       get 'boards'
-      get 'share_tumblr'
-      get 'new_avatar'
-      post 'create_avatar'
       get 'search'
-      get 'show_illusts'
-      get 'show_target_images'
       delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
 
-      # routes for debug
-      get 'download_favored_images'
-      get 'debug_illust_detection'
-      get 'debug_crawling'
-      get 'toggle_miniprofiler'
+      # debug or temporary created paths
+      #get 'share_tumblr'  # for debug
+      #get 'show_target_images'
     end
   end
 
+  resources :favored_images, only: [:show, :destroy]
+  resources :image_boards do
+    collection do
+      get 'boards'
+
+      # debug paths
+      get 'boards_another'
+      post 'create_another'
+    end
+  end
+  resources :images, only: [:index, :show, :destroy]
+  resources :images do
+    member do
+      put 'favor'
+      put 'hide'
+
+      # debug paths
+      put 'favor_another'
+      get 'show_debug'
+    end
+  end
+
+=begin
   resources :target_images do
     member do
       get 'prefer'
@@ -53,6 +86,7 @@ Ispick::Application.routes.draw do
       get 'switch'
     end
   end
+=end
 
   resources :target_words do
     collection do
@@ -60,31 +94,9 @@ Ispick::Application.routes.draw do
       post 'attach'
     end
     member do
-      get 'prefer'
-      get 'show_delivered'
+      get 'images'
     end
   end
-
-  resources :image_boards do
-    collection do
-      get 'boards'
-      get 'reload'
-      get 'boards_another'
-      post 'create_another'
-    end
-  end
-
-  resources :favored_images, only: [:show, :destroy]
-  resources :images, only: [:index, :show, :destroy]
-  resources :images do
-    member do
-      put 'favor'
-      put 'favor_another'
-      put 'hide'
-      get 'show_debug'
-    end
-  end
-
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search

@@ -10,9 +10,11 @@ describe User do
   let(:auth_facebook) { OmniAuth::AuthHash.new({
     provider: 'facebook',
     uid: '12345678',
-    extra: { raw_info: {name:'John'}},
-    info: {email:'test@example.com'}
+    #extra: { raw_info: {name:'John'}},
+    info: { email:'test@example.com', last_name: 'Smith', first_name: 'John' },
+    credentials: OmniAuth::AuthHash.new({})
   })}
+
 
   describe "get_images method" do
     it "returns proper relation object" do
@@ -30,20 +32,20 @@ describe User do
     end
   end
 
-  describe "create_defaul method" do
-    it "returns a certain path" do
-      user = User.new(email: 'test@example.com', password: '12345678', name: 'test')
-      user.create_default
-      expect(user.image_boards.count).to eq(1)
-    end
-  end
-
   describe "get_board method" do
     it "return the valid ImageBoard record" do
       user = FactoryGirl.create(:user)
       board_id = user.image_boards.first.id
       expect(user.get_board.class).to eq(ImageBoard)
       expect(user.get_board(board_id).class).to eq(ImageBoard)
+    end
+  end
+
+  describe "create_defaul method" do
+    it "returns a certain path" do
+      user = User.new(email: 'test@example.com', password: '12345678', name: 'test')
+      user.create_default
+      expect(user.image_boards.count).to eq(1)
     end
   end
 
@@ -54,7 +56,6 @@ describe User do
   describe "from_omniauth method" do
     it "returns user if persisted" do
       user = FactoryGirl.create(:twitter_user)
-      #puts user.authorizations.inspect
       auth_user = User.from_omniauth(auth_twitter, nil)
       expect(User.count).to eq 1
     end

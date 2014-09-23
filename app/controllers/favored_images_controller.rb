@@ -5,8 +5,7 @@ class FavoredImagesController < ApplicationController
   # GET /favored_images/1.json
   def show
     respond_to do |format|
-      format.html
-      # Render views/favored_images/show.js.erb, then _favored_image.html.erb
+      format.html {}
       format.js { render partial: 'show' }
     end
   end
@@ -20,6 +19,7 @@ class FavoredImagesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
