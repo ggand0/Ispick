@@ -92,12 +92,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # [Unused]画像登録画面を表示する
-  # Render the index page of target_images.
-  def show_target_images
-  @target_images = current_user.target_images
-    render action: 'debug/show_target_images'
-  end
 
   # タグ登録画面を表示する
   # Render the index page of target_words.
@@ -140,6 +134,17 @@ class UsersController < ApplicationController
       format.html { render action: 'preferences' }
       format.js { render partial: 'layouts/reload_followed_tags' }
     end
+  end
+
+  # ===============================
+  #  Debugging / temporary actions
+  # ===============================
+
+  # [Unused]画像登録画面を表示する
+  # Render the index page of target_images.
+  def show_target_images
+  @target_images = current_user.target_images
+    render action: 'debug/show_target_images'
   end
 
   # A temporary method. Will be fixed.

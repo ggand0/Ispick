@@ -1,4 +1,7 @@
 class DebugController < ApplicationController
+  before_action :render_sign_in_page
+  before_filter :authenticate
+
   def index
   end
 
@@ -83,6 +86,11 @@ class DebugController < ApplicationController
 
 
   private
+
+  # Render the 'sign in' template if the user is logged in.
+  def render_sign_in_page
+    redirect_to '/signin_with_password' unless signed_in?
+  end
 
   # Update session values based on request parameters.
   def update_session
