@@ -40,18 +40,20 @@ Ispick::Application.routes.draw do
     collection do
       get 'home'
       get 'settings'
+      get 'new_avatar'
+      post 'create_avatar'
       get 'preferences'
       post 'preferences'
       get 'boards'
-      #get 'share_tumblr'  # for debug
-      get 'new_avatar'
-      post 'create_avatar'
       get 'search'
-      #get 'show_target_images'
       delete 'delete_target_word'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
+
+      # debug or temporary created paths
+      #get 'share_tumblr'  # for debug
+      #get 'show_target_images'
     end
   end
 
@@ -59,7 +61,6 @@ Ispick::Application.routes.draw do
   resources :image_boards do
     collection do
       get 'boards'
-      get 'reload'
       get 'boards_another' # for debug
       post 'create_another'  # for debug
     end
@@ -68,8 +69,9 @@ Ispick::Application.routes.draw do
   resources :images do
     member do
       put 'favor'
-      put 'favor_another' # for debug
       put 'hide'
+
+      put 'favor_another' # for debug
       get 'show_debug'# for debug
     end
   end
