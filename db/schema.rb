@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140923073443) do
+ActiveRecord::Schema.define(version: 20140923144017) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -79,6 +79,11 @@ ActiveRecord::Schema.define(version: 20140923073443) do
     t.text     "original_url"
     t.text     "artist"
     t.text     "poster"
+  end
+
+  create_table "favored_images_tags", force: true do |t|
+    t.integer "favored_image_id", null: false
+    t.integer "tag_id",           null: false
   end
 
   create_table "features", force: true do |t|
