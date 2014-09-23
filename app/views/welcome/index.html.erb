@@ -18,13 +18,3 @@
 </div>
 <br>
 <br>
-<div>
-  <!-- デバッグ用OAuthログイン -->
-  <h3>Debug</h3>
-  <% if user_signed_in? %>
-    <%= link_to 'Logout', destroy_user_session_path %>
-  <% else %>
-    <%= link_to "Login with twitter", user_omniauth_authorize_path(:twitter) %><br>
-    <%= link_to "Login with facebook", '/' %>
-  <% end %>
-</div>
