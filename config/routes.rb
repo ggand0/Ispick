@@ -1,14 +1,17 @@
 require 'resque_web'
 
 Ispick::Application.routes.draw do
-  resources :authorizations, only: [:destroy]
 
-  # RequeWeb
+  devise_for :admins, ActiveAdmin::Devise.config
+
+
+  # RequeWeb configuration
   mount ResqueWeb::Engine => '/resque_web'
   ResqueWeb::Engine.eager_load!
 
   # Root path
   root 'welcome#index'
+
 
   # Devise
   devise_for :users, controllers: {
@@ -19,21 +22,23 @@ Ispick::Application.routes.draw do
   devise_scope :user do
     get 'reset_password' => 'devise/passwords#new'
   end
+  ActiveAdmin.routes(self)
 
   # Resources
+  resources :authorizations, only: [:destroy]
+
   resources :users do
     collection do
       get 'home'
-      get 'home_debug'
+      get 'home_debug' # for debug
       get 'settings'
       get 'preferences'
       post 'preferences'
       get 'boards'
-      get 'share_tumblr'
+      get 'share_tumblr'  # for debug
       get 'new_avatar'
       post 'create_avatar'
       get 'search'
-      get 'show_illusts'
       get 'show_target_images'
       delete 'delete_target_word'
 
@@ -45,6 +50,25 @@ Ispick::Application.routes.draw do
       get 'debug_illust_detection'
       get 'debug_crawling'
       get 'toggle_miniprofiler'
+    end
+  end
+
+  resources :favored_images, only: [:show, :destroy]
+  resources :image_boards do
+    collection do
+      get 'boards'
+      get 'reload'
+      get 'boards_another' # for debug
+      post 'create_another'  # for debug
+    end
+  end
+  resources :images, only: [:index, :show, :destroy]
+  resources :images do
+    member do
+      put 'favor'
+      put 'favor_another' # for debug
+      put 'hide'
+      get 'show_debug'
     end
   end
 
@@ -66,27 +90,6 @@ Ispick::Application.routes.draw do
       get 'show_delivered'
     end
   end
-
-  resources :image_boards do
-    collection do
-      get 'boards'
-      get 'reload'
-      get 'boards_another'
-      post 'create_another'
-    end
-  end
-
-  resources :favored_images, only: [:show, :destroy]
-  resources :images, only: [:index, :show, :destroy]
-  resources :images do
-    member do
-      put 'favor'
-      put 'favor_another'
-      put 'hide'
-      get 'show_debug'
-    end
-  end
-
   resources :people do
     collection do
       match 'search' => 'people#search', via: [:get, :post], as: :search
