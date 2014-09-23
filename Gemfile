@@ -9,6 +9,9 @@ gem 'mysql2'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
 
+# http://stackoverflow.com/questions/22276991/heroku-error-encountered-while-saving-cache
+#gem 'sass', '3.2.13'
+
 # View related gems
 gem 'bootstrap-sass', '~> 3.2.0'
 gem 'autoprefixer-rails'
@@ -74,6 +77,7 @@ gem 'omniauth-tumblr'
 gem 'nokogiri'                                      # For scraping
 gem 'mechanize'
 gem 'rmagick', require: false                       # Image processing lib. Used by AnimeFace
+#gem 'rmagick', require: 'RMagick'                       # For image processing
 gem 'resque'                                        # For background jobs
 gem 'resque-web', require: 'resque_web'             # Web interface for resque
 gem 'resque-logger'
@@ -81,10 +85,11 @@ gem 'daemon-spawn', require: 'daemon_spawn', git: 'git@github.com:pentiumx/daemo
 gem 'pidfile'
 gem 'whenever', require: false                      # Support crontab
 gem 'rubyzip'
-gem 'ransack'
+gem 'ransack', github: 'activerecord-hackery/ransack'
 gem 'factory_girl_rails'                            # A fixtures replacement
 gem 'engtagger'
 gem 'letter_opener', group: :development            # Open emails on browser
+gem 'activeadmin', github: 'activeadmin'
 
 # Gems for centralized logging
 group :production do
