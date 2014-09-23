@@ -1,5 +1,5 @@
 class TargetWordsController < ApplicationController
-  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :show_delivered, :attach]
+  before_action :set_target_word, only: [:show, :edit, :update, :destroy, :images, :attach]
 
   # GET /target_words
   # GET /target_words.json
@@ -136,7 +136,7 @@ class TargetWordsController < ApplicationController
 
   # Show images associated by a specific tag. Will be moved to the UsersController class.
   # 特定のタグに配信されている画像のみを表示する。UsersControllerに移動予定
-  def show_delivered
+  def images
     redirect_to '/signin_with_password' unless signed_in?
 
     # Get images of the TargetWord record

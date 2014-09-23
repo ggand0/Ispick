@@ -70,10 +70,11 @@ Ispick::Application.routes.draw do
       put 'favor'
       put 'favor_another' # for debug
       put 'hide'
-      get 'show_debug'
+      get 'show_debug'# for debug
     end
   end
 
+=begin
   resources :target_images do
     member do
       get 'prefer'
@@ -81,6 +82,7 @@ Ispick::Application.routes.draw do
       get 'switch'
     end
   end
+=end
 
   resources :target_words do
     collection do
@@ -88,8 +90,7 @@ Ispick::Application.routes.draw do
       post 'attach'
     end
     member do
-      get 'prefer'
-      get 'show_delivered'
+      get 'images'
     end
   end
   resources :people do
