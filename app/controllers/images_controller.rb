@@ -50,6 +50,9 @@ class ImagesController < ApplicationController
       favorites: @image.favorites,
       posted_at: @image.posted_at,
     )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
 
     # save出来たらimageへの参照も追加
     if favored_image.save
@@ -95,6 +98,10 @@ class ImagesController < ApplicationController
       favorites: @image.favorites,
       posted_at: @image.posted_at,
     )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
+
     if favored_image.save
       @image.favored_images << favored_image
     end
