@@ -29,7 +29,7 @@ describe UsersController do
     it "renders show_target_images template when logged in" do
       login_user
       get :show_target_images, {}, valid_session
-      response.should render_template('show_target_images')
+      response.should render_template('debug/_show_target_images')
     end
 
     it "renders not_signed_in template when NOT logged in" do

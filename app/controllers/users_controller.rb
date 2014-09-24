@@ -98,7 +98,7 @@ class UsersController < ApplicationController
   # タグ登録画面を表示する
   # Render the index page of target_words.
   def preferences
-    @popular_tags = TargetWord.get_tags_with_images(20)
+    @popular_tags = TargetWord.get_tags_with_images(100)
     @target_words = current_user.target_words
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
@@ -148,7 +148,7 @@ class UsersController < ApplicationController
   # Render the index page of target_images.
   def show_target_images
     @target_images = current_user.target_images
-    render action: 'debug/show_target_images'
+    render partial: 'debug/show_target_images'
   end
 
   # A temporary method. Will be fixed.
