@@ -64,6 +64,7 @@ describe UsersController do
     end
   end
 
+=begin
   describe "GET download_favored_images" do
     # see: http://stackoverflow.com/questions/4701108/rspec-send-file-testing
     it "downloads favored delivered_images" do
@@ -82,7 +83,7 @@ describe UsersController do
       response.should render_template('debug_illust_detection')
     end
   end
-
+=end
 
   # ==========================
   #  specs of private methods

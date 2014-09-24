@@ -57,7 +57,7 @@ Ispick::Application.routes.draw do
 
       # debug or temporary created paths
       #get 'share_tumblr'  # for debug
-      #get 'show_target_images'
+      get 'show_target_images'
     end
   end
 
@@ -75,7 +75,7 @@ Ispick::Application.routes.draw do
     end
   end
 
-=begin
+
   resources :target_images do
     member do
       get 'prefer'
@@ -83,7 +83,6 @@ Ispick::Application.routes.draw do
       get 'switch'
     end
   end
-=end
 
   resources :target_words do
     collection do
