@@ -15,6 +15,7 @@ describe "Deliver::Words" do
     @logger = Logger.new('log/deliver.log')
   end
 
+=begin
   describe "deliver_from_word function" do
     it "deliver properly" do
       FactoryGirl.create(:user_with_target_words, words_count: 5)
