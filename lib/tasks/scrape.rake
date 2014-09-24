@@ -40,7 +40,7 @@ namespace :scrape do
   end
 
   # @params limit [Integer] 最大保存数
-  # 最大保存数を超えている場合古いImageから順に削除
+  # 最大保存数を超えている場合古いImageから順に削除、削除したレコード情報はold_record.txtにエクスポートする
   desc "Delete images if its the count of all images exceeds the limit"
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
@@ -55,6 +55,29 @@ namespace :scrape do
     before_count = Image.count
     if Image.count > limit
       delete_num = Image.count - limit
+      
+      # recordを削除する前にtxtファイルにエクスポートする
+=begin
+      io = File.open("#{Rails.root}/log/old_record.txt","a")      
+      Image.reorder(:created_at).limit(delete_num).each do |image|
+        str=""
+        image.attributes.keys.each do |key|
+          if !image[key].nil?
+            str = str + key.to_s + ":\"" + image[key].to_s + "\","
+          else
+            str = str + key.to_s + ":\"nil\","
+          end
+        end
+        str = str + "tags:\""
+        image.tags.each do |tag|
+          str = str + tag.name + "|"
+        end
+        str = str+"\""
+        io.puts(str)
+      end      
+      io.close       
+=end
+        
       Image.reorder(:created_at).limit(delete_num).destroy_all
     end
 
