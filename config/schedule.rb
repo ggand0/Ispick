@@ -42,7 +42,12 @@ end
 every 6.hours do
   # TargetWordと同名のTagを持つImageをTargetWordと関連づける処理
   #rake 'deliver:associate', output: 'log/deliver.log'
+  
+  # 指定枚数を越えたらその分Imagesから画像ファイルを削除
+  rake 'scrape:delete_excess_image_files[500000]', output: 'log/deliver.log'
 
   # 指定枚数を超えたらその分Imagesから削除
-  rake 'scrape:delete_excess[500000]', output: 'log/deliver.log'
+  rake 'scrape:delete_excess[1000000]', output: 'log/deliver.log'
+  
+
 end

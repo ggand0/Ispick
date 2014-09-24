@@ -11,7 +11,8 @@ require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 
 namespace :scrape do
-  @DEFAULT = 10000
+  @DEFAULT_MN = 10000
+  @DEFAULT_MO = 7
 
   # ==================================
   #           General tasks
@@ -19,12 +20,19 @@ namespace :scrape do
 
   # 指定された時期より古いImageを削除
   desc "Delete images older than a certain date"
-  task delete_old: :environment do
+  task :delete_old, [:limit] => :environment do |t, args|
     puts 'Deleting old images...'
+    
+    if args[:limit]
+      limit = args[:limit].to_i
+    else
+      limit = @DEFAULT_MO
+    end
+    
     before_count = Image.count
 
     # ref: http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
-    old = DateTime.now.utc - 7.days
+    old = DateTime.now.utc - limit.days
     Image.where("created_at < ?", old).destroy_all
 
     puts "Deleted: #{(before_count - Image.count).to_s} images"
@@ -40,18 +48,45 @@ namespace :scrape do
     if args[:limit]
       limit = args[:limit].to_i
     else
-      limit = @DEFAULT
+      limit = @DEFAULT_MN
     end
     puts "limit: #{limit.to_s}"
 
     before_count = Image.count
     if Image.count > limit
       delete_num = Image.count - limit
-      Image.limit(delete_num).order(:created_at).destroy_all
+      Image.reorder(:created_at).limit(delete_num).destroy_all
     end
 
     puts "Deleted: #{(before_count - Image.count).to_s} images"
     puts "Current image count: #{Image.count.to_s}"
+  end
+  
+  # @params limit [Integer] 最大保存数
+  # 最大保存数を超えている場合、古いImageから順に画像ファイルだけを削除
+  desc "Delete images if its the count of all images exceeds the limit"
+  task :delete_excess_image_files, [:limit] => :environment do |t, args|
+    puts "Deleting excessed image's files..."
+
+    if args[:limit]
+      limit = args[:limit].to_i
+    else
+      limit = @DEFAULT_MN
+    end
+    puts "limit: #{limit.to_s}"
+
+    # 画像を持つレコードの数
+    before_count = Image.where.not(data_file_size:nil).count
+    if before_count > limit
+      delete_num = before_count - limit
+      Image.where.not(data_file_size:nil).reorder(:created_at).limit(delete_num).each do |image|
+        image.destroy_image_files
+      end
+    end
+
+    puts "Deleted: #{(before_count - Image.where.not(data_file_size:nil).count).to_s} image's files"
+    puts "Current image count: #{Image.count.to_s}"
+    puts "Number of images with not nil data: #{Image.where.not(data_file_size:nil).count}"
   end
 
   desc "画像を対象webサイト全てから抽出する"
