@@ -7,7 +7,7 @@
 
 <!-- new boardを作るフォーム -->
 <div class="id"><%= image.id %></div>
-<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create_another' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
+<%= bootstrap_form_for image_board, remote: true, url: { controller: 'debug', action: 'create_another' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
   <%= f.text_field :name, layout: :default, placeholder: 'Enter a board name', class: 'new_board_input' %>
   <%= f.submit 'New board', class: "btn btn-primary" %>
 <% end %>
@@ -17,6 +17,6 @@
 <% current_user.image_boards.each do |board| %>
   <% existed = check_existed(board.id, image.id) %>
   <%= button_group do %>
-    <%= bs_button_to board.name.to_s, { controller: 'images', action: 'favor_another', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
+    <%= bs_button_to board.name.to_s, { controller: 'debug', action: 'favor_another', id: image.id, board: board.name, remote: true, html_id: html }, method: :put, class: "btn btn-default user_boards #{existed ? 'favored_board' : ''}" %>
   <% end %>
 <% end %>

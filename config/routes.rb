@@ -13,6 +13,11 @@ Ispick::Application.routes.draw do
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
     get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
     get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
+
+    get '/boards_another' => 'debug#boards_another', as: "boards_another_debug"
+    post '/create_another' => 'debug#create_another', as: "create_another_debug"
+    put '/favor_another' => 'debug#favor_another', as: "favor_another_debug"
+    get '/show_debug' => 'debug#show_debug', as: "show_image_debug"
   end
 
   # RequeWeb configuration
@@ -60,10 +65,6 @@ Ispick::Application.routes.draw do
   resources :image_boards do
     collection do
       get 'boards'
-
-      # debug paths
-      get 'boards_another'
-      post 'create_another'
     end
   end
   resources :images, only: [:index, :show, :destroy]
@@ -71,10 +72,6 @@ Ispick::Application.routes.draw do
     member do
       put 'favor'
       put 'hide'
-
-      # debug paths
-      put 'favor_another'
-      get 'show_debug'
     end
   end
 

@@ -1,6 +1,8 @@
 class DebugController < ApplicationController
   before_action :render_sign_in_page
   before_filter :authenticate
+  before_action :set_image, only: [:favor_another, :show_debug]
+  #before_action :set_image_board, only: [:create_another]
 
   def index
   end
@@ -85,7 +87,82 @@ class DebugController < ApplicationController
   end
 
 
+  # ======================
+  #  Clip buttons related
+  # ======================
+  # POST /image_boards
+  def create_another
+    @image_board = ImageBoard.new(image_board_params)
+    @image_board.save!
+    current_user.image_boards << @image_board
+    @image = Image.find(params[:image])
+    @board = ImageBoard.new
+    @id = params[:html_id]
+    respond_to do |format|
+      format.html { render nothing: true }
+      format.js { render partial: 'boards_another' }
+    end
+  end
+  def boards_another
+    @image = Image.find(params[:image])
+    @board = ImageBoard.new
+    @id = params[:id]
+    respond_to do |format|
+      format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
+      format.js { render partial: 'boards_another' }
+    end
+  end
+
+  # ===============
+  #  DEBUG actions
+  # ===============
+  def favor_another
+    board_name = params[:board]
+    board = current_user.image_boards.where(name: board_name).first
+    favored_image = board.favored_images.build(
+      title: @image.title,
+      caption: @image.caption,
+      data: @image.data,
+      src_url: @image.src_url,
+      page_url: @image.page_url,
+      site_name: @image.site_name,
+      views: @image.views,
+      favorites: @image.favorites,
+      posted_at: @image.posted_at,
+    )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
+
+    if favored_image.save
+      @image.favored_images << favored_image
+    end
+    @clipped_board = board_name
+    @board = ImageBoard.new
+    @id = params[:html_id]
+    respond_to do |format|
+      format.html { redirect_to boards_users_path }
+      format.js { render partial: 'boards_another' }
+    end
+  end
+
+  def show_debug
+    respond_to do |format|
+      format.js { render partial: 'show_image_debug' }
+    end
+  end
+
   private
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_image
+    @image = Image.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def image_board_params
+    params.require(:image_board).permit(:name)
+  end
 
   # Render the 'sign in' template if the user is logged in.
   def render_sign_in_page

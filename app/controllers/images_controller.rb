@@ -1,6 +1,5 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide,
-    :favor_another, :show_debug]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide]
 
   # GET /images
   # GET /images.json
@@ -71,6 +70,7 @@ class ImagesController < ApplicationController
   end
 
   # PUT hide
+  # TODO: Need refactoring
   def hide
     if not @image.avoided
       @image.update_attributes!(avoided: true)
@@ -80,46 +80,6 @@ class ImagesController < ApplicationController
     redirect_to :back
   end
 
-
-
-  # ===============
-  #  DEBUG actions
-  # ===============
-  def favor_another
-    board_name = params[:board]
-    board = current_user.image_boards.where(name: board_name).first
-    favored_image = board.favored_images.build(
-      title: @image.title,
-      caption: @image.caption,
-      data: @image.data,
-      src_url: @image.src_url,
-      page_url: @image.page_url,
-      site_name: @image.site_name,
-      views: @image.views,
-      favorites: @image.favorites,
-      posted_at: @image.posted_at,
-    )
-    @image.tags.each do |tag|
-      favored_image.tags << tag
-    end
-
-    if favored_image.save
-      @image.favored_images << favored_image
-    end
-    @clipped_board = board_name
-    @board = ImageBoard.new
-    @id = params[:html_id]
-    respond_to do |format|
-      format.html { redirect_to boards_users_path }
-      format.js { render partial: 'image_boards/boards_another' }
-    end
-  end
-
-  def show_debug
-    respond_to do |format|
-      format.js { render partial: 'show_image_debug' }
-    end
-  end
 
 
   private

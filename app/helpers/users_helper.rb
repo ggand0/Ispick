@@ -47,12 +47,6 @@ module UsersHelper
      class: "btn-default #{size}"
   end
 
-  def render_show_debug_button(image, size='btn-sm')
-    bs_button_to wrench_glyphicon, { controller: 'images', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
-      class: "btn-default #{size}"
-  end
-
-
 
   # ==========================================
   #  Glyphicon helpers
@@ -100,10 +94,15 @@ module UsersHelper
   #  DEBUG BUTTONS
   #  will be deleted
   # =================
+  def render_show_debug_button(image, size='btn-sm')
+    bs_button_to wrench_glyphicon, { controller: 'debug', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+      class: "btn-default #{size}"
+  end
   def render_clip_debug_button(image)
-    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards_another', remote: true, image: image.id, id: "popover-board#{image.id}",
+    bs_button_to paperclip_glyphicon, { controller: 'debug', action: 'boards_another', remote: true, image: image.id, id: "popover-board#{image.id}",
     class: 'popover-board btn-info btn-xs' }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body'#, id: "popover-board#{image.id}"
   end
+  # Another show button with smaller option
   def render_show_another_button(image)
     bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
     class: 'btn-default btn-xs'
