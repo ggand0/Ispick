@@ -10,7 +10,7 @@ describe "Default feature" do
       # ログインする
       visit root_path
       mock_auth_hash
-      click_link 'Login with twitter'
+      click_link 'Continue with Twitter'
 
       # 登録イラスト一覧へのページへ進む
       visit show_target_images_users_path
