@@ -6,11 +6,13 @@ class UsersController < ApplicationController
   include ApplicationHelper
   before_filter :set_user, only: [:edit, :update, :settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
+  before_filter :authenticate, only: [:show_target_images]
 
   before_action :render_sign_in_page,
     only: [:home, :boards, :preferences, :search, :show_target_images,
       :download_favored_images, :debug_illust_detection, :debug_crawling]
   before_action :update_session, only: [:home, :search, :debug_illust_detection]
+
 
   # GET /users/1/edit
   def edit
@@ -145,7 +147,7 @@ class UsersController < ApplicationController
   # [Unused]画像登録画面を表示する
   # Render the index page of target_images.
   def show_target_images
-  @target_images = current_user.target_images
+    @target_images = current_user.target_images
     render action: 'debug/show_target_images'
   end
 
