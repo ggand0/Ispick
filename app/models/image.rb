@@ -32,7 +32,15 @@ class Image < ActiveRecord::Base
   # attachmentを削除し、ストレージにある画像ファイルも削除する
   # Destroys paperclip attachment, including image files in the storage
   def destroy_attachment
+    # data.destroyは画像を削除するだけ、すなわちパスの指定は変更されない（デフォルトパスが指定されない）
     self.data.destroy
+  end
+  
+  # ストレージから画像を削除し、デフォルトパスを指定する。
+  def destroy_image_files
+    tmp = self
+    tmp.data = nil
+    tmp.save
   end
 
   # 与えられたFileオブジェクトからMD5チェックサムを生成する
