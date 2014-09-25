@@ -12,7 +12,7 @@ describe "Top page" do
   it "login with oauth" do
     visit root_path
     mock_auth_hash
-    click_link 'Login with twitter'
+    click_link 'Continue with Twitter'
 
     # users/homeに移動しているはず
     uri = URI.parse(current_url)

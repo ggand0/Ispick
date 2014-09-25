@@ -55,16 +55,17 @@ describe "user's home page" do
     # お気に入り画像をそのボードに登録出来る
     it "clips an image by clicking the 'Clip' button" do
       page.find('.boxInner').hover
-      expect(page).to have_content('Clip')
-      click_link 'Clip'
+      expect(page).to have_css('span.glyphicon-paperclip')
+      find('.glyphicon-paperclip').click
+      wait_for_ajax
       windows.length.should == 1
 
       within_window(windows.last) do
         form = page.find(:xpath, "//input[@value='New board']")
         expect(form).to_not eq(nil)
-        expect(page).to have_content('Default')
+        expect(page).to have_content('Choose a board')
 
-        click_link 'Default'
+        click_button 'Clip this'
         wait_for_ajax
       end
 
