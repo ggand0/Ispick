@@ -49,7 +49,7 @@ describe UsersHelper do
       expect(result.class).to eq(ActiveSupport::SafeBuffer)
 
       id = image.id
-      html = "<a class=\"popover-board btn-info btn-sm btn\" data-container=\"body\" data-placement=\"bottom\" data-remote=\"true\" data-toggle=\"popover\" href=\"/image_boards/boards?id=popover-board#{id}&amp;image=#{id}\" id=\"popover-board#{id}\">Clip</a>"
+      html = "<a class=\"popover-board btn-info btn-sm btn\" data-container=\"body\" data-placement=\"bottom\" data-remote=\"true\" data-toggle=\"popover\" href=\"/image_boards/boards?id=popover-board#{id}&amp;image=#{id}\" id=\"popover-board#{id}\"><span class=\"glyphicon glyphicon-paperclip\" style=\"vertical-align:middle\"></span></a>"
       expect(result.to_s).to eq(html)
     end
   end
