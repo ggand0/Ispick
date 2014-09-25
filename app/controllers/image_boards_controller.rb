@@ -26,7 +26,8 @@ class ImageBoardsController < ApplicationController
     @board = ImageBoard.new
     @id = params[:id]
     respond_to do |format|
-      format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
+      format.html { render partial: 'shared/popover_board',
+        locals: { image: @image, image_board: @board, html: @id } }
       format.js { render partial: 'boards' }
     end
   end
