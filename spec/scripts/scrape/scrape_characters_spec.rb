@@ -29,7 +29,7 @@ describe "Scrape::Wiki::Character" do
     end
 
     it "returns an anime_character_page" do
-          anime_page = {
+      anime_page = {
         "ラブライブ!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}
       }
 
@@ -75,7 +75,7 @@ describe "Scrape::Wiki::Character" do
 
     it "return a valid hash for english" do
       page_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}}
-      valid_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!"}}
+      valid_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!", :title_ja=>nil}}
       puts result = Scrape::Wiki::Character.get_anime_character_page(page_hash)
       expect(result).to be_a(Hash)
       expect(result).to eq(valid_hash)
@@ -176,7 +176,7 @@ describe "Scrape::Wiki::Character" do
         '魔法少女まどか☆マギカ', html)
       #result.each { |n| puts "#{n.count}, #{n}" }
       expect(result).to be_a(Array)
-      expect(result.count).to eq(73)
+      expect(result.count).to eq(75)
     end
   end
 

@@ -51,15 +51,6 @@ describe "Scrape" do
     end
   end
 
-  describe "get_anime_page_en" do
-    it "returns a Hash value" do
-      # まどかのアニメ概要ページ
-      url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      puts result = Scrape::Wiki.get_anime_page_en(url)
-      expect(result).to eql('http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica')
-    end
-  end
-
   describe "open_html function" do
     let(:url) { 'http://www.google.co.jp/' }
 
