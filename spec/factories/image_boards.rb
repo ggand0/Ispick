@@ -6,8 +6,8 @@ FactoryGirl.define do
     name 'A board without images'
   end
 
-  # Defaultで生成されるBoardのfactory
-  # This one generates boards used as the default board of a user
+  # Defaultで生成されるImageBoardのfactory
+  # This one generates boards used as a default board of a user
   factory :image_board do
     name 'Default'
 
@@ -16,7 +16,7 @@ FactoryGirl.define do
     end
   end
 
-  # ユーザによって新たに作成されるBoardのfactory
+  # ユーザによって新たに作成されるImageBoardのfactory
   # Creates custom ImageBoard objects
   factory :image_boards, class: ImageBoard do
     sequence(:name) { |n| "My board#{n}" }
