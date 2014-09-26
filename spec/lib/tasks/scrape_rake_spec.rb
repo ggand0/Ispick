@@ -39,6 +39,22 @@ describe "scrape:delete_excess" do
   end
 end
 
+describe "scrape:delete_excess_image_files" do
+  before do
+    IO.any_instance.stub(:puts)
+  end
+  include_context 'rake'
+  its(:prerequisites) { should include('environment') }
+
+  it "delete old recoreds to fit the limit" do
+    FactoryGirl.create_list(:image_file, 3)
+    subject.invoke 2
+    expect(Image.last.data.url).to eq(Image.get_default_url)
+  end
+end
+
+
+
 
 # Scraping tasks
 describe "scrape:all" do

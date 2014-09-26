@@ -1,3 +1,5 @@
+# Not in use @14/09/26
+
 require "#{Rails.root}/app/services/target_images_service"
 
 namespace :feature do

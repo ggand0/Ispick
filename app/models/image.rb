@@ -29,13 +29,17 @@ class Image < ActiveRecord::Base
     ActionController::Base.helpers.asset_path('default_image_thumb.png')
   end
 
+  def self.get_default_url
+    '/assets/default_image_thumb.png'
+  end
+
   # attachmentを削除し、ストレージにある画像ファイルも削除する
   # Destroys paperclip attachment, including image files in the storage
   def destroy_attachment
     # data.destroyは画像を削除するだけ、すなわちパスの指定は変更されない（デフォルトパスが指定されない）
     self.data.destroy
   end
-  
+
   # ストレージから画像を削除し、デフォルトパスを指定する。
   def destroy_image_files
     tmp = self
