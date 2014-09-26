@@ -35,14 +35,14 @@ describe Scrape do
       target_word = FactoryGirl.create(:word_with_person)
       result = Scrape.get_query target_word
 
-      expect(result).to eq('鹿目まどか')
+      expect(result).to eq('鹿目まどか1')
     end
 
     it "returns proper string when target_word doesn't have a person model" do
       target_word = FactoryGirl.create(:target_word)
       result = Scrape.get_query target_word
 
-      expect(result).to eq('鹿目 まどか（かなめ まどか）1')
+      expect(result).to eq('鹿目まどか1')
     end
   end
 

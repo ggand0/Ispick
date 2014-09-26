@@ -24,12 +24,52 @@ describe UsersController do
     end
   end
 
+  describe "GET new_avatar" do
+    it "renders proper partial" do
+      login_user
+      get :new_avatar, :format => 'js'
+
+      expect(response).to render_template('users/_new_avatar')
+    end
+  end
+
+  describe "POST create_avatar" do
+    it "updates avatar image" do
+      login_user
+      request.env['HTTP_REFERER'] = '/'
+
+      post :create_avatar, { id: User.first.id, avatar: fixture_file_upload("files/madoka0.jpg") }
+      expect(User.first.avatar).not_to eq(nil)
+    end
+  end
+
+  describe "PUT update" do
+    it "updates a user correctly" do
+      login_user
+      put :update, { id: User.first.id, user: { name: 'madoka'}}
+      expect(User.first.name).to eq('madoka')
+    end
+  end
+
+  describe "GET search" do
+    it "Search and render the right images" do
+      login_user
+      image1 = FactoryGirl.create(:image_with_tags)
+
+      get :search, { query: '鹿目まどか6', page: 1 }
+
+      response.should render_template('home')
+      expect(assigns(:images).count).to eq(1)
+      expect(assigns(:images).first).to eq(image1)
+    end
+  end
+
 
   describe "GET show_target_images" do
     it "renders show_target_images template when logged in" do
       login_user
       get :show_target_images, {}, valid_session
-      response.should render_template('show_target_images')
+      response.should render_template('debug/_show_target_images')
     end
 
     it "renders not_signed_in template when NOT logged in" do
@@ -64,25 +104,22 @@ describe UsersController do
     end
   end
 
-  describe "GET download_favored_images" do
-    # see: http://stackoverflow.com/questions/4701108/rspec-send-file-testing
-    it "downloads favored delivered_images" do
+
+  describe "DELETE delete_target_word" do
+    it "deletes a target_word only from the User.target_words relation" do
       login_user
-      controller.stub(:render).and_return nil
-      controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
-      get :download_favored_images, {}, valid_session
+      user = User.first
+      word_count = TargetWord.count
+      user_count = user.target_words.count
+      target_word = user.target_words.first
+
+      delete :delete_target_word, { id: target_word.id }
+
+      expect(response).to render_template('preferences')
+      expect(TargetWord.count).to eq(word_count)
+      expect(user.target_words.count).to eq(user_count-1  )
     end
   end
-
-  # An action for debug
-  describe "GET debug_illust_detection" do
-    it "renders valid template" do
-      login_user
-      get :debug_illust_detection, {}, valid_session
-      response.should render_template('debug_illust_detection')
-    end
-  end
-
 
   # ==========================
   #  specs of private methods

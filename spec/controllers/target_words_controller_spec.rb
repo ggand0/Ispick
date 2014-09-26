@@ -184,10 +184,10 @@ describe TargetWordsController do
     end
   end
 
-  describe "show_delivered action" do
+  describe "images action" do
     it "assigns associated images" do
       target_word = FactoryGirl.create(:word_with_image_file)
-      get :show_delivered, { id: target_word.to_param }, valid_session
+      get :images, { id: target_word.to_param }, valid_session
 
       count = target_word.images.count
       expect(assigns(:images).count).to eq(count)

@@ -6,11 +6,13 @@ class UsersController < ApplicationController
   include ApplicationHelper
   before_filter :set_user, only: [:edit, :update, :settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
+  before_filter :authenticate, only: [:show_target_images]
 
   before_action :render_sign_in_page,
     only: [:home, :boards, :preferences, :search, :show_target_images,
       :download_favored_images, :debug_illust_detection, :debug_crawling]
-  before_action :update_session, only: [:home, :search, :debug_illust_detection]
+  before_action :update_session, only: [:home, :search]
+
 
   # GET /users/1/edit
   def edit
@@ -96,7 +98,7 @@ class UsersController < ApplicationController
   # タグ登録画面を表示する
   # Render the index page of target_words.
   def preferences
-    @popular_tags = TargetWord.get_tags_with_images(20)
+    @popular_tags = TargetWord.get_tags_with_images(100)
     @target_words = current_user.target_words
     @target_word = TargetWord.new
     @search = Person.search(params[:q])
@@ -145,8 +147,8 @@ class UsersController < ApplicationController
   # [Unused]画像登録画面を表示する
   # Render the index page of target_images.
   def show_target_images
-  @target_images = current_user.target_images
-    render action: 'debug/show_target_images'
+    @target_images = current_user.target_images
+    render partial: 'debug/show_target_images'
   end
 
   # A temporary method. Will be fixed.
@@ -192,17 +194,6 @@ class UsersController < ApplicationController
     session[:sort] = params[:sort] if params[:sort]
     session[:illust] ||= 'all'
     session[:illust] = params[:illust] if params[:illust]
-  end
-
-  # Returns the session data for debugging.
-  # デバッグ用にsessionの情報を返す。
-  # @return [Array] String array of session data
-  def get_session_data
-    [
-      "filter_illust: #{session[:illust]}",
-      "sort_type: #{session[:sort]}",
-      "filter_site: #{session[:all]}",
-    ]
   end
 
 end

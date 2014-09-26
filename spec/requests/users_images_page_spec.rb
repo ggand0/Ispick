@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+# Integration specs of target_images related pages.
+# Note that this pages are not in use for now[14/09/25].
 describe "Default feature" do
   describe "target_images page" do
     let(:page_title) { '登録イラスト一覧' }
@@ -10,7 +12,7 @@ describe "Default feature" do
       # ログインする
       visit root_path
       mock_auth_hash
-      click_link 'Login with twitter'
+      click_link 'Continue with Twitter'
 
       # 登録イラスト一覧へのページへ進む
       visit show_target_images_users_path

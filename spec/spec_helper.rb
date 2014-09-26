@@ -4,10 +4,16 @@ SimpleCov.start do
   # Ignore these paths
   add_filter '/vendor/bundle/'
   add_filter '/script/pixiv'
+  add_filter '/script/scrape/_legacy'
+  add_filter '/script/deliver'
   add_filter '/lib/tasks'
-  add_filter 'config/initializers/reload_lib'
-  add_filter 'config/initializers/teaspoon'
+  #add_filter 'config/initializers/reload_lib'
+  #add_filter 'config/initializers/teaspoon'
+  add_filter 'config'
+  add_filter '/spec/factories'
   add_filter '/spec/support'
+  add_filter '/app/admin'
+  add_filter '/spec/teaspoon_env.rb'
 
   add_group 'Models', 'app/models'
 end

@@ -64,7 +64,8 @@ module Scrape
        # 画像情報を取得してlimit枚DBヘ保存する
       xml.search('image').take(@limit).each_with_index do |item, count|
         begin
-          if item.css('adult_level').first.content.to_i > 1 || item.css('clip_count').first.content.to_i == 0  # 春画画像、クリップ数0をskip
+          # 春画画像、クリップ数0をskip
+          if item.css('adult_level').first.content.to_i > 1 || item.css('clip_count').first.content.to_i == 0
             skipped += 1
             next
           end

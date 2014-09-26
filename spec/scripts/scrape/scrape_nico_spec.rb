@@ -44,9 +44,10 @@ describe Scrape::Nico do
   describe "scrape_using_api function" do
     before do
       stream = File.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml'))
-      uri = 'http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=まどかわいい'
+      #uri = 'http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=まどかわいい'
+      uri = 'http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=鹿目まどか1'
       FakeWeb.register_uri(:get,
-        URI.escape(uri) ,
+        URI.escape(uri),
         body: stream,
         content_type: 'text/xml')
     end
@@ -60,6 +61,7 @@ describe Scrape::Nico do
       Scrape::Nico.stub(:get_data).and_return({})
 
       target_word = FactoryGirl.create(:word_with_person)
+      puts target_word.inspect
       Scrape::Client.stub(:save_image).and_return(1)
       result = @client.scrape_using_api(target_word)
       puts result

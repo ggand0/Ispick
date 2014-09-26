@@ -109,7 +109,8 @@ RSpec.describe ImageBoardsController, :type => :controller do
       it "redirects to the image_board" do
         image_board = ImageBoard.create! valid_attributes
         put :update, {:id => image_board.to_param, :image_board => valid_attributes}, valid_session
-        expect(response).to redirect_to(image_board)
+        # redirects to /users/boards
+        expect(response).to redirect_to(boards_users_path)
       end
     end
 

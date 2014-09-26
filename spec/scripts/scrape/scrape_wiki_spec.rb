@@ -11,7 +11,7 @@ describe "Scrape" do
     IO.any_instance.stub(:puts)
   end
 
-  describe "scrape function" do
+  describe "scrape_all function" do
     it "calls proper functions" do
       Scrape::Wiki.stub(:get_anime_page).and_return nil
       Scrape::Wiki::Character.stub(:get_anime_character_page).and_return nil
@@ -25,9 +25,9 @@ describe "Scrape" do
       expect(Scrape::Wiki::Character).to receive(:get_anime_character_name).exactly(years).times
       #expect(Scrape::Wiki::GameCharacter).to receive(:get_game_character_name).exactly(1).times
       expect(Scrape::Wiki).to receive(:save_to_database).exactly(years).times
-      expect(Scrape::Wiki).to receive(:scrape_wiki_for_game_characters).exactly(1).times
+      #expect(Scrape::Wiki).to receive(:scrape_wiki_for_game_characters).exactly(1).times
 
-      Scrape::Wiki.scrape
+      Scrape::Wiki.scrape_all
     end
   end
 
@@ -48,15 +48,6 @@ describe "Scrape" do
     it "returns valid hash" do
       url = 'http://en.wikipedia.org/wiki/Category:2014_anime_television_series'
       puts result = Scrape::Wiki.get_anime_page(url, true)
-    end
-  end
-
-  describe "get_anime_page_en" do
-    it "returns a Hash value" do
-      # まどかのアニメ概要ページ
-      url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      puts result = Scrape::Wiki.get_anime_page_en(url)
-      expect(result).to eql('http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica')
     end
   end
 
