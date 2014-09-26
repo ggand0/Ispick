@@ -101,8 +101,12 @@ class UsersController < ApplicationController
     @popular_tags = TargetWord.get_tags_with_images(100)
     @target_words = current_user.target_words
     @target_word = TargetWord.new
+
+
     @search = Person.search(params[:q])
-    @people = @search.result(distinct: true).page(params[:page]).per(50)
+    if params[:q]
+      @people = @search.result(distinct: true).page(params[:page]).per(50)
+    end
 
     respond_to do |format|
       format.html { render action: 'preferences' }
