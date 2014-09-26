@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   before_action :render_sign_in_page,
     only: [:home, :boards, :preferences, :search, :show_target_images,
       :download_favored_images, :debug_illust_detection, :debug_crawling]
-  before_action :update_session, only: [:home, :search, :debug_illust_detection]
+  before_action :update_session, only: [:home, :search]
 
 
   # GET /users/1/edit
@@ -194,17 +194,6 @@ class UsersController < ApplicationController
     session[:sort] = params[:sort] if params[:sort]
     session[:illust] ||= 'all'
     session[:illust] = params[:illust] if params[:illust]
-  end
-
-  # Returns the session data for debugging.
-  # デバッグ用にsessionの情報を返す。
-  # @return [Array] String array of session data
-  def get_session_data
-    [
-      "filter_illust: #{session[:illust]}",
-      "sort_type: #{session[:sort]}",
-      "filter_site: #{session[:all]}",
-    ]
   end
 
 end
