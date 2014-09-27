@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/client"
 
 describe Scrape::Client do
   before do
-    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Client.new
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
@@ -53,6 +53,23 @@ describe Scrape::Client do
       expect {
         @client.scrape_target_words('', 15)
       }.to raise_error(SystemExit)
+    end
+  end
+
+
+  describe "is_adult method" do
+    it "returns true if tags contain dirty words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'R18')
+
+      expect(Scrape::Client.is_adult(image.tags)).to eq(true)
+    end
+
+    it "returns true if tags contain irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'cosplay')
+
+      expect(Scrape::Client.is_adult(image.tags)).to eq(true)
     end
   end
 
