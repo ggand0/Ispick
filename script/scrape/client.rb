@@ -142,9 +142,13 @@ module Scrape
       end
     end
 
+    # Returns true if the tags contain adult words
+    # See details at: https://github.com/tjackiw/obscenity
+    # @param tags [ActiveRecord::Associations::CollectionProxy]
+    # @return [Boolean] Contains adult words or not
     def self.is_adult(tags)
       tags.each do |tag|
-        return true if tag.name.casecmp('R18') == 0
+        return true if Obscenity.profane?(tag.name)
       end
       false
     end

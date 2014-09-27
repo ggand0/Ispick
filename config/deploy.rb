@@ -37,7 +37,7 @@ set :scm, :git
 set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/database.yml config/config.yml config/fluent-logger.yml config/app_environment_variables.rb }
+set :linked_files, %w{config/database.yml config/config.yml config/fluent-logger.yml config/app_environment_variables.rb config/banned_words.yml}
 
 # Default value for linked_dirs is []
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/assets}
@@ -109,16 +109,19 @@ namespace :deploy do
       upload!('config/database.yml', "#{shared_path}/config/database.yml")
     end
   end
-
   task :upload_fluentd do
     on roles(:app) do |host|
       upload!('config/fluent-logger.yml', "#{shared_path}/config/fluent-logger.yml")
     end
   end
-
   task :upload_app_env do
     on roles(:app) do |host|
       upload!('config/app_environment_variables.rb', "#{shared_path}/config/app_environment_variables.rb")
+    end
+  end
+  task :upload_banned do
+    on roles(:app) do |host|
+      upload!('config/banned_words.yml', "#{shared_path}/config/banned_words.yml")
     end
   end
 

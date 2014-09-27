@@ -16,6 +16,7 @@
     </div>
     <li role="presentation" class="divider"></li>
     <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
+    <li><%= link_to 'No nicoseiga(test)', home_users_path(nico: true) %></li>
   <% end %>
   <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>

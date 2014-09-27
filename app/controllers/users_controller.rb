@@ -52,6 +52,9 @@ class UsersController < ApplicationController
       images = Image.filter_by_date(images, date)
     end
 
+    # TMP FEATURE
+    images = images.where.not(site_name: 'nicoseiga') if params[:nico]
+
     @images = images.page(params[:page]).per(25)
     @images_all = images
   end

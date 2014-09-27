@@ -27,6 +27,7 @@ erd.dot
 config.yml
 database.yml
 fluent-logger.yml
+banned_words.yml
 
 *.rbc
 *.sassc
