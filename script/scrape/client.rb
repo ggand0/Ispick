@@ -146,15 +146,24 @@ module Scrape
     # See details at: https://github.com/tjackiw/obscenity
     # @param tags [ActiveRecord::Associations::CollectionProxy]
     # @return [Boolean] Contains adult words or not
-    def self.is_adult(tags)
+    def self.is_banned(tags)
       tags.each do |tag|
         return true if Obscenity.profane?(tag.name)
       end
       false
     end
 
+    def self.check_banned(image)
+      return true if Obscenity.profane?(image.title)
+      return true if Obscenity.profane?(image.caption)
 
-    # TODO: Associate the target_word to the image here.
+      if (not image.tags.nil?) and (not image.tags.empty?)
+        return true if self.is_banned(image.tags)
+      end
+      false
+    end
+
+
     # Create new image instanace and save it to the database.
     # Imageレコードを新たに生成してDBに保存する
     # @param [Hash] Imageレコードに与える属性のHash
@@ -164,15 +173,10 @@ module Scrape
     # @param [Boolean] ログ出力を行うかどうか
     # @return [Integer] 保存されたImageレコードのID。失敗した場合はnil
     def self.save_image(attributes, logger, target_word=nil, tags=[], options={})
+      # Skip the image if src_url is duplicate
       # src_urlが重複していればskip
       if options[:validation] and Scrape.is_duplicate(attributes[:src_url])
         logger.info 'Skipping a duplicate image...' if options[:verbose]
-        return
-      end
-
-      # アダルト画像ならばskip
-      if (not tags.nil?) and (not tags.empty?) and self.is_adult(tags)
-        logger.debug self.is_adult(tags)
         return
       end
 
@@ -183,6 +187,9 @@ module Scrape
       # Create a new instance and associate tags
       image = Image.new attributes
       tags.each { |tag| image.tags << tag }
+
+      # Skip the image if it's irrelevant, like porns and cosplay images
+      return if self.check_banned(image)
 
       # Use src_url as original_url if the latter one is nil
       image.original_url = image.src_url if image.original_url.nil?
