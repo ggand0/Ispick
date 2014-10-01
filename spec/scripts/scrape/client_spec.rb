@@ -7,11 +7,20 @@ describe Scrape::Client do
     IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Client.new
+    # Uncomment and edit this if you don't want to let it write logs
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
     @logger = Logger.new('log/scrape_cron.log')
   end
 
   describe "scrape_target_words method" do
+    it "calls necessary methods" do
+      FactoryGirl.create(:target_word)
+      expect(@client).to receive(:crawl_target_word)
+      expect(@client).to receive(:detect_multiple_running)
+      @client.stub(:sleep).and_return nil
+      @client.scrape_target_words('', 60)
+    end
+
     it "skips keywords with nil or empty value" do
       nil_word = TargetWord.new
       nil_word.save!
@@ -55,6 +64,18 @@ describe Scrape::Client do
       }.to raise_error(SystemExit)
     end
   end
+
+
+  describe "crawl_target_word method" do
+    it "calls sub methods correctly" do
+      target_word = FactoryGirl.create(:target_word)
+      expect(@client).to receive(:scrape_using_api).exactly(1).times.
+        and_return({scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 })
+
+      @client.crawl_target_word('test_module', target_word)
+    end
+  end
+
 
 
   describe "check_banned method" do
@@ -152,7 +173,7 @@ describe Scrape::Client do
   end
 
   describe "generate_jobs method" do
-    it "does something" do
+    it "can be executed without an error" do
       #Resque.unstub(:enqueue)
       #expect(Scrape::Client).to receive(:generate_jobs).with(1, 'goo', false, 1, 'TargetWord', 1)
       #expect(Scrape::Client).to receive(:generate_jobs)#.with(1, 'goo', false, 1, 'TargetWord', 1)
@@ -163,6 +184,14 @@ describe Scrape::Client do
 
       puts 'test'
       Scrape::Client.generate_jobs(1, 'goo', false, 1, 'TargetWord', 1)
+    end
+  end
+
+  describe "send_error_mail method" do
+    it "sends an error email correctly" do
+      target_word = FactoryGirl.create(:target_word)
+      @client.send_error_mail(Exception.new, 'test', target_word)
+      puts ActionMailer::Base.deliveries
     end
   end
 

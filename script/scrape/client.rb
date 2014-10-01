@@ -57,36 +57,18 @@ module Scrape
 
 
       # １タグごとにタグ検索APIを用いて画像取得
-      count=0
+      count = 0
       target_word = TargetWord.first
       while (count < TargetWord.count) do
-
         begin
-          # パラメータに基づいてAPIリクエストを行い結果を得る
-          if (not target_word.name.nil?) and (not target_word.name.empty?)
-            @logger.debug "target_word_id: #{target_word.id}"
-
-            # デフォルトのパラメータで実行
-            result = scrape_using_api(target_word)
-            @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
-
-            # 英語メインのサイトの場合は英名でも検索する
-            if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
-              # english=trueで呼ぶ
-              result = scrape_using_api(target_word, nil, true, false, true)
-              @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
-            end
-
-            target_word.crawl_count += 1
-            target_word.save!
-          end
+          crawl_target_word(module_type, target_word)
         rescue => e
           @logger.info e
           logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
 
           # Send an email manually
           if Rails.env.production?
-            self.class.send_error_mail(e, module_type, target_word)
+            send_error_mail(e, module_type, target_word)
           end
         end
 
@@ -108,9 +90,32 @@ module Scrape
       @logger.info '--------------------------------------------------'
     end
 
+    def crawl_target_word(module_type, target_word)
+      # パラメータに基づいてAPIリクエストを行い結果を得る
+      if (not target_word.name.nil?) and (not target_word.name.empty?)
+        @logger.debug "target_word_id: #{target_word.id}"
+
+        # デフォルトのパラメータで実行
+        result = scrape_using_api(target_word)
+        puts result.inspect
+        @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+
+        # 英語メインのサイトの場合は英名でも検索する
+        if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
+          # english=trueで呼ぶ
+          result = scrape_using_api(target_word, nil, true, false, true)
+          @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+        end
+
+        target_word.crawl_count += 1
+        target_word.save!
+      end
+    end
+
+
     # 派生クラスでoverrideして使う。
     def scrape_using_api(target_word)
-      { scraped: 0, duplicates: 0, avg_time: 0 }
+      { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 }
     end
 
 
@@ -241,12 +246,18 @@ module Scrape
       end
     end
 
-    def self.send_error_mail(e, module_type, target_word)
-      ActionMailer::Base.mail(
-        :from => "noreply@ispicks.com",
-        :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
-        :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}"
-      ).deliver
+    def send_error_mail(e, module_type, target_word)
+      begin
+        ActionMailer::Base.mail(
+          :from => "noreply@ispicks.com",
+          :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
+          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}"
+        ).deliver
+      rescue => e
+        #puts e.inspect
+        @logger.error e.inspect
+        @logger.error 'Sending an error email has failed!'
+      end
     end
 
   end
