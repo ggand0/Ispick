@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140923144017) do
+ActiveRecord::Schema.define(version: 20140929025259) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -79,6 +79,8 @@ ActiveRecord::Schema.define(version: 20140923144017) do
     t.text     "original_url"
     t.text     "artist"
     t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
   end
 
   create_table "favored_images_tags", force: true do |t|
@@ -124,6 +126,10 @@ ActiveRecord::Schema.define(version: 20140923144017) do
     t.text     "artist"
     t.text     "original_url"
     t.text     "poster"
+    t.integer  "popularity"
+    t.integer  "popularity_anipic"
+    t.integer  "original_width"
+    t.integer  "original_height"
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
