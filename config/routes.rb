@@ -2,6 +2,7 @@ require 'resque_web'
 
 Ispick::Application.routes.draw do
 
+
   # Root path
   root 'welcome#index'
 
@@ -51,6 +52,7 @@ Ispick::Application.routes.draw do
       get 'boards'
       get 'search'
       delete 'delete_target_word'
+      delete 'delete_tag'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
@@ -87,6 +89,15 @@ Ispick::Application.routes.draw do
   resources :target_words do
     collection do
       match 'search' => 'target_words#search', via: [:get, :post], as: :search
+      post 'attach'
+    end
+    member do
+      get 'images'
+    end
+  end
+  resources :tags do
+    collection do
+      match 'search' => 'tags#search', via: [:get, :post], as: :search
       post 'attach'
     end
     member do
