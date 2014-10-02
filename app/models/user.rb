@@ -16,8 +16,10 @@ class User < ActiveRecord::Base
   has_many :likes, dependent: :destroy, counter_cache: :likes_count
 
   # has_many tags for making image feeds
-  has_many :target_words_users, dependent: :destroy
-  has_many :target_words, :through => :target_words_users
+  #has_many :target_words_users, dependent: :destroy
+  #has_many :target_words, :through => :target_words_users
+  has_many :tags_users, dependent: :destroy
+  has_many :tags, :through => :tags_users
 
 
   # ================
@@ -51,7 +53,7 @@ class User < ActiveRecord::Base
   # Get images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
-    words = target_words.map{ |target_word| target_word.name }
+    words = tags.map{ |target_word| target_word.name }
     Image.joins(:target_words).where("target_words.name IN (?)", words).
       where.not(data_updated_at: nil).references(:target_words)
   end
@@ -59,7 +61,7 @@ class User < ActiveRecord::Base
   # For now, it's same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
-    words = target_words.map{ |target_word| target_word.name }
+    words = tags.map{ |target_word| target_word.name }
     Image.joins(:target_words).where("target_words.name IN (?)", words).
       where.not(data_updated_at: nil).references(:target_words)
   end
