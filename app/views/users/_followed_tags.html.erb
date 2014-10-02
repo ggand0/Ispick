@@ -1,6 +1,6 @@
 <h3>Followed tags</h3>
 <div class="followed-tags">
-  <% @tags.each do |tag| %>
+  <% tags.each do |tag| %>
     <%= button_group do %>
       <%= bs_button_to tag.name, images_tag_path(tag), class: 'btn-default' %>
       <%= bs_button_to '<span class="glyphicon glyphicon-remove" style="vertical-align:middle"></span>'.html_safe, delete_tag_users_path({ id: tag.id }), method: :delete, remote: true, class: 'btn-default' %>

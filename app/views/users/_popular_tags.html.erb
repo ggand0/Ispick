@@ -1,13 +1,12 @@
 <h3>Popular tags</h3>
 <div class="popular-tags">
-  <% if @tags_result.nil? %>
+  <% if tags_result.nil? %>
     <% popular_tags.each do |tag| %>
       <%# name = tag.get_name(current_user.language_preferences) %>
       <%= bs_button_to(tag.name, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default') %>
     <% end %>
   <% else %>
-    <% @tags_result.each do |tag| %>
-    <%# name = person.get_name(current_user.language_preferences) %>
+    <% tags_result.each do |tag| %>
       <%= bs_button_to tag.name, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default' %>
     <% end %>
   <% end %>
