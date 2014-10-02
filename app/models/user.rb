@@ -54,8 +54,8 @@ class User < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = tags.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).
-      where.not(data_updated_at: nil).references(:target_words)
+    Image.joins(:tags).where("tags.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:tags)
   end
 
   # For now, it's same as get_images method

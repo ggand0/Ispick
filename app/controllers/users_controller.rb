@@ -105,7 +105,6 @@ class UsersController < ApplicationController
     @tags = current_user.tags
     @tag = Tag.new
 
-
     @search = Tag.search(params[:q])
     if params[:q]
       @tags_result = @search.result(distinct: true).page(params[:page]).per(50)

@@ -32,9 +32,7 @@ class TagsController < ApplicationController
 
     @images = images.page(params[:page]).per(25)
     @images_all = images
-    render action: '../users/home'
-    #render action: 'home'
-    #render action: "#{Rails.root}/app/views/users/home"
+    render action: 'home'
   end
 
 
