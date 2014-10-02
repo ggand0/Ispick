@@ -88,6 +88,9 @@ module UsersHelper
   def link_glyphicon
     '<span class="glyphicon glyphicon-link" style="vertical-align:middle"></span>'.html_safe
   end
+  def plus_glyphicon
+    '<span class="glyphicon glyphicon-plus" style="vertical-align:middle"></span>'.html_safe
+  end
 
 
   # =================

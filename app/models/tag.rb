@@ -22,8 +22,8 @@ class Tag < ActiveRecord::Base
   # Get popular tags in the order of images_count
   # @param size [Integer]
   def self.get_tags_with_images(size)
-    #Tag.where.not(images_count: 0).order('images_count DESC').limit(size)
-    Tag.order('images_count DESC').limit(size)
+    Tag.where.not(images_count: 0).order('images_count DESC').limit(size)
+    #Tag.order('images_count DESC').limit(size)
   end
 
   # Get images which refers this record.
