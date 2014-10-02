@@ -1,1 +1,2 @@
-$(".wrapper-popular-tags").html('<%= escape_javascript(render :partial => "users/popular_tags", :locals => { people: @people }) %>');
+//$(".wrapper-popular-tags").html('<%= escape_javascript(render :partial => "users/popular_tags", :locals => { people: @people }) %>');
+$(".wrapper-popular-tags").html('<%= escape_javascript(render :partial => "users/popular_tags", collection: @tags_result ) %>');

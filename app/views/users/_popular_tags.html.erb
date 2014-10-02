@@ -1,14 +1,14 @@
 <h3>Popular tags</h3>
 <div class="popular-tags">
-  <% if people.nil? %>
-    <% popular_tags.each do |target_word| %>
-      <% name = target_word.get_name(current_user.language_preferences) %>
-      <%= bs_button_to(name, { controller: 'target_words', action: 'attach', id: target_word.id }, method: :post, remote: true, class: 'btn btn-default') unless target_word.person.nil? %>
+  <% if @tags_result.nil? %>
+    <% popular_tags.each do |tag| %>
+      <%# name = tag.get_name(current_user.language_preferences) %>
+      <%= bs_button_to(tag.name, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default') %>
     <% end %>
   <% else %>
-    <% people.each do |person| %>
-    <% name = person.get_name(current_user.language_preferences) %>
-      <%= bs_button_to name, { controller: 'target_words', action: 'attach', id: person.target_word.id }, method: :post, remote: true, class: 'btn btn-default' %>
+    <% @tags_result.each do |tag| %>
+    <%# name = person.get_name(current_user.language_preferences) %>
+      <%= bs_button_to tag.name, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default' %>
     <% end %>
   <% end %>
 </div>

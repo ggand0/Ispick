@@ -1,1 +1,3 @@
-$(".wrapper-followed-tags").html('<%= escape_javascript(render :partial => "users/followed_tags", :locals => { target_words: @target_words}) %>');
+//$(".wrapper-followed-tags").html('<%= escape_javascript(render :partial => "users/followed_tags", :locals => { target_words: @target_words}) %>');
+//$(".wrapper-followed-tags").html('<%= escape_javascript(render :partial => "users/followed_tags", :locals => { tags: @tags }) %>');
+$(".wrapper-followed-tags").html('<%= escape_javascript(render :partial => "users/followed_tags", collection: @tags) %>');

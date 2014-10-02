@@ -37,10 +37,10 @@ class UsersController < ApplicationController
   # ユーザ個別のホームページを表示する。
   def home
     # Get images: For a new user, display the newer images
-    if current_user.target_words.empty?
+    if current_user.tags.empty?
       images = Image.get_recent_images(500)
 
-    # Otherwise, display images from user.target_words relation
+    # Otherwise, display images from user.tags relation
     else
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
@@ -99,16 +99,16 @@ class UsersController < ApplicationController
 
 
   # タグ登録画面を表示する
-  # Render the index page of target_words.
+  # Render the index page of tags.
   def preferences
-    @popular_tags = TargetWord.get_tags_with_images(100)
-    @target_words = current_user.target_words
-    @target_word = TargetWord.new
+    @popular_tags = Tag.get_tags_with_images(100)
+    @tags = current_user.tags
+    @tag = Tag.new
 
 
-    @search = Person.search(params[:q])
+    @search = Tag.search(params[:q])
     if params[:q]
-      @people = @search.result(distinct: true).page(params[:page]).per(50)
+      @tags_result = @search.result(distinct: true).page(params[:page]).per(50)
     end
 
     respond_to do |format|
@@ -134,10 +134,22 @@ class UsersController < ApplicationController
   end
 
   # 登録タグの削除：関連のみ削除する
-  # Remove a registered text tag from user.target_words.
+  # Remove a registered text tag from user.tags.
   def delete_target_word
-    current_user.target_words.delete(TargetWord.find(params[:id]))
-    @target_words = current_user.target_words
+    current_user.tags.delete(TargetWord.find(params[:id]))
+    @tags = current_user.tags
+
+    respond_to do |format|
+      format.html { render action: 'preferences' }
+      format.js { render partial: 'layouts/reload_followed_tags' }
+    end
+  end
+
+  # 登録タグの削除：関連のみ削除する
+  # Remove a registered text tag from user.tags.
+  def delete_tag
+    current_user.tags.delete(Tag.find(params[:id]))
+    @tags = current_user.tags
 
     respond_to do |format|
       format.html { render action: 'preferences' }
