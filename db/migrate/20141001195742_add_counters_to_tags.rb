@@ -7,7 +7,7 @@ class AddCountersToTags < ActiveRecord::Migration
     Tag.reset_column_information
     count = Tag.count
     first = Tag.first.id
-    start = Tag.where.not(images_count: 0).first.id
+    start = Tag.where.not(images_count: 0).last.id
     tags = Tag.where("id > ?", start)
     tags.each do |tag|
       if tag.images_count > 0  # Consider non-zero counters as it's already added.
