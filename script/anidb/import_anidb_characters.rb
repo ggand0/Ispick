@@ -27,11 +27,22 @@ class Import
           title = Title.where(id_anidb: aid).first
           next if title.nil?
 
-          person = Person.new(name: name_ja, name_english: name_en, name_type: 'character_anidb')
-          if title and person.save
-            person.titles << title
+          persist = Person.where(name_english: name_en).first
+          if persist
+            # If a record with the same name exist, it must be a TargetWord created from ani-pic tags.
+            # That means the record needs to be associated with a Title record.
+            persist.titles << title
+            puts "persisted character: #{name_en}/#{title.name}"
             matched = true
             break
+          else
+            person = Person.new(name: name_ja, name_english: name_en, name_type: 'character_anidb')
+            if title and person.save
+              person.titles << title
+              puts "matched character: #{name_en}/#{title.name}"
+              matched = true
+              break
+            end
           end
         end
         puts "unmatched character: #{name_ja}/#{name_en}" unless matched

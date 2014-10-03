@@ -8,15 +8,14 @@
 
 <!-- 表示する画像数とフィルタに関するdropdownを描画 -->
 <p>
-  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
   <%= bs_dropdown_button_to 'Filters' do %>
     Filter by date
     <div class="input-group date" style="width: 200px;" align="right">
       <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
     </div>
     <li role="presentation" class="divider"></li>
-    <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
-    <li><%= link_to 'No nicoseiga(test)', home_users_path(nico: true) %></li>
+    <li><%= link_to 'Sort by posted_at', images_tag_path(sort: true) %></li>
+    <li><%= link_to 'No nicoseiga(test)', images_tag_path(nico: true) %></li>
   <% end %>
   <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>

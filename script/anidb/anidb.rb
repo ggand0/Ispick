@@ -7,7 +7,7 @@ class AniDB
   attr_accessor :xml, :output, :titles, :hash
 
   # 10000件のアニメ情報があるinput用xml
-  FILE_PATH = "#{Rails.root}/script/anidb/anime-titles.xml"
+  FILE_PATH = "#{Rails.root}/script/anidb/anime_titles.xml"
 
   # 出力用のXML::Documentオブジェクトを読み込むファイル。
   # Nokogiri::XML::Elementを追加して新しいxmlを作成する。
@@ -111,7 +111,3 @@ class AniDB
   end
 
 end
-
-
-anidb = AniDB.new
-anidb.main

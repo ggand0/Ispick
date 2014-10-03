@@ -9,7 +9,8 @@ You can follow a tag to make an image feed related to the tag.
 <%= search_form_for @search, url: preferences_users_path, html: { method: :post }, remote: true do |f| %>
   <div class="row">
     <div class="col-lg-2">
-      <%= f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
+      <%# f.text_field :titles_name_or_titles_name_english_or_name_or_name_or_name_english_or_name_display_cont, class: "form-control" %>
+      <%= f.text_field :name_cont, class: "form-control" %>
     </div>
   </div>
   <div class="actions">
@@ -21,14 +22,14 @@ You can follow a tag to make an image feed related to the tag.
 
 <!-- Render popular tags or search result in the partial -->
 <div class="wrapper-popular-tags">
-  <%= render partial: 'users/popular_tags', locals: { people: @people, popular_tags: @popular_tags } %>
+  <%= render partial: 'users/popular_tags', locals: { tags_result: @tags_result, popular_tags: @popular_tags } %>
 </div>
 
 <div class="arrow">></div>
 
 <!-- Render followed tags in the partial -->
 <div class="wrapper-followed-tags">
-  <%= render partial: 'users/followed_tags', locals: { target_words: @target_words } %>
+  <%= render partial: 'users/followed_tags', locals: { tags: @tags, test: 'test0' } %>
 </div>
 
 

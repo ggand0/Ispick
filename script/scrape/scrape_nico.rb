@@ -118,7 +118,8 @@ module Scrape
         caption: item.css('description').first.content,
         src_url: "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i",
         page_url: "http://seiga.nicovideo.jp/seiga/im#{nico_image_id}",
-        original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
+        #original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
+        original_url: src_url,
 
         views: item.css('view_count').first.content,
         favorites: item.css('clip_count').first.content,

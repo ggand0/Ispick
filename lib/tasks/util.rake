@@ -1,10 +1,24 @@
 # encoding: utf-8
 require "#{Rails.root}/script/restore_target_words"
+require "#{Rails.root}/script/anidb/anidb"
+require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
   desc "Restore target_words from a csv file"
   task :target_words, [:csv_path] => :environment do |t, args|
     Util.restore_target_words(args.csv_path)
+  end
+
+  desc "Seed AniDB titles"
+  task :seed_anidb_titles => :environment do
+    anidb = AniDB.new
+    anidb.main
+  end
+
+  desc "Seed AniDB characters"
+  task :seed_anidb_characters => :environment do
+    importer = Import.new
+    importer.main
   end
 
   desc "Seed target_words.name_english from their person records"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140923144017) do
+ActiveRecord::Schema.define(version: 20141001195742) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -79,6 +79,8 @@ ActiveRecord::Schema.define(version: 20140923144017) do
     t.text     "original_url"
     t.text     "artist"
     t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
   end
 
   create_table "favored_images_tags", force: true do |t|
@@ -124,6 +126,12 @@ ActiveRecord::Schema.define(version: 20140923144017) do
     t.text     "artist"
     t.text     "original_url"
     t.text     "poster"
+    t.integer  "popularity"
+    t.integer  "popularity_anipic"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "original_views"
+    t.integer  "original_favorites"
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
@@ -188,9 +196,16 @@ ActiveRecord::Schema.define(version: 20140923144017) do
     t.integer  "image_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "images_count", default: 0, null: false
+    t.integer  "users_count",  default: 0, null: false
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
+
+  create_table "tags_users", force: true do |t|
+    t.integer "tag_id",  null: false
+    t.integer "user_id", null: false
+  end
 
   create_table "target_images", force: true do |t|
     t.string   "data_file_name"

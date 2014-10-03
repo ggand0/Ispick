@@ -22,13 +22,13 @@ namespace :scrape do
   desc "Delete images older than a certain date"
   task :delete_old, [:limit] => :environment do |t, args|
     puts 'Deleting old images...'
-    
+
     if args[:limit]
       limit = args[:limit].to_i
     else
       limit = @DEFAULT_MO
     end
-    
+
     before_count = Image.count
 
     # ref: http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
@@ -55,10 +55,10 @@ namespace :scrape do
     before_count = Image.count
     if Image.count > limit
       delete_num = Image.count - limit
-      
+
       # recordを削除する前にtxtファイルにエクスポートする
 =begin
-      io = File.open("#{Rails.root}/log/old_record.txt","a")      
+      io = File.open("#{Rails.root}/log/old_record.txt","a")
       Image.reorder(:created_at).limit(delete_num).each do |image|
         str=""
         image.attributes.keys.each do |key|
@@ -74,17 +74,17 @@ namespace :scrape do
         end
         str = str+"\""
         io.puts(str)
-      end      
-      io.close       
+      end
+      io.close
 =end
-        
+
       Image.reorder(:created_at).limit(delete_num).destroy_all
     end
 
     puts "Deleted: #{(before_count - Image.count).to_s} images"
     puts "Current image count: #{Image.count.to_s}"
   end
-  
+
   # @params limit [Integer] 最大保存数
   # 最大保存数を超えている場合、古いImageから順に画像ファイルだけを削除
   desc "Delete images if its the count of all images exceeds the limit"
@@ -180,7 +180,7 @@ namespace :scrape do
   end
 
   desc "キャラクタに関する静的なDBを構築する"
-  task wiki_title: :environment do
+  task wiki_titles: :environment do
     puts 'Scraping anime titles...'
     Scrape::Wiki.scrape_titles
   end
@@ -190,6 +190,7 @@ namespace :scrape do
     puts 'Scraping character names from anime-pictures.net...'
     Scrape::Tags.scrape
   end
+
 
   desc "ニコ静から画像抽出する"
   task :nico, [:interval] => :environment do |t, args|
