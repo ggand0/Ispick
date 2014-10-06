@@ -21,13 +21,12 @@ class TargetWordsController < ApplicationController
   def edit
   end
 
+=begin
   # POST
   # This action only get the existing TargetWord record,
   # and add it to current_user.target_words.
   def attach
     # Get the existing target_word record
-    #@target_word = search_target_word(target_word_params)
-    #@target_word = TargetWord.find()
     current_user.target_words << @target_word
 
     respond_to do |format|
@@ -102,7 +101,7 @@ class TargetWordsController < ApplicationController
     target_word = TargetWord.where(name_english: name_english)
     target_word
   end
-
+=end
   # PATCH/PUT /target_words/1
   # PATCH/PUT /target_words/1.json
   def update

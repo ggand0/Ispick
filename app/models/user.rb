@@ -53,7 +53,7 @@ class User < ActiveRecord::Base
   # Get images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
-    words = tags.map{ |target_word| target_word.name }
+    words = tags.map{ |tag| tag.name }
     Image.joins(:tags).where("tags.name IN (?)", words).
       where.not(data_updated_at: nil).references(:tags)
   end
@@ -61,9 +61,9 @@ class User < ActiveRecord::Base
   # For now, it's same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
-    words = tags.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).
-      where.not(data_updated_at: nil).references(:target_words)
+    words = tags.map{ |tag| tag.name }
+    Image.joins(:tags).where("tags.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:tags)
   end
 
   # Get an optional ImageBoard instance by board_id.

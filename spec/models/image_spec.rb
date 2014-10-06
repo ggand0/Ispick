@@ -29,16 +29,16 @@ describe Image do
 
   describe "search_images method" do
     it "returns a valid image relation" do
-      FactoryGirl.create(:word_with_images, images_count: 5)
+      FactoryGirl.create(:tag_with_images, images_count: 5)
       images = Image.search_images('鹿目まどか1')
-      expect(images.count).to eq(1)
+      expect(images.count).to eq(5)
     end
   end
 
   describe "filter_by_date method" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_images, images_count: 1)
-      images = user.target_words.first.images
+      user = FactoryGirl.create(:user_with_tag_images, images_count: 1)
+      images = user.tags.first.images
       date_string = 'Mon Sep 01 2014 00:00:00 GMT 0900 (JST)'
       date = DateTime.parse(date_string).to_date
 
@@ -49,7 +49,7 @@ describe Image do
 
   describe "filter_by_illust method" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_images, images_count: 1)
+      user = FactoryGirl.create(:user_with_tag_images, images_count: 1)
       images = user.get_images
 
       # The above code creates user.images with an illust and a photo,
@@ -60,7 +60,7 @@ describe Image do
 
   describe "sort_images method" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_dif_image)
+      user = FactoryGirl.create(:user_with_tag_dif_image)
       images = user.get_images
       first = images[0]
       second = images[1]

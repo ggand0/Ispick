@@ -65,66 +65,66 @@ FactoryGirl.define do
 
 
     # ==============================
-    #  Users with target_words only
+    #  Users with tags only
     # ==============================
-    factory :user_with_target_words do
+    factory :user_with_tags do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       uid '22345678'
       ignore do
-        words_count 5
+        tags_count 5
       end
       after(:create) do |user, evaluator|
         5.times do
-          user.target_words << create(:target_words)
+          user.tags << create(:tags)
         end
       end
     end
 
-    factory :user_with_target_word do
+    factory :user_with_tag do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       uid '22345678'
       after(:create) do |user|
         1.times do
-          user.target_words << create(:target_words)
+          user.tags << create(:tags)
         end
       end
     end
 
 
     # ==========================================
-    #  Users with target_words that have images
+    #  Users with tags that have images
     # ==========================================
-    factory :user_with_target_word_images do
+    factory :user_with_tag_images do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       ignore do
         images_count 1
       end
       after(:create) do |user, evaluator|
         1.times do
-          user.target_words << create(:word_with_images, images_count: evaluator.images_count)
+          user.tags << create(:tag_with_images, images_count: evaluator.images_count)
         end
       end
     end
 
-    factory :user_with_target_word_images_file do
+    factory :user_with_tag_images_file do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       ignore do
         images_count 1
       end
       after(:create) do |user, evaluator|
         1.times do
-          user.target_words << create(:word_with_image_file, images_count: evaluator.images_count)
+          user.tags << create(:tag_with_image_file, images_count: evaluator.images_count)
         end
       end
     end
 
-    factory :user_with_target_word_dif_image do
+    factory :user_with_tag_dif_image do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       after(:create) do |user|
         1.times do
-          user.target_words << create(:word_with_images)
-          user.target_words << create(:word_with_image_dif_time)
-          #user.target_words << create(:word_with_image_photo)
+          user.tags << create(:tag_with_images)
+          user.tags << create(:tag_with_image_dif_time)
+          #user.tags << create(:tag_with_image_photo)
         end
       end
     end

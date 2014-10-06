@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "user's home page" do
   describe "default features" do
     before do
-      FactoryGirl.create(:user_with_target_word_images_file)
+      FactoryGirl.create(:user_with_tag_images_file)
       visit root_path
       mock_auth_hash
       click_link 'Continue with Twitter'
@@ -39,7 +39,7 @@ describe "user's home page" do
 
   describe "clipping images", :js => true do
     before do
-      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
+      user = FactoryGirl.create(:user_with_tag_images_file, images_count: 1)
       @board = user.image_boards.first
       visit root_path
       mock_auth_hash
@@ -77,7 +77,7 @@ describe "user's home page" do
 
   describe "infinite scrolling", :js => true do
     before do
-      FactoryGirl.create(:user_with_target_word_images_file, images_count: 26)
+      FactoryGirl.create(:user_with_tag_images_file, images_count: 26)
       visit root_path
       mock_auth_hash
       click_link 'Continue with Twitter'

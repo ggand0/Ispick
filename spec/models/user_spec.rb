@@ -18,7 +18,7 @@ describe User do
 
   describe "get_images method" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
+      user = FactoryGirl.create(:user_with_tag_images_file, images_count: 1)
       images = user.get_images
       expect(images.count).to eq(1)
     end
@@ -26,7 +26,7 @@ describe User do
 
   describe "get_images_all method" do
     it "returns proper relation object" do
-      user = FactoryGirl.create(:user_with_target_word_images_file, images_count: 1)
+      user = FactoryGirl.create(:user_with_tag_images_file, images_count: 1)
       images = user.get_images_all
       expect(images.count).to eq(1)
     end
