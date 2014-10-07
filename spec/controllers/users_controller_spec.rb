@@ -57,11 +57,10 @@ describe UsersController do
       image1 = FactoryGirl.create(:image_with_tags)
 
       get :search, { query: '鹿目まどか6', page: 1 }
-      #puts Tag.all.inspect
-
       response.should render_template('home')
-      expect(assigns(:images).count).to eq(6)# total count: 12, page1=6 images
-      puts assigns(:images).inspect
+
+      # total count of images is 12, so at page 1, there must be six images
+      expect(assigns(:images).count).to eq(6)
       #expect(assigns(:images).first).to eq(image1)
     end
   end
