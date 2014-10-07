@@ -2,9 +2,10 @@ require 'resque_web'
 
 Ispick::Application.routes.draw do
 
-
   # Root path
   root 'welcome#index'
+  match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
+  match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
 
   # Debugging paths
   scope "/debug" do
