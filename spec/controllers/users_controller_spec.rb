@@ -57,10 +57,11 @@ describe UsersController do
       image1 = FactoryGirl.create(:image_with_tags)
 
       get :search, { query: '鹿目まどか6', page: 1 }
-
       response.should render_template('home')
-      expect(assigns(:images).count).to eq(1)
-      expect(assigns(:images).first).to eq(image1)
+
+      # total count of images is 12, so at page 1, there must be six images
+      expect(assigns(:images).count).to eq(6)
+      #expect(assigns(:images).first).to eq(image1)
     end
   end
 
@@ -78,7 +79,7 @@ describe UsersController do
     end
   end
 
-  describe "GET show_target_words" do
+  describe "GET show_tags" do
     it "renders 'preferences' template when logged in" do
       login_user
       get :preferences, {}, valid_session
@@ -105,19 +106,19 @@ describe UsersController do
   end
 
 
-  describe "DELETE delete_target_word" do
-    it "deletes a target_word only from the User.target_words relation" do
+  describe "DELETE delete_tag" do
+    it "deletes a tag only from the User.tags relation" do
       login_user
       user = User.first
       word_count = TargetWord.count
-      user_count = user.target_words.count
-      target_word = user.target_words.first
+      user_count = user.tags.count
+      tag = user.tags.first
 
-      delete :delete_target_word, { id: target_word.id }
+      delete :delete_tag, { id: tag.id }
 
       expect(response).to render_template('preferences')
       expect(TargetWord.count).to eq(word_count)
-      expect(user.target_words.count).to eq(user_count-1  )
+      expect(user.tags.count).to eq(user_count-1  )
     end
   end
 

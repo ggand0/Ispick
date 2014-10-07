@@ -19,9 +19,9 @@ FactoryGirl.define do
     posted_at DateTime.now
     is_illust true
 
-    after(:create) do |image|
-      image.tags << create(:tags)
-    end
+    #after(:create) do |image|
+    #  image.tags << create(:tags)
+    #end
 
     # sequenceされていないタグのみ必要な場合
     factory :image_with_specific_tags do
