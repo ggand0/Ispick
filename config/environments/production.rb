@@ -80,13 +80,15 @@ Ispick::Application.configure do
   # SMTPの設定
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { :host => CONFIG['ip'] }
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
     port: 587,
     authentication: :plain,
     domain: 'smtp.gmail.com',
     user_name: CONFIG['gmail_username'],
-    password: CONFIG['gmail_password']
+    password: CONFIG['gmail_password'],
+    enable_starttls_auto: true
   }
 
   # Configuration of exception notification gem
