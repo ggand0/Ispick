@@ -1,32 +1,38 @@
-<div style="width:600px;">
-  <%= render partial: 'shared/about_us' %>
+<div class="container-fluid">
+  <div class="col-md-8">
+    <%= render partial: 'shared/about_us' %>
+    blog: ispick.tumblr.com<br />
+    twitter: @ispic6
+  </div>
+</div>
+<br />
+<br />
+<div class="container-fluid">
+  <div class="col-md-6">
+    <p><strong>Contact us</strong></p>
 
-  <%= bootstrap_form_for @message, :url => create_contact_path do |form| %>
-    <fieldset class="fields">
-      <div class="field">
-        <%= form.label :name %>
-        <%= form.text_field :name %>
-      </div>
+    <%= bootstrap_form_for @message, :url => create_contact_path do |form| %>
+      <fieldset class="fields">
+        <div class="field">
+          <%= form.text_field :name %>
+        </div>
 
-      <div class="field">
-        <%= form.label :email %>
-        <%= form.text_field :email %>
-      </div>
-      <div class="field">
-        <%= form.label :subject %>
-        <%= form.text_field :subject %>
-      </div>
+        <div class="field">
+          <%= form.text_field :email %>
+        </div>
+        <div class="field">
+          <%= form.text_field :subject %>
+        </div>
 
-      <div class="field">
-        <%= form.label :body %>
-        <%= form.text_area :body %>
-      </div>
-    </fieldset>
+        <div class="field">
+          <%= form.text_area :body, rows: '4' %>
+        </div>
+      </fieldset>
 
-    <fieldset class="actions">
-      <%= form.submit "Send" %>
-    </fieldset>
-  <% end %>
-  blog: ispick.tumblr.com<br />
-  twitter: @ispic6
+      <fieldset class="actions">
+        <%= form.submit "Send" %>
+      </fieldset>
+    <% end %>
+  </div>
+  <br />
 </div>

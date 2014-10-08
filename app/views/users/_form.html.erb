@@ -15,17 +15,9 @@
     </div>
   <% end %>
 
-  <div class="row">
-    <div class="col-lg-2">
       <%= f.text_field :name, :required => true, :autofocus => true %>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="col-lg-2">
       <%= f.select :language_preferences, ['ja', 'en'], { label: "Choose a language:" }, { class: "selectpicker" } %>
-    </div>
-  </div>
 
   <div class="actions">
     <%= f.submit %>

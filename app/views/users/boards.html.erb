@@ -1,35 +1,23 @@
-<%= render 'shared/modal_image' %>
 <%= stylesheet_link_tag 'users' %>
+<%= render 'shared/modal_image' %>
 <%= render 'shared/modal_board' %>
 
-<!-- Debug情報とボード選択dropdownを描画 -->
-<p>
-  <strong>Clipped images count:</strong>
-  <%= @favored_images.count %>
-  <br />
-  <strong>Total size of clipped images in bytes:</strong>
-  <%= @total_size %> MB
-  <br />
-  <br />
-  <br />
-</p>
 
-
-<!-- Board選択/編集/削除を行うUIを描画 -->
+<!-- Render UIs to add/edit/delete boards -->
 <%= button_group do %>
-  <%= bs_dropdown_button_to 'Select a board' do %>
+  <%= bs_dropdown_button_to list_glyphicon do %>
     <% current_user.image_boards.each do |board| %>
       <li>
         <%= link_to board.name, { controller: 'users', action: 'boards', board: board.id }, class: 'btn-default' %>
       </li>
     <% end %>
   <% end %>
-  <%= bs_button_to 'Edit this board', edit_image_board_path(id: @image_board.id), remote: true, class: 'btn btn-default' %>
-  <%= bs_button_to '<span class="glyphicon glyphicon-remove" style="vertical-align:middle"></span>Delete'.html_safe, @image_board, method: :delete, data: { confirm: 'Are you sure to delete this board? This operation cannot be undone.' }, class: 'btn btn-default' %>
+  <%= bs_button_to pencil_glyphicon, edit_image_board_path(id: @image_board.id), remote: true, class: 'btn btn-default' %>
+  <%= bs_button_to remove_glyphicon, @image_board, method: :delete, data: { confirm: 'Are you sure to delete this board? This operation cannot be undone.' }, class: 'btn btn-default' %>
 <% end %>
 
 
-<!-- 選択されているBoardの画像一覧を表示、home.html.erbと同様 -->
+<!-- Display the images of the selected board. Same as home.html.erb -->
 <div class="wrap">
   <% @favored_images.each do |favored_image| %>
     <div class="box">

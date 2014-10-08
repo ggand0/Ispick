@@ -91,6 +91,13 @@ module UsersHelper
   def plus_glyphicon
     '<span class="glyphicon glyphicon-plus" style="vertical-align:middle"></span>'.html_safe
   end
+  def remove_glyphicon
+    '<span class="glyphicon glyphicon-remove" style="vertical-align:middle"></span>'.html_safe
+  end
+  def list_glyphicon
+    '<span class="glyphicon glyphicon-list" style="vertical-align:middle"></span>'.html_safe
+  end
+
 
 
   # =================
