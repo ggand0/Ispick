@@ -112,7 +112,7 @@ module Scrape
     # ==============
     # [OLD]直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
     # @param [String] likes_countを取得するページのurl
-    def get_favorites(page_url)
+    def get_original_favorite_count(page_url)
       begin
         # show:likesを設定しているページのみ取得
         html = Nokogiri::HTML(open(page_url))
@@ -137,8 +137,8 @@ module Scrape
     def self.get_artist_information(caption)
         # タグの除去
       caption = caption.gsub(/<.*?>/,"")
-      
-      #Hatsune… Madoka? | hitsu [pixiv]  
+
+      #Hatsune… Madoka? | hitsu [pixiv]
         #「まどかさん」/「かきあげ」のイラスト [pixiv]
         #「ハサハ」/「ローラ」の作品 [TINAMI] #illustail
       if /\[pixiv\]|\[TINAMI\]/ =~ caption
@@ -148,7 +148,7 @@ module Scrape
           artist = $1
         else
           artist = $1
-        end      
+        end
       # Goddess of the Month August by 成瀬まひ
       elsif caption.scan(/ by /).size == 1
         /.+[by|By|BY] (.+)/ =~ caption
@@ -156,13 +156,13 @@ module Scrape
       else
           artist = nil
       end
-      
-      return artist        
+
+      return artist
     end
 
 
     # 画像１枚に関する情報をHashにして返す。
-    # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
+    # original_favorite_countを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
     # @param [Hash]
     # @return [Hash]
     def self.get_data(image)
@@ -176,11 +176,11 @@ module Scrape
         src_url: image['photos'].first['alt_sizes'][0]['url'],
         page_url: image['post_url'],
         posted_at: image['date'],
-        views: nil,
+        original_view_count: nil,
 
-        #favorites: self.get_favorites(image['post_url']),
+        #original_favorite_count: self.get_original_favorite_count(image['post_url']),
         # reblog+likesされた数の合計値。別々には取得不可
-        favorites: image['note_count'],
+        original_favorite_count: image['note_count'],
 
         site_name: 'tumblr',
         module_name: 'Scrape::Tumblr',
@@ -201,7 +201,7 @@ module Scrape
       posts = client.posts(blog_name)
       post = posts['posts'].find { |h| h['id'] == id.to_i } if posts['posts']
 
-      { views: nil, favorites: post ? post['note_count'] : nil }
+      { original_view_count: nil, original_favorite_count: post ? post['note_count'] : nil }
     end
 
   end

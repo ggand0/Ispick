@@ -78,14 +78,14 @@ describe Scrape::Tumblr do
 
 
   describe "get_stats function" do
-    it "returns a hash with favorites value" do
+    it "returns a hash with original_favorite_count value" do
       post = FactoryGirl.build(:tumblr_api_response)
       Tumblr::Client.any_instance.stub(:posts).and_return(post[:response])
       page_url = 'http://realotakuman.tumblr.com/post/84103502875/twitter-kiya-si-http-t-co-mq1t'
       stats = Scrape::Tumblr.get_stats(page_url)
 
       expect(stats).to be_a(Hash)
-      expect(stats[:favorites]).to eql(post[:response]['posts'][0]['note_count'])
+      expect(stats[:original_favorite_count]).to eql(post[:response]['posts'][0]['note_count'])
     end
   end
 
@@ -96,10 +96,10 @@ describe Scrape::Tumblr do
     end
   end
 
-  describe "get_favorites function" do
-    it "returns favorites count of the post" do
+  describe "get_original_favorite_count function" do
+    it "returns original_favorite_count count of the post" do
       page_url = 'http://senshi.org/post/82331944259/miku-x-cat-by-kenji'
-      puts result = @client.get_favorites(page_url)
+      puts result = @client.get_original_favorite_count(page_url)
       expect(result).not_to eql(nil)
     end
   end

@@ -47,3 +47,16 @@
 .btn-group-oauth {
   width     : 280px;
 }
+
+// styles for "Creating an account means you've accepted Term of Service and..."
+.warning{
+  font-size: 9px;
+  line-height: 10px;
+}
+.warning a {
+  &:hover {
+    color: #000;
+    background-color: #E4F5F5;
+    text-decoration: underline;
+  }
+}

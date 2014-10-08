@@ -6,7 +6,7 @@
 <%= render 'shared/modal_board' %>
 
 
-<!-- 表示する画像数とフィルタに関するdropdownを描画 -->
+<!-- Render images and the dropdown for filtering them -->
 <p>
   <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
   <%= bs_dropdown_button_to 'Filters' do %>
@@ -21,5 +21,5 @@
   <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>
 
-<!-- ここから画像表示 -->
+<!-- image rendering starts from here -->
 <%= render partial: 'users/home_images', locals: { images: @images } %>

@@ -50,8 +50,9 @@ Ispick::Application.configure do
       sender_address: 'noreply@ispicks.com',
       exception_recipients: CONFIG['gmail_username'],
     }
-  config.action_mailer.delivery_method = :letter_opener
 =end
+  config.action_mailer.delivery_method = :letter_opener
+
 
   config.action_mailer.default_url_options = {:host => "0.0.0.0:3000"}
 
