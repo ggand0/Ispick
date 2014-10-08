@@ -1,9 +1,4 @@
-<h1><strong>Ispick Beta</strong></h1>
-<p>
-  Ispick is an automated anime artworks aggregation service!<br />
-You can create various anime image feeds based on text tags.<br />
-This is the beta version, so your favorites and followed tags data could be deleted.
-</p>
+<%= render partial: 'shared/top_description' %>
 
 <div class="top-image">
   <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
@@ -16,6 +11,7 @@ This is the beta version, so your favorites and followed tags data could be dele
     <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br>
     <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
   </div>
+  <%= render partial: 'shared/warning' %>
   <div align="center">
     <%= bs_button_to 'Login', '/signin_with_password', class: 'btn-mini btn-default' %>
   </div>
