@@ -66,21 +66,21 @@ module Scrape
 
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
       page.search("span[class='img_block_big']").each_with_index do |image, count|
-      
+
           # 広告又はR18画像はスキップ
         if image.children.search('img').first.nil?
           skipped += 1
           next
-        else      
+        else
             # サーチ結果ページから、ソースページのURLを取得
          page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
         end
-        
+
           # ソースページのパース
         xml = Nokogiri::XML(open(page_url))
           # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-        
+
         image_data = self.get_data(xml, page_url)
 
 
@@ -174,7 +174,7 @@ module Scrape
     end
 
     # 画像１枚に関する情報をHashにして返す。
-    # favoritesの抽出にはVotesを利用
+    # original_favorite_countの抽出にはVotesを利用
     # @param [Nokogiri::XML]
     # @param [String]
     # @return [Hash]
@@ -193,12 +193,12 @@ module Scrape
       # posted_atの取得( 8/13/14, 7:26 PM\n\t\t)
       time = xml.css("div[class='post_content']").css("b")[2].next.content
       time = self.class.get_time(time)
-      time = Time.parse(time) 
-      
+      time = Time.parse(time)
+
       # src_urlの取得
       image_url_div = xml.css("div[id='big_preview_cont']")
       src_url = image_url_div.css("img").first.attributes['src'].value.gsub!(/ /,'')
-      
+
       # original_urlの取得
       # aタグが上手くパース出来なかったときの例外処理
       if image_url_div.children.css("a").first.nil?
@@ -206,7 +206,7 @@ module Scrape
       else
         original_url = ROOT_URL + image_url_div.children.search("a").first.attributes['href'].value
       end
-      
+
       author = "none"
       # artistの取得
       xml.css("ul[class='tags']").first.css('span').each do |span|
@@ -215,7 +215,7 @@ module Scrape
           break
         end
       end
-      
+
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
       hash = {
@@ -223,10 +223,10 @@ module Scrape
         caption: caption,
         page_url: page_url,
         posted_at: time,
-        views: nil,
+        original_view_count: nil,
         src_url: src_url,
         original_url: original_url,
-        favorites: votes,             # votesの数
+        original_favorite_count: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
         artist: author,

@@ -109,10 +109,10 @@ class Image < ActiveRecord::Base
     end
   end
 
-  # Sort images by its favorites attribute.
+  # Sort images by its original_favorite_count attribute.
   # @return [ActiveRecord::AssociationRelation]
   def self.sort_images(images, page)
-    images = images.reorder('images.favorites desc')
+    images = images.reorder('images.original_favorite_count desc')
     images.page(page).per(25)
   end
 

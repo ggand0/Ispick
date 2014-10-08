@@ -46,8 +46,8 @@ class ImagesController < ApplicationController
       original_url: @image.original_url,
       page_url: @image.page_url,
       site_name: @image.site_name,
-      views: @image.views,
-      favorites: @image.favorites,
+      original_view_count: @image.original_view_count,
+      original_favorite_count: @image.original_favorite_count,
       posted_at: @image.posted_at,
     )
     @image.tags.each do |tag|

@@ -110,8 +110,8 @@ describe Scrape::Nico do
       image = FactoryGirl.create(:image_nicoseiga)
       puts result = Scrape::Nico.get_stats(@agent, image.page_url)
       expect(result).to be_a(Hash)
-      expect(result[:views]).to be_a(String)
-      expect(result[:favorites]).to be_a(String)
+      expect(result[:original_view_count]).to be_a(String)
+      expect(result[:original_favorite_count]).to be_a(String)
     end
   end
 

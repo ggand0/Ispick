@@ -121,8 +121,8 @@ module Scrape
         #original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
         original_url: src_url,
 
-        views: item.css('view_count').first.content,
-        favorites: item.css('clip_count').first.content,
+        original_view_count: item.css('view_count').first.content,
+        original_favorite_count: item.css('clip_count').first.content,
         # Parse JST posted_at datetime to utc
         # JSTの投稿日時が返却されるのでUTCに変換する
         posted_at: DateTime.parse(item.css('created').first.content).in_time_zone('Asia/Tokyo').utc,
@@ -173,14 +173,14 @@ module Scrape
       begin
         page = agent.get(page_url)
         info_elements = page.at("ul[@class='illust_count']")
-        views = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
+        original_view_count = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
         comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
         clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
       rescue => e
         return false
       end
 
-      { views: views, favorites: clips}
+      { original_view_count: original_view_count, original_favorite_count: clips}
     end
 
   end

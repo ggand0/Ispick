@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141007080152) do
+ActiveRecord::Schema.define(version: 20141007140007) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -73,8 +73,8 @@ ActiveRecord::Schema.define(version: 20141007080152) do
     t.datetime "updated_at"
     t.text     "page_url"
     t.text     "site_name"
-    t.integer  "views"
-    t.integer  "favorites"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
     t.datetime "posted_at"
     t.text     "original_url"
     t.text     "artist"
@@ -118,8 +118,8 @@ ActiveRecord::Schema.define(version: 20141007080152) do
     t.text     "page_url"
     t.text     "site_name"
     t.string   "module_name"
-    t.integer  "views"
-    t.integer  "favorites"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
     t.datetime "posted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -132,6 +132,9 @@ ActiveRecord::Schema.define(version: 20141007080152) do
     t.integer  "original_height"
     t.integer  "original_views"
     t.integer  "original_favorites"
+    t.integer  "view_count",              default: 0, null: false
+    t.integer  "clip_count",              default: 0, null: false
+    t.integer  "share_count",             default: 0, null: false
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
