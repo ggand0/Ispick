@@ -65,6 +65,7 @@ module Scrape
       page = self.get_search_result(query)
 
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
+      return if page.search("span[class='img_block_big']").count == 0
       page.search("span[class='img_block_big']").each_with_index do |image, count|
 
           # 広告又はR18画像はスキップ
