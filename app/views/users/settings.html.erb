@@ -1,17 +1,16 @@
 <!--
-  ユーザ情報の設定ページ
+  Setting page for editing user's data
   - Using gem: https://github.com/Tretti/rails-bootstrap-helpers
 -->
 
 
-<!-- name/language等の編集フォーム -->
+<!-- Edit form of name/language attribute -->
 <div class="container-fluid">
   <div class="col-md-4">
     <h3>Edit Account</h3>
     <%= render 'form' %>
 
-<!-- linkされているSNSアカウントを表示する -->
-
+<!-- Display SNS accounts that are already linked -->
     <h3>Connect Account</h3>
     <br />
     <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
@@ -27,7 +26,6 @@
         <%= bs_button_to "Sign in with #{provider.to_s.titleize}",
           omniauth_authorize_path('user', provider), class: 'btn-default btn-block' %>
       <% end %>
-
     <br />
     <br />
     <% end %>

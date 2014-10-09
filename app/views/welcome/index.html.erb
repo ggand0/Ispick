@@ -1,30 +1,31 @@
-
-  <div class="container-fluid top">
-    <div class="row">
+<div class="container-fluid top">
+  <div class="row">
     <div class="col-md-6 col-centered">
       <%= render partial: 'shared/top_description' %>
     </div>
     <br />
-  </div></div>
-  <div class="container-fluid">
-    <div class="top col-md-8 col-centered">
-    <div class="top-image">
-      <%= link_to (image_tag asset_path('background0.png')), '/' %>
-    </div>
+  </div>
+</div>
 
-    <div class="wrapper-oauth">
-      <div class="btn-group-vertical btn-group-oauth">
-        <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
-      </div>
-      <%= render partial: 'shared/warning' %>
-      <div align="center">
-        <%= bs_button_to 'Login', '/signin_with_password', class: 'btn-mini btn-default' %>
-      </div>
+<div class="container-fluid">
+  <div class="top col-md-8 col-centered">
+  <div class="top-image">
+    <%= link_to (image_tag asset_path('background0.png')), '/' %>
+  </div>
+
+  <div class="wrapper-oauth">
+    <div class="btn-group-vertical btn-group-oauth">
+      <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
+      <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
+      <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
+      <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
+    </div>
+    <%= render partial: 'shared/warning' %>
+    <div align="center">
+      <%= bs_button_to 'Log in', '/signin_with_password', class: 'btn-mini btn-default' %>
     </div>
   </div>
+</div>
 <br />
 <br />
 </div>

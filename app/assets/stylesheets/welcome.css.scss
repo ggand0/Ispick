@@ -4,8 +4,6 @@
 
 .top-image {
   position  : relative;
-  //display: inline-block;
-  //text-align:center;
   width     : 500px;
   height    : 300px;
   float     : left;
@@ -13,8 +11,6 @@
 }
 .wrapper-oauth {
   position  : relative;
-  //display:inline-block;
-  //text-align:center;
   width     : 300px;
   height    : 300px;
   background-color : #E4F5F5;
@@ -27,7 +23,7 @@
 .wrapper-sign-in {
   position  : relative;
   width     : 300px;
-  height    : 450px;
+  height    : 350px;
   background-color : #E4F5F5;
   margin    : 10;
   padding   : 10px;
@@ -69,11 +65,8 @@
 .top {
   text-align: center;
   align: center;
-  /*float:left;
-  position:relative;
-  left:50%;*/
 }
 .col-centered{
-    float: none;
-    margin: 0 auto;
+  float: none;
+  margin: 0 auto;
 }

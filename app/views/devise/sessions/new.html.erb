@@ -1,31 +1,41 @@
-<%= render partial: 'shared/top_description' %>
-
-<div class="top-image">
-  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
+<div class="container-fluid top">
+  <div class="row">
+    <div class="col-md-6 col-centered">
+      <%= render partial: 'shared/top_description' %>
+    </div>
+    <br />
+  </div>
 </div>
 
-<div class="wrapper-sign-in">
-  <div class="btn-group-vertical btn-group-oauth">
-    <%= button_group do %>
-      <%= bs_button_to 'Login with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br>
-      <br>
-
-      <div align="center">
-        <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name) do |f| %>
-          <%= f.email_field :email, autofocus: true, placeholder: 'email' %>
-          <%= f.password_field :password, autocomplete: 'off', placeholder: 'password' %>
-          <%= f.submit 'Submit' %>
-        <% end %>
-      </div>
-
-    <% end %>
+<div class="container-fluid">
+  <div class="top col-md-8 col-centered">
+  <div class="top-image">
+    <%= link_to (image_tag asset_path('background0.png')), '/' %>
   </div>
-  <br>
-  <br>
-  <div class="link-sign-in" align="center">
-    <%= link_to 'Forgot password?', '/reset_password' %><br>
-    <%= link_to 'Sign up', '/signup_with_password' %>
+
+  <div class="wrapper-sign-in">
+    <div class="btn-group-vertical btn-group-oauth">
+      <%= button_group do %>
+        <%= bs_button_to 'Log in with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
+        <%= bs_button_to 'Log in with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
+        <%= bs_button_to 'Log in with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
+
+        <div align="center">
+          <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name), class: "well" do |f| %>
+            <%= f.email_field :email, autofocus: true, placeholder: 'email', hide_label: :true %>
+            <%= f.password_field :password, autocomplete: 'off', placeholder: 'password', hide_label: :true %>
+            <%= f.submit 'Log in' %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <br />
+    <div class="link-sign-in" align="center">
+      <%= link_to 'Forgot password?', '/reset_password' %><br />
+      <%= link_to 'Sign up', '/signup_with_password' %>
+    </div>
   </div>
+<br />
+<br />
 </div>
