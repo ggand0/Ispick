@@ -4,13 +4,17 @@
 
 .top-image {
   position  : relative;
-  width     : 400px;
+  //display: inline-block;
+  //text-align:center;
+  width     : 500px;
   height    : 300px;
   float     : left;
   z-index   : 1;
 }
 .wrapper-oauth {
   position  : relative;
+  //display:inline-block;
+  //text-align:center;
   width     : 300px;
   height    : 300px;
   background-color : #E4F5F5;
@@ -59,4 +63,17 @@
     background-color: #E4F5F5;
     text-decoration: underline;
   }
+}
+
+// top page wrapper
+.top {
+  text-align: center;
+  align: center;
+  /*float:left;
+  position:relative;
+  left:50%;*/
+}
+.col-centered{
+    float: none;
+    margin: 0 auto;
 }
