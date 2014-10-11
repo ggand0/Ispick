@@ -10,7 +10,7 @@ class @Component
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
-    $(".wrap").infinitescroll({
+    ###$(".wrap").infinitescroll({
       navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
       nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
       itemSelector: ".box"                        # selector for all items you'll retrieve
@@ -18,7 +18,32 @@ class @Component
     (arrayOfNewElems) ->
       #window.Clip.removeClipEvents(true)
       #window.Clip.initButtons(true)
-    )
+    )###
+    $el = $('.wrap')
+    listView = new infinity.ListView($el)
+    $(window).scroll ->
+      console.log(window.scrollReady)
+      return if (window.scrollReady == false)
+
+      url = $('nav.pagination a[rel=next]').attr('href')
+      if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
+        console.log($(window).data('ajaxready'))
+        window.scrollReady = false#$(window).data('ajaxready', false)
+        $.getScript(url)
+        $.ajax({
+          cache: false,
+          url: url,
+          type: 'GET',
+          dataType: 'html',
+          success: (data) ->
+            #console.log($(data).find(".box"))
+            listView.append($(data).find('.box'))
+            window.scrollReady = true
+          failure: (data) ->
+            console.log('failed')
+            window.scrollReady = true
+        })
+
 
   initCalender: () ->
     #selector = "[data-behaviour~=datepicker]"

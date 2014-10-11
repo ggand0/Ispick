@@ -1,0 +1,5 @@
+<% if @images.next_page %>
+  $('.pagination').replaceWith('<%= j paginate @images %>');
+<% else %>
+  $('.pagination').remove();
+<% end %>
