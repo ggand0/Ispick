@@ -12,7 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery.infinitescroll.min
+// require jquery.infinitescroll.min
+//= require infinity
 //= require jquery.remotipart
 //= require bootstrap
 //= require bootstrap-datepicker
