@@ -21,14 +21,16 @@ class @Component
     )###
     $el = $('.wrap')
     listView = new infinity.ListView($el)
+    window.scrollReady = true
     $(window).scroll ->
       console.log(window.scrollReady)
+
       return if (window.scrollReady == false)
 
       url = $('nav.pagination a[rel=next]').attr('href')
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
-        console.log($(window).data('ajaxready'))
-        window.scrollReady = false#$(window).data('ajaxready', false)
+        $('.pagination').text("Fetching more products...")
+        window.scrollReady = false
         $.getScript(url)
         $.ajax({
           cache: false,
@@ -36,9 +38,9 @@ class @Component
           type: 'GET',
           dataType: 'html',
           success: (data) ->
-            #console.log($(data).find(".box"))
             listView.append($(data).find('.box'))
             window.scrollReady = true
+
           failure: (data) ->
             console.log('failed')
             window.scrollReady = true
