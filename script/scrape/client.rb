@@ -251,7 +251,7 @@ module Scrape
         ActionMailer::Base.mail(
           :from => "noreply@ispicks.com",
           :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
-          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}"
+          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\n#{e.backtrace.join("\n")}"
         ).deliver
       rescue => e
         #puts e.inspect
