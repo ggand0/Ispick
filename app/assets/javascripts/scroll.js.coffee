@@ -8,7 +8,7 @@ class @Scroll
   infiniteScroll: (logging) =>
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
-    $(".wrap").infinitescroll({
+    ###$(".wrap").infinitescroll({
       navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
       nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
       itemSelector: ".box"                        # selector for all items you'll retrieve
@@ -16,9 +16,9 @@ class @Scroll
     (arrayOfNewElems) ->
       #window.Clip.removeClipEvents(true)
       #window.Clip.initButtons(true)
-    )
+    )###
 
-    ###$(window).scroll =>
+    $(window).scroll =>
       #console.log(@scrollReady)
       return if @scrollReady == false
 
@@ -40,5 +40,5 @@ class @Scroll
             console.log('failed')
             @scrollReady = true
         })
-    ###
+    ######
 

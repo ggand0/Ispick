@@ -13,10 +13,9 @@ $(document).on 'ready page:load', ->
 
 
   # Initialize infinite scroll
-  #component.infiniteScroll(true)
-  console.log('test')
-  scroll = new Scroll()
-  scroll.infiniteScroll(true)
+  component.infiniteScroll(true)
+  #scroll = new Scroll()
+  #scroll.infiniteScroll(true)
 
   # Display the calender (Datepicker)
   component.initCalender()
