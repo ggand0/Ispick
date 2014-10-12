@@ -22,4 +22,6 @@
 </p>
 
 <!-- image rendering starts from here -->
-<%= render partial: 'users/home_images', locals: { images: @images } %>
+<div ng-controller="ImageCtrl">
+  <%= render partial: 'users/home_images', locals: { images: @images } %>
+</div>

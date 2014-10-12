@@ -19,6 +19,9 @@ class Image < ActiveRecord::Base
       original: "600x800>"
     },
     default_url: lambda { |data| data.instance.set_default_url},
+    #url: ":hash.:extension",
+    #url: ":attachment/:id/:style/:basename.:extenstion",
+    #hash_secret: "ilovemadokasomuch",
     use_timestamp: false
 
   before_destroy :destroy_attachment

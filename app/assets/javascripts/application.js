@@ -12,8 +12,13 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require angular
+//= require angular-resource
+
 // require jquery.infinitescroll.min
-//= require infinity
+// require infinity
+//= require ng-infinite-scroll
+
 //= require jquery.remotipart
 //= require bootstrap
 //= require bootstrap-datepicker
