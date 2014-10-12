@@ -10,31 +10,13 @@ class @Component
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
-    ###$(".wrap").infinitescroll({
-      navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
-      nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
-      itemSelector: ".box"                        # selector for all items you'll retrieve
-    },
-    (arrayOfNewElems) ->
-      #window.Clip.removeClipEvents(true)
-      #window.Clip.initButtons(true)
-    )###
-    console.log(document.URL)
-    console.log(document.URL.indexOf('home'))
-    console.log(document.URL.indexOf('home') > -1)
-    #console.log(document.URL.indexOf('home') > -1)
-    #if window.action == 'home'
+
+
     if document.URL.indexOf('home') > -1
-      console.log('t')
+      console.log('fast scrolling with infinity.js')
       window.$el = $('.wrap')
       window.listView = new infinity.ListView(window.$el)
       window.scrollReady = true
-
-      $(window).on('popstate', (e)->
-        console.log("page transition occurred!")
-        #$el = $('.wrap')
-        #window.listView = new infinity.ListView($el)
-      )
 
       $(window).scroll ->
         console.log(window.scrollReady)
@@ -60,6 +42,17 @@ class @Component
               console.log('failed')
               window.scrollReady = true
           })
+    else# normal slow scroll in other pages
+      console.log('normal scrolling with infinite-scroll lib')
+      $(".wrap").infinitescroll({
+        navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
+        nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
+        itemSelector: ".box"                        # selector for all items you'll retrieve
+      },
+      (arrayOfNewElems) ->
+        #window.Clip.removeClipEvents(true)
+        #window.Clip.initButtons(true)
+      )
 
 
   initCalender: () ->
