@@ -4,7 +4,7 @@
 #= require 'component'
 #= require 'scroll'
 
-#ready = ->
+history.navigationMode = 'compatible'
 $(document).on 'ready page:load', ->
   component = new Component()
 
