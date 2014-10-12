@@ -120,9 +120,6 @@ group :test do
   gem 'webmock'
   gem 'fakeweb', '~> 1.3'
 end
-#group :assets do
-  gem 'angularjs-rails'
-#end
 
 group :development, :test do
 

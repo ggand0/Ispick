@@ -18,9 +18,9 @@ module UsersHelper
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_clip_button(image_id, size='btn-sm')
-    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image_id, id: "popover-board#{image_id}",
-      class: "popover-board btn-info #{size}" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image_id}"
+  def render_clip_button(image, size='btn-sm')
+    bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
+      class: "popover-board btn-info #{size}" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
   end
 
   # Renders a bootstrap button with the link.
@@ -42,8 +42,8 @@ module UsersHelper
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
-  def render_show_button(image_id, size='btn-sm')
-    bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image_id, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+  def render_show_button(image, size='btn-sm')
+    bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
      class: "btn-default #{size}"
   end
 
@@ -104,8 +104,8 @@ module UsersHelper
   #  DEBUG BUTTONS
   #  will be deleted
   # =================
-  def render_show_debug_button(image_id, size='btn-sm')
-    bs_button_to wrench_glyphicon, { controller: 'debug', action: 'show_debug', id: image_id, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+  def render_show_debug_button(image, size='btn-sm')
+    bs_button_to wrench_glyphicon, { controller: 'debug', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
       class: "btn-default #{size}"
   end
   def render_clip_debug_button(image)

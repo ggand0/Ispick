@@ -19,17 +19,17 @@ class @Component
       #window.Clip.removeClipEvents(true)
       #window.Clip.initButtons(true)
     )###
-
-    ###$el = $('.wrap')
-    window.listView = new infinity.ListView($el)
+    $el = $('.wrap')
+    listView = new infinity.ListView($el)
     window.scrollReady = true
     $(window).scroll ->
-      #console.log(window.scrollReady)
+      console.log(window.scrollReady)
+
       return if (window.scrollReady == false)
 
       url = $('nav.pagination a[rel=next]').attr('href')
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
-        $('.pagination').text("Fetching more images...")
+        $('.pagination').text("Fetching more products...")
         window.scrollReady = false
         $.getScript(url)
         $.ajax({
@@ -38,14 +38,13 @@ class @Component
           type: 'GET',
           dataType: 'html',
           success: (data) ->
-            console.log('success')
-            #window.listView.append($(data).find('.box'))
+            listView.append($(data).find('.box'))
             window.scrollReady = true
+
           failure: (data) ->
             console.log('failed')
             window.scrollReady = true
         })
-    $(window).scroll()###
 
 
   initCalender: () ->

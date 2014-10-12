@@ -1,6 +1,6 @@
 <% if @images.next_page %>
   $('.pagination').replaceWith('<%= j paginate @images %>');
-  //$('.pagination').hide();
+  $('.pagination').hide();
 <% else %>
   $('.pagination').remove();
 <% end %>

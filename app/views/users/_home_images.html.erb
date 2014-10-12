@@ -1,38 +1,7 @@
 <%= paginate images unless images.nil? %>
 
-<div id="images" class="wrap" infinite-scroll="image.nextPage()" infinite-scroll-distance="2">
-  <div ng-repeat='item in image.items'>
-    <div class="box">
-      <div class="boxInner">
-        <%# link_to image_tag('{{item.thumb}}'), { controller: 'images', action: 'show', id: '{{item.id}}', remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
-        <a data-remote="true" href="/images/{{item.id}}?data-target=%23modal-image&amp;data-toggle=modal"><img alt="" src={{item.thumb}} /></a>
-
-        <div class="titleBox">
-          <div class="id">{{item.id}}</div>
-          <%= button_group class: 'pull-right blocks' do %>
-            <%= render_clip_button('{{item.id}}') %>
-            <%= render_show_button('{{item.id}}') %>
-            <%= render_show_debug_button('{{item.id}}') %>
-          <% end %>
-          <br />
-        </div>
-
-        <div class="title">
-          {{item.title}}<br />
-          <div class="time-string">
-            <%# "CA: #{get_jst_string(image.created_at)}" %><br />
-            <%# "PA: #{get_jst_string(image.posted_at)}" %>
-            PA: {{item.posted_at}}
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-  </div>
-
-
-  <!--<% images.each_with_index do |image, index| %>
+<div class="wrap">
+  <% images.each_with_index do |image, index| %>
 
     <div class="box">
       <div class="boxInner">
@@ -41,9 +10,9 @@
         <div class="titleBox">
           <div class="id"><%= image.id %></div>
           <%= button_group class: 'pull-right blocks' do %>
-            <%= render_clip_button(image.id) %>
-            <%= render_show_button(image.id) %>
-            <%= render_show_debug_button(image.id) %>
+            <%= render_clip_button(image) %>
+            <%= render_show_button(image) %>
+            <%= render_show_debug_button(image) %>
           <% end %>
           <br />
         </div>
@@ -58,7 +27,7 @@
 
       </div>
     </div>
-  <% end %>-->
+  <% end %>
 </div>
 
 <%= paginate images %>
