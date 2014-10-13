@@ -98,13 +98,13 @@ module Scrape
         # デフォルトのパラメータで実行
         result = scrape_using_api(target_word)
         puts result.inspect
-        @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+        @logger.info Scrape.get_result_string(result)
 
         # 英語メインのサイトの場合は英名でも検索する
         if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
           # english=trueで呼ぶ
           result = scrape_using_api(target_word, nil, true, false, true)
-          @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+          @logger.info Scrape.get_result_string(result)
         end
 
         target_word.crawl_count += 1
@@ -251,7 +251,7 @@ module Scrape
         ActionMailer::Base.mail(
           :from => "noreply@ispicks.com",
           :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
-          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\n#{e.backtrace.join("\n")}"
+          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\nperson:#{target_word.person.inspect}\n\n#{e.backtrace.join("\n")}"
         ).deliver
       rescue => e
         #puts e.inspect

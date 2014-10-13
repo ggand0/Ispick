@@ -47,60 +47,52 @@ module Scrape
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
       @logger.debug "#{target_word.inspect}"
+      result_hash = Scrape.get_result_hash
+
       if english
         query = Scrape.get_query_en(target_word, 'roman')
       else
         query = Scrape.get_query_en(target_word, '')
       end
-      return if query.nil? or query.empty?
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
       @logger.info "query=#{query}"
 
 
-      duplicates = 0
-      skipped = 0
-      scraped = 0
-      avg_time = 0
-
       # Mecanizeによりクエリ検索結果のページを取得
       page = self.get_search_result(query)
-
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
       return if page.search("span[class='img_block_big']").count == 0
-      page.search("span[class='img_block_big']").each_with_index do |image, count|
 
-          # 広告又はR18画像はスキップ
+      page.search("span[class='img_block_big']").each_with_index do |image, count|
+        puts 'test'
+        # 広告又はR18画像はスキップ
         if image.children.search('img').first.nil?
-          skipped += 1
+          result_hash[:skipped] += 1
           next
         else
-            # サーチ結果ページから、ソースページのURLを取得
-         page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
+          # サーチ結果ページから、ソースページのURLを取得
+          page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
         end
 
-          # ソースページのパース
+        # ソースページのパース
         xml = Nokogiri::XML(open(page_url))
-          # ソースページから画像情報を取得してDBへ保存する
+
+        # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-
         image_data = self.get_data(xml, page_url)
-
-
-        options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: (not user_id.nil?)
-        }
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
         tags = self.get_tags_original(xml)
-        #@logger.debug tags.inspect
 
         # 保存に必要なものはimage_data, tags, validetion
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
-        avg_time += elapsed_time
+        result_hash[:avg_time] += elapsed_time
         @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
 
         # Resqueで非同期的に画像解析を行う
@@ -111,10 +103,11 @@ module Scrape
         end
 
         # @limit枚抽出したら終了
-        break if (count+1 - skipped) >= @limit
+        break if (count+1 - result_hash[:skipped]) >= @limit
       end
 
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
     # Mechanizeにより検索結果を取得
