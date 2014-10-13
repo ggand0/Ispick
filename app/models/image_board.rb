@@ -1,6 +1,6 @@
 class ImageBoard < ActiveRecord::Base
   belongs_to :user
-  has_many :favored_images
+  has_many :favored_images, dependent: :destroy
 
   validates_uniqueness_of :name, :scope => :user_id
 

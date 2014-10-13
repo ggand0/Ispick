@@ -1,5 +1,5 @@
 class FavoredImage < ActiveRecord::Base
-  has_many :favored_images_tags
+  has_many :favored_images_tags, dependent: :destroy
   has_many :tags, :through => :favored_images_tags
   belongs_to :image_board
   belongs_to :image
