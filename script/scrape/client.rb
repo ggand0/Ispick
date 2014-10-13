@@ -259,12 +259,12 @@ module Scrape
     # @param e [Exception]
     # @param module_type [String]
     # @param target_word [TargetWord]
-    def send_error_mail(e, module_type, target_word)
+    def send_error_mail(e, module_type, target_word, info=nil)
       begin
         ActionMailer::Base.mail(
           :from => "noreply@ispicks.com",
           :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
-          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\nperson:#{target_word.person.inspect}\n\n#{e.backtrace.join("\n")}"
+          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\nperson:#{target_word.person.inspect}\n\n#{e.backtrace.join("\n")}\n\ninfo:#{info}"
         ).deliver
       rescue => e
         @logger.error e.inspect
