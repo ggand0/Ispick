@@ -86,4 +86,12 @@ describe Scrape do
     end
   end
 
+  describe "remove_4bytes method" do
+    it "returns a string which 4byte strings are removed" do
+      string = '👍'
+      result = Scrape.remove_4bytes(string)
+      expect(result).to eq('')
+    end
+  end
+
 end
