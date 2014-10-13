@@ -8,9 +8,9 @@ describe Scrape::Nico do
   let(:limit) { 10 }
 
   before do
-    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
-    @agent = Scrape::Nico.get_client      # Mechanize agentの作成
+    IO.any_instance.stub(:puts)             # Surpress console outputs
+    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
+    @agent = Scrape::Nico.get_client        # Create a Mechanize agent
     @client = Scrape::Nico.new(nil, limit)
 
     url = 'http://seiga.nicovideo.jp/rss/illust/new'
@@ -53,31 +53,28 @@ describe Scrape::Nico do
     end
 
     it "skip if keyword arg is nil" do
-      Scrape::Nico.should_not_receive(:get_data)
+      expect(Scrape::Nico).not_to receive(:get_data)
       @client.scrape_using_api(nil)
     end
 
-    it "calls get_data function 'limit' times" do
-      Scrape::Nico.stub(:get_data).and_return({})
-
+    it "calls get_data function '@limit' times" do
       target_word = FactoryGirl.create(:word_with_person)
-      puts target_word.inspect
+      Scrape::Nico.stub(:get_data).and_return({})
       Scrape::Client.stub(:save_image).and_return(1)
-      result = @client.scrape_using_api(target_word)
-      puts result
-      Scrape::Nico.should_receive(:get_data).exactly(limit - result[:skipped]).times
 
-      Scrape::Client.should_receive(:save_image).exactly(limit - result[:skipped]).times
+      result = @client.scrape_using_api(target_word)
+      expect(Scrape::Nico).to receive(:get_data).exactly(limit - result[:skipped]).times
+      expect(Scrape::Client).to receive(:save_image).exactly(limit - result[:skipped]).times
 
       puts result = @client.scrape_using_api(target_word)
     end
 
     it "allows duplicates three times" do
-      Scrape::Nico.stub(:get_data).and_return({})
-      Scrape::Nico.should_receive(:get_data).exactly(3).times
-      Scrape::Client.stub(:save_image).and_return nil
-      Scrape::Client.should_receive(:save_image).exactly(3).times
       target_word = FactoryGirl.create(:word_with_person)
+      Scrape::Nico.stub(:get_data).and_return({})
+      Scrape::Client.stub(:save_image).and_return nil
+      expect(Scrape::Nico).to receive(:get_data).exactly(3).times
+      expect(Scrape::Client).to receive(:save_image).exactly(3).times
 
       @client.scrape_using_api(target_word)
     end

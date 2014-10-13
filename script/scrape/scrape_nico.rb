@@ -42,48 +42,44 @@ module Scrape
     end
 
     # Scrape images from nicoseiga, using its (probablly unofficial) API.
-     # キーワードからタグ検索してlimit分の画像を保存する
+    # キーワードからタグ検索してlimit分の画像を保存する
     # @param target_word [TargetWord] A TargetWord object to scrape.
     # @param user_id [Integer] An id value of certain user, if necessary.
     # @param validation [Boolean] Whether it needs to validate records or not.
     # @return verbose [Hash] Output verbose log when it's true.
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false)
+      result_hash = Scrape.get_result_hash
       query = Scrape.get_query target_word
-      return if query.nil? or query.empty?
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
+
       # Get the xml file with api response
       @logger.info "query=#{query}"
       agent = self.class.get_client
       url = "#{TAG_SEARCH_URL}?page=1&query=#{query}"
       escaped = URI.escape(url)
       xml = agent.get(escaped)
-      duplicates = 0
-      scraped = 0
-      skipped = 0
-      avg_time = 0
 
-       # 画像情報を取得してlimit枚DBヘ保存する
+      # 画像情報を取得してlimit枚DBヘ保存する
       xml.search('image').take(@limit).each_with_index do |item, count|
         begin
-          # 春画画像、クリップ数0をskip
+          # Skip adult images and ones that have 0 clip count
           if item.css('adult_level').first.content.to_i > 1 || item.css('clip_count').first.content.to_i == 0
-            skipped += 1
+            result_hash[:skipped] += 1
             next
           end
 
           start = Time.now
           image_data = self.class.get_data(item)             # APIの結果から画像情報取得
-          options = {
-            validation: validation,
-            large: false,
-            verbose: false,
-            resque: (not user_id.nil?)
-          }
+          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
           image_id = self.class.save_image(image_data, @logger, target_word, [ Scrape.get_tag(query) ], options)
 
-          duplicates += image_id ? 0 : 1
-          scraped += 1 if image_id
+          result_hash[:duplicates] += image_id ? 0 : 1
+          result_hash[:scraped] += 1 if image_id
           elapsed_time = Time.now - start
-          avg_time += elapsed_time
+          result_hash[:avg_time] += elapsed_time
 
           # Resqueで非同期的に画像解析を行う
           # 始めに画像をダウンロードし、終わり次第ユーザに配信
@@ -94,16 +90,17 @@ module Scrape
               target_word.class.name, target_word.id, @logger)
           end
 
-          break if duplicates >= 3
+          break if result_hash[:duplicates] >= 3
         rescue => e
           # 検索結果が0の場合など
           @logger.error e
           next
         end
-        break if count+1 >= limit
+        break if count+1 >= @limit
       end
 
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
     # Construct attributes of Image model basted on a HTML object

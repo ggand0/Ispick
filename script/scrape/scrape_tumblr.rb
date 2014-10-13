@@ -46,47 +46,41 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
+      result_hash = Scrape.get_result_hash
       if english
         query = Scrape.get_query_en(target_word, 'english')
       else
         query = Scrape.get_query_en(target_word, '')
       end
-      return if query.nil? or query.empty?
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
 
       @logger.info "query=#{query}"
       client = self.class.get_client
-      duplicates = 0
-      skipped = 0
-      scraped = 0
-      avg_time = 0
 
       # タグ検索：limitで指定された数だけ画像を取得
       client.tagged(query).each_with_index do |image, count|
-        # 画像のみを対象とする
+        # Scrape images only
         if image['type'] != 'photo'
-          skipped += 1
+          result_hash[:skipped] += 1
           next
         end
 
-
-        # API responseから画像情報を取得してDBへ保存する
+        # Retrieve data into a hash for creating a new Image record
         start = Time.now
         image_data = Scrape::Tumblr.get_data(image)
-        options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: (not user_id.nil?)
-        }
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
 
         # Save images to the database using parent's class method
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
 
-        # 抽出情報の更新
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
+        # Update the statistics numbers
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
-        avg_time += elapsed_time
+        result_hash[:avg_time] += elapsed_time
 
 
         # 登録直後の配信の場合は、ここでResqueで非同期的に画像解析を行う
@@ -97,12 +91,12 @@ module Scrape
             user_id, target_word.class.name, target_word.id, @logger)
         end
 
-        # limit枚抽出したら終了
-        #break if duplicates >= 3 # 検討中
-        break if (count+1 - skipped) >= limit
+        # Finish the loop after it scrapes @limit images
+        break if (count+1 - result_hash[:skipped]) >= @limit
       end
 
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
 

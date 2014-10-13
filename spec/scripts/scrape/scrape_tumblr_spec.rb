@@ -6,10 +6,9 @@ describe Scrape::Tumblr do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
   before do
-    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
+    IO.any_instance.stub(:puts)             # Surpress console outputs
+    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
     @client = Scrape::Tumblr.new(nil, 5)
-    #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
     @response = JSON.parse(response)['response']
     @logger = Logger.new('log/scrape_tumblr_cron.log')
   end
@@ -27,13 +26,9 @@ describe Scrape::Tumblr do
   describe "scrape_target_word method" do
     it "calls scrape_using_api method" do
       target_word = FactoryGirl.create(:word_with_person)
-      #puts Scrape::Tumblr.class
-      #puts Scrape::Tumblr.any_instance.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 }).inspect
-      @client.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 }) # => pass
+      @client.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
 
-      #client = Scrape::Tumblr.new
       expect(@client).to receive(:scrape_using_api)
-
       @client.scrape_target_word(1, target_word)
     end
   end
@@ -41,14 +36,15 @@ describe Scrape::Tumblr do
 
   describe "scrape_using_api function" do
     it "calls proper functions" do
+      target_word = FactoryGirl.create(:word_with_person)
       Tumblr::Client.any_instance.stub(:tagged).and_return(@response)
 
-      # get_data functionをmockすると何故かcallされなくなるので、save_imageのみ見る
-      #Scrape::Tumblr.should_receive(:get_data).exactly(5).times
-      Scrape::Client.should_receive(:save_image).exactly(5).times
-      target_word = FactoryGirl.create(:word_with_person)
-
-      @client.scrape_using_api(target_word)
+      expect(Scrape::Tumblr).to receive(:get_data).exactly(5).times.and_return({})
+      expect(Scrape::Client).to receive(:save_image).exactly(5).times.and_return(1)
+      result = @client.scrape_using_api(target_word)
+      expect(result).to be_a(Hash)
+      expect(result[:scraped]).to eq(5)
+      expect(result[:duplicates]).to eq(0)
     end
   end
 

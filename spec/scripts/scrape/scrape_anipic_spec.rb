@@ -7,7 +7,7 @@ describe Scrape::Anipic do
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
   before do
     IO.any_instance.stub(:puts)             # Surpress console outputs
-    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from executing
+    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
     @client = Scrape::Anipic.new(nil, 5)
     @response = JSON.parse(response)['response']
     @logger = Logger.new('log/scrape_tumblr_cron.log')
