@@ -1,12 +1,13 @@
 <div class="wrap">
   <% if @first %>
-    <div class="box top-description">
-      <div class="boxInner">
+    <div class="box">
+      <div class="boxInner top-description">
       <%= render partial: 'shared/top_description' %>
     </div></div>
 
-    <div class="box wrapper-oauth">
-      <div class="boxInner">
+    <div class="box">
+      <div class="boxInner wrapper-oauth">
+        <br />
       <div class="btn-group-vertical btn-group-sm btn-group-oauth">
         <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
         <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />

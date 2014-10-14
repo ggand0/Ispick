@@ -6,9 +6,14 @@
   float: none;
   margin: 0 auto;
 }
+.btn-group-oauth {
+  //width     : 200px;
+  width     : 80%;
+}
 .top-description {
   text-align: center;
-  background-color : #7ACECE;
+  background-color : #E4F5F5//#7ACECE;
+  //overflow:scroll;
   //margin: 0px;
   //padding-bottom: 20%;
   //padding: 5px;
@@ -42,7 +47,7 @@
   //margin    : 0px;
   //padding-bottom: 20%;
   //padding: 5px;
-  overflow  : hidden;
+  //overflow: scroll;
   z-index   : 9999;
 }
 .wrapper-sign-in {
@@ -69,10 +74,7 @@
   }
 }
 
-.btn-group-oauth {
-  width     : 250px;
-  //width     : 15%;
-}
+
 
 // styles for "Creating an account means you've accepted Term of Service and..."
 .warning{
