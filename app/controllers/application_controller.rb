@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
   before_filter :your_function
-  before_filter :set_cache_headers
+  #before_filter :set_cache_headers
   after_filter  :expire_for_development
 
   def authenticate_admin_user!
