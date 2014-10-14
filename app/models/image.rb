@@ -85,7 +85,7 @@ class Image < ActiveRecord::Base
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
-    Image.joins(:tags).where(tags: { name: query }).references(:tags)
+    Image.joins(:tags).where(tags: { name: query }).where.not(data_updated_at: nil).references(:tags)
   end
 
   # @param images [ActiveRecord::CollectionProxy]

@@ -24,7 +24,12 @@
 
     <div class="box">
       <div class="boxInner">
-        <%= image_tag(image.data.url(:thumb)) %>
+        <%# image_tag(image.data.url(:thumb)) %>
+        <% if image.page_url %>
+          <%= link_to image_tag(image.data.url), image.page_url.html_safe, :target => "_blank" %>
+        <% else %>
+          <%= link_to image_tag(image.data.url), image.src_url.html_safe, :target => "_blank" %>
+        <% end %>
 
         <div class="title">
           <%= image.title.to_s %><br />
