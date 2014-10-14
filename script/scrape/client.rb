@@ -98,13 +98,13 @@ module Scrape
         # デフォルトのパラメータで実行
         result = scrape_using_api(target_word)
         puts result.inspect
-        @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+        @logger.info Scrape.get_result_string(result)
 
         # 英語メインのサイトの場合は英名でも検索する
         if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
           # english=trueで呼ぶ
           result = scrape_using_api(target_word, nil, true, false, true)
-          @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+          @logger.info Scrape.get_result_string(result)
         end
 
         target_word.crawl_count += 1
@@ -113,7 +113,10 @@ module Scrape
     end
 
 
+    # Scrapes images by APIs. Used in child classes through overriding.
     # 派生クラスでoverrideして使う。
+    # @param target_word [TargetWord] A TargetWord object to scrape
+    # @return [Hash] The result of scraping
     def scrape_using_api(target_word)
       { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 }
     end
@@ -124,20 +127,22 @@ module Scrape
     # @param [Boolean] デバッグ出力を行うかどうか
     def detect_multiple_running(debug=false)
       unless @pid_debug
-        if PidFile.running? # PidFileが存在する場合はプロセスを終了する
+        # Finish the process if there is already a PidFile
+        # PidFileが存在する場合はプロセスを終了する
+        if PidFile.running?
           @logger.info 'Another process is already runnnig. Exit.'
           exit
         end
 
-        # PidFileが存在しない場合、新たにPidFileを作成し、
-        # 新たにプロセスが生成されるのを防ぐ
+        # If there aren't any PidFiles, create one and prevent any new processes from running
+        # PidFileが存在しない場合、新たにPidFileを作成し、新たにプロセスが生成されるのを防ぐ
         pid_hash = {
-          #pidfile: "#{module_type}.pid",
           pidfile: "#{self.class.name}.pid",
           piddir: "#{Rails.root}/tmp/pids"
         }
         p = PidFile.new(pid_hash)
 
+        # As default, PidFiles are created under /tmp directory.
         # デフォルトでは/tmp以下にPidFileが作成される
         @logger.debug 'PidFile DEBUG:'
         @logger.debug p.pidfile
@@ -158,6 +163,9 @@ module Scrape
       false
     end
 
+    # Checks if the given image is irrelavant or not
+    # @param image [Image] An Image object to examine
+    # @return [Boolean] Contains adult words or not
     def self.check_banned(image)
       return true if Obscenity.profane?(image.title)
       return true if Obscenity.profane?(image.caption)
@@ -185,9 +193,11 @@ module Scrape
         return
       end
 
-      # Remove 4 bytes chars
+      # Remove all 4 bytes characters
       # Because with the old version of the MySQL we cannot save them to any columns.
       attributes[:caption] = Scrape.remove_4bytes(attributes[:caption])
+      attributes[:title] = Scrape.remove_4bytes(attributes[:title])
+      attributes[:artist] = Scrape.remove_4bytes(attributes[:artist])
 
       # Create a new instance and associate tags
       image = Image.new attributes
@@ -199,10 +209,11 @@ module Scrape
       # Use src_url as original_url if the latter one is nil
       image.original_url = image.src_url if image.original_url.nil?
 
+      # Use 'save' method as it could fail frequently
       # 高頻度で失敗し得るのでsave!ではなくsaveを使用する
-      # ダウンロード・特徴抽出処理をgenerate_jobs内で非同期的に行う
       if image.save(validate: options[:validation])
 
+        # Associate the image to the TargetWord object
         # target_wordオブジェクトに関連づける
         # nilの場合(RSSのスクレイピング時等)は、後でスクリプトを走らせて別途関連づける
         target_word.images << image unless target_word.nil?
@@ -232,7 +243,6 @@ module Scrape
           Resque.enqueue(DownloadImageLarge, image_id, src_url,
             user_id, target_type, target_id)
         else
-          #logger.info "with #{user_id}: #{image_id}" if logger
           Resque.enqueue(DownloadImage, image_id, src_url,
             user_id, target_type, target_id)
         end
@@ -240,21 +250,23 @@ module Scrape
         if large
           Resque.enqueue(DownloadImageLarge, image_id, src_url)
         else
-          #logger.info "without #{user_id}: #{image_id}" if logger
           Resque.enqueue(DownloadImage, image_id, src_url)
         end
       end
     end
 
-    def send_error_mail(e, module_type, target_word)
+    # Send an email that indicates there was an error.
+    # @param e [Exception]
+    # @param module_type [String]
+    # @param target_word [TargetWord]
+    def send_error_mail(e, module_type, target_word, info=nil)
       begin
         ActionMailer::Base.mail(
           :from => "noreply@ispicks.com",
           :to => CONFIG['gmail_username'], :subject => "crawl_error #{module_type}",
-          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}"
+          :body => "#{e.inspect}\n\ntarget_word:#{target_word.inspect}\n\nperson:#{target_word.person.inspect}\n\n#{e.backtrace.join("\n")}\n\ninfo:#{info}"
         ).deliver
       rescue => e
-        #puts e.inspect
         @logger.error e.inspect
         @logger.error 'Sending an error email has failed!'
       end

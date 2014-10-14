@@ -10,15 +10,50 @@ class @Component
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
-    $(".wrap").infinitescroll({
-      navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
-      nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
-      itemSelector: ".box"                        # selector for all items you'll retrieve
-    },
-    (arrayOfNewElems) ->
-      #window.Clip.removeClipEvents(true)
-      #window.Clip.initButtons(true)
-    )
+
+
+    if document.URL.indexOf('home') > -1
+      console.log('fast scrolling with infinity.js')
+      window.$el = $('.wrap')
+      window.listView = new infinity.ListView(window.$el)
+      window.scrollReady = true
+
+      $(window).scroll ->
+        console.log(window.scrollReady)
+        return if window.scrollReady == false
+
+        url = $('nav.pagination a[rel=next]').attr('href')
+        if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
+          $('.pagination').text("Fetching more products...")
+          window.scrollReady = false
+          $.getScript(url)
+          $.ajax({
+            cache: false,
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: (data) ->
+              window.listView.append($(data).find('.box'))
+              count = window.listView.pages[0].items.length
+              console.log(count)
+              console.log(window.listView.pages[0].items[count-1])
+              window.scrollReady = true
+            failure: (data) ->
+              console.log('failed')
+              window.scrollReady = true
+          })
+    else# normal slow scroll in other pages
+      console.log('normal scrolling with infinite-scroll lib')
+      $(".wrap").infinitescroll({
+        navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
+        nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
+        itemSelector: ".box"                        # selector for all items you'll retrieve
+      },
+      (arrayOfNewElems) ->
+        #window.Clip.removeClipEvents(true)
+        #window.Clip.initButtons(true)
+      )
+
 
   initCalender: () ->
     #selector = "[data-behaviour~=datepicker]"

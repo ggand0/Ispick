@@ -1,3 +1,4 @@
+# The list is used by 'obscenity' gem. Rename this file to 'banned_words.yml' to get it work!
 - R18
 - cosplay
 - figure

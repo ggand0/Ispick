@@ -41,7 +41,7 @@ Ispick::Application.configure do
   }
 
   # Settings of exception_notification gem
-  # Uncomment if you need to debug this
+  # Uncomment this if you need to debug
 =begin
   config.middleware.use ExceptionNotification::Rack,
     :ignore_crawlers => %w{Googlebot bingbot},

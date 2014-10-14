@@ -15,6 +15,15 @@ describe User do
     credentials: OmniAuth::AuthHash.new({})
   })}
 
+  describe "association dependency" do
+    it "destroys tags_users when destroyed" do
+      user = FactoryGirl.create(:user_with_tags)
+      user.destroy
+      expect(TagsUser.count).to eq(0)
+      expect(Tag.count).to eq(5)
+    end
+  end
+
 
   describe "get_images method" do
     it "returns proper relation object" do

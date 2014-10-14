@@ -16,8 +16,6 @@ class User < ActiveRecord::Base
   has_many :likes, dependent: :destroy, counter_cache: :likes_count
 
   # has_many tags for making image feeds
-  #has_many :target_words_users, dependent: :destroy
-  #has_many :target_words, :through => :target_words_users
   has_many :tags_users, dependent: :destroy
   has_many :tags, :through => :tags_users
 

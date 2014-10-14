@@ -86,6 +86,7 @@ gem 'engtagger'
 gem 'letter_opener', group: :development              # Open emails on browser
 gem 'activeadmin', github: 'activeadmin'
 gem 'obscenity'
+gem 'fastimage'
 
 # Twitter Bootstrap gems
 gem 'bootstrap-sass', '~> 3.2.0'

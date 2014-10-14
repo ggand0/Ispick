@@ -1,9 +1,11 @@
 class Image < ActiveRecord::Base
   has_one :feature, as: :featurable
   has_many :favored_images
-  has_many :images_tags
+
+  has_many :images_tags, dependent: :destroy
   has_many :tags, :through => :images_tags
-  has_many :images_target_words
+
+  has_many :images_target_words, dependent: :destroy
   has_many :target_words, :through => :images_target_words
 
 
