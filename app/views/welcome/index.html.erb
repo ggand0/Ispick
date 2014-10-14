@@ -1,19 +1,17 @@
-<div class="container top">
-  <div class="row">
-    <div class="col-md-6 col-centered">
-      <%= render partial: 'shared/top_description' %>
-    </div>
-    <br />
-  </div>
+<!-- image rendering starts from here -->
+<div class="top_background">
+  <%= render partial: 'shared/render_images', locals: { images: @images } %>
 </div>
 
 <div class="container">
+  <br />
+  <br />
   <div class="row">
-      <div class="top-image col-md-5 col-sm-1 col-md-offset-2">
-        <%= link_to (image_tag asset_path('background0.png')), '/' %>
-      </div>
+    <div class="col-md-5 col-centered top-wrap">
+      <%= render partial: 'shared/top_description' %>
+      <br />
 
-      <div class="wrapper-oauth col-md-5 col-sm-1">
+      <div class="wrapper-oauth">
         <div class="btn-group-vertical btn-group-oauth">
           <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
           <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
@@ -26,8 +24,5 @@
         </div>
       </div>
 
-    </div>
   </div>
-<br />
-<br />
 </div>
