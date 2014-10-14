@@ -67,7 +67,6 @@ module Scrape
       return if page.search("span[class='img_block_big']").count == 0
 
       page.search("span[class='img_block_big']").each_with_index do |image, count|
-        puts 'test'
         # 広告又はR18画像はスキップ
         if image.children.search('img').first.nil?
           result_hash[:skipped] += 1
@@ -180,14 +179,14 @@ module Scrape
     # @return [Hash]
     def get_data(xml, page_url)
       # titleの取得
-        # 改行の除去
+      # 改行の除去
       title = xml.css("div[class='post_content']").css("h1").first.content.gsub!(/\n/,'')
-        # タブのスペースへの変換
+      # タブのスペースへの変換
       title.gsub!(/\t/,' ')
       # captionの取得
-        # 改行の除去
+      # 改行の除去
       caption = xml.css('title').first.content.gsub!(/\n/,'')
-        # タブのスペースへの変換
+      # タブのスペースへの変換
       caption.gsub!(/\t/,' ')
 
       # posted_atの取得( 8/13/14, 7:26 PM\n\t\t)
@@ -218,6 +217,11 @@ module Scrape
 
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
+
+      # Get resolution
+      resolution = xml.css("div[class='post_content']").first.css('b')[4].next_element.content
+      size = resolution.split('x')
+
       hash = {
         title: title,
         caption: caption,
@@ -226,6 +230,8 @@ module Scrape
         original_view_count: nil,
         src_url: src_url,
         original_url: original_url,
+        original_width: size[0],
+        original_height: size[1],
         original_favorite_count: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',

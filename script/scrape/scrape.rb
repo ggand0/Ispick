@@ -106,7 +106,7 @@ module Scrape
   end
 
   def self.get_result_hash
-    { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0 }
+    { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: 'none' }
   end
 
   def self.get_result_string(result)

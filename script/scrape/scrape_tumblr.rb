@@ -170,6 +170,8 @@ module Scrape
         src_url: image['photos'].first['alt_sizes'][0]['url'],
         page_url: image['post_url'],
         posted_at: image['date'],
+        original_width: image['photos'].first['original_size']['width'],
+        original_height: image['photos'].first['original_size']['height'],
         original_view_count: nil,
 
         #original_favorite_count: self.get_original_favorite_count(image['post_url']),
