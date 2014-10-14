@@ -108,16 +108,20 @@ module Scrape
     # @return [Hash] Attributes of Image model
     def self.get_data(item)
       nico_image_id = item.css('id').first.content
+      src_url = "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i"
+      size = FastImage.size(src_url)
+
       {
         artist: item.css('nickname').first.content,
         poster: nil,
         title: item.css('title').first.content,
         caption: item.css('description').first.content,
-        src_url: "http://lohas.nicoseiga.jp/thumb/#{nico_image_id}i",
+        src_url: src_url,
         page_url: "http://seiga.nicovideo.jp/seiga/im#{nico_image_id}",
         #original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
         original_url: src_url,
-
+        original_width: size[0],
+        original_height: size[1],
         original_view_count: item.css('view_count').first.content,
         original_favorite_count: item.css('clip_count').first.content,
         # Parse JST posted_at datetime to utc

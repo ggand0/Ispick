@@ -68,7 +68,10 @@ describe Scrape::Tumblr do
       }
 
       image_data = Scrape::Tumblr.get_data(image)
+      puts image_data.inspect
       expect(image_data).to be_a(Hash)
+      expect(image_data[:original_width]).to eq(697)
+      expect(image_data[:original_height]).to eq(981)
     end
   end
 

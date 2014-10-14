@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/client"
 
 describe Scrape::Nico do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
-  let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
+  #let(:xml) { IO.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml')) }
   let(:limit) { 10 }
 
   before do
@@ -13,10 +13,15 @@ describe Scrape::Nico do
     @agent = Scrape::Nico.get_client        # Create a Mechanize agent
     @client = Scrape::Nico.new(nil, limit)
 
-    url = 'http://seiga.nicovideo.jp/rss/illust/new'
-    xml = Nokogiri::XML(open(url))
-    item = xml.css('item')[0]
-    @page_url = item.css('link').first.content
+    stream = File.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml'))
+    uri = 'http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=鹿目まどか1'
+    FakeWeb.register_uri(:get,
+      URI.escape(uri),
+      body: stream,
+      content_type: 'text/xml')
+    xml = Nokogiri::XML(open(URI.escape(uri)))
+    @item = xml.search('image')[0]
+    @page_url =  'http://seiga.nicovideo.jp/seiga/im3063004'
   end
 
   describe "scrape method" do
@@ -41,7 +46,9 @@ describe Scrape::Nico do
     end
   end
 
+
   describe "scrape_using_api function" do
+=begin
     before do
       stream = File.read(Rails.root.join('spec', 'fixtures', 'nico_api_response.xml'))
       #uri = 'http://seiga.nicovideo.jp/api/tagslide/data?page=1&query=まどかわいい'
@@ -51,6 +58,7 @@ describe Scrape::Nico do
         body: stream,
         content_type: 'text/xml')
     end
+=end
 
     it "skip if keyword arg is nil" do
       expect(Scrape::Nico).not_to receive(:get_data)
@@ -59,6 +67,7 @@ describe Scrape::Nico do
 
     it "calls get_data function '@limit' times" do
       target_word = FactoryGirl.create(:word_with_person)
+      #Scrape.stub(:get_query).and_return('Madoka Kaname')
       Scrape::Nico.stub(:get_data).and_return({})
       Scrape::Client.stub(:save_image).and_return(1)
 
@@ -80,6 +89,16 @@ describe Scrape::Nico do
     end
   end
 
+  describe "get_data method" do
+    it "returns a hash that has valid attributes" do
+      result = Scrape::Nico.get_data(@item)
+      puts result.inspect
+      expect(result).to be_a(Hash)
+      expect(result[:site_name]).to eq('nicoseiga')
+      expect(result[:original_width]).to eq(443)
+      expect(result[:original_height]).to eq(600)
+    end
+  end
 
 
   describe "get_contents method" do
@@ -91,14 +110,14 @@ describe Scrape::Nico do
       Rails.logger.should_receive(:info)
       Scrape::Client.should_not_receive(:save_image)
 
-      Scrape::Nico.get_contents(url, @agent, @title)
+      Scrape::Nico.get_contents(url, @client, @title)
     end
 
     it "ignores adulut pages" do
       page_url = 'http://seiga.nicovideo.jp/seiga/im3833006'
 
       Scrape.should_not_receive(:save_image)
-      Scrape::Nico.get_contents(page_url, @agent, @title)
+      Scrape::Nico.get_contents(page_url, @client, @title)
     end
   end
 
