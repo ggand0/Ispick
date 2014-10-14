@@ -6,7 +6,13 @@
   float: none;
   margin: 0 auto;
 }
-
+.top-description {
+  text-align: center;
+  background-color : #7ACECE;
+  //margin: 0px;
+  //padding-bottom: 20%;
+  //padding: 5px;
+}
 .top-image {
   text-align: center;
   width     : 500px;
@@ -27,13 +33,15 @@
 }
 .wrapper-oauth {
   text-align: center;
-  display: block;
-  width     : 300px;
-  height    : 300px;
+  //display: block;
+  font-size: 8px;
+  line-height: 10px;
+  //width     : 300px;
+  //height    : 250px;
   background-color : #7ACECE;
-  margin    : auto;
-  padding   : 10px;
-  border    : 10px;
+  //margin    : 0px;
+  //padding-bottom: 20%;
+  //padding: 5px;
   overflow  : hidden;
   z-index   : 9999;
 }
@@ -62,7 +70,8 @@
 }
 
 .btn-group-oauth {
-  width     : 280px;
+  width     : 250px;
+  //width     : 15%;
 }
 
 // styles for "Creating an account means you've accepted Term of Service and..."

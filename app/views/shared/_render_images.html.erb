@@ -1,4 +1,25 @@
 <div class="wrap">
+  <% if @first %>
+    <div class="box top-description">
+      <div class="boxInner">
+      <%= render partial: 'shared/top_description' %>
+    </div></div>
+
+    <div class="box wrapper-oauth">
+      <div class="boxInner">
+      <div class="btn-group-vertical btn-group-sm btn-group-oauth">
+        <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
+        <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
+        <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
+        <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
+      </div>
+      <%= render partial: 'shared/warning' %>
+      <div align="center">
+        <%= bs_button_to 'Log in', '/signin_with_password', class: 'btn-sm btn-default' %>
+      </div>
+    </div></div>
+  <% end %>
+
   <% images.each_with_index do |image, index| %>
 
     <div class="box">
@@ -17,3 +38,5 @@
     </div>
   <% end %>
 </div>
+
+<%= paginate images %>
