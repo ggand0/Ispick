@@ -56,7 +56,7 @@
   }
   &:hover {
     color: #000;
-    background-color: #E4F5F5;
+    //background-color: #E4F5F5;
     text-decoration: underline;
   }
 }
@@ -73,7 +73,7 @@
 .warning a {
   &:hover {
     color: #000;
-    background-color: #E4F5F5;
+    //background-color: #E4F5F5;
     text-decoration: underline;
   }
 }
@@ -85,7 +85,7 @@
 }
 .top_background {
   background-size: contain;
-  //background-image:url('http://666a658c624a3c03a6b2-25cda059d975d2f318c03e90bcf17c40.r92.cf1.rackcdn.com/unsplash_527bf56961712_1.JPG');
+  background-image:url('background.png');
   display: block;
   //width: 1200px;
   height: 800px;
@@ -96,10 +96,10 @@
   z-index: -1;
   margin: -5px -10px -10px -5px;
 
-  -webkit-filter: blur(5px);
+  -webkit-filter: blur(3px);
   -moz-filter: blur(5px);
   -o-filter: blur(5px);
   -ms-filter: blur(5px);
-  filter: blur(5px);
+  filter: blur(3px);
 }
 
