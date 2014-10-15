@@ -15,6 +15,7 @@
 
 //= require jquery.infinitescroll.min
 //= require infinity
+//= require masonry.pkgd.min
 
 //= require jquery.remotipart
 //= require bootstrap

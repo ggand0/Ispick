@@ -7,6 +7,14 @@ class @Component
       $(this).parents('.boxInner').addClass('hovered')
     )
 
+  masonry: () ->
+    $container = $('.wrap')
+    $container.masonry(
+      #columnWidth: 200,
+      itemSelector: '.box'
+    )
+
+
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
@@ -34,6 +42,7 @@ class @Component
             dataType: 'html',
             success: (data) ->
               window.listView.append($(data).find('.box'))
+              #$(".wrap").masonry( 'appended', $(data).find('.box') )
               count = window.listView.pages[0].items.length
               console.log(count)
               console.log(window.listView.pages[0].items[count-1])
@@ -43,15 +52,20 @@ class @Component
               window.scrollReady = true
           })
     else# normal slow scroll in other pages
+      @.masonry()
+
       console.log('normal scrolling with infinite-scroll lib')
       $(".wrap").infinitescroll({
         navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
         nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
         itemSelector: ".box"                        # selector for all items you'll retrieve
+        loading: {
+          img: 'http://i.imgur.com/6RMhx.gif'
+        }
       },
-      (arrayOfNewElems) ->
-        #window.Clip.removeClipEvents(true)
-        #window.Clip.initButtons(true)
+      (newElements) ->
+        $newElems = $( newElements )
+        $(".wrap").masonry( 'appended', $newElems )
       )
 
 
