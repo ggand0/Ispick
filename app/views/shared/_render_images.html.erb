@@ -1,31 +1,25 @@
+<!-- A version of embedding description and login form as boxes. -->
 <div class="wrap">
+  <!-- Render description box and login form box only at the first time -->
   <% if @first %>
     <div class="box">
       <div class="boxInner top-description">
       <%= render partial: 'shared/top_description' %>
-    </div></div>
+      </div>
+    </div>
 
     <div class="box">
       <div class="boxInner wrapper-oauth">
         <br />
-      <div class="btn-group-vertical btn-group-sm btn-group-oauth">
-        <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
-        <%= bs_button_to 'Continue with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
+        <%= render partial: 'shared/top/wrapper_oauth' %>
       </div>
-      <%= render partial: 'shared/warning' %>
-      <div align="center">
-        <%= bs_button_to 'Log in', '/signin_with_password', class: 'btn-sm btn-default' %>
-      </div>
-    </div></div>
+    </div>
   <% end %>
 
+  <!-- Render images as usual -->
   <% images.each_with_index do |image, index| %>
-
     <div class="box">
       <div class="boxInner">
-        <%# image_tag(image.data.url(:thumb)) %>
         <% if image.page_url %>
           <%= link_to image_tag(image.data.url), image.page_url.html_safe, :target => "_blank" %>
         <% else %>
@@ -35,14 +29,16 @@
         <div class="title">
           <%= image.title.to_s %><br />
           <div class="time-string">
-            <%# "CA: #{get_jst_string(image.created_at)}" %><br />
-            <%= "PA: #{get_jst_string(image.posted_at)}" %>
+            <br />
+            <%= "Posted at: #{get_jst_string(image.posted_at)}" %>
           </div>
         </div>
 
       </div>
     </div>
   <% end %>
+
 </div>
 
+<!-- Render pagination nav used for infinite scrolling -->
 <%= paginate images %>
