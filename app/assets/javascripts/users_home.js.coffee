@@ -12,6 +12,7 @@ $(document).on 'ready page:load', ->
   component.initButtons()
 
 
+
   # Initialize infinite scroll
   component.infiniteScroll(true)
   #scroll = new Scroll()

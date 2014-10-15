@@ -8,12 +8,18 @@ class @Component
     )
 
   masonry: () ->
-    $container = $('.wrap')
-    $container.masonry(
-      #columnWidth: 200,
-      itemSelector: '.box'
+    $container = $('#wrapper')
+    $container.masonry( ->
+       itemSelector: '.image',
+       #gutterWidth: 66,
+       animate: true,
+       columnWidth: 200;
     )
-
+    # call the layout method after all elements have been loaded
+    $container.imagesLoaded( ->
+      $container.masonry()
+    )
+    $container.masonry()
 
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
@@ -55,17 +61,21 @@ class @Component
       @.masonry()
 
       console.log('normal scrolling with infinite-scroll lib')
-      $(".wrap").infinitescroll({
+      $("#wrapper").infinitescroll({
         navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
         nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
-        itemSelector: ".box"                        # selector for all items you'll retrieve
-        loading: {
-          img: 'http://i.imgur.com/6RMhx.gif'
-        }
+        itemSelector: ".image"                        # selector for all items you'll retrieve
+        #loading: {
+        #  img: 'http://i.imgur.com/6RMhx.gif'
+        #}
       },
       (newElements) ->
         $newElems = $( newElements )
-        $(".wrap").masonry( 'appended', $newElems )
+        $container = $("#wrapper")
+        $container.masonry( 'appended', $newElems )
+        $container.imagesLoaded( ->
+          $container.masonry()
+        )
       )
 
 

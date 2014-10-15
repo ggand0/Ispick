@@ -1,29 +1,32 @@
-<!-- A version of embedding description and login form as boxes. -->
-<div class="wrap">
-  <!-- Render description box and login form box only at the first time -->
+<div class="container-fluid">
   <% if @first %>
-    <div class="box">
-      <div class="boxInner top-description">
+    <div class="t">
+      <div class="top-description">
       <%= render partial: 'shared/top_description' %>
-      </div>
     </div>
 
-    <div class="box">
-      <div class="boxInner wrapper-oauth">
+    <div class="t">
+      <div class="wrapper-oauth">
         <br />
         <%= render partial: 'shared/top/wrapper_oauth' %>
       </div>
     </div>
   <% end %>
+</div>
+
+<!-- A version of embedding description and login form as boxes. -->
+<div id="wrapper">
+  <!-- Render description box and login form box only at the first time -->
+
 
   <!-- Render images as usual -->
   <% images.each_with_index do |image, index| %>
-    <div class="box">
-      <div class="boxInner">
+    <div class="image">
+
         <% if image.page_url %>
-          <%= link_to image_tag(image.data.url), image.page_url.html_safe, :target => "_blank" %>
+          <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
         <% else %>
-          <%= link_to image_tag(image.data.url), image.src_url.html_safe, :target => "_blank" %>
+          <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
         <% end %>
 
         <div class="title">
@@ -34,7 +37,7 @@
           </div>
         </div>
 
-      </div>
+      <!--<div class="boxInner"></div>-->
     </div>
   <% end %>
 
