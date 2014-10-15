@@ -1,0 +1,23 @@
+<div class="btn-group-vertical btn-group-oauth">
+  <%= button_group do %>
+    <%= bs_button_to 'Log in with Facebook', user_omniauth_authorize_path(:facebook), class: "btn-xs btn-default btn-block" %><br />
+    <%= bs_button_to 'Log in with Twitter', user_omniauth_authorize_path(:twitter), class: "btn-xs btn-default btn-block" %><br />
+    <%= bs_button_to 'Log in with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn-xs btn-default btn-block" %><br />
+</div>
+    <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name), class: "well" do |f| %>
+    <div class="line">
+      <%= f.email_field :email, autofocus: true, placeholder: 'email', hide_label: :true, class: "input-sm" %>
+      </div>
+    <div class="line">
+      <%= f.password_field :password, autocomplete: 'off', placeholder: 'password', hide_label: :true, class: "input-sm" %>
+    </div>
+      <%= f.submit 'Log in', class: "btn-default btn-sm input-sm" %>
+    <% end %>
+
+  <% end %>
+
+
+<div class="link-sign-in" align="center">
+  <%= link_to 'Forgot password?', '/reset_password' %> /
+  <%= link_to 'Sign up', signup_welcome_path %>
+</div>

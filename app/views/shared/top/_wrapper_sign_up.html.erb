@@ -1,0 +1,12 @@
+<div class="btn-group-vertical btn-group-oauth">
+  <%= button_group do %>
+    <%= bs_button_to 'Create an account with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Create an account with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Create an account with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to 'Create an account with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
+  <% end %>
+</div>
+<%= render partial: 'shared/warning' %>
+<div align="center">
+  <%= bs_button_to 'Log in', '/signin_with_password', class: 'btn-mini btn-default' %>
+</div>
