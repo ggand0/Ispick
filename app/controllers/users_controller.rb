@@ -55,7 +55,7 @@ class UsersController < ApplicationController
     # TMP FEATURE
     images = images.where.not(site_name: 'nicoseiga') if params[:nico]
 
-    @images = images.page(params[:page]).per(25)
+    @images = images.page(params[:page]).per(10)
     @images_all = images
   end
 

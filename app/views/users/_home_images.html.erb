@@ -1,6 +1,6 @@
 <%# paginate images unless images.nil? %>
 
-<div class="wrap">
+<!--<div class="wrap">
   <% images.each_with_index do |image, index| %>
 
     <div class="box">
@@ -28,6 +28,21 @@
       </div>
     </div>
   <% end %>
+</div>
+-->
+<div class="wrapper">
+  <% images.each_with_index do |image, index| %>
+    <div class="block">
+      <% if image.page_url %>
+          <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
+        <% else %>
+          <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
+        <% end %>
+    </div>
+  <% end %>
+</div>
+<div class="loader">
+  <%= image_tag asset_path('loading.gif')%>
 </div>
 
 <%= paginate images %>

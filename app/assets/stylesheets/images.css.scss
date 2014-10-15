@@ -8,6 +8,18 @@
   //position:relative;
   height: auto;
 }
+.block {
+  position: absolute;
+  //background: #eee;
+  //padding: 20px;
+  width: 300px;
+  height: auto;
+  //border: 1px solid #ddd;
+}
+.loader {
+  text-align: center;
+  z-index: 3;
+}
 
 // デバッグ用の画像一覧ページで使用。
 // Classes used at 'View all images' page (for debugging)

@@ -47,7 +47,7 @@ class @Component
             type: 'GET',
             dataType: 'html',
             success: (data) ->
-              window.listView.append($(data).find('.box'))
+              window.listView.append($(data).find('.i'))
               #$(".wrap").masonry( 'appended', $(data).find('.box') )
               count = window.listView.pages[0].items.length
               console.log(count)

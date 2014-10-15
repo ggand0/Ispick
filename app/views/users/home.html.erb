@@ -9,7 +9,34 @@
 <!-- Render images and the dropdown for filtering them -->
 <p>
   <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
-  <%= bs_dropdown_button_to list_glyphicon do %>
+
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <div class="dropdown">
+    <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-primary" data-target="#" href="/page.html">
+        Dropdown <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+      <li><a href="#">Some action</a></li>
+      <li><a href="#">Some other action</a></li>
+      <li class="divider"></li>
+      <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Hover me for more options</a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" href="#">Second level</a></li>
+          <li class="dropdown-submenu">
+            <a href="#">Even More..</a>
+            <ul class="dropdown-menu">
+                <li><a href="#">3rd level</a></li>
+              <li><a href="#">3rd level</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Second level</a></li>
+          <li><a href="#">Second level</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
     Filter by date
     <div class="input-group date" style="width: 200px;" align="right">
       <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
@@ -17,7 +44,16 @@
     <li role="presentation" class="divider"></li>
     <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
     <li><%= link_to 'No nicoseiga(test)', home_users_path(nico: true) %></li>
-  <% end %>
+    <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
+    <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Hover me for more options</a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" href="#">Second level</a></li>
+        </ul>
+    </li>
+  </ul>
+    <%# end %>
+
   <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>
 
