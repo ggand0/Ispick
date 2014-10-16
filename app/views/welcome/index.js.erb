@@ -1,0 +1,8 @@
+<% if @images.next_page %>
+  $('.pagination').replaceWith('<%= j paginate @images %>');
+  $('.pagination').hide();
+  console.log('INDEX JS YES');
+<% else %>
+  $('.pagination').remove();
+  console.log('INDEX JS NO');
+<% end %>

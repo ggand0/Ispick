@@ -154,7 +154,9 @@ class @Scroll
       #console.log(window.scrollReady)
       return if window.scrollReady == false
       url = $('nav.pagination a[rel=next]').attr('href')
+      console.log(url)
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
+        console.log('Fetching...')
         $('.pagination').text("Fetching more products...")
         window.scrollReady = false
         $.getScript(url)
