@@ -13,7 +13,9 @@ namespace :util do
       limit = 1000
     end
     Image.last(limit).each do |image|
+      next if image.data_updated_at.nil?
       image.data.reprocess! :thumb
+      #image.save_image_dimensions
       puts "#{image.id} thumb refreshed."
       #break if count >= limit
     end

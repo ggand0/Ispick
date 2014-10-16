@@ -23,7 +23,6 @@ class Tag < ActiveRecord::Base
   # @param size [Integer]
   def self.get_tags_with_images(size)
     Tag.where.not(images_count: 0).order('images_count DESC').limit(size)
-    #Tag.order('images_count DESC').limit(size)
   end
 
   # Get images which refers this record.
