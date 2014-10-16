@@ -22,3 +22,5 @@
 //= require bootstrap
 //= require bootstrap-datepicker
 //= require turbolinks
+
+//= require users_home

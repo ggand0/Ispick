@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'users_home' %>
+<%# javascript_include_tag 'users_home' %>
 <%= javascript_include_tag 'core' %>
 <%= stylesheet_link_tag 'users' %>
 <%= stylesheet_link_tag 'images_detail' %>
@@ -7,6 +7,7 @@
 
 
 <!-- Render images and the dropdown for filtering them -->
+<%# asset_path('round_loader_mini.gif') %>
 <p>
   <%= bs_dropdown_button_to 'Filters' do %>
     Filter by date

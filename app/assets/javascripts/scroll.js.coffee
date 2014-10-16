@@ -3,6 +3,21 @@ Array.min = (array) ->
 Array.max = (array) ->
   return Math.max.apply(Math, array)
 
+getNatural = ($mainImage) ->
+  mainImage = $mainImage[0]
+  d = {}
+
+  #if mainImage.naturalWidth === undefined
+  if mainImage.naturalWidth is undefined
+    i = new Image()
+    i.src = mainImage.src
+    d.oWidth = i.width
+    d.oHeight = i.height
+  else
+    d.oWidth = mainImage.naturalWidth
+    d.oHeight = mainImage.naturalHeight
+  return d
+
 
 
 class @Scroll
@@ -13,6 +28,7 @@ class @Scroll
     @margin=20
     @windowWidth=0
     window.blocks=[]
+    window.promisesArray=[]
     @counter = 0
 
   masonry: () ->
@@ -45,6 +61,27 @@ class @Scroll
       window.blocks.push(defHeight)
     console.log(window.blocks)
 
+  getImageHeight: (img, index, min, margin)=>
+    deferred = new $.Deferred()
+    height=0
+    console.log(index+' '+min+' '+margin)
+    #console.log(img)
+    #console.log($(img).height())
+    $(img).on('load', ()->
+      height = $(this).height()
+      #return deferred.resolve(height)
+      console.log(height)
+      window.blocks[index] = min+height+margin
+
+      deferred.resolve({ height: height })
+      #return deferred.promise(height)
+    ).each( ->
+      $(this).load() if (this.complete)
+    )
+    #return deferred.promise(height)
+    window.promisesArray.push(deferred.promise)
+
+
   initPositionBlocks: ()=>
     self = @
     $('.block').each(()->
@@ -56,7 +93,35 @@ class @Scroll
         'top':min+'px'
       })
       $(this).show()
-      window.blocks[index] = min+$(this).outerHeight()+self.margin
+
+      $img = $(this).find('img')
+      height = $img.height()
+      ###console.log(self.getImageHeight)
+      self.getImageHeight($img, index, min, self.margin).then(()->
+        console.log('d')
+
+      )###
+      console.log(height)
+      window.blocks[index] = min+height+self.margin
+      #console.log($img.height())
+      ###deferred = new $.Deferred()
+      deferred.then(->
+        $img.on('load', ->
+          console.log('test')
+          height = $(this).height()
+          console.log(index+' '+min+' '+self.margin)
+          console.log(height)
+          window.blocks[index] = min+height+self.margin
+         # deferred.resolve()
+        ).each(->
+          $(this).load() if(this.complete)
+        )
+      )
+      ###
+
+      #height = @.getImageHeight($img)
+      #console.log(height)
+      #window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks)
 

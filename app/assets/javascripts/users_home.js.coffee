@@ -4,35 +4,27 @@
 #= require 'component'
 #= require 'scroll'
 
-history.navigationMode = 'compatible'
+#history.navigationMode = 'compatible'
 
-
+#$(window).load(()
 $(document).on 'ready page:load', ->
+  $(window).load(()->
+    console.log('window\'s been loaded!')
+  )
+
+  imgLoad = imagesLoaded($('.wrapper'))
+  imgLoad.on( 'progress', ( instance, image ) ->
+    result = image.isLoaded ? 'loaded' : 'broken'
+    console.log( 'image is ' + result + ' for ' + image.img.src )
+  )
   console.log('loaded'+window.loaded)
-  $(window).on('popState', (event)->
-    console.log('POPSTATE')
-    window.loaded = false
-  )
-  $(window).on('pushState', (event)->
-    console.log('PUSHSTATE')
-    window.loaded = false
-  )
-  $(window).on('hashchange',()->
-    console.log('HASHCHANGE')
-    window.loaded = false
-  )
-  $('body').on('hashchange',()->
-    console.log('HASHCHANGE')
-    window.loaded = false
-    ''
-  )
   console.log($('.wrapper').length)
   console.log($('.block').length)
   return if $('.wrapper').length==0
 
-  if window.loaded
-    $('.wrapper').unbind()
-    $(document).add('*').off()
+  #if window.loaded
+    #$('.wrapper').unbind()
+    #$(document).add('*').off()
     #window.$el = $('.wrapper')
     #window.listView = new infinity.ListView(window.$el)
     #window.scrollReady = true
