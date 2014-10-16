@@ -12,11 +12,15 @@ namespace :util do
     else
       limit = 1000
     end
-    Image.last(limit).each do |image|
+    Image.limit(limit).each do |image|
       next if image.data_updated_at.nil?
-      image.data.reprocess! :thumb
-      #image.save_image_dimensions
-      puts "#{image.id} thumb refreshed."
+      begin
+        image.data.reprocess! :thumb
+        puts "#{image.id} thumb refreshed."
+      rescue => e
+        puts "#{image.id} thumb refresh failed."
+      end
+
       #break if count >= limit
     end
   end
