@@ -9,6 +9,7 @@
 <!-- Render images and the dropdown for filtering them -->
 <p>
   <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
+</p>
 
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <div class="dropdown">
@@ -42,6 +43,7 @@
       </li>
     </ul>
   </div>
+  <br />
 
 <!-- image rendering starts from here -->
 <%= render partial: 'users/home_images', locals: { images: @images } %>
