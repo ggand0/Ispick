@@ -44,12 +44,18 @@ class UsersController < ApplicationController
     else
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
+      images.reorder!('original_favorite_count DESC') if params[:fav]
     end
 
     # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
       images = Image.filter_by_date(images, date)
+    end
+
+    # Filter images by sites
+    if params[:site]
+      images = Image.filter_by_date(images, params[:site])
     end
 
     # TMP FEATURE

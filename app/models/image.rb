@@ -33,7 +33,8 @@ class Image < ActiveRecord::Base
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
 
-  TARGET_SITES = ['tumblr', 'anime-pictures']
+  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga']
+  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga']
 
   # @return [String] デフォルトでattachmentに設定される画像のpath
   def set_default_url
@@ -105,6 +106,13 @@ class Image < ActiveRecord::Base
   # @return [ActiveRecord::CollectionProxy]
   def self.filter_by_date(images, date)
     images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+  end
+
+  # @param images [ActiveRecord::CollectionProxy]
+  # @param date [Date] date
+  # @return [ActiveRecord::CollectionProxy]
+  def self.filter_by_date(images, site)
+    images.where(site_name: site)
   end
 
   # Return images which is filtered by is_illust data.
