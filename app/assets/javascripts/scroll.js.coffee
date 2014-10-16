@@ -81,6 +81,39 @@ class @Scroll
     #return deferred.promise(height)
     window.promisesArray.push(deferred.promise)
 
+  doTask: (i, next)=>
+    console.log('doTasks')
+    self = @
+    min = Array.min(window.blocks)
+    index = $.inArray(min, window.blocks)
+    leftPos = self.margin+(index*(self.colWidth+self.margin))
+
+    block = $('.block').eq(i)
+    block.css({
+      'left':leftPos+'px',
+      'top':min+'px'
+    })
+    block.show()
+    $img = block.find('img')
+    console.log($img)
+    console.log(next)
+    $img.on('load', ()->
+      height = $(this).height()
+      console.log(height)
+      window.blocks[index] = min+height+self.margin
+      next()
+    )
+    time = Math.floor(Math.random()*3000)
+    setTimeout(->
+      height = $(this).height()
+      console.log(height)
+      window.blocks[index] = min+height+self.margin
+      next()
+    ,time)
+  createTask: (num)=>
+    return (next)=>
+      @.doTask(num, next)
+
 
   initPositionBlocks: ()=>
     self = @
@@ -93,37 +126,28 @@ class @Scroll
         'top':min+'px'
       })
       $(this).show()
-
       $img = $(this).find('img')
       height = $img.height()
-      ###console.log(self.getImageHeight)
-      self.getImageHeight($img, index, min, self.margin).then(()->
-        console.log('d')
-
-      )###
       console.log(height)
       window.blocks[index] = min+height+self.margin
-      #console.log($img.height())
-      ###deferred = new $.Deferred()
-      deferred.then(->
-        $img.on('load', ->
-          console.log('test')
-          height = $(this).height()
-          console.log(index+' '+min+' '+self.margin)
-          console.log(height)
-          window.blocks[index] = min+height+self.margin
-         # deferred.resolve()
-        ).each(->
-          $(this).load() if(this.complete)
-        )
-      )
-      ###
-
-      #height = @.getImageHeight($img)
-      #console.log(height)
-      #window.blocks[index] = min+height+self.margin
+      #$img.on('load', ()->
+      #  height = $(this).height()
+      #  console.log(height)
+      #  window.blocks[index] = min+height+self.margin
     )
+
+    ###tasks = [0..$('.block').length-1]
+    console.log(tasks)
+    for i in tasks
+      $(document).queue('tasks', @.createTask(tasks[i]))
+    $(document).queue('tasks', ()->
+      console.log('all done')
+    )
+    $(document).dequeue('tasks')###
+
     console.log(window.blocks)
+    #return $.when.apply(undefined, promises).promise()
+
 
   positionBlocks: (newElemsCount) =>
     self = @
@@ -176,9 +200,11 @@ class @Scroll
     @.updateSpinner()
 
     $('.wrapper').imagesLoaded( =>
-      $('#loader').hide()
-      console.log('image loaded')
-      @.initPositionBlocks()
+      $('.wrapper').imagesLoaded( =>
+        $('#loader').hide()
+        console.log('image loaded')
+        @.initPositionBlocks()
+      )
     )
 
     window.$el = $('.wrapper')
