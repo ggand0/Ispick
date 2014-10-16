@@ -20,7 +20,7 @@
   position: absolute;
   text-align: center;
   z-index: 10;
-  hidden: true;
+  //visibility: hidden;
   //background-image: url('loader_sprites.png');
   //background-size:contain;
   height: auto;
@@ -118,7 +118,7 @@ body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleB
 }*/
 
 // new version
-.boxInner .titleBox {
+.block .titleBox {
    position: absolute;
    visibility: hidden;
    top: 0px;
@@ -142,12 +142,12 @@ body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleB
   color: #FFF;
   padding: 10px;
 }
-body.no-touch .boxInner:hover .titleBox, body.touch .boxInner.touchFocus .titleBox {
+body.no-touch .block:hover .titleBox, body.touch .block.touchFocus .titleBox {
    margin-bottom: 0;
    color: #FFF;
    visibility: visible;
 }
-body.no-touch .boxInner.hovered .titleBox, body.touch .boxInner.touchFocus .titleBox {
+body.no-touch .block.hovered .titleBox, body.touch .block.touchFocus .titleBox {
    margin-bottom: 0;
    color: #FFF;
    visibility: visible;

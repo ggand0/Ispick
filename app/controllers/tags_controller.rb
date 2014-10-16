@@ -30,7 +30,7 @@ class TagsController < ApplicationController
       images = Image.filter_by_date(images, date)
     end
 
-    @images = images.page(params[:page]).per(25)
+    @images = images.page(params[:page]).per(10)
     @images_all = images
     render action: 'home'
   end
