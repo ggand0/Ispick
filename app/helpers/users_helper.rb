@@ -98,6 +98,9 @@ module UsersHelper
   def list_glyphicon
     '<span class="glyphicon glyphicon-list" style="vertical-align:middle"></span>'.html_safe
   end
+  def file_glyphicon
+    '<span class="glyphicon glyphicon-file" style="vertical-align:middle"></span>'.html_safe
+  end
 
 
 
