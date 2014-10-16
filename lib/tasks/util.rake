@@ -4,6 +4,15 @@ require "#{Rails.root}/script/anidb/anidb"
 require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
+  desc "Refresh last 1000 thumbnails"
+  task refresh_thumbs: :environment do
+    count=0
+    images_to_reprocess.each do |image|
+      image.data.reprocess! :thumb
+      break if count >= 1000
+    end
+  end
+
   desc "Restore target_words from a csv file"
   task :target_words, [:csv_path] => :environment do |t, args|
     Util.restore_target_words(args.csv_path)

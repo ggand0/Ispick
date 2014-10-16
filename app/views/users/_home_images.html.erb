@@ -1,7 +1,9 @@
 <div class="wrapper">
   <% images.each_with_index do |image, index| %>
     <div class="block has-gutters">
+      <div class="height"><%= image.height %></div>
       <%= render_image(image) %>
+
       <div class="titleBox">
         <div class="id"><%= image.id %></div>
         <%= button_group class: 'pull-right blocks' do %>

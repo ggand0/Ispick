@@ -126,9 +126,11 @@ class @Scroll
         'top':min+'px'
       })
       $(this).show()
-      $img = $(this).find('img')
-      height = $img.height()
+      #$img = $(this).find('img')
+      #height = $img.height()
+      height = parseInt($(this).find('.height').text())
       console.log(height)
+
       window.blocks[index] = min+height+self.margin
       #$img.on('load', ()->
       #  height = $(this).height()
@@ -161,7 +163,9 @@ class @Scroll
         'left':leftPos+'px',
         'top':min+'px'
       })
-      window.blocks[index] = min+$(this).outerHeight()+self.margin
+      #height = $(this).outerHeight()
+      height = parseInt($(this).find('.height').text())
+      window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks)
 
@@ -200,11 +204,26 @@ class @Scroll
     @.updateSpinner()
 
     $('.wrapper').imagesLoaded( =>
-      $('.wrapper').imagesLoaded( =>
-        $('#loader').hide()
+      setTimeout(=>
+        #do something based on $('img').width and/or $('img').height
+        #$('.block').each(->
+        #  console.log($(this).find('img').height())
+        #)
         console.log('image loaded')
-        @.initPositionBlocks()
-      )
+        $('#loader').hide()
+        @initPositionBlocks()
+        ###b=$('.block')
+        self = @
+
+        console.log(b.eq(b.length-1).find('img'))
+        b.eq(b.length-1).find('img').on('load',->
+          console.log($(this).height())
+          $('#loader').hide()
+          self.initPositionBlocks()
+        )###
+
+
+      , 0)
     )
 
     window.$el = $('.wrapper')
@@ -233,10 +252,19 @@ class @Scroll
 
             window.scrollReady = true
             @.updateSpinner()
+
             $('#loader').show()
             $('.wrapper').imagesLoaded( =>
+              console.log('image loaded')
+              ###
+              b=$('.block')
+              self=@
+              b.eq(b.length-1).find('img').on('load',->
+                console.log($(this).height())
+                $('#loader').hide()
+                self.positionBlocks($newElements.length)
+              )###
               $('#loader').hide()
-
               @.positionBlocks($newElements.length)
             )
           failure: (data) ->
