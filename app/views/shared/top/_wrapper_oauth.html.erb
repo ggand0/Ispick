@@ -1,4 +1,4 @@
-<div class="btn-group-vertical btn-group-sm btn-group-oauth">
+<div class="btn-group-vertical btn-group-oauth">
   <%= bs_button_to 'Continue with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
   <%= bs_button_to 'Continue with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
   <%= bs_button_to 'Continue with Tumblr',  user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
@@ -6,5 +6,5 @@
 </div>
 <%= render partial: 'shared/top/warning' %>
 <div align="center">
-  <%= bs_button_to 'Log in', '/signin_with_password', class: 'btn-sm btn-default' %>
+  <%= bs_button_to 'Log in', '/signin_with_password' %>
 </div>

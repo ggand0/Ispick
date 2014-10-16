@@ -8,7 +8,7 @@
 }
 .btn-group-oauth {
   //width     : 200px;
-  width     : 80%;
+  width     : 90%;
   line-height: 5px;
 }
 form .line {
@@ -47,7 +47,7 @@ form .line {
 .wrapper-oauth {
   text-align: center;
   //display: block;
-  font-size: 8px;
+  //font-size: 10px;
   line-height: 10px;
   //width     : 300px;
   //height    : 220px;
@@ -59,7 +59,7 @@ form .line {
   z-index   : 9999;
 }
 .wrapper-sign-in {
-  line-height: 5px;
+  line-height: 10px;
   background-color : #E4F5F5;
   overflow  : hidden;
   z-index   : 2;
@@ -81,7 +81,7 @@ form .line {
 
 // styles for "Creating an account means you've accepted Term of Service and..."
 .warning{
-  font-size: 9px;
+  font-size: 10px;
   line-height: 10px;
 }
 .warning a {

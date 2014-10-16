@@ -6,9 +6,9 @@ class Users::SessionsController < Devise::SessionsController
     #clean_up_passwords(resource)
     #respond_with_navigational(resource, stub_options(resource)){ render_with_scope :new }
 
-    @images = Image.search_images('aqua eyes').page(params[:page]).per(25)
-    @images = Image.search_images('pixiv').page(params[:page]).per(25) if @images.empty?
-    @images = Image.get_recent_images(500).page(params[:page]).per(25) if @images.empty?
+    @images = Image.search_images('aqua eyes').page(params[:page]).per(10)
+    @images = Image.search_images('pixiv').page(params[:page]).per(10) if @images.empty?
+    @images = Image.get_recent_images(500).page(params[:page]).per(10) if @images.empty?
     @first = true
     @first = false if params[:page] and params[:page].to_i > 1
 
