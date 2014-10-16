@@ -5,11 +5,17 @@ require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
   desc "Refresh last 1000 thumbnails"
-  task refresh_thumbs: :environment do
+  task :refresh_thumbs, [:limit]=> :environment do |t, args|
     count=0
+    if args[:limit]
+      limit = args[:limit]
+    else
+      limit = 1000
+    end
     images_to_reprocess.each do |image|
       image.data.reprocess! :thumb
-      break if count >= 1000
+      puts "image.id thumb refreshed."
+      break if count >= limit
     end
   end
 
