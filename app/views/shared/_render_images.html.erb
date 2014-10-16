@@ -1,59 +1,21 @@
-<!-- A version of embedding description and login form as boxes. -->
-<!-- Render description box and login form box only at the first time -->
-<br />
-<div class="wrapper">
-  <% if @first %>
-    <div class="block has-gutters">
-      <div class="height">260</div>
-      <div class="top-description">
-        <br />
-        <%= render partial: 'shared/top_description' %>
-        <br />
-      </div>
-    </div>
-    <div class="block has-gutters">
-      <div class="height">230</div>
-      <div class="wrapper-oauth">
-        <br />
-        <%= render partial: 'shared/top/wrapper_oauth' %>
-        <br />
-        <br />
-      </div>
-    </div>
-  <% end %>
+<!-- Render images as usual -->
+<% images.each_with_index do |image, index| %>
+  <div class="block has-gutters">
+    <div class="height"><%= image.height %></div>
+    <% if image.page_url %>
+      <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
+    <% else %>
+      <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
+    <% end %>
 
-  <!-- Render images as usual -->
-  <% images.each_with_index do |image, index| %>
-    <div class="block has-gutters">
-      <div class="height"><%= image.height %></div>
-      <% if image.page_url %>
-        <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
-      <% else %>
-        <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
-      <% end %>
-
-      <!--<div class="titleBox">
-        <div class="id"><%= image.id %></div>
-        <%= button_group class: 'pull-right blocks' do %>
-          <%= render_clip_button(image) %>
-          <%= render_show_button(image) %>
-          <%= render_show_debug_button(image) %>
-        <% end %>
-        <br />
-      </div>-->
-      <div class="title">
-          <%= image.title.to_s %><br />
-          <div class="time-string">
-            <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
-          </div>
+    <div class="title">
+        <%= image.title.to_s %><br />
+        <div class="time-string">
+          <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
         </div>
-    </div>
-  <% end %>
-  <div id="loader">
-    <%= image_tag asset_path('round_loader_mini.gif')%>
+      </div>
   </div>
-
+<% end %>
+<div id="loader">
+  <%= image_tag asset_path('round_loader_mini.gif')%>
 </div>
-
-<!-- Render pagination nav used for infinite scrolling -->
-<%= paginate images %>
