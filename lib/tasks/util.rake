@@ -8,14 +8,14 @@ namespace :util do
   task :refresh_thumbs, [:limit]=> :environment do |t, args|
     count=0
     if args[:limit]
-      limit = args[:limit]
+      limit = args[:limit].to_i
     else
       limit = 1000
     end
-    images_to_reprocess.each do |image|
+    Image.last(limit).each do |image|
       image.data.reprocess! :thumb
-      puts "image.id thumb refreshed."
-      break if count >= limit
+      puts "#{image.id} thumb refreshed."
+      #break if count >= limit
     end
   end
 
