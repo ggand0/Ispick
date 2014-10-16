@@ -76,7 +76,7 @@ class @Scroll
       #$img = $(this).find('img')
       #height = $img.height()
       height = parseInt($(this).find('.height').text())
-      height = 500 if height == 0
+      height = 300 if height == 0
       console.log(height)
 
       window.blocks[index] = min+height+self.margin
@@ -97,7 +97,7 @@ class @Scroll
       })
       #height = $(this).outerHeight()
       height = parseInt($(this).find('.height').text())
-      height = 500 if height == 0
+      height = 300 if height == 0
       window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks)
