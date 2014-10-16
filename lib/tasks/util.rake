@@ -4,6 +4,26 @@ require "#{Rails.root}/script/anidb/anidb"
 require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
+  desc "Redownload first n thumbnails"
+  task :redownload, [:limit]=> :environment do |t, args|
+    count=0
+    if args[:limit]
+      limit = args[:limit].to_i
+    else
+      limit = 1000
+    end
+    Image.limit(limit).each do |image|
+      next if image.data_updated_at.nil?
+      begin
+        image.data.destroy
+        image.image_from_url(image.src_url)
+        puts "#{image.id} thumb redownloaded."
+      rescue => e
+        puts e
+        puts "#{image.id} thumb redownload failed."
+      end
+    end
+  end
   desc "Refresh last 1000 thumbnails"
   task :refresh_thumbs, [:limit]=> :environment do |t, args|
     count=0
@@ -18,6 +38,7 @@ namespace :util do
         image.data.reprocess! :thumb
         puts "#{image.id} thumb refreshed."
       rescue => e
+        puts e
         puts "#{image.id} thumb refresh failed."
       end
 
