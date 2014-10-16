@@ -17,6 +17,7 @@ namespace :util do
       begin
         image.data.destroy
         image.image_from_url(image.src_url)
+        image.save!
         puts "#{image.id} thumb redownloaded."
       rescue => e
         puts e
