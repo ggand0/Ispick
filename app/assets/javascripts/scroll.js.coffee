@@ -61,59 +61,6 @@ class @Scroll
       window.blocks.push(defHeight)
     console.log(window.blocks)
 
-  getImageHeight: (img, index, min, margin)=>
-    deferred = new $.Deferred()
-    height=0
-    console.log(index+' '+min+' '+margin)
-    #console.log(img)
-    #console.log($(img).height())
-    $(img).on('load', ()->
-      height = $(this).height()
-      #return deferred.resolve(height)
-      console.log(height)
-      window.blocks[index] = min+height+margin
-
-      deferred.resolve({ height: height })
-      #return deferred.promise(height)
-    ).each( ->
-      $(this).load() if (this.complete)
-    )
-    #return deferred.promise(height)
-    window.promisesArray.push(deferred.promise)
-
-  doTask: (i, next)=>
-    console.log('doTasks')
-    self = @
-    min = Array.min(window.blocks)
-    index = $.inArray(min, window.blocks)
-    leftPos = self.margin+(index*(self.colWidth+self.margin))
-
-    block = $('.block').eq(i)
-    block.css({
-      'left':leftPos+'px',
-      'top':min+'px'
-    })
-    block.show()
-    $img = block.find('img')
-    console.log($img)
-    console.log(next)
-    $img.on('load', ()->
-      height = $(this).height()
-      console.log(height)
-      window.blocks[index] = min+height+self.margin
-      next()
-    )
-    time = Math.floor(Math.random()*3000)
-    setTimeout(->
-      height = $(this).height()
-      console.log(height)
-      window.blocks[index] = min+height+self.margin
-      next()
-    ,time)
-  createTask: (num)=>
-    return (next)=>
-      @.doTask(num, next)
-
 
   initPositionBlocks: ()=>
     self = @
@@ -129,27 +76,12 @@ class @Scroll
       #$img = $(this).find('img')
       #height = $img.height()
       height = parseInt($(this).find('.height').text())
+      height = 500 if height == 0
       console.log(height)
 
       window.blocks[index] = min+height+self.margin
-      #$img.on('load', ()->
-      #  height = $(this).height()
-      #  console.log(height)
-      #  window.blocks[index] = min+height+self.margin
     )
-
-    ###tasks = [0..$('.block').length-1]
-    console.log(tasks)
-    for i in tasks
-      $(document).queue('tasks', @.createTask(tasks[i]))
-    $(document).queue('tasks', ()->
-      console.log('all done')
-    )
-    $(document).dequeue('tasks')###
-
     console.log(window.blocks)
-    #return $.when.apply(undefined, promises).promise()
-
 
   positionBlocks: (newElemsCount) =>
     self = @
@@ -165,32 +97,23 @@ class @Scroll
       })
       #height = $(this).outerHeight()
       height = parseInt($(this).find('.height').text())
+      height = 500 if height == 0
       window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks)
 
+  # Update loading icon's position
   updateSpinner: ()=>
     max = Array.max(window.blocks)
     $('#loader').css({
       'top':max+'px'
       'left':(@colCount/2)*@colWidth+'px'
     })
-    ###setInterval(()=>
-      frames= 12
-      frameWidth = 128
-      offset= @counter * -frameWidth
-      #console.log(offset + "px 0px")
-      $("#loader").css('backgroundPosition', offset + "px 0px")
-      @counter += 1
-      @counter =0 if (@counter>=frames)
-    , 100)###
-
 
   infiniteScroll: (logging) =>
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
     @.fastInfiniteScroll()
-
     ###if document.URL.indexOf('home') > -1
       console.log('home')
     else# normal slow scroll in other pages
@@ -214,15 +137,12 @@ class @Scroll
         @initPositionBlocks()
         ###b=$('.block')
         self = @
-
         console.log(b.eq(b.length-1).find('img'))
         b.eq(b.length-1).find('img').on('load',->
           console.log($(this).height())
           $('#loader').hide()
           self.initPositionBlocks()
         )###
-
-
       , 0)
     )
 
@@ -256,14 +176,6 @@ class @Scroll
             $('#loader').show()
             $('.wrapper').imagesLoaded( =>
               console.log('image loaded')
-              ###
-              b=$('.block')
-              self=@
-              b.eq(b.length-1).find('img').on('load',->
-                console.log($(this).height())
-                $('#loader').hide()
-                self.positionBlocks($newElements.length)
-              )###
               $('#loader').hide()
               @.positionBlocks($newElements.length)
             )
@@ -271,6 +183,7 @@ class @Scroll
             console.log('failed')
             window.scrollReady = true
         })
+
 
   normalInfiniteScroll: ()=>
     @.masonry()
@@ -294,30 +207,4 @@ class @Scroll
         $newElems.show()
       )
     )
-
-
-  ###infiniteScroll: (logging) =>
-    console.log('infiniteScroll called') if logging
-    $('.pagination').hide()
-    $(window).scroll =>
-      return if @scrollReady == false
-      url = $('nav.pagination a[rel=next]').attr('href')
-      if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
-        $('.pagination').text("Fetching more products...")
-        @scrollReady = false
-        $.getScript(url)
-        $.ajax({
-          cache: false,
-          url: url,
-          type: 'GET',
-          dataType: 'html',
-          success: (data) =>
-            @listView.append($(data).find('.box'))
-            console.log(@listView.pages[0].items.length)
-            @scrollReady = true
-          failure: (data) =>
-            console.log('failed')
-            @scrollReady = true
-        })
-    ###
 
