@@ -1,14 +1,19 @@
 <div class="container-fluid">
-  <div class="col-md-8">
+  <div class="col-md-4 about-us">
+    <br />
     <%= render partial: 'shared/about_us' %>
     blog: ispick.tumblr.com<br />
     twitter: @ispic6
+    <br />
+    <br />
   </div>
+  <br />
 </div>
 <br />
 <br />
 <div class="container-fluid">
-  <div class="col-md-6">
+  <div class="col-md-4 about-us">
+    <br />
     <p><strong>Contact us</strong></p>
 
     <%= bootstrap_form_for @message, :url => create_contact_path do |form| %>
@@ -33,6 +38,11 @@
         <%= form.submit "Send" %>
       </fieldset>
     <% end %>
+    <br />
+    s<br />
   </div>
-  <br />
+
 </div>
+<br />
+  <br />
+  <br />
