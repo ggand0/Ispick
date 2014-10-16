@@ -40,9 +40,10 @@
         <% end %>
     </div>
   <% end %>
-</div>
-<div class="loader">
-  <%= image_tag asset_path('loading.gif')%>
+  <div id="loader">
+    <%= image_tag asset_path('round_loader_mini.gif')%>
+  </div>
+
 </div>
 
 <%= paginate images %>

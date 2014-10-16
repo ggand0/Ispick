@@ -3,6 +3,8 @@ Array.min = (array) ->
 Array.max = (array) ->
   return Math.max.apply(Math, array)
 
+
+
 class @Scroll
   constructor: ->
     console.log('scroll constructor called')
@@ -11,6 +13,10 @@ class @Scroll
     @margin=20
     @windowWidth=0
     @blocks=[]
+    @counter = 0
+
+
+
 
   setupBlocks: ()=>
     @windowWidth = $(window).width()
@@ -60,8 +66,24 @@ class @Scroll
     $('.block').hide()
     if document.URL.indexOf('home') > -1
       console.log('fast scrolling with infinity.js')
+      @.setupBlocks()
+      max = Array.max(@blocks)
+      $('#loader').css({
+        'top':max+'px'
+        'left':(@colCount/2)*@colWidth+'px'
+      })
+      ###setInterval(()=>
+        frames= 12
+        frameWidth = 128
+        offset= @counter * -frameWidth
+        #console.log(offset + "px 0px")
+        $("#loader").css('backgroundPosition', offset + "px 0px")
+        @counter += 1
+        @counter =0 if (@counter>=frames)
+      , 100)###
+
       $('.wrapper').imagesLoaded( =>
-        @.setupBlocks()
+        $('#loader').hide()
         @.initPositionBlocks()
       )
 
@@ -91,15 +113,15 @@ class @Scroll
               console.log(window.listView.pages[0].items[count-1])
 
               window.scrollReady = true
-              max = Array.max(@blocks)+600;
+              max = Array.max(@blocks)-64
               console.log('max'+max)
-              $('.loader').css({
+              $('#loader').css({
                 'top':max+'px'
+                'left':(@colCount/2)*@colWidth+'px'
               })
-              $('.loader').show()
+              $('#loader').show()
               $('.wrapper').imagesLoaded( =>
-                $('.loader').hide()
-
+                $('#loader').hide()
 
                 @.positionBlocks($newElements.length)
               )
