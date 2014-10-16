@@ -18,16 +18,26 @@
 <table>
   <thead>
     <tr>
+      <th align="left">Size</th>
+      <td><%= "#{image.width}, #{image.height}" %></td>
+    </tr>
+    <tr>
+      <th align="left">Original size</th>
+      <td><%= "#{image.original_width}, #{image.original_height}" %></td>
+    </tr>
+    <tr>
+    <tr>
+    <tr>
       <th align="left">Is an illustration</th>
       <td><%= image.is_illust %></td>
     </tr>
     <tr>
       <th align="left">Views</th>
-      <td><%= image.views %></td>
+      <td><%= image.original_view_count %></td>
     </tr>
     <tr>
       <th align="left">Favorites</th>
-      <td><strong><%= image.favorites %></strong></td>
+      <td><strong><%= image.original_favorite_count %></strong></td>
     </tr>
     <tr>
       <th align="left">Created_at</th>

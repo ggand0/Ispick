@@ -15,16 +15,26 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: {
-      thumb: "300x300#",
+      thumb: "300>",
       #thumb: { geometry: "300x300#", :processors => [:custom], :gif_first_frame_only => true },
       #thumb_gif: "300x300#",
       original: "600x800>"
     },
     default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
+  after_post_process :save_image_dimensions
+
+  def save_image_dimensions
+    geo = Paperclip::Geometry.from_file(data.queued_for_write[:thumb])
+    self.width = geo.width
+    self.height = geo.height
+  end
 
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
+
+  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga']
+  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga']
 
   # @return [String] デフォルトでattachmentに設定される画像のpath
   def set_default_url
@@ -85,7 +95,10 @@ class Image < ActiveRecord::Base
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
-    Image.joins(:tags).where(tags: { name: query }).references(:tags)
+    Image.joins(:tags).where(tags: { name: query }).
+      where.not(data_updated_at: nil).
+      where.not(data_content_type: 'image/gif').
+      references(:tags)
   end
 
   # @param images [ActiveRecord::CollectionProxy]
@@ -93,6 +106,13 @@ class Image < ActiveRecord::Base
   # @return [ActiveRecord::CollectionProxy]
   def self.filter_by_date(images, date)
     images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
+  end
+
+  # @param images [ActiveRecord::CollectionProxy]
+  # @param date [Date] date
+  # @return [ActiveRecord::CollectionProxy]
+  def self.filter_by_date(images, site)
+    images.where(site_name: site)
   end
 
   # Return images which is filtered by is_illust data.

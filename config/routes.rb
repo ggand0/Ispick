@@ -3,7 +3,10 @@ require 'resque_web'
 Ispick::Application.routes.draw do
 
   # Root path
-  root 'welcome#index'
+  #root 'welcome#index'
+  #root 'welcome#signup', :as => 'signup_welcome'
+  match '/' => 'welcome#index', :via => :get
+  match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
 
@@ -30,7 +33,8 @@ Ispick::Application.routes.draw do
   # Devise
   devise_for :admins, ActiveAdmin::Devise.config
   devise_for :users, controllers: {
-    omniauth_callbacks: "users/omniauth_callbacks"
+    omniauth_callbacks: "users/omniauth_callbacks",
+    sessions: "users/sessions"
   }, path: '', path_names: {
     sign_in: 'signin_with_password'
   }

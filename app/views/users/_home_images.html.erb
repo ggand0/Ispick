@@ -1,33 +1,30 @@
-<%# paginate images unless images.nil? %>
-
-<div class="wrap">
+<div class="wrapper">
   <% images.each_with_index do |image, index| %>
+    <div class="block has-gutters">
+      <div class="height"><%= image.height %></div>
+      <%= render_image(image) %>
 
-    <div class="box">
-      <div class="boxInner">
-        <%= render_image(image) %>
-
-        <div class="titleBox">
-          <div class="id"><%= image.id %></div>
-          <%= button_group class: 'pull-right blocks' do %>
-            <%= render_clip_button(image) %>
-            <%= render_show_button(image) %>
-            <%= render_show_debug_button(image) %>
-          <% end %>
-          <br />
-        </div>
-
-        <div class="title">
+      <div class="titleBox">
+        <div class="id"><%= image.id %></div>
+        <%= button_group class: 'pull-right blocks' do %>
+          <%= render_clip_button(image) %>
+          <%= render_show_button(image) %>
+          <%= render_show_debug_button(image) %>
+        <% end %>
+        <br />
+      </div>
+      <div class="title">
           <%= image.title.to_s %><br />
           <div class="time-string">
-            <%# "CA: #{get_jst_string(image.created_at)}" %><br />
-            <%= "PA: #{get_jst_string(image.posted_at)}" %>
+            <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
           </div>
         </div>
-
-      </div>
     </div>
   <% end %>
+  <div id="loader">
+    <%= image_tag asset_path('round_loader_mini.gif')%>
+  </div>
+
 </div>
 
 <%= paginate images %>

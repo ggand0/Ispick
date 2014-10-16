@@ -3,12 +3,12 @@
 ready = ->
   # Dropdown:
   # click時にdialogを閉じる
-  component = new Component()
-  component.initDropdowns()
+  window.component = new Component()
+  window.component.initDropdowns()
 
   # Modal:
   # 特定のクラスを持つモーダルは、背景を消して表示する
-  component.initModals()
+  window.component.initModals()
 
 $(document).ready(ready)
 $(document).on('page:load', ready)

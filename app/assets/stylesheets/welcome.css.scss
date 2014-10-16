@@ -1,37 +1,70 @@
 // Place all the styles related to the welcome controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-
-.top-image {
-  //position  : relative;
+.about-us {
+  background-color: #F8F8F8;//#F3F0EC;
+  border: 2px solid #F8F8F8;
+  border-radius: 15px;
+}
+.col-centered{
+  float: none;
+  margin: 0 auto;
+}
+.btn-group-oauth {
+  //width     : 200px;
+  width     : 90%;
+  line-height: 5px;
+}
+form .line {
+  margin-bottom: 5px; //adjust to your liking
+}
+.form-group {
+  margin-bottom: 5px;
+}
+.top-description {
   text-align: center;
-  //align:      center;
+  background-color : #E4F5F5;//#7ACECE;
+  //overflow:scroll;
+  //margin: 0px;
+  //padding-bottom: 20%;
+  //padding: 5px;
+  //height: 120px;
+}
+.top-image {
+  text-align: center;
   width     : 500px;
   height    : 300px;
-  //float     : left;
-  z-index   : 1;
-}
-.wrapper-oauth {
-  //position  : relative;
-  text-align: center;
-  //align:      center;
-  width     : 300px;
-  height    : 300px;
-  background-color : #E4F5F5;
-  margin    : 10;
-  padding   : 10px;
-  border    : 10px;
-  overflow  : hidden;
   z-index   : 2;
 }
-.wrapper-sign-in {
-  position  : relative;
-  width     : 300px;
-  height    : 350px;
+.top-wrap {
   background-color : #E4F5F5;
-  margin    : 10;
-  padding   : 10px;
-  border    : 10px;
+  text-align: center;
+  vertical-align:middle;
+  align: center;
+  height: 550px;
+  padding: 10px;
+  margin: auto;
+  border: 2px solid #7ACECE;
+  border-radius: 15px;
+  z-index   : 9999;
+}
+.wrapper-oauth {
+  text-align: center;
+  //display: block;
+  //font-size: 10px;
+  line-height: 10px;
+  //width     : 300px;
+  //height    : 220px;
+  background-color : #7ACECE;
+  //margin    : 0px;
+  //padding-bottom: 20%;
+  //padding: 5px;
+  //overflow: scroll;
+  z-index   : 9999;
+}
+.wrapper-sign-in {
+  line-height: 10px;
+  background-color : #E4F5F5;
   overflow  : hidden;
   z-index   : 2;
 }
@@ -43,24 +76,22 @@
   }
   &:hover {
     color: #000;
-    background-color: #E4F5F5;
+    //background-color: #E4F5F5;
     text-decoration: underline;
   }
 }
 
-.btn-group-oauth {
-  width     : 280px;
-}
+
 
 // styles for "Creating an account means you've accepted Term of Service and..."
 .warning{
-  font-size: 9px;
+  font-size: 10px;
   line-height: 10px;
 }
 .warning a {
   &:hover {
     color: #000;
-    background-color: #E4F5F5;
+    //background-color: #E4F5F5;
     text-decoration: underline;
   }
 }
@@ -69,12 +100,24 @@
 .top {
   text-align: center;
   align: center;
+}
+.top_background {
+  background-size: contain;
+  background-image:url('background.png');
+  display: block;
+  //width: 1200px;
+  height: 800px;
+  left: 0;
+  position: fixed;
+  overflow:hidden;
+  right: 0;
+  z-index: -1;
+  margin: -5px -10px -10px -5px;
 
+  -webkit-filter: blur(3px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(3px);
 }
-.background {
-  background-image: url('background.png');
-}
-.col-centered{
-  float: none;
-  margin: 0 auto;
-}
+

@@ -44,6 +44,7 @@ class UsersController < ApplicationController
     else
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
+      images.reorder!('original_favorite_count DESC') if params[:fav]
     end
 
     # Filter images by date
@@ -52,10 +53,15 @@ class UsersController < ApplicationController
       images = Image.filter_by_date(images, date)
     end
 
+    # Filter images by sites
+    if params[:site]
+      images = Image.filter_by_date(images, params[:site])
+    end
+
     # TMP FEATURE
     images = images.where.not(site_name: 'nicoseiga') if params[:nico]
 
-    @images = images.page(params[:page]).per(25)
+    @images = images.page(params[:page]).per(10)
     @images_all = images
   end
 

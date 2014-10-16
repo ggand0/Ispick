@@ -7,6 +7,20 @@ class @Component
       $(this).parents('.boxInner').addClass('hovered')
     )
 
+  masonry: () ->
+    $container = $('#wrapper')
+    $container.masonry( ->
+       itemSelector: '.image',
+       #gutterWidth: 66,
+       animate: true,
+       columnWidth: 200;
+    )
+    # call the layout method after all elements have been loaded
+    $container.imagesLoaded( ->
+      $container.masonry()
+    )
+    $container.masonry()
+
   infiniteScroll: (logging) ->
     console.log('infiniteScroll called') if logging
     $('.pagination').hide()
@@ -33,7 +47,8 @@ class @Component
             type: 'GET',
             dataType: 'html',
             success: (data) ->
-              window.listView.append($(data).find('.box'))
+              window.listView.append($(data).find('.i'))
+              #$(".wrap").masonry( 'appended', $(data).find('.box') )
               count = window.listView.pages[0].items.length
               console.log(count)
               console.log(window.listView.pages[0].items[count-1])
@@ -43,15 +58,24 @@ class @Component
               window.scrollReady = true
           })
     else# normal slow scroll in other pages
+      @.masonry()
+
       console.log('normal scrolling with infinite-scroll lib')
-      $(".wrap").infinitescroll({
+      $("#wrapper").infinitescroll({
         navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
         nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
-        itemSelector: ".box"                        # selector for all items you'll retrieve
+        itemSelector: ".image"                        # selector for all items you'll retrieve
+        #loading: {
+        #  img: 'http://i.imgur.com/6RMhx.gif'
+        #}
       },
-      (arrayOfNewElems) ->
-        #window.Clip.removeClipEvents(true)
-        #window.Clip.initButtons(true)
+      (newElements) ->
+        $newElems = $( newElements )
+        $container = $("#wrapper")
+        $container.masonry( 'appended', $newElems )
+        $container.imagesLoaded( ->
+          $container.masonry()
+        )
       )
 
 
@@ -102,9 +126,10 @@ class @Component
     $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
       $('body').toggleClass('modal-color-none')
     )
-    $('#modal-image').on('show.bs.modal hide.bs.modal', (e) ->
-      $('body').toggleClass('modal-color-none')
-    )
+    #$('#modal-image').on('show.bs.modal hide.bs.modal', (e) ->
+    #$('.modal-images').on('show.bs.modal hide.bs.modal', (e) ->
+    #  $('body').toggleClass('modal-color-none')
+    #)
 
   initBoards = () ->
     #

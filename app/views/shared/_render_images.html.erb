@@ -1,0 +1,21 @@
+<!-- Render images as usual -->
+<% images.each_with_index do |image, index| %>
+  <div class="block has-gutters">
+    <div class="height"><%= image.height %></div>
+    <% if image.page_url %>
+      <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
+    <% else %>
+      <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
+    <% end %>
+
+    <div class="title">
+        <%= image.title.to_s %><br />
+        <div class="time-string">
+          <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
+        </div>
+      </div>
+  </div>
+<% end %>
+<div id="loader">
+  <%= image_tag asset_path('round_loader_mini.gif')%>
+</div>

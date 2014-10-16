@@ -15,8 +15,13 @@
 
 //= require jquery.infinitescroll.min
 //= require infinity
+//= require masonry.pkgd.min
+//= require imagesloaded.pkgd.min
 
 //= require jquery.remotipart
 //= require bootstrap
 //= require bootstrap-datepicker
 //= require turbolinks
+
+//= require users_home
+//= require core
