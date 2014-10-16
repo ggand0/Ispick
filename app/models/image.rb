@@ -23,10 +23,15 @@ class Image < ActiveRecord::Base
     default_url: lambda { |data| data.instance.set_default_url},
     use_timestamp: false
   after_post_process :save_image_dimensions
+
   def save_image_dimensions
+    #puts data.url(:thumb).inspect
+    #puts data.queued_for_write[:thumb].inspect
+    #puts data.queued_for_write[:original].inspect
     geo = Paperclip::Geometry.from_file(data.queued_for_write[:thumb])
     self.width = geo.width
     self.height = geo.height
+    self.save
   end
 
   before_destroy :destroy_attachment

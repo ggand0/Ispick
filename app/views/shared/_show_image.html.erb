@@ -15,7 +15,9 @@
   <br /><br />
   <%= link_glyphicon %> <%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %>
   <br /><br />
-  Sharable size <%= "#{image.original_width}, #{image.original_height}" %>
+  Sharable size: <%= "#{image.original_width}, #{image.original_height}" %>
+  <br /><br />
+  Thumb size: <%= "#{image.width}, #{image.height}" %>
   <br /><br />
   <%= tags_glyphicon %>
   <% image.tags.each do |tag| %>
