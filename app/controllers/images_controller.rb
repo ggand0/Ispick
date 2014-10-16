@@ -48,6 +48,8 @@ class ImagesController < ApplicationController
       site_name: @image.site_name,
       original_view_count: @image.original_view_count,
       original_favorite_count: @image.original_favorite_count,
+      width: @image.width,
+      height: @image.height,
       posted_at: @image.posted_at,
     )
     @image.tags.each do |tag|

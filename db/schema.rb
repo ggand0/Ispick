@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141016113852) do
+ActiveRecord::Schema.define(version: 20141016181815) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -81,6 +81,8 @@ ActiveRecord::Schema.define(version: 20141016113852) do
     t.text     "poster"
     t.integer  "original_width"
     t.integer  "original_height"
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
   end
 
   create_table "favored_images_tags", force: true do |t|

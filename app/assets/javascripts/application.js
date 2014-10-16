@@ -24,3 +24,4 @@
 //= require turbolinks
 
 //= require users_home
+//= require core
