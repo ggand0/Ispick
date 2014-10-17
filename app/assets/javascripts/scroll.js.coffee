@@ -6,8 +6,6 @@ Array.max = (array) ->
 getNatural = ($mainImage) ->
   mainImage = $mainImage[0]
   d = {}
-
-  #if mainImage.naturalWidth === undefined
   if mainImage.naturalWidth is undefined
     i = new Image()
     i.src = mainImage.src
@@ -20,9 +18,10 @@ getNatural = ($mainImage) ->
 
 
 
+
 class @Scroll
-  constructor: ->
-    #console.log('scroll constructor called')
+  constructor: (logging) ->
+    @logging = logging
     @colCount=0
     @colWidth=0
     @margin=20
@@ -46,7 +45,6 @@ class @Scroll
     $container.imagesLoaded( ->
       $('.wrapper').show()
       $container.masonry()
-
     )
     $container.masonry()
 
@@ -57,9 +55,8 @@ class @Scroll
     @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     for i in [0..@colCount-1]
       defHeight = $('.wrapper').offset().top
-      #console.log(defHeight)
       window.blocks.push(defHeight)
-    console.log(window.blocks)
+    console.log(window.blocks) if @logging
 
 
   initPositionBlocks: ()=>
@@ -77,11 +74,10 @@ class @Scroll
       #height = $img.height()
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
-      console.log(height)
-
+      console.log(height) if @logging
       window.blocks[index] = min+height+self.margin
     )
-    console.log(window.blocks)
+    console.log(window.blocks) if @logging
 
   positionBlocks: (newElemsCount) =>
     self = @
@@ -97,10 +93,10 @@ class @Scroll
       })
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
-      console.log(height)
+      console.log(height) if @logging
       window.blocks[index] = min+height+self.margin
     )
-    console.log(window.blocks)
+    console.log(window.blocks) if @logging
 
   # Update loading icon's position
   updateSpinner: ()=>
@@ -110,8 +106,9 @@ class @Scroll
       'left':(@colCount/2)*@colWidth+'px'
     })
 
-  infiniteScroll: (logging) =>
-    console.log('infiniteScroll called') if logging
+
+  infiniteScroll: () =>
+    console.log('infiniteScroll called') if @logging
     $('.pagination').hide()
     @.fastInfiniteScroll()
     ###if document.URL.indexOf('home') > -1
@@ -121,29 +118,15 @@ class @Scroll
 
 
   fastInfiniteScroll: ()=>
-    console.log('fast scrolling with infinity.js')
+    console.log('fast scrolling with infinity.js') if @logging
     $('.block').hide()
     @.setupBlocks()
     @.updateSpinner()
 
     $('.wrapper').imagesLoaded( =>
-      setTimeout(=>
-        #do something based on $('img').width and/or $('img').height
-        #$('.block').each(->
-        #  console.log($(this).find('img').height())
-        #)
-        console.log('image loaded')
-        $('#loader').hide()
-        @initPositionBlocks()
-        ###b=$('.block')
-        self = @
-        console.log(b.eq(b.length-1).find('img'))
-        b.eq(b.length-1).find('img').on('load',->
-          console.log($(this).height())
-          $('#loader').hide()
-          self.initPositionBlocks()
-        )###
-      , 0)
+      console.log('images loaded') if @logging
+      $('#loader').hide()
+      @initPositionBlocks()
     )
 
     window.$el = $('.wrapper')
@@ -154,9 +137,10 @@ class @Scroll
       #console.log(window.scrollReady)
       return if window.scrollReady == false
       url = $('nav.pagination a[rel=next]').attr('href')
-      console.log(url)
+      console.log(url) if @logging
+
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
-        console.log('Fetching...')
+        console.log('Fetching...') if @logging
         $('.pagination').text("Fetching more products...")
         window.scrollReady = false
         $.getScript(url)
@@ -170,19 +154,19 @@ class @Scroll
             $newElements.hide()
             window.listView.append($newElements)
             count = window.listView.pages[0].items.length
-            console.log(count+': '+window.listView.pages[0].items[count-1])
+            console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
 
             window.scrollReady = true
             @.updateSpinner()
 
             $('#loader').show()
             $('.wrapper').imagesLoaded( =>
-              console.log('image loaded')
+              console.log('images loaded') if @logging
               $('#loader').hide()
               @.positionBlocks($newElements.length)
             )
           failure: (data) ->
-            console.log('failed')
+            console.log('failed') if @logging
             window.scrollReady = true
         })
 

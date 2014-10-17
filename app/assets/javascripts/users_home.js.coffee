@@ -4,38 +4,18 @@
 #= require 'component'
 #= require 'scroll'
 
-#history.navigationMode = 'compatible'
-
-#$(window).load(()
 $(document).on 'ready page:load', ->
-  $(window).load(()->
-    console.log('window\'s been loaded!')
-  )
-
+  logging = false
   imgLoad = imagesLoaded($('.wrapper'))
   imgLoad.on( 'progress', ( instance, image ) ->
     result = image.isLoaded ? 'loaded' : 'broken'
-    console.log( 'image is ' + result + ' for ' + image.img.src )
+    console.log( 'image is ' + result + ' for ' + image.img.src ) if logging
   )
-  console.log('loaded'+window.loaded)
-  console.log($('.wrapper').length)
-  console.log($('.block').length)
+  if logging
+    console.log('loaded'+window.loaded)
+    console.log($('.wrapper').length)
+    console.log($('.block').length)
   return if $('.wrapper').length==0
-
-  #if window.loaded
-    #$('.wrapper').unbind()
-    #$(document).add('*').off()
-    #window.$el = $('.wrapper')
-    #window.listView = new infinity.ListView(window.$el)
-    #window.scrollReady = true
-    #window.blocks=[]
-    #$('.block').hide()
-    #window.scroll = new Scroll()
-    #window.scroll.infiniteScroll(true)
-    #return
-
-  window.loaded=true
-
 
 
   window.component = new Component()
@@ -44,11 +24,9 @@ $(document).on 'ready page:load', ->
   window.component.initButtons()
 
 
-
   # Initialize infinite scroll
-  #component.infiniteScroll(true)
-  window.scroll = new Scroll()
-  window.scroll.infiniteScroll(true)
+  window.scroll = new Scroll(logging)
+  window.scroll.infiniteScroll()
 
   # Display the calender (Datepicker)
   window.component.initCalender()
