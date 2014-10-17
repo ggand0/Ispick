@@ -204,7 +204,10 @@ module Scrape
       tags.each { |tag| image.tags << tag }
 
       # Skip the image if it's irrelevant, like porns and cosplay images
-      return if self.check_banned(image)
+      if self.check_banned(image)
+        logger.info 'Skipping an irrelevant image...' if options[:verbose]
+        return
+      end
 
       # Use src_url as original_url if the latter one is nil
       image.original_url = image.src_url if image.original_url.nil?
