@@ -15,9 +15,8 @@
     </div>
   <% end %>
 
-      <%= f.text_field :name, :required => true, :autofocus => true %>
-
-      <%= f.select :language_preferences, ['ja', 'en'], { label: "Choose a language:" }, { class: "selectpicker" } %>
+  <%= f.text_field :name, :required => true, :autofocus => true %>
+  <%# f.select :language_preferences, ['ja', 'en'], { label: "Choose a language:" }, { class: "selectpicker" } %>
 
   <div class="actions">
     <%= f.submit %>
