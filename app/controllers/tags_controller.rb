@@ -13,14 +13,15 @@ class TagsController < ApplicationController
     end
   end
 
-
-  # Show images associated by a specific tag. Will be moved to the UsersController class.
-  # 特定のタグに配信されている画像のみを表示する。UsersControllerに移動予定
+  # GET
+  # Show images associated by a specific tag.
   def images
     redirect_to '/signin_with_password' unless signed_in?
 
     # Get images of the TargetWord record
     images = @tag.get_images
+    images.reorder!('posted_at DESC') if params[:sort]
+    images.reorder!('original_favorite_count DESC') if params[:fav]
 
     # Filter by created_at attribute
     # 配信日で絞り込む場合
@@ -28,6 +29,11 @@ class TagsController < ApplicationController
       date = params[:date]
       date = DateTime.parse(date).to_date
       images = Image.filter_by_date(images, date)
+    end
+
+    # Filter images by sites
+    if params[:site]
+      images = Image.filter_by_date(images, params[:site])
     end
 
     @images = images.page(params[:page]).per(10)

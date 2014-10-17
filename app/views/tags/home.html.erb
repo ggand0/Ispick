@@ -15,23 +15,16 @@
       <div class="input-group date" style="width: 200px;" align="right">
         <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
       </div>
-      <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
-      <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
+      <li><%= link_to 'Sort by posted_at', { action: "images", controller: "tags", id: params[:id], sort: true } %></li>
+      <li><%= link_to 'Sort by favorites', { action: "images", controller: "tags", id: params[:id], fav: true } %></li>
       <li class="divider"></li>
       <li class="dropdown-submenu">
         <a tabindex="-1" href="#">Filter by source</a>
 
         <ul class="dropdown-menu">
           <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
-            <li><%= link_to "#{site}", home_users_path(site: Image::TARGET_SITES[count]) %></li>
+            <li><%= link_to "#{site}", { action: "images", controller: "tags", id: params[:id], site: Image::TARGET_SITES[count] } %></li>
           <% end %>
-          <!--<li class="dropdown-submenu">
-            <a href="#">Even More..</a>
-            <ul class="dropdown-menu">
-                <li><a href="#">3rd level</a></li>
-              <li><a href="#">3rd level</a></li>
-            </ul>
-          </li>-->
         </ul>
       </li>
     </ul>
