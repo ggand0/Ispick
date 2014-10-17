@@ -107,7 +107,12 @@ class UsersController < ApplicationController
   # タグ登録画面を表示する
   # Render the index page of tags.
   def preferences
-    @popular_tags = Tag.get_tags_with_images(100)
+    if params[:target_words]
+      @popular_tags = TargetWord.get_tags_with_images(100).
+        map { |target_word| Tag.where(name: target_word.name_english).first }
+    else
+      @popular_tags = Tag.get_tags_with_images(100)
+    end
     @tags = current_user.tags
     @tag = Tag.new
 
