@@ -110,6 +110,7 @@ class UsersController < ApplicationController
     if params[:target_words]
       @popular_tags = TargetWord.get_tags_with_images(100).
         map { |target_word| Tag.where(name: target_word.name_english).first }
+      @popular_tags.compact!
     else
       @popular_tags = Tag.get_tags_with_images(100)
     end
