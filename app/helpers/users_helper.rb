@@ -48,6 +48,13 @@ module UsersHelper
      class: "btn-default #{size}"
   end
 
+  # Renders a bootstrap button with the link.
+  # @params image [Image] An object of Image.
+  def render_show_favored_button(image, size='btn-sm')
+    bs_button_to resize_full_glyphicon, { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
+     class: "btn-default #{size}"
+  end
+
 
   # ==========================================
   #  Glyphicon helpers
