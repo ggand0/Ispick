@@ -61,10 +61,14 @@ class @Scroll
 
   initPositionBlocks: ()=>
     self = @
+    @colWidth = $('.block').outerWidth() if @colWidth is null
     $('.block').each(()->
       min = Array.min(window.blocks)
       index = $.inArray(min, window.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
+      if @logging
+        console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
+        console.log(index+','+min)
       $(this).css({
         'left':leftPos+'px',
         'top':min+'px'
@@ -74,18 +78,24 @@ class @Scroll
       #height = $img.height()
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
-      console.log(height) if @logging
+      console.log(leftPos+','+height) if self.logging
       window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks) if @logging
 
   positionBlocks: (newElemsCount) =>
     self = @
+    # Sometimes, especially after using the datepicker,
+    # colWidth variable gets null. Re-initialize it if it detects null.
+    @colWidth = $('.block').outerWidth() if @colWidth is null
     $container = $('.block')
     $container.slice(Math.max($container.length - newElemsCount, 1)).each (()->
       min = Array.min(window.blocks)
       index = $.inArray(min, window.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
+      if @logging
+        console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
+        console.log(index+','+min)
       $(this).show()
       $(this).css({
         'left':leftPos+'px',
@@ -93,7 +103,7 @@ class @Scroll
       })
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
-      console.log(height) if @logging
+      console.log(leftPos+','+height) if self.logging
       window.blocks[index] = min+height+self.margin
     )
     console.log(window.blocks) if @logging
