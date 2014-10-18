@@ -4,6 +4,7 @@ class WelcomeController < ApplicationController
     @images = Image.get_recent_images(500).page(params[:page]).per(10) if @images.empty?
     @first = true
     @first = false if params[:page] and params[:page].to_i > 1
+    @disable_fotter = true
   end
 
   def signup
@@ -12,5 +13,6 @@ class WelcomeController < ApplicationController
     @images = Image.get_recent_images(500).page(params[:page]).per(10) if @images.empty?
     @first = true
     @first = false if params[:page] and params[:page].to_i > 1
+    @disable_fotter = true
   end
 end

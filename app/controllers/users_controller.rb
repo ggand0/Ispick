@@ -63,6 +63,7 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(10)
     @images_all = images
+    @disable_fotter = true
   end
 
   # GET
@@ -78,6 +79,7 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(10)
     @images_all = images
+    @disable_fotter = true
     render action: 'home'
   end
 
@@ -139,6 +141,7 @@ class UsersController < ApplicationController
       @image_board = ImageBoard.find(board.id)
       @favored_images = board.favored_images.page(params[:page]).per(25)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
+      @disable_fotter = true
     else
       render action: 'boards_no_images'
     end
