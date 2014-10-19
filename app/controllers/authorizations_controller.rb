@@ -4,6 +4,8 @@ class AuthorizationsController < ApplicationController
   # DELETE /target_words/1
   # DELETE /target_words/1.json
   def destroy
+    return redirect_to settings_users_path if current_user.authorizations.count == 1
+
     @authorization.destroy
     respond_to do |format|
       format.html { redirect_to settings_users_path }
