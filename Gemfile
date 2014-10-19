@@ -102,7 +102,7 @@ gem 'jquery-fileupload-rails'                     # Upload multiple files
 gem 'remotipart', '~> 1.2'                        # Enable ajax request with form_tag
 gem 'high_voltage', '~> 2.1.0'                    # Handles static pages
 gem 'rack-mini-profiler'                          # For debugging loading times
-
+gem "font-awesome-rails"
 
 
 # Logging and notification
