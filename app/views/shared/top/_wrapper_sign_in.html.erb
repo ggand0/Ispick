@@ -1,8 +1,8 @@
 <div class="btn-group-vertical btn-group-oauth">
   <%= button_group do %>
-    <%= bs_button_to 'Log in with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br />
-    <%= bs_button_to 'Log in with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br />
-    <%= bs_button_to 'Log in with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br />
+    <%= bs_button_to '<i class="fa fa-facebook"></i>Log in with Facebook'.html_safe, user_omniauth_authorize_path(:facebook), class: "btn-block btn-social btn-facebook" %><br />
+    <%= bs_button_to '<i class="fa fa-twitter"></i>Log in with Twitter'.html_safe, user_omniauth_authorize_path(:twitter), class: "btn-default btn-block btn-social btn-twitter" %><br />
+    <%= bs_button_to '<i class="fa fa-tumblr"></i>Log in with Tumblr'.html_safe,  user_omniauth_authorize_path(:tumblr), class: "btn-default btn-block btn-social btn-tumblr" %><br />
 </div>
 <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name), class: "well" do |f| %>
   <div class="line">
