@@ -21,7 +21,7 @@
 .btn-social-icon.btn-xs{height:22px;width:22px;padding-left:0;padding-right:0}
 
 // Added by pentiumx on 141019
-.btn-email{color:#000;background-color:#205081;border-color:rgba(0,0,0,0.2)}.btn-email:hover,.btn-email:focus,.btn-email:active,.btn-email.active,.open .dropdown-toggle.btn-email{color:#000;background-color:#ddd;border-color:rgba(0,0,0,0.2)}
+.btn-email{color:#000;background-color:#fff;border-color:rgba(0,0,0,0.2)}.btn-email:hover,.btn-email:focus,.btn-email:active,.btn-email.active,.open .dropdown-toggle.btn-email{color:#000;background-color:#ddd;border-color:rgba(0,0,0,0.2)}
 .btn-email:active,.btn-email.active,.open .dropdown-toggle.btn-email{background-image:none}
 .btn-email.disabled,.btn-email[disabled],fieldset[disabled] .btn-email,.btn-email.disabled:hover,.btn-email[disabled]:hover,fieldset[disabled] .btn-email:hover,.btn-email.disabled:focus,.btn-email[disabled]:focus,fieldset[disabled] .btn-email:focus,.btn-email.disabled:active,.btn-email[disabled]:active,fieldset[disabled] .btn-email:active,.btn-email.disabled.active,.btn-email[disabled].active,fieldset[disabled] .btn-email.active{background-color:#ddd;border-color:rgba(0,0,0,0.2)}
 
