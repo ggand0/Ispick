@@ -87,6 +87,7 @@ gem 'letter_opener', group: :development              # Open emails on browser
 gem 'activeadmin', github: 'activeadmin'
 gem 'obscenity'
 gem 'fastimage'
+gem 'google-analytics-rails'
 
 # Twitter Bootstrap gems
 gem 'bootstrap-sass', '~> 3.2.0'
@@ -102,7 +103,7 @@ gem 'jquery-fileupload-rails'                     # Upload multiple files
 gem 'remotipart', '~> 1.2'                        # Enable ajax request with form_tag
 gem 'high_voltage', '~> 2.1.0'                    # Handles static pages
 gem 'rack-mini-profiler'                          # For debugging loading times
-gem "font-awesome-rails"
+gem 'font-awesome-rails'
 
 
 # Logging and notification

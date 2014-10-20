@@ -248,6 +248,7 @@ GEM
       faraday (~> 0.8.8)
       faraday_middleware-parse_oj (~> 0.2.1)
       launchy (~> 2.4.2)
+    google-analytics-rails (0.0.6)
     guard (2.6.1)
       formatador (>= 0.2.4)
       listen (~> 2.7)
@@ -616,6 +617,7 @@ DEPENDENCIES
   futaba!
   fuubar
   giphy
+  google-analytics-rails
   guard
   guard-rspec (= 4.2.0)
   guard-teaspoon

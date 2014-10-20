@@ -8,6 +8,9 @@
   <%= csrf_meta_tags %>
   <!-- tells mobile browsers to not scale the page by default -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google analytics script -->
+  <%= analytics_init if Rails.env.production? %>
 </head>
 <body class="no-touch">
 

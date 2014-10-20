@@ -75,6 +75,9 @@ Ispick::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
+  # Configure google analytics gem
+  GA.tracker = "UA-55893084-1"
+
 
   # Configure SMTP
   # SMTPの設定
