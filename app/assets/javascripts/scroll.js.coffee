@@ -126,6 +126,36 @@ class @Scroll
     else# normal slow scroll in other pages
       console.log('other than home')###
 
+  loadImages: (url) =>
+    console.log('Fetching...') if @logging
+    $('.pagination').text("Fetching more images...")
+    window.scrollReady = false
+    $.getScript(url)
+    $.ajax({
+      cache: false,
+      url: url,
+      type: 'GET',
+      dataType: 'html',
+      success: (data) =>
+        $newElements = $(data).find('.block')
+        $newElements.hide()
+        window.listView.append($newElements)
+        count = window.listView.pages[0].items.length
+        console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
+
+        window.scrollReady = true
+        @.updateSpinner()
+
+        $('#loader').show()
+        $('.wrapper').imagesLoaded( =>
+          console.log('images loaded') if @logging
+          $('#loader').hide()
+          @.positionBlocks($newElements.length)
+        )
+      failure: (data) ->
+        console.log('failed') if @logging
+        window.scrollReady = true
+    })
 
   fastInfiniteScroll: ()=>
     console.log('fast scrolling with infinity.js') if @logging
@@ -143,42 +173,24 @@ class @Scroll
     window.listView = new infinity.ListView(window.$el)
     window.scrollReady = true
 
+    $(window).on('mousewheel', (e) =>
+      return if window.scrollReady == false
+      hasScrollBar = $(document).height() > $(window).height()
+      url = $('nav.pagination a[rel=next]').attr('href')
+      #console.log(e.originalEvent.deltaY) if @logging
+      if e.originalEvent.deltaY > 0 and !hasScrollBar
+        console.log('without scrollbar') if @logging
+        @.loadImages(url)
+    )
+
     $(window).scroll =>
-      #console.log(window.scrollReady)
+      #console.log(window.scrollReady) if @logging
       return if window.scrollReady == false
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
-
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
-        console.log('Fetching...') if @logging
-        $('.pagination').text("Fetching more products...")
-        window.scrollReady = false
-        $.getScript(url)
-        $.ajax({
-          cache: false,
-          url: url,
-          type: 'GET',
-          dataType: 'html',
-          success: (data) =>
-            $newElements = $(data).find('.block')
-            $newElements.hide()
-            window.listView.append($newElements)
-            count = window.listView.pages[0].items.length
-            console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
-
-            window.scrollReady = true
-            @.updateSpinner()
-
-            $('#loader').show()
-            $('.wrapper').imagesLoaded( =>
-              console.log('images loaded') if @logging
-              $('#loader').hide()
-              @.positionBlocks($newElements.length)
-            )
-          failure: (data) ->
-            console.log('failed') if @logging
-            window.scrollReady = true
-        })
+        console.log('with scrollbar') if @logging
+        @.loadImages(url)
 
 
   normalInfiniteScroll: ()=>

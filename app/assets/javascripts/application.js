@@ -14,6 +14,7 @@
 //= require jquery_ujs
 
 //= require jquery.infinitescroll.min
+//= require jquery.mousewheel.min
 //= require infinity
 //= require masonry.pkgd.min
 //= require imagesloaded.pkgd.min
