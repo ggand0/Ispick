@@ -46,6 +46,7 @@ class UsersController < ApplicationController
       images.reorder!('posted_at DESC') if params[:sort]
       images.reorder!('original_favorite_count DESC') if params[:fav]
     end
+    images.uniq!
 
     # Filter images by date
     if params[:date]
