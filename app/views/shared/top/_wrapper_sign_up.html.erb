@@ -1,9 +1,9 @@
 <div class="btn-group-vertical btn-group-oauth">
   <%= button_group do %>
-    <%= bs_button_to 'Create an account with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Create an account with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Create an account with Tumblr', user_omniauth_authorize_path(:tumblr), class: "btn btn-default btn-block" %><br>
-    <%= bs_button_to 'Create an account with Email', '/sign_up', class: "btn btn-default btn-block" %><br>
+    <%= bs_button_to '<i class="fa fa-facebook"></i>Continue with Facebook'.html_safe, user_omniauth_authorize_path(:facebook), class: "btn-block btn-social btn-facebook" %><br />
+    <%= bs_button_to '<i class="fa fa-twitter"></i>Continue with Twitter'.html_safe, user_omniauth_authorize_path(:twitter), class: "btn-default btn-block btn-social btn-twitter" %><br />
+    <%= bs_button_to '<i class="fa fa-tumblr"></i>Continue with Tumblr'.html_safe,  user_omniauth_authorize_path(:tumblr), class: "btn-default btn-block btn-social btn-tumblr" %><br />
+    <%= bs_button_to '<i class="fa fa-envelope"></i>Continue with Email'.html_safe, '/sign_up', class: "btn-default btn-block  btn-social btn-email" %><br />
   <% end %>
 </div>
 <%= render partial: 'shared/top/warning' %>

@@ -16,7 +16,12 @@
       <%= navbar_item 'Home', home_users_path %>
       <%= navbar_item 'Boards', boards_users_path %>
       <%= navbar_item 'Preferences', preferences_users_path %>
+      <%# navbar_item 'About us', new_contact_path %>
+      <%= navbar_dropdown 'About' do %>
       <%= navbar_item 'About us', new_contact_path %>
+      <%= navbar_item 'Blog', 'http://ispick.tumblr.com/'.html_safe %>
+      <%= navbar_item 'FAQ', page_path('faq') %>
+      <% end %>
     <% end %>
 
     <div style="text-align:right;">

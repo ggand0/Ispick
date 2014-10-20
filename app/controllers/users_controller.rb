@@ -63,6 +63,7 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(10)
     @images_all = images
+    @disable_fotter = true
   end
 
   # GET
@@ -78,6 +79,7 @@ class UsersController < ApplicationController
 
     @images = images.page(params[:page]).per(10)
     @images_all = images
+    @disable_fotter = true
     render action: 'home'
   end
 
@@ -110,6 +112,7 @@ class UsersController < ApplicationController
     if params[:target_words]
       @popular_tags = TargetWord.get_tags_with_images(100).
         map { |target_word| Tag.where(name: target_word.name_english).first }
+      @popular_tags.compact!
     else
       @popular_tags = Tag.get_tags_with_images(100)
     end
@@ -138,6 +141,7 @@ class UsersController < ApplicationController
       @image_board = ImageBoard.find(board.id)
       @favored_images = board.favored_images.page(params[:page]).per(25)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
+      @disable_fotter = true
     else
       render action: 'boards_no_images'
     end

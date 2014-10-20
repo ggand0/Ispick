@@ -3,6 +3,12 @@
   - variables needed: image, image_board, html
   - Using gem: https://github.com/bootstrap-ruby/rails-bootstrap-forms
 -->
+
+<div style="text-align: right; align:right;">
+  <!-- Putting this block directly inside the modal-content div seem to make the button unclickable -->
+  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+</div>
+<br />
 <div class="id"><%= image.id %></div>
 
 <%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>

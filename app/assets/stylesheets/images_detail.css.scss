@@ -1,7 +1,7 @@
 // 画像詳細画面(modal)で使用するクラス
 .image-title {
   font-size: 20pt;
-  width: 560px;
+  width: 700px;//560px;
   float: left;
 }
 .image-detail {
@@ -21,9 +21,11 @@
 .image-time {
   text-align: left;
 }
+.image-buttons {
+}
 .share-button {
   float: right;
-  width: 50px;
+  width: auto;
   text-align: right;
   align: right;
 }

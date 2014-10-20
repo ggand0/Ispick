@@ -116,13 +116,18 @@ class User < ActiveRecord::Base
     if authorization.user.blank?
       user = current_user.nil? ? User.where('email = ?', auth["info"]["email"]).first : current_user
       unless user
-        user = User.create(
-          name:     auth.info.nickname,
-          provider: auth.provider,
-          uid:      auth.uid,
-          email:    User.get_email(auth),
-          password: Devise.friendly_token[0,20]
-        )
+        begin
+          user = User.create(
+            #name:     auth.info.nickname,
+            name:     User.get_user_name(auth),
+            provider: auth.provider,
+            uid:      auth.uid,
+            email:    User.get_email(auth),
+            password: Devise.friendly_token[0,20]
+          )
+        rescue => e
+          return
+        end
       end
 
       authorization.user_name = User.get_user_name(auth)

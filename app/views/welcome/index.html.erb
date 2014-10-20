@@ -1,3 +1,12 @@
+<!-- Start of StatCounter Code for Default Guide -->
+<%= javascript_include_tag 'stat_counter' if Rails.env.production? %>
+<noscript><div class="statcounter"><a title="shopify visitor
+statistics" href="http://statcounter.com/shopify/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/10089559/0/da2e4b88/1/"
+alt="shopify visitor statistics"></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide -->
+
 <!-- A version of embedding description and login form as boxes. -->
 <!-- Render description box and login form box only at the first time -->
 <br />
@@ -12,7 +21,7 @@
       </div>
     </div>
     <div class="block has-gutters">
-      <div class="height">340</div>
+      <div class="height">250</div>
       <div class="wrapper-oauth">
         <br />
         <%= render partial: 'shared/top/wrapper_oauth' %>

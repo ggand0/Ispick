@@ -1,5 +1,3 @@
-.modal { position: absolute; }
-
 // 配信画像のモーダル表示時の背景色
 .modal-backdrop {
   background-color: #E4E1E3
@@ -16,7 +14,11 @@
   // TODO: hard codingを解消する
   position: fixed;
   top: 3%;
-  left: -68.2%;//-56.7%;
+  left: -68.2%;
+}
+.modal.modal-images {
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
 }
 
 

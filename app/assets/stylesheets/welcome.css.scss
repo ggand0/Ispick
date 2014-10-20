@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 .about-us {
-  background-color: #F8F8F8;//#F3F0EC;
+  background-color: #F8F8F8;
   border: 2px solid #F8F8F8;
   border-radius: 15px;
   margin: 10px;
@@ -12,7 +12,6 @@
   margin: 0 auto;
 }
 .btn-group-oauth {
-  //width     : 200px;
   width     : 90%;
   line-height: 5px;
 }
@@ -22,20 +21,11 @@ form .line {
 .form-group {
   margin-bottom: 5px;
 }
+
+
 .top-description {
   text-align: center;
   background-color : #E4F5F5;//#7ACECE;
-  //overflow:scroll;
-  //margin: 0px;
-  //padding-bottom: 20%;
-  //padding: 5px;
-  //height: 120px;
-}
-.top-image {
-  text-align: center;
-  width     : 500px;
-  height    : 300px;
-  z-index   : 2;
 }
 .top-wrap {
   background-color : #E4F5F5;
@@ -51,16 +41,8 @@ form .line {
 }
 .wrapper-oauth {
   text-align: center;
-  //display: block;
-  //font-size: 10px;
   line-height: 10px;
-  //width     : 300px;
-  //height    : 220px;
   background-color : #7ACECE;
-  //margin    : 0px;
-  //padding-bottom: 20%;
-  //padding: 5px;
-  //overflow: scroll;
   z-index   : 9999;
 }
 .wrapper-sign-in {
@@ -77,7 +59,6 @@ form .line {
   }
   &:hover {
     color: #000;
-    //background-color: #E4F5F5;
     text-decoration: underline;
   }
 }
@@ -96,29 +77,3 @@ form .line {
     text-decoration: underline;
   }
 }
-
-// top page wrapper
-.top {
-  text-align: center;
-  align: center;
-}
-.top_background {
-  background-size: contain;
-  background-image:url('background.png');
-  display: block;
-  //width: 1200px;
-  height: 800px;
-  left: 0;
-  position: fixed;
-  overflow:hidden;
-  right: 0;
-  z-index: -1;
-  margin: -5px -10px -10px -5px;
-
-  -webkit-filter: blur(3px);
-  -moz-filter: blur(5px);
-  -o-filter: blur(5px);
-  -ms-filter: blur(5px);
-  filter: blur(3px);
-}
-

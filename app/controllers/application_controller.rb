@@ -3,11 +3,10 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  before_filter :authenticate
+  #before_filter :authenticate
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
   before_filter :your_function
-  #before_filter :set_cache_headers
   after_filter  :expire_for_development
 
   def authenticate_admin_user!
