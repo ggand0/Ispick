@@ -35,14 +35,14 @@ describe Scrape do
       target_word = FactoryGirl.create(:word_with_person)
       result = Scrape.get_query target_word
 
-      expect(result).to eq('鹿目まどか')
+      expect(result).to eq('鹿目まどか1')
     end
 
     it "returns proper string when target_word doesn't have a person model" do
       target_word = FactoryGirl.create(:target_word)
       result = Scrape.get_query target_word
 
-      expect(result).to eq('鹿目 まどか（かなめ まどか）1')
+      expect(result).to eq('鹿目まどか1')
     end
   end
 
@@ -55,6 +55,43 @@ describe Scrape do
     end
   end
 
+  describe "get_result_hash method" do
+    it "returns the empty hash including proper keys" do
+      result = Scrape.get_result_hash
+      expect(result).to be_a(Hash)
+      expect(result).to have_key(:scraped)
+      expect(result).to have_key(:duplicates)
+      expect(result).to have_key(:skipped)
+      expect(result).to have_key(:avg_time)
+    end
+  end
 
+  describe "get_result_string method" do
+    it "return the valid string based on a result hash" do
+      result = Scrape.get_result_hash
+      string = Scrape.get_result_string(result)
+      valid_string = 'scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: '
+      expect(string).to eq(valid_string)
+    end
+  end
+
+  describe "get_option_hash method" do
+    it "returns a valid option hash" do
+      result = Scrape.get_option_hash(true, true, true, true)
+      expect(result).to be_a(Hash)
+      expect(result).to have_key(:validation)
+      expect(result).to have_key(:large)
+      expect(result).to have_key(:verbose)
+      expect(result).to have_key(:resque)
+    end
+  end
+
+  describe "remove_4bytes method" do
+    it "returns a string which 4byte strings are removed" do
+      string = '👍'
+      result = Scrape.remove_4bytes(string)
+      expect(result).to eq('')
+    end
+  end
 
 end

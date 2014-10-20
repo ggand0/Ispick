@@ -1,12 +1,3 @@
-//= require 'modal_boards'
-
-console.log('AJAXing: '+"<%= @id %>");
-selector = "#" + "<%= @id.to_s %>";
-console.log(selector);
-
-$(selector).popover('destroy');
-$(selector).popover({
-  html: true,
-  content: "<%= escape_javascript(render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id }) %>",
-  container: 'body'
-}).popover('show');
+$("#modal-board-body").html("<%= escape_javascript(
+  render partial: 'shared/form_board', locals: { image: @image, image_board: @board, html: @id }) %>");
+$("#modal-board").modal('show');

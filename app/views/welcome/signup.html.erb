@@ -1,0 +1,29 @@
+<!-- A version of embedding description and login form as boxes. -->
+<!-- Render description box and login form box only at the first time -->
+<br />
+<div class="wrapper">
+  <% if @first %>
+    <div class="block has-gutters">
+      <div class="height">260</div>
+      <div class="top-description">
+        <br />
+        <%= render partial: 'shared/top_description' %>
+        <br />
+      </div>
+    </div>
+    <div class="block has-gutters">
+      <div class="height">250</div>
+      <div class="wrapper-oauth">
+        <br />
+        <%= render partial: 'shared/top/wrapper_sign_up' %>
+        <br />
+        <br />
+      </div>
+    </div>
+  <% end %>
+
+  <%= render partial: 'shared/render_images', locals: { images: @images } %>
+</div>
+
+<!-- Render pagination nav used for infinite scrolling -->
+<%= paginate @images %>

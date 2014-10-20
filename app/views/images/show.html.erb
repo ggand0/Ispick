@@ -1,77 +1,12 @@
-<!--
-  現在の所使ってない。
-  モーダル表示をせずに直接templateを描画する場合に使う。
--->
+<!-- モーダル表示をせずに直接templateを描画する場合に使う。-->
+<%= javascript_include_tag 'users_home' %>
+<%= javascript_include_tag 'core' %>
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_board' %>
 
-<p id="notice"><%= notice %></p>
-
-<p>
-  <strong>Title:</strong>
-  <%= @image.title %>
-</p>
-
-<p>
-  <strong>Caption:</strong>
-  <%= @image.caption %>
-</p>
-
-<p>
-  <strong>Face feature:</strong>
-  <%= @face_feature %>
-</p>
-
-<p>
-  <strong>Is an illustration:</strong>
-  <%= @image.is_illust %>
-</p>
-
-<p>
-  <strong>Source URL:</strong>
-  <%= link_to 'source image URL', @image.src_url %>
-</p>
-
-<p>
-  <strong>Page URL:</strong>
-  <%= link_to 'source page URL', @image.page_url.html_safe if @image.page_url %>
-</p>
-
-<p>
-  <strong>Views:</strong>
-  <%= @image.views %>
-</p>
-<p>
-  <strong>Favorites:</strong>
-  <%= @image.favorites %>
-</p>
-
-<p>
-  <strong>Posted at:</strong>
-  <%= @image.posted_at %>
-</p>
-
-<p>
-  <strong>Tags:</strong>
-  <% @image.tags.each do |tag| %>
-  <%= tag.name %>
-  <% end %>
-</p>
-
-<p>
-  <strong>MD5:</strong><br />
-  <%= @image.md5_checksum %> <br />
-</p>
-
-<p>
-  <strong>Size in bytes:</strong><br />
-  <%= bytes_to_kilobytes(@image.data.size) %> KB<br />
-  <%= bytes_to_megabytes(@image.data.size) %> MB<br />
-</p>
-
-<br />
-<% if @image.page_url %>
-  <%= link_to image_tag(@image.data.url(:medium)), @image.page_url.html_safe %>
-<% else %>
-  <%= image_tag @image.data.url(:medium) %>
-<% end %>
-<br />
-<%= link_to 'Back', images_path %>
+<!-- モーダル表示で使用している。２つのpartial templateを描画する。 -->
+<div class="detail-wrap">
+  <%= render partial: 'shared/render_image', locals: { image: @image } %>
+  <%= render partial: 'shared/show_image', locals: { image: @image } %>
+</div>

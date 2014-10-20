@@ -1,8 +1,11 @@
-// 画像詳細画面で使用するクラスを定義
-
+// 画像詳細画面(modal)で使用するクラス
 .image-title {
   font-size: 20pt;
-  width: 560px;
+  width: 700px;//560px;
+  float: left;
+}
+.image-detail {
+  width: 500px;
   float: left;
 }
 .image-buttons {
@@ -14,4 +17,20 @@
 .image-share {
   text-align: right;
   align: right;
+}
+.image-time {
+  text-align: left;
+}
+.image-buttons {
+}
+.share-button {
+  float: right;
+  width: auto;
+  text-align: right;
+  align: right;
+}
+
+// 画像詳細画面(html)で使用するクラス
+.detail-wrap {
+  width: 800px;
 }

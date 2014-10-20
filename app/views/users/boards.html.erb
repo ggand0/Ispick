@@ -1,0 +1,48 @@
+<%= stylesheet_link_tag 'users' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render UIs to add/edit/delete boards -->
+<%= button_group do %>
+  <%= bs_dropdown_button_to list_glyphicon do %>
+    <% current_user.image_boards.each do |board| %>
+      <li>
+        <%= link_to board.name, { controller: 'users', action: 'boards', board: board.id }, class: 'btn-default' %>
+      </li>
+    <% end %>
+  <% end %>
+  <%= bs_button_to pencil_glyphicon, edit_image_board_path(id: @image_board.id), remote: true, class: 'btn btn-default' %>
+  <%= bs_button_to remove_glyphicon, @image_board, method: :delete, data: { confirm: 'Are you sure to delete this board? This operation cannot be undone.' }, class: 'btn btn-default' %>
+<% end %>
+<br /><br />
+
+<!-- Display the images of the selected board. Same as home.html.erb -->
+
+<div class="wrapper">
+  <% @favored_images.each_with_index do |favored_image, index| %>
+    <div class="block has-gutters">
+      <div class="height"><%= favored_image.height %></div>
+      <%= render_favored_image(favored_image) %>
+
+      <div class="titleBox">
+        <%= button_group class: 'pull-right blocks' do %>
+          <%= render_unclip_button(favored_image) %>
+          <%= render_show_favored_button(favored_image) %>
+        <% end %>
+        <br />
+      </div>
+      <div class="title">
+          <%= favored_image.title.to_s %><br />
+          <div class="time-string">
+            <br /><%= "PA: #{get_jst_string(favored_image.posted_at)}" %>
+          </div>
+        </div>
+    </div>
+  <% end %>
+  <div id="loader">
+    <%= image_tag asset_path('round_loader_mini.gif')%>
+  </div>
+
+</div>
+<%= paginate @favored_images %>

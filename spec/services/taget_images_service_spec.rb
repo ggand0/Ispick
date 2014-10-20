@@ -1,6 +1,8 @@
 require 'spec_helper'
 require "#{Rails.root}/app/services/target_images_service"
-include ActionDispatch::TestProcess
+# Need to attach 'Rails.env.test?' or this crushes activeadmin pages.
+# https://github.com/activeadmin/activeadmin/issues/512
+include ActionDispatch::TestProcess if Rails.env.test?
 
 describe TargetImagesService do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }

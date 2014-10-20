@@ -12,9 +12,16 @@
 //
 //= require jquery
 //= require jquery_ujs
+
 //= require jquery.infinitescroll.min
+//= require infinity
+//= require masonry.pkgd.min
+//= require imagesloaded.pkgd.min
+
 //= require jquery.remotipart
-// require bootstrap-sprockets			// requireするとdropdownが死ぬので避けている
 //= require bootstrap
 //= require bootstrap-datepicker
 //= require turbolinks
+
+//= require users_home
+//= require core

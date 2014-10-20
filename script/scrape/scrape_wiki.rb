@@ -5,7 +5,7 @@ require 'natto'
 
 
 # Scrape anime characters names from Wikipedia
-# wikipediaからアニメのキャラクター名を抽出する
+# Wikipediaからアニメのキャラクター名を抽出する
 module Scrape::Wiki
   require "#{Rails.root}/script/scrape/scrape_characters"
   require "#{Rails.root}/script/scrape/scrape_game_characters"
@@ -103,28 +103,6 @@ module Scrape::Wiki
   end
 
 
-  # 英語版ページへのリンクがある場合そのページurlを返す
-  # @param [String] 日本語版ページのurl
-  # @return [String] 英語版ページのurl
-  def self.get_anime_page_en(anime_page)
-    html = self.open_html anime_page
-    return if html.nil?
-
-    # 日本語ページに登場キャラクターがいない
-    if !self.detect_having_characters(html)
-      return 'no_characters'
-    end
-
-    # liタグ内のaタグのリンクを調べる
-    item = html.css("li[class='interlanguage-link interwiki-en']").first
-    if item.nil?
-      return ''
-    else
-      url = item.css('a').first.attr('href')
-      return "http:#{url}"
-    end
-  end
-
   # Get the url of the japanese version of a Wikipedia article.
   # @param anime_page [String]
   # @return [String]
@@ -151,7 +129,7 @@ module Scrape::Wiki
       html = Nokogiri::HTML(open(url))
     rescue OpenURI::HTTPError => e
       if e.message == '404 Not Found'
-        puts '次のURLを開けませんでした'
+        puts 'Could not open the following url:'
         puts "URL : #{url}"
       else
         raise e
@@ -184,6 +162,7 @@ module Scrape::Wiki
   end
 
 
+  # Parse the character information and save them to the database.
   # キャラクタ情報をparseしてPeopleテーブルへ保存する
   # @param input_hash [Hash] keyがアニメタイトル、valueが登場キャラクタの配列であるようなHash
   def self.save_to_database(input_hash)
@@ -196,7 +175,7 @@ module Scrape::Wiki
 
       title_en = value[:title_en]
       value[:characters].each do |name_hash|
-        # {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
+        # name_hash: {:name=>"鹿目 まどか", :query=>"鹿目まどか", :_alias=>"かなめ まどか", :en=>"Madoka Kaname"}
         person = Person.create(
           name: name_hash[:query],
           name_display: name_hash[:name],
@@ -212,10 +191,6 @@ module Scrape::Wiki
         title = self.get_title(value[:title_ja], value[:title_en])
         person.titles << title
 
-        # よみがなをaliasとして追加
-        #keyword = self.get_keyword(name_hash[:_alias], true)
-        #person.keywords << keyword
-
         # keywords保存の例
         #person.keywords.create(name: 'まど', is_alias: true)     # createと同時に保存される
         #person.keywords.create(name: 'ピンク', is_alias: false)
@@ -226,7 +201,7 @@ module Scrape::Wiki
         #mecab.parse('まどかだよっ！') do |n|
         #  puts n.surface # => まどか/だ/よ/っ/！　など
         #end
-        # =>パフォーマンスに問題あり？ => C++/C#
+
 
         person.save
       end

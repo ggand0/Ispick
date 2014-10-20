@@ -59,7 +59,7 @@ Ispick::Application.configure do
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-  config.assets.precompile += %w( *.js )
+  config.assets.precompile += %w( *.js users.css images-detail.css )
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
@@ -75,6 +75,45 @@ Ispick::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
+  # Configure google analytics gem
+  GA.tracker = "UA-55893084-1"
+
+
+  # Configure SMTP
+  # SMTPの設定
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { :host => CONFIG['ip'] }
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    authentication: :plain,
+    domain: 'smtp.gmail.com',
+    user_name: CONFIG['gmail_username'],
+    password: CONFIG['gmail_password'],
+    enable_starttls_auto: true
+  }
+
+  # Configuration of exception notification gem
+  # Settings of exception_notification gem
+  config.middleware.use ExceptionNotification::Rack,
+    :ignore_crawlers => %w{Googlebot bingbot},
+    :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
+    email: {
+      sender_address: 'noreply@ispicks.com',
+      exception_recipients: CONFIG['gmail_username'],
+    }
+
+
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+
+  # Configure the logger for fluentd
+  #config.log_level = :info
+  #config.logger = ActFluentLoggerRails::Logger.new
+  #config.lograge.enabled = true
+  #config.lograge.formatter = Lograge::Formatters::Json.new
+
+  # ltsv gem version
+  #config.logger = LTSV::Logger.open("log/production_ltsv.log")
 end

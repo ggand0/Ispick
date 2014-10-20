@@ -4,7 +4,7 @@ require 'capistrano/puma'
 lock '3.1.0'
 
 set :application, 'Ispick'
-set :repo_url, 'git@github.com:pentiumx/Ispic.git'
+set :repo_url, 'git@github.com:pentiumx/Ispick.git'
 set :branch, 'development'
 set :rails_env, 'production'
 
@@ -37,7 +37,7 @@ set :scm, :git
 set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/database.yml config/config.yml}
+set :linked_files, %w{config/database.yml config/config.yml config/fluent-logger.yml config/app_environment_variables.rb config/banned_words.yml}
 
 # Default value for linked_dirs is []
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/assets}
@@ -56,32 +56,35 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:all), in: :sequence, wait: 5 do
-      #execute :sudo, "/etc/init.d/puma restart"# #{fetch(:application)}
     end
   end
+
   desc 'Start application'
   task :start do
     on roles(:all) do
-      #execute "/etc/init.d/puma start"
     end
   end
+
   desc 'Stop application'
   task :stop do
     on roles(:all) do
-      #execute "/etc/init.d/puma stop"
     end
   end
+
   desc 'Debug the env variables'
   task :debug do
     on roles(:all) do
       #execute "echo #{fetch(:default_env)}"
       #execute "cat ~/.bash_profile"
-
       #execute "export LD_LIBRARY_PATH='/usr/local/lib'"
       #execute "echo $LD_LIBRARY_PATH"
       #execute "printenv"
+    end
+  end
 
-      test 'crontab -r'
+  task :start_scraping do
+    on roles(:app) do |host|
+      execute "cd #{current_path} && RAILS_ENV=#{fetch(:rails_env)} ./script/start_all_scraping.sh"
     end
   end
 
@@ -104,6 +107,36 @@ namespace :deploy do
   task :upload_db do
     on roles(:app) do |host|
       upload!('config/database.yml', "#{shared_path}/config/database.yml")
+    end
+  end
+  task :upload_fluentd do
+    on roles(:app) do |host|
+      upload!('config/fluent-logger.yml', "#{shared_path}/config/fluent-logger.yml")
+    end
+  end
+  task :upload_app_env do
+    on roles(:app) do |host|
+      upload!('config/app_environment_variables.rb', "#{shared_path}/config/app_environment_variables.rb")
+    end
+  end
+  task :upload_banned do
+    on roles(:app) do |host|
+      upload!('config/banned_words.yml', "#{shared_path}/config/banned_words.yml")
+    end
+  end
+
+  task :assets_clean do
+    on roles(:app) do |host|
+      within current_path do
+        execute :rake, 'assets:clean'
+      end
+    end
+  end
+  task :assets_precompile do
+    on roles(:app) do |host|
+      within current_path do
+        execute :rake, 'assets:precompile'
+      end
     end
   end
 

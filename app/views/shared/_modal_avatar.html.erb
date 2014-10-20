@@ -1,0 +1,14 @@
+<!-- The modal window for editing an avatar image -->
+
+<div class="modal modal-avatar" id="the-modal-avatar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <%= bootstrap_form_tag url: { controller: '/users', action: 'create_avatar', id: current_user.id } do |f| %>
+          <%= f.file_field :avatar, layout: :default %>
+          <%= f.submit 'Submit' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div><!-- /.modal -->

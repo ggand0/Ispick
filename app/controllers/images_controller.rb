@@ -1,5 +1,5 @@
 class ImagesController < ApplicationController
-  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide, :show_debug]
+  before_action :set_image, only: [:show, :edit, :update, :destroy, :favor, :hide]
 
   # GET /images
   # GET /images.json
@@ -13,13 +13,6 @@ class ImagesController < ApplicationController
     respond_to do |format|
       format.html {}
       format.js { render partial: 'show' }
-    end
-  end
-
-  def show_debug
-    respond_to do |format|
-      format.js { render partial: 'layouts/show_image_debug' }
-      #format.js { render partial: 'show' }
     end
   end
 
@@ -44,16 +37,24 @@ class ImagesController < ApplicationController
     # Board名のリンクをクリックして呼ばれるので必ず対応するboardがあると仮定
     board = current_user.image_boards.where(name: board_name).first
     favored_image = board.favored_images.build(
+      artist: @image.artist,
+      poster: @image.poster,
       title: @image.title,
       caption: @image.caption,
       data: @image.data,
       src_url: @image.src_url,
+      original_url: @image.original_url,
       page_url: @image.page_url,
       site_name: @image.site_name,
-      views: @image.views,
-      favorites: @image.favorites,
+      original_view_count: @image.original_view_count,
+      original_favorite_count: @image.original_favorite_count,
+      width: @image.width,
+      height: @image.height,
       posted_at: @image.posted_at,
     )
+    @image.tags.each do |tag|
+      favored_image.tags << tag
+    end
 
     # save出来たらimageへの参照も追加
     if favored_image.save
@@ -61,15 +62,17 @@ class ImagesController < ApplicationController
     end
 
     # format.jsの場合はpopoverをリロードするために'boards' templateを呼ぶ
+    @clipped_board = board_name
     @board = ImageBoard.new
     @id = params[:html_id]
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path }
-      format.js { render partial: 'image_boards/boards' }
+      format.html { redirect_to boards_users_path }
+      format.js { render partial: 'image_boards/after_clipped' }
     end
   end
 
   # PUT hide
+  # TODO: Need refactoring
   def hide
     if not @image.avoided
       @image.update_attributes!(avoided: true)
@@ -78,6 +81,8 @@ class ImagesController < ApplicationController
     end
     redirect_to :back
   end
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

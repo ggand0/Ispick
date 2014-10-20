@@ -28,7 +28,7 @@ module Scrape::Wiki::Character
       title_en = anime_title if title_en.nil?
       page_url_en = self.get_character_page_en(title_en, url[:en], html_en)
 
-      if (not url[:ja].empty?) and (not html_ja.nil?)
+      if (not url[:ja].nil?) and (not html_ja.nil?)
         title_ja = html_ja.css('h1[class="firstHeading"]').first.content
         puts "DEBUG: #{title_ja}" if logging
       end

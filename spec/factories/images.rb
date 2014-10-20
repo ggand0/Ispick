@@ -6,7 +6,7 @@ FactoryGirl.define do
     sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
 
-  # The main factory. it generates Image objects with various attributes.
+  # The main factory. This generates Image objects with various attributes.
   factory :image, class: Image do
     title 'test'
     caption 'test'
@@ -15,9 +15,13 @@ FactoryGirl.define do
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
-    views 10000
+    original_view_count 10000
     posted_at DateTime.now
     is_illust true
+
+    #after(:create) do |image|
+    #  image.tags << create(:tags)
+    #end
 
     # sequenceされていないタグのみ必要な場合
     factory :image_with_specific_tags do
@@ -53,7 +57,7 @@ FactoryGirl.define do
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
-    views 10000
+    original_view_count 10000
     posted_at DateTime.now - 2.day
     #created_at DateTime.now - 1.day
     is_illust true
@@ -91,10 +95,10 @@ FactoryGirl.define do
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
-    views 10000
+    original_view_count 10000
     posted_at DateTime.now
     is_illust true
-    data { fixture_file_upload('spec/fixtures/files/madoka.png') }
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
     to_create do |instance|
       instance.save validate: false
     end

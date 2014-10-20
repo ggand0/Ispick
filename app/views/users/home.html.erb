@@ -1,0 +1,50 @@
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render images and the dropdown for filtering them -->
+<p>
+  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
+
+
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <div class="dropdown">
+    <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-default" data-target="#" href="/page.html">
+        Filter/Sort <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+      Filter by date
+      <div class="input-group date" style="width: 200px;" align="right">
+        <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+      </div>
+      <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
+      <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
+      <li class="divider"></li>
+      <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Filter by source</a>
+
+        <ul class="dropdown-menu">
+          <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+            <li><%= link_to "#{site}", home_users_path(site: Image::TARGET_SITES[count]) %></li>
+          <% end %>
+          <!--<li class="dropdown-submenu">
+            <a href="#">Even More..</a>
+            <ul class="dropdown-menu">
+                <li><a href="#">3rd level</a></li>
+              <li><a href="#">3rd level</a></li>
+            </ul>
+          </li>-->
+        </ul>
+      </li>
+    </ul>
+    <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
+  </div>
+
+</p>
+  <br />
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images } %>

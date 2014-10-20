@@ -2,19 +2,30 @@ class User < ActiveRecord::Base
   # Set this variabale true during testing to skip all callbacks.
   cattr_accessor :skip_callbacks
 
+  # ==============
+  #  Associations
+  # ==============
+  # Enable associating multiple social network accounts
+  has_many :authorizations, dependent: :destroy
+
   # has_many uploaded images
   has_many :target_images, dependent: :destroy
 
   # has_many boards for storing clipped images
   has_many :image_boards, dependent: :destroy
+  has_many :likes, dependent: :destroy, counter_cache: :likes_count
 
   # has_many tags for making image feeds
-  has_many :target_words_users
-  has_many :target_words, :through => :target_words_users
+  has_many :tags_users, dependent: :destroy
+  has_many :tags, :through => :tags_users
 
+
+  # ================
+  #  Other settings
+  # ================
   # devise configuration
   devise :database_authenticatable, :omniauthable, :recoverable,
-         :registerable, :rememberable, :trackable, :validatable
+         :registerable, :rememberable, :trackable, :validatable, :omniauth_providers=>[:tumblr,:twitter,:facebook]
 
   # paperclip configuration: thumbnail size, etc.
   has_attached_file :avatar,
@@ -40,59 +51,32 @@ class User < ActiveRecord::Base
   # Get images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
-    words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
-    #Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(is_illust: nil).references(:target_words)
+    words = tags.map{ |tag| tag.name }
+    Image.joins(:tags).where("tags.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:tags)
   end
 
-  # Search images which is shown at user's home page.
-  # @return [ActiveRecord::AssociationRelation]
-  def search_images(query)
-    Image.joins(:tags).where(tags: { name: query }).references(:tags)
-  end
-
+  # For now, it's same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
-    words = target_words.map{ |target_word| target_word.name }
-    Image.joins(:target_words).where("target_words.name IN (?)", words).where.not(data_updated_at: nil).references(:target_words)
+    words = tags.map{ |tag| tag.name }
+    Image.joins(:tags).where("tags.name IN (?)", words).
+      where.not(data_updated_at: nil).references(:tags)
   end
 
-  # @param images [ActiveRecord::CollectionProxy]
-  # @param date [Date] date
-  # @return [ActiveRecord::CollectionProxy]
-  def self.filter_by_date(images, date)
-    images.where(created_at: date.to_datetime.utc..(date+1).to_datetime.utc)
-  end
-
-  # Return images which is filtered by is_illust data.
-  # How the filter is applied depends on the session[:illust] value.
-  # イラストと判定されてるかどうかでフィルタをかけるメソッド。
-  # @param images [ActiveRecord::Association::CollectionProxy]
-  # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
-  def self.filter_by_illust(images, illust)
-    case illust
-    when 'all'
-      return images
-    when 'illust'
-      return images.where({ is_illust: true })
-    when 'photo'
-      return images.where({ is_illust: false })
+  # Get an optional ImageBoard instance by board_id.
+  # そのUserオブジェクトに関連したImageBoardオブジェクトを取得する。
+  # board_idが指定されない場合はimage_boards内の一番最初のオブジェクトを返す。
+  # @param board_id [Integer] The image_board's id which you want to retrive
+  # @return [ImageBoard]
+  def get_board(board_id=nil)
+    if board_id.nil?
+      board = image_boards.first
+    else
+      board = image_boards.find(board_id)
     end
   end
 
-  # Sort images by its favorites attribute.
-  # @return [ActiveRecord::AssociationRelation]
-  def self.sort_images(images, page)
-    images = images.reorder('images.favorites desc')
-    images.page(page).per(25)
-  end
-
-  # Sort images by its quality attribute.
-  # @return [ActiveRecord::AssociationRelation]
-  def self.sort_by_quality(images, page)
-    images = images.reorder('quality desc')
-    images.page(page).per(25)
-  end
 
   # @return The path where default thumbnail file is.
   def set_default_url
@@ -111,59 +95,58 @@ class User < ActiveRecord::Base
     self.save!
   end
 
-  # Get an optional ImageBoard instance by board_id.
-  # そのUserオブジェクトに関連したImageBoardオブジェクトを取得する。
-  # board_idが指定されない場合はimage_boards内の一番最初のオブジェクトを返す。
-  # @param board_id [Integer] The image_board's id which you want to retrive
-  # @return [ImageBoard]
-  def get_board(board_id=nil)
-    if board_id.nil?
-      board = image_boards.first
-    else
-      board = image_boards.find(board_id)
-    end
-  end
 
 
   # ===============================
   #  Authorization related methods
   # ===============================
-  def self.new_with_session(params, session)
-    super.tap do |user|
-      if data = session['devise.facebook_data'] && session['devise.facebook_data']['extra']['raw_info']
-        user.email = data['email']
+
+  # Called from omniauth_callback_controller.
+  # @param auth [OmniAuth::AuthHash]
+  # @param current_user [User]
+  # @return [User]
+  def self.from_omniauth(auth, current_user)
+    authorization = Authorization.where(
+      :provider => auth.provider,
+      :uid => auth.uid.to_s,
+      :token => auth.credentials.token,
+      :secret => auth.credentials.secret
+    ).first_or_initialize
+
+    if authorization.user.blank?
+      user = current_user.nil? ? User.where('email = ?', auth["info"]["email"]).first : current_user
+      unless user
+        begin
+          user = User.create(
+            #name:     auth.info.nickname,
+            name:     User.get_user_name(auth),
+            provider: auth.provider,
+            uid:      auth.uid,
+            email:    User.get_email(auth),
+            password: Devise.friendly_token[0,20]
+          )
+        rescue => e
+          return
+        end
       end
+
+      authorization.user_name = User.get_user_name(auth)
+      authorization.user = user
+      authorization.save
+    end
+    authorization.user
+  end
+
+  def self.get_user_name(auth)
+    if auth.provider == 'facebook'
+      "#{auth.info.first_name} #{auth.info.last_name}"
+    else
+      auth.info.nickname
     end
   end
 
-  #
-  # emailを取得したい場合は、migrationにemailを追加する
-  def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
-    user = User.where(provider: auth.provider, uid: auth.uid).first
-    unless user
-      user = User.create(
-        name:auth.extra.raw_info.name,
-        provider:auth.provider,
-        uid:auth.uid,
-        email:auth.info.email,
-        password:Devise.friendly_token[0,20]
-      )
-    end
-    user
-  end
-
-  def self.find_for_twitter_oauth(auth, signed_in_resource=nil)
-    user = User.where(provider: auth.provider, uid: auth.uid).first
-    unless user
-      user = User.create(
-        name:     auth.info.nickname,
-        provider: auth.provider,
-        uid:      auth.uid,
-        email:    User.create_unique_email,
-        password: Devise.friendly_token[0,20]
-      )
-    end
-    user
+  def self.get_email(auth)
+    auth.provider == 'twitter' ? User.create_unique_email : auth.info.email
   end
 
   # @return A string that provides an uuid.

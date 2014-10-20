@@ -1,4 +1,4 @@
-<%= render 'shared/modal' %>
+<%= render 'shared/modal_avatar' %>
 
 <nav class="navbar navbar-default" role="navigation">
   <%= navbar_header brand: image_tag(asset_path('test_logo.png')), brand_link: home_users_path, class: 'logo' %>
@@ -8,25 +8,25 @@
         <li>
           <%= link_to 'Change avatar image', new_avatar_users_path, { :remote => true, 'data-toggle' => "modal", 'data-target' => '#modal-window', class: 'dropdown-user' } %>
         </li>
+        <%= navbar_item 'Settings', settings_users_path %>
         <%= navbar_dropdown_divider %>
         <%= navbar_item 'Log out', destroy_user_session_path %>
       <% end %>
 
       <%= navbar_item 'Home', home_users_path %>
-      <%= navbar_item 'Boards', show_favored_images_users_path %>
-      <%= navbar_item 'Preferences', show_target_words_users_path %>
-      <%= navbar_dropdown 'DEBUG' do %>
-        <%= navbar_item 'View all images', images_path %>
-        <%= navbar_item 'Debug illust detection', debug_illust_detection_users_path %>
-        <%= navbar_item 'Debug crawling', debug_crawling_users_path %>
-        <%= navbar_item 'Tutorial', '/tutorial' %>
-        <%= navbar_item 'Top page', '/' %>
-        <%= navbar_item 'Resque', '/resque_web/overview' %>
-        <%= navbar_item 'Toggle miniprofiler', toggle_miniprofiler_users_path %>
+      <%= navbar_item 'Boards', boards_users_path %>
+      <%= navbar_item 'Preferences', preferences_users_path %>
+      <%# navbar_item 'About us', new_contact_path %>
+      <%= navbar_dropdown 'About' do %>
+      <%= navbar_item 'About us', new_contact_path %>
+      <%= navbar_item 'Blog', 'http://ispick.tumblr.com/'.html_safe %>
+      <%= navbar_item 'FAQ', page_path('faq') %>
       <% end %>
     <% end %>
 
-    <%= image_tag(current_user.avatar.url(:thumb), align: 'right', class: 'current-avatar') %>
-
+    <div style="text-align:right;">
+      <%= "Hi, #{current_user.name}!" %>
+      <%= image_tag(current_user.avatar.url(:thumb), class: 'current-avatar') %>
+    </div>
   <% end %>
 </nav>

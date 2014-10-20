@@ -1,0 +1,22 @@
+<%= bootstrap_form_for(@image_board) do |f| %>
+  <% if @image_board.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@image_board.errors.count, "error") %> prohibited this image_board from being saved:</h2>
+
+      <ul>
+      <% @image_board.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <%= f.text_field :name, :required => true, :autofocus => true %>
+    </div>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

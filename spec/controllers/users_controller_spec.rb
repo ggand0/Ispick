@@ -7,15 +7,61 @@ describe UsersController do
   end
 
   describe "GET home" do
-    it "renders 'signed_in' template when the user is logged in" do
-      login_user
-      get :home, {}, valid_session
-      expect(response).to render_template('signed_in')
-    end
-
-    it "renders 'not_signed_in' template when the user is NOT logged in" do
+    it "renders 'signin_with_password' template when the user is NOT logged in" do
       get :home, {}, valid_session
       expect(response).to redirect_to('/signin_with_password')
+    end
+
+    it "renders 'home' template when the user is logged in" do
+      login_user
+      get :home, {}, valid_session
+      expect(response).to render_template('home')
+    end
+
+    it "does something" do
+      login_user
+      get :home, { date: 'Mon Sep 01 2014 00:00:00 GMT 0900 (JST)' }, valid_session
+    end
+  end
+
+  describe "GET new_avatar" do
+    it "renders proper partial" do
+      login_user
+      get :new_avatar, :format => 'js'
+
+      expect(response).to render_template('users/_new_avatar')
+    end
+  end
+
+  describe "POST create_avatar" do
+    it "updates avatar image" do
+      login_user
+      request.env['HTTP_REFERER'] = '/'
+
+      post :create_avatar, { id: User.first.id, avatar: fixture_file_upload("files/madoka0.jpg") }
+      expect(User.first.avatar).not_to eq(nil)
+    end
+  end
+
+  describe "PUT update" do
+    it "updates a user correctly" do
+      login_user
+      put :update, { id: User.first.id, user: { name: 'madoka'}}
+      expect(User.first.name).to eq('madoka')
+    end
+  end
+
+  describe "GET search" do
+    it "Search and render the right images" do
+      login_user
+      image1 = FactoryGirl.create(:image_with_tags)
+
+      get :search, { query: '鹿目まどか6', page: 1 }
+      response.should render_template('home')
+
+      # total count of images is 12, so at page 1, there must be six images
+      expect(assigns(:images).count).to eq(6)
+      #expect(assigns(:images).first).to eq(image1)
     end
   end
 
@@ -24,7 +70,7 @@ describe UsersController do
     it "renders show_target_images template when logged in" do
       login_user
       get :show_target_images, {}, valid_session
-      response.should render_template('show_target_images')
+      response.should render_template('debug/_show_target_images')
     end
 
     it "renders not_signed_in template when NOT logged in" do
@@ -33,60 +79,48 @@ describe UsersController do
     end
   end
 
-  describe "GET show_target_words" do
-    it "renders 'show_target_words' template when logged in" do
+  describe "GET show_tags" do
+    it "renders 'preferences' template when logged in" do
       login_user
-      get :show_target_words, {}, valid_session
-      response.should render_template('show_target_words')
+      get :preferences, {}, valid_session
+      response.should render_template('preferences')
     end
 
     it "renders 'not_signed_in' template when NOT logged in" do
-      get :show_target_words, {}, valid_session
+      get :preferences, {}, valid_session
       expect(response).to redirect_to('/signin_with_password')
     end
   end
 
-  describe "GET show_favored_images" do
+  describe "GET boards" do
     it "renders show_target_images template when logged in" do
       login_user
-      get :show_favored_images, {}, valid_session
-      response.should render_template('show_favored_images')
+      get :boards, {}, valid_session
+      response.should render_template('boards')
     end
 
     it "renders not_signed_in template when NOT logged in" do
-      get :show_favored_images, {}, valid_session
+      get :boards, {}, valid_session
       expect(response).to redirect_to('/signin_with_password')
     end
   end
 
-  describe "GET download_favored_images" do
-    # see: http://stackoverflow.com/questions/4701108/rspec-send-file-testing
-    it "downloads favored delivered_images" do
+
+  describe "DELETE delete_tag" do
+    it "deletes a tag only from the User.tags relation" do
       login_user
-      controller.stub(:render).and_return nil
-      controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
-      get :download_favored_images, {}, valid_session
-    end
+      user = User.first
+      word_count = TargetWord.count
+      user_count = user.tags.count
+      tag = user.tags.first
 
-    it "renders not_signed_in template when NOT logged in" do
-      # rootにいたと仮定
-      request.env['HTTP_REFERER'] = '/'
-      get :download_favored_images, {}, valid_session
+      delete :delete_tag, { id: tag.id }
 
-      # redirect_to :backされるはず
-      expect(response).to redirect_to '/'
+      expect(response).to render_template('preferences')
+      expect(TargetWord.count).to eq(word_count)
+      expect(user.tags.count).to eq(user_count-1  )
     end
   end
-
-  # An action for debug
-  describe "GET debug_illust_detection" do
-    it "renders valid template" do
-      login_user
-      get :debug_illust_detection, {}, valid_session
-      response.should render_template('debug_illust_detection')
-    end
-  end
-
 
   # ==========================
   #  specs of private methods

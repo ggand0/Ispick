@@ -1,0 +1,49 @@
+<%= stylesheet_link_tag 'users' %>
+
+<div class="container-fluid">
+  <div class="col-md-8">
+  <h2>Preferences</h2>
+  <div class="col-md-4">Search a tag to follow!</div>
+  <br />
+
+  <!-- Render the search form -->
+  <%= search_form_for @search, url: preferences_users_path, html: { method: :post }, remote: true do |f| %>
+    <div class="col-md-4">
+      <%= f.text_field :name_cont, class: "form-control" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit 'Search', class: "btn btn-default" %>
+    </div>
+  <% end %>
+  <br />
+
+  <!-- Render a dropdown to switch popular tags source -->
+  <%= bs_dropdown_button_to list_glyphicon do %>
+    <li><%= link_to 'Tags used for crawling', { controller: 'users', action: 'preferences', target_words: true }, class: 'btn-default' %></li>
+    <li><%= link_to 'All tags', { controller: 'users', action: 'preferences' }, class: 'btn-default' %></li>
+  <% end %>
+  <br /><br />
+
+
+  <!-- Render popular tags or search result in the partial -->
+  <div class="wrapper-popular-tags">
+    <%= render partial: 'users/popular_tags', locals: { tags_result: @tags_result, popular_tags: @popular_tags } %>
+  </div>
+
+  <div class="arrow">></div>
+
+  <!-- Render followed tags in the partial -->
+  <div class="wrapper-followed-tags">
+    <%= render partial: 'users/followed_tags', locals: { tags: @tags, test: 'test0' } %>
+  </div>
+
+
+  <!-- Insert space -->
+  <div style="clear: both;">
+    <br />
+    <br />
+    <br />
+  </div>
+</div>
+</div>

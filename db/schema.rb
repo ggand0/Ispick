@@ -11,7 +11,53 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140912171151) do
+ActiveRecord::Schema.define(version: 20141016181815) do
+
+  create_table "active_admin_comments", force: true do |t|
+    t.string   "namespace"
+    t.text     "body"
+    t.string   "resource_id",   null: false
+    t.string   "resource_type", null: false
+    t.integer  "author_id"
+    t.string   "author_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
+  add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
+  add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "admins", force: true do |t|
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.boolean  "god_mode"
+    t.boolean  "reports_only"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "admins", ["email"], name: "index_admins_on_email", unique: true, using: :btree
+  add_index "admins", ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true, using: :btree
+
+  create_table "authorizations", force: true do |t|
+    t.string   "provider"
+    t.string   "uid"
+    t.integer  "user_id"
+    t.string   "token"
+    t.string   "secret"
+    t.string   "user_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "favored_images", force: true do |t|
     t.text     "title"
@@ -27,9 +73,21 @@ ActiveRecord::Schema.define(version: 20140912171151) do
     t.datetime "updated_at"
     t.text     "page_url"
     t.text     "site_name"
-    t.integer  "views"
-    t.integer  "favorites"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
     t.datetime "posted_at"
+    t.text     "original_url"
+    t.text     "artist"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
+  end
+
+  create_table "favored_images_tags", force: true do |t|
+    t.integer "favored_image_id", null: false
+    t.integer "tag_id",           null: false
   end
 
   create_table "features", force: true do |t|
@@ -62,11 +120,25 @@ ActiveRecord::Schema.define(version: 20140912171151) do
     t.text     "page_url"
     t.text     "site_name"
     t.string   "module_name"
-    t.integer  "views"
-    t.integer  "favorites"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
     t.datetime "posted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "artist"
+    t.text     "original_url"
+    t.text     "poster"
+    t.integer  "popularity"
+    t.integer  "popularity_anipic"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "original_views"
+    t.integer  "original_favorites"
+    t.integer  "view_count",              default: 0, null: false
+    t.integer  "clip_count",              default: 0, null: false
+    t.integer  "share_count",             default: 0, null: false
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
@@ -92,6 +164,22 @@ ActiveRecord::Schema.define(version: 20140912171151) do
   end
 
   add_index "keywords", ["name"], name: "index_keywords_on_name", length: {"name"=>10}, using: :btree
+
+  create_table "likes", force: true do |t|
+    t.integer  "image_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "messages", force: true do |t|
+    t.text     "name"
+    t.string   "email"
+    t.text     "subject"
+    t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "people", force: true do |t|
     t.string   "name"
@@ -124,9 +212,16 @@ ActiveRecord::Schema.define(version: 20140912171151) do
     t.integer  "image_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "images_count", default: 0, null: false
+    t.integer  "users_count",  default: 0, null: false
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
+
+  create_table "tags_users", force: true do |t|
+    t.integer "tag_id",  null: false
+    t.integer "user_id", null: false
+  end
 
   create_table "target_images", force: true do |t|
     t.string   "data_file_name"
@@ -150,6 +245,7 @@ ActiveRecord::Schema.define(version: 20140912171151) do
     t.integer  "crawl_count",       default: 0, null: false
     t.integer  "images_count",      default: 0, null: false
     t.integer  "users_count",       default: 0, null: false
+    t.text     "name_english"
   end
 
   create_table "target_words_users", force: true do |t|
@@ -189,6 +285,9 @@ ActiveRecord::Schema.define(version: 20140912171151) do
     t.string   "password"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "language"
+    t.integer  "likes_count",                      default: 0,  null: false
+    t.string   "language_preferences"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

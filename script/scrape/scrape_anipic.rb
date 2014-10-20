@@ -6,7 +6,7 @@ require "#{Rails.root}/script/scrape/client"
 
 module Scrape
   class Anipic < Client
-    ROOT_URL = 'http://anime-pictures.net/'
+    ROOT_URL = 'http://anime-pictures.net'
 
     def initialize(logger=nil, limit=20)
       self.limit = limit
@@ -47,56 +47,60 @@ module Scrape
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
       @logger.debug "#{target_word.inspect}"
+      result_hash = Scrape.get_result_hash
+
       if english
         query = Scrape.get_query_en(target_word, 'roman')
       else
         query = Scrape.get_query_en(target_word, '')
       end
-      return if query.nil? or query.empty?
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
       @logger.info "query=#{query}"
 
 
-      duplicates = 0
-      skipped = 0
-      scraped = 0
-      avg_time = 0
-
       # Mecanizeによりクエリ検索結果のページを取得
       page = self.get_search_result(query)
-
       # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
-      page.search("span[class='img_block_big']").each_with_index do |image, count|
-        # サーチ結果ページから、ソースページのURLを取得
-        page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
-        # ソースページのパース
-        xml = Nokogiri::XML(open(page_url))
-        # ソースページから画像情報を取得してDBへ保存する
-        start = Time.now
+      return if page.search("span[class='img_block_big']").count == 0
 
-        begin
-          image_data = self.get_data(xml, page_url)
-        rescue => e
-          # R18画像はloginしないと見れないのでerrorになる？
-          puts e.inspect
+      page.search("span[class='img_block_big']").each_with_index do |image, count|
+        # 広告又はR18画像はスキップ
+        if image.children.search('img').first.nil?
+          result_hash[:skipped] += 1
           next
+        else
+          # サーチ結果ページから、ソースページのURLを取得
+          page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
         end
 
-        options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: (not user_id.nil?)
-        }
+        # ソースページのパース
+        xml = Nokogiri::XML(open(page_url))
+
+        # ソースページから画像情報を取得してDBへ保存する
+        start = Time.now
+        image_data = self.get_data(xml, page_url)
+        @logger.debug image_data.inspect
+        begin
+          #image_data = self.get_data(xml, page_url)
+          #@logger.debug "src_url: #{image_data.src_url}"
+        rescue => e
+          @logger.error "An error has occurred inside get_data method. count: #{count}"
+          send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
+          next
+        end
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
         tags = self.get_tags_original(xml)
-        #@logger.debug tags.inspect
 
         # 保存に必要なものはimage_data, tags, validetion
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
-        avg_time += elapsed_time
+        result_hash[:avg_time] += elapsed_time
         @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
 
         # Resqueで非同期的に画像解析を行う
@@ -107,10 +111,11 @@ module Scrape
         end
 
         # @limit枚抽出したら終了
-        break if (count+1 - skipped) >= @limit
+        break if (count+1 - result_hash[:skipped]) >= @limit
       end
 
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
     # Mechanizeにより検索結果を取得
@@ -122,9 +127,9 @@ module Scrape
       page = agent.get(ROOT_URL)
 
       # login作業
-      page.forms[1]['login'] = 'ul0640id'
-      page.forms[1]['password'] = 'ul0943id'
-      page.forms[1].submit
+      #page.forms[1]['login'] = 'xxx'
+      #page.forms[1]['password'] = 'xxx'
+      #page.forms[1].submit
 
       page.forms[2]['search_tag'] = query
 
@@ -171,7 +176,7 @@ module Scrape
     end
 
     # 画像１枚に関する情報をHashにして返す。
-    # favoritesの抽出にはVotesを利用
+    # original_favorite_countの抽出にはVotesを利用
     # @param [Nokogiri::XML]
     # @param [String]
     # @return [Hash]
@@ -181,7 +186,6 @@ module Scrape
       title = xml.css("div[class='post_content']").css("h1").first.content.gsub!(/\n/,'')
       # タブのスペースへの変換
       title.gsub!(/\t/,' ')
-
       # captionの取得
       # 改行の除去
       caption = xml.css('title').first.content.gsub!(/\n/,'')
@@ -194,20 +198,49 @@ module Scrape
       time = Time.parse(time)
 
       # src_urlの取得
-      src_url = xml.css("div[id='big_preview_cont']").css("img").first.attributes['src'].value.gsub!(/ /,'')
+      image_url_div = xml.css("div[id='big_preview_cont']")
+      #src_url = image_url_div.css("img").first.attributes['src'].value.gsub!(/ /,'')
+      src_url = image_url_div.css("img").first.attributes['src'].value
+      @logger.debug src_url.inspect
+
+      # original_urlの取得
+      # aタグが上手くパース出来なかったときの例外処理
+      if image_url_div.children.css("a").first.nil?
+        original_url = ROOT_URL + xml.css("div[class='post_vote_block']").css("a[rel='nofollow']").first.attributes['href'].value.gsub!(/download_image/,"get_image")
+      else
+        original_url = ROOT_URL + image_url_div.children.search("a").first.attributes['href'].value
+      end
+
+      author = "none"
+      # artistの取得
+      xml.css("ul[class='tags']").first.css('span').each do |span|
+        if span.content == "author"
+          author = span.next_element.css('a').first.content.gsub(/\t|\n/,'')
+          break
+        end
+      end
 
       # votesの取得
       votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
+
+      # Get resolution
+      resolution = xml.css("div[class='post_content']").first.css('b')[4].next_element.content
+      size = resolution.split('x')
+
       hash = {
         title: title,
         caption: caption,
         page_url: page_url,
         posted_at: time,
-        views: nil,
+        original_view_count: nil,
         src_url: src_url,
-        favorites: votes,             # votesの数
+        original_url: original_url,
+        original_width: size[0],
+        original_height: size[1],
+        original_favorite_count: votes,             # votesの数
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
+        artist: author,
       }
 
       return hash

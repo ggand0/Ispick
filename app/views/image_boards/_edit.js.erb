@@ -1,0 +1,3 @@
+$(".modal-boards .modal-body").html("<%= escape_javascript(
+  render partial: 'image_boards/edit_board', locals: { image_board: @image_board }) %>");
+$("#modal-board").modal('show');

@@ -1,0 +1,17 @@
+<h3>Welcome to Ispick debugging page!</h3>
+"DEBUG" navbar will be deleted soon,<br />
+and this page would be used as the alternative in production.<br />
+<br />
+<br />
+<%= button_group class: 'btn-group-vertical' do %>
+  <%= bs_button_to 'View all images', images_path, class: 'btn-default' %>
+  <%= bs_button_to 'Debug design', home_debug_path, class: 'btn-default' %>
+  <%= bs_button_to 'Debug illust_detection', illust_detection_debug_path, class: 'btn-default' %>
+  <%= bs_button_to 'Debug crawling', crawling_debug_path, class: 'btn-default' %>
+  <%= bs_button_to 'Download images', download_debug_path, class: 'btn-default' %>
+  <%= bs_button_to 'Toggle miniprofiler', miniprofiler_debug_path, class: 'btn-default' %>
+  <%= bs_button_to 'Top page', '/', class: 'btn-default' %>
+  <%= bs_button_to 'Tutorial', '/tutorial', class: 'btn-default' %>
+  <%= bs_button_to 'Resque', '/resque_web/overview' %>
+  <%= bs_button_to 'ActiveAdmin', '/admin/login', class: 'btn-info btn-default' %>
+<% end %>

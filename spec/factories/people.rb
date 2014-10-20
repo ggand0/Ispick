@@ -19,6 +19,19 @@ FactoryGirl.define do
     end
   end
 
+  factory :person_madokas, class: Person do
+    sequence(:name) { |n| "鹿目まどか#{n}" }
+    sequence(:name_roman) { |n| "Kaname Madoka#{n}" }
+    sequence(:name_english) { |n| "Madoka Kaname#{n}" }
+    name_type 'Character'
+    sequence(:name_display) { |n| "鹿目 まどか（かなめ まどか）#{n}" }
+
+    after(:create) do |person|
+      #person.keywords << create(:keyword_title)
+      #person.keywords << create(:keyword_alias)
+    end
+  end
+
   factory :person_madoka_en, class: Person do
     name_roman 'Kaname Madoka'
     name_english 'Madoka Kaname'

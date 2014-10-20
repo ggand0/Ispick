@@ -1,32 +1,29 @@
-<h1><strong>Ispick v0.3</strong></h1>
-<p>Ispick is an illustration aggregation service!</p>
-
-<div class="top-image">
-  <%= link_to (image_tag asset_path('top_madoka.jpg')), '/', style: " z-index: 1;"%>
-</div>
-
-<div class="wrapper-sign-in">
-  <div class="btn-group-vertical btn-group-oauth">
-    <%= button_group do %>
-      <%= bs_button_to 'Login with Facebook', user_omniauth_authorize_path(:facebook), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Twitter', user_omniauth_authorize_path(:twitter), class: "btn btn-default btn-block" %><br>
-      <%= bs_button_to 'Login with Pinterest', '/', class: "btn btn-default btn-block" %><br>
-      <br>
-
-      <div align="center">
-        <%= bootstrap_form_for resource, as: resource_name, url: session_path(resource_name) do |f| %>
-          <%= f.email_field :email, autofocus: true, placeholder: 'email' %>
-          <%= f.password_field :password, autocomplete: 'off', placeholder: 'password' %>
-          <%= f.submit 'Submit' %>
-        <% end %>
+<!-- A version of embedding description and login form as boxes. -->
+<!-- Render description box and login form box only at the first time -->
+<br />
+<div class="wrapper">
+  <% if @first %>
+    <div class="block has-gutters">
+      <div class="height">260</div>
+      <div class="top-description">
+        <br />
+        <%= render partial: 'shared/top_description' %>
+        <br />
       </div>
+    </div>
+    <div class="block has-gutters">
+      <div class="height">280</div>
+      <div class="wrapper-oauth">
+        <br />
+        <%= render partial: 'shared/top/wrapper_sign_in' %>
+        <br />
+        <br />
+      </div>
+    </div>
+  <% end %>
 
-    <% end %>
-  </div>
-  <br>
-  <br>
-  <div class="link-sign-in" align="center">
-    <%= link_to 'Forgot password?', '/reset_password' %><br>
-    <%= link_to 'Sign up', '/signup_with_password' %>
-  </div>
+  <%= render partial: 'shared/render_images', locals: { images: @images } %>
 </div>
+
+<!-- Render pagination nav used for infinite scrolling -->
+<%= paginate @images %>

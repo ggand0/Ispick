@@ -105,6 +105,18 @@ module Scrape
     query
   end
 
+  def self.get_result_hash
+    { scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: 'none' }
+  end
+
+  def self.get_result_string(result)
+    "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}, info: #{result[:info]}"
+  end
+
+  def self.get_option_hash(validation, large, verbose, resque)
+    { validation: validation, large: large, verbose: verbose, resque: resque }
+  end
+
   def self.get_titles (target_word)
     return nil if target_word.nil?
     target_word.person.titles if target_word.person and target_word.person.titles
@@ -130,7 +142,7 @@ module Scrape
 
   def self.remove_4bytes(string)
     return nil if string.nil?
-    string.each_char.select{|c| c.bytes.count < 4 }.join('')
+    string.each_char.select{ |c| c.bytes.count < 4 }.join('')
   end
 
 end

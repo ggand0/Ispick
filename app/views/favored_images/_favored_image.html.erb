@@ -1,41 +1,4 @@
 <!-- Called from the favored_images controller indirectly -->
 
 <%= render partial: 'shared/render_image', locals: { image: @favored_image } %>
-<p>
-  <strong>Title:</strong>
-  <%= @favored_image.title unless @favored_image.title.nil? %>
-</p>
-
-<p>
-  <strong>Caption:</strong>
-  <%= @favored_image.caption.html_safe unless @favored_image.caption.nil? %>
-</p>
-
-<p>
-  <strong>Source URL:</strong>
-  <%= link_to 'source image URL', @favored_image.src_url %>
-</p>
-<p>
-  <strong>Size in bytes:</strong><br>
-  <%= bytes_to_kilobytes(@favored_image.data.size) %> KB<br>
-  <%= bytes_to_megabytes(@favored_image.data.size) %> MB<br>
-</p>
-
-
-<h2>Debug:</h2>
-<table>
-  <thead>
-    <tr>
-      <th align="left">id of favored_image</th>
-      <td><%= @favored_image.id %></td>
-    </tr>
-    <tr>
-      <th align="left">id of image</th>
-      <td><%= @favored_image.image.id %></td>
-    </tr>
-    <tr>
-      <th align="left">raw image size</th>
-      <td><%= @favored_image.data.size if @favored_image.data %></td>
-    </tr>
-  </thead>
-</table>
+<%= render partial: 'shared/show_image', locals: { image: @favored_image } %>

@@ -25,9 +25,11 @@ Ispick::Application.configure do
   # 開発時はfalseだと問題に気づくことができないためtrueにする
   config.action_mailer.raise_delivery_errors = true
 
+  # Set the SMTP as delivery protocol
   # 送信プロトコルにSMTPを選択
   config.action_mailer.delivery_method = :smtp
 
+  # Configure SMTP
   # SMTPの設定
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
@@ -37,6 +39,20 @@ Ispick::Application.configure do
     user_name: CONFIG['gmail_username'],
     password: CONFIG['gmail_password']
   }
+
+  # Settings of exception_notification gem
+  # Uncomment this if you need to debug
+=begin
+  config.middleware.use ExceptionNotification::Rack,
+    :ignore_crawlers => %w{Googlebot bingbot},
+    :ignore_exceptions => ['ActionView::TemplateError'] + ExceptionNotifier.ignored_exceptions,
+    email: {
+      sender_address: 'noreply@ispicks.com',
+      exception_recipients: CONFIG['gmail_username'],
+    }
+=end
+  config.action_mailer.delivery_method = :letter_opener
+
 
   config.action_mailer.default_url_options = {:host => "0.0.0.0:3000"}
 

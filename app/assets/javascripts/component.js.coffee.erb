@@ -1,0 +1,138 @@
+class @Component
+  constructor: () ->
+
+  # 'Clip'ボタンを押下した時にボタンを表示したままにする
+  initButtons: () ->
+    $(document).on('click', '.popover-board', () ->
+      $(this).parents('.boxInner').addClass('hovered')
+    )
+
+  masonry: () ->
+    $container = $('#wrapper')
+    $container.masonry( ->
+       itemSelector: '.image',
+       #gutterWidth: 66,
+       animate: true,
+       columnWidth: 200;
+    )
+    # call the layout method after all elements have been loaded
+    $container.imagesLoaded( ->
+      $container.masonry()
+    )
+    $container.masonry()
+
+  infiniteScroll: (logging) ->
+    console.log('infiniteScroll called') if logging
+    $('.pagination').hide()
+
+
+    if document.URL.indexOf('home') > -1
+      console.log('fast scrolling with infinity.js')
+      window.$el = $('.wrap')
+      window.listView = new infinity.ListView(window.$el)
+      window.scrollReady = true
+
+      $(window).scroll ->
+        console.log(window.scrollReady)
+        return if window.scrollReady == false
+
+        url = $('nav.pagination a[rel=next]').attr('href')
+        if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
+          $('.pagination').text("Fetching more products...")
+          window.scrollReady = false
+          $.getScript(url)
+          $.ajax({
+            cache: false,
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            success: (data) ->
+              window.listView.append($(data).find('.i'))
+              #$(".wrap").masonry( 'appended', $(data).find('.box') )
+              count = window.listView.pages[0].items.length
+              console.log(count)
+              console.log(window.listView.pages[0].items[count-1])
+              window.scrollReady = true
+            failure: (data) ->
+              console.log('failed')
+              window.scrollReady = true
+          })
+    else# normal slow scroll in other pages
+      @.masonry()
+
+      console.log('normal scrolling with infinite-scroll lib')
+      $("#wrapper").infinitescroll({
+        navSelector: "nav.pagination"               # selector for the paged navigation (it will be hidden)
+        nextSelector: "nav.pagination a[rel=next]"  # selector for the NEXT link (to page 2)
+        itemSelector: ".image"                        # selector for all items you'll retrieve
+        #loading: {
+        #  img: 'http://i.imgur.com/6RMhx.gif'
+        #}
+      },
+      (newElements) ->
+        $newElems = $( newElements )
+        $container = $("#wrapper")
+        $container.masonry( 'appended', $newElems )
+        $container.imagesLoaded( ->
+          $container.masonry()
+        )
+      )
+
+
+  initCalender: () ->
+    #selector = "[data-behaviour~=datepicker]"
+    selector = ".input-group.date"
+    $(selector).datepicker().on('changeDate', (ev) ->
+      $('.current-date').change()
+
+      date = $(this).datepicker('getDate')
+      $(selector).datepicker('hide')
+
+      url = window.location.href
+      url = url.split('?')[0]+'?date='+date
+      window.location.href = url
+    )
+    $("body").on("click", ".filter-button", () ->
+      $(selector).datepicker('show')
+    )
+
+  initPopovers: () ->
+    $('body').on('click', (e) ->
+      $('[data-toggle="popover"]').each(() ->
+        # the 'is' for buttons that trigger popups
+        # the 'has' for icons within a button that triggers a popup
+        if (!$(this).is(e.target) && ($(this).has(e.target).length is 0) && $('.popover').has(e.target).length is 0)
+          $(this).popover('hide')
+          # Clip buttonもついでに消す
+          $('.boxInner').removeClass('hovered')
+          $('.titleD').removeClass('notransition')
+      )
+    )
+    # Initialize all popovers
+    $('.popover-board').popover({
+      html: true,
+      content: '',
+      #trigger: 'manual'
+      #trigger: 'click'
+    }).popover('hide')
+
+
+  initDropdowns: () ->
+    $('.dropdown-user').click (e) ->
+      $("body").trigger("click")
+
+  # Initializes the backdrop colors of the modals
+  initModals: () ->
+    $('.modal-avatar').on('show.bs.modal hide.bs.modal', (e) ->
+      $('body').toggleClass('modal-color-none')
+    )
+    #$('#modal-image').on('show.bs.modal hide.bs.modal', (e) ->
+    #$('.modal-images').on('show.bs.modal hide.bs.modal', (e) ->
+    #  $('body').toggleClass('modal-color-none')
+    #)
+
+  initBoards = () ->
+    #
+    $('.user_boards').on("click", (e, data, status, xhr) ->
+      $('#modal-board').modal('hide')
+    )

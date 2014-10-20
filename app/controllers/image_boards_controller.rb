@@ -22,29 +22,23 @@ class ImageBoardsController < ApplicationController
   end
 
   def boards
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:id]
     respond_to do |format|
-      format.html { render partial: 'shared/popover_board', locals: { image: @image, image_board: @board, html: @id } }
-      format.js { render partial: 'boards' }  # _boards.js.erbを描画
-    end
-  end
-
-  def reload
-    #@image = DeliveredImage.find(params[:image])
-    @image = Image.find(params[:image])
-    @board = ImageBoard.new
-    respond_to do |format|
-      format.html
-      format.js { render partial: 'reload' }
+      format.html { render partial: 'shared/popover_board',
+        locals: { image: @image, image_board: @board, html: @id } }
+      format.js { render partial: 'boards' }
     end
   end
 
 
   # GET /image_boards/1/edit
   def edit
+    respond_to do |format|
+      format.html
+      format.js { render partial: 'edit' }
+    end
   end
 
   # POST /image_boards
@@ -53,7 +47,6 @@ class ImageBoardsController < ApplicationController
     @image_board.save!
     current_user.image_boards << @image_board
 
-    #@image = DeliveredImage.find(params[:image])
     @image = Image.find(params[:image])
     @board = ImageBoard.new
     @id = params[:html_id]
@@ -68,7 +61,7 @@ class ImageBoardsController < ApplicationController
   def update
     respond_to do |format|
       if @image_board.update(image_board_params)
-        format.html { redirect_to @image_board, notice: 'Image board was successfully updated.' }
+        format.html { redirect_to boards_users_path }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -82,10 +75,12 @@ class ImageBoardsController < ApplicationController
   def destroy
     @image_board.destroy
     respond_to do |format|
-      format.html { redirect_to show_favored_images_users_path }
+      format.html { redirect_to boards_users_path }
       format.json { head :no_content }
     end
   end
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

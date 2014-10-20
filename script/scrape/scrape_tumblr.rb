@@ -46,47 +46,41 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, verbose=false, english=false)
+      result_hash = Scrape.get_result_hash
       if english
         query = Scrape.get_query_en(target_word, 'english')
       else
         query = Scrape.get_query_en(target_word, '')
       end
-      return if query.nil? or query.empty?
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
 
       @logger.info "query=#{query}"
       client = self.class.get_client
-      duplicates = 0
-      skipped = 0
-      scraped = 0
-      avg_time = 0
 
       # タグ検索：limitで指定された数だけ画像を取得
       client.tagged(query).each_with_index do |image, count|
-        # 画像のみを対象とする
+        # Scrape images only
         if image['type'] != 'photo'
-          skipped += 1
+          result_hash[:skipped] += 1
           next
         end
 
-
-        # API responseから画像情報を取得してDBへ保存する
+        # Retrieve data into a hash for creating a new Image record
         start = Time.now
         image_data = Scrape::Tumblr.get_data(image)
-        options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: (not user_id.nil?)
-        }
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
 
         # Save images to the database using parent's class method
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(image['tags']), options)
 
-        # 抽出情報の更新
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
+        # Update the statistics numbers
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
-        avg_time += elapsed_time
+        result_hash[:avg_time] += elapsed_time
 
 
         # 登録直後の配信の場合は、ここでResqueで非同期的に画像解析を行う
@@ -97,12 +91,12 @@ module Scrape
             user_id, target_word.class.name, target_word.id, @logger)
         end
 
-        # limit枚抽出したら終了
-        #break if duplicates >= 3 # 検討中
-        break if (count+1 - skipped) >= limit
+        # Finish the loop after it scrapes @limit images
+        break if (count+1 - result_hash[:skipped]) >= @limit
       end
 
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
 
@@ -112,7 +106,7 @@ module Scrape
     # ==============
     # [OLD]直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
     # @param [String] likes_countを取得するページのurl
-    def get_favorites(page_url)
+    def get_original_favorite_count(page_url)
       begin
         # show:likesを設定しているページのみ取得
         html = Nokogiri::HTML(open(page_url))
@@ -134,24 +128,55 @@ module Scrape
       ::Tumblr::Client.new
     end
 
+    def self.get_artist_information(caption)
+        # タグの除去
+      caption = caption.gsub(/<.*?>/,"")
+
+      #Hatsune… Madoka? | hitsu [pixiv]
+        #「まどかさん」/「かきあげ」のイラスト [pixiv]
+        #「ハサハ」/「ローラ」の作品 [TINAMI] #illustail
+      if /\[pixiv\]|\[TINAMI\]/ =~ caption
+        /「.+」 *[\/|\|] *「(.+)」.+/ =~ caption
+        if $1.nil?
+          /.+ [\/|\|] (.+) \[.+\]/ =~ caption
+          artist = $1
+        else
+          artist = $1
+        end
+      # Goddess of the Month August by 成瀬まひ
+      elsif caption.scan(/ by /).size == 1
+        /.+[by|By|BY] (.+)/ =~ caption
+        artist = $1
+      else
+          artist = nil
+      end
+
+      return artist
+    end
+
 
     # 画像１枚に関する情報をHashにして返す。
-    # favoritesを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
+    # original_favorite_countを抽出するのは重い(1枚あたり0.5-1.0sec)ので今のところ回避している。
     # @param [Hash]
     # @return [Hash]
     def self.get_data(image)
+      artist = self.get_artist_information(image['caption'])
       {
+        artist: artist,
+        poster: image['blog_name'],
         title: 'tumblr' + SecureRandom.random_number(10**14).to_s,
         caption: image['caption'],
-        #src_url: image['photos'].first['original_size']['url'],
+        original_url: image['photos'].first['original_size']['url'],
         src_url: image['photos'].first['alt_sizes'][0]['url'],
         page_url: image['post_url'],
         posted_at: image['date'],
-        views: nil,
+        original_width: image['photos'].first['original_size']['width'],
+        original_height: image['photos'].first['original_size']['height'],
+        original_view_count: nil,
 
-        #favorites: self.get_favorites(image['post_url']),
+        #original_favorite_count: self.get_original_favorite_count(image['post_url']),
         # reblog+likesされた数の合計値。別々には取得不可
-        favorites: image['note_count'],
+        original_favorite_count: image['note_count'],
 
         site_name: 'tumblr',
         module_name: 'Scrape::Tumblr',
@@ -172,7 +197,7 @@ module Scrape
       posts = client.posts(blog_name)
       post = posts['posts'].find { |h| h['id'] == id.to_i } if posts['posts']
 
-      { views: nil, favorites: post ? post['note_count'] : nil }
+      { original_view_count: nil, original_favorite_count: post ? post['note_count'] : nil }
     end
 
   end

@@ -4,11 +4,21 @@ SimpleCov.start do
   # Ignore these paths
   add_filter '/vendor/bundle/'
   add_filter '/script/pixiv'
+  add_filter '/script/scrape/_legacy'
+  add_filter '/script/deliver'
   add_filter '/lib/tasks'
-  add_filter 'config/initializers/reload_lib'
-  add_filter 'config/initializers/teaspoon'
+  #add_filter 'config/initializers/reload_lib'
+  #add_filter 'config/initializers/teaspoon'
+  add_filter 'config'
+  add_filter '/spec/factories'
   add_filter '/spec/support'
+  add_filter '/app/admin'
+  add_filter '/spec/teaspoon_env.rb'
+
+  add_group 'Models', 'app/models'
 end
+SimpleCov.command_name "rspec"
+SimpleCov.command_name "RSpec"
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 #ENV["RAILS_ENV"] ||= 'test'
@@ -18,6 +28,9 @@ require 'rspec/rails'
 require 'rspec/autorun'
 require 'capybara'
 require 'capybara/rspec'
+require 'database_cleaner'
+Capybara.javascript_driver = :webkit
+#Capybara.current_session.driver.header('Accept-Language', 'ja')
 
 # Initialize webmock gem
 require 'webmock/rspec'
@@ -49,7 +62,7 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of
@@ -71,6 +84,9 @@ RSpec.configure do |config|
   # Devise configuration
   config.include Devise::TestHelpers, :type => :controller
   config.include ControllerMacros, :type => :controller
+  config.include WaitForAjax#, type: :feature
+
+  #config.include WaitForAjax, type: :feature
 
   # Capybara
   config.include Capybara::DSL

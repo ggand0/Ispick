@@ -26,6 +26,8 @@ erd.dot
 # Ignore secret files
 config.yml
 database.yml
+fluent-logger.yml
+banned_words.yml
 
 *.rbc
 *.sassc
@@ -48,3 +50,4 @@ rerun.txt
 pickle-email-*.html
 .project
 config/initializers/secret_token.rb
+/config/app_environment_variables.rb

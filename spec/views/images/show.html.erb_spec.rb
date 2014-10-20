@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 describe "images/show" do
-  before(:each) do
-    @image = assign(:image, stub_model(Image,
+  before do
+    image = assign(:image, stub_model(Image,
       title: 'Title',
       caption: 'Caption',
       src_url: 'http://goo.gl/4b7UUc',
-      page_url: 'http://goo.gl/8icNI9'
+      page_url: 'http://goo.gl/8icNI9',
+      original_url: 'http://goo.gl/4b7UUc',
     ))
+    view.stub(:pinit_button).and_return image.page_url
   end
 
   it "renders attributes in <p>" do
