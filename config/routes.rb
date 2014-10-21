@@ -74,8 +74,11 @@ Ispick::Application.routes.draw do
       get 'boards'
     end
   end
-  resources :images, only: [:index, :show, :destroy]
+  #resources :images, only: [:index, :show, :destroy]
   resources :images do
+    collection do
+      get 'rss_aqua'
+    end
     member do
       put 'favor'
       put 'hide'

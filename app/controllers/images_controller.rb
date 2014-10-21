@@ -83,6 +83,17 @@ class ImagesController < ApplicationController
   end
 
 
+  # =============
+  #  RSS actions
+  # =============
+  def rss_aqua
+    @images = Image.search_images('aqua eyes')
+
+    respond_to do |format|
+      format.rss { render :layout => false }
+    end
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
