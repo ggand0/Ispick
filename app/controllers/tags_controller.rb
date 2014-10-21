@@ -42,6 +42,7 @@ class TagsController < ApplicationController
 
     respond_to do |format|
       format.html { render action: 'home' }
+      format.js { render action: 'home' }
       format.rss { render action: 'tag_images' }
     end
   end
