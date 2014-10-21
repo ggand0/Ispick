@@ -39,7 +39,11 @@ class TagsController < ApplicationController
     @images = images.page(params[:page]).per(10)
     @images_all = images
     @disable_fotter = true
-    render action: 'home'
+
+    respond_to do |format|
+      format.html { render action: 'home' }
+      format.rss { render action: 'tag_images' }
+    end
   end
 
 
