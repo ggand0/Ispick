@@ -102,9 +102,9 @@ namespace :util do
     end
 
     Image.order('created_at DESC').limit(limit).each do |image|
-      if Scrape::Client.is_adult(image.tags)
+      if Scrape::Client.check_banned(image)
         image.destroy
-        puts "Deleted: #{image.id} / #{image.target_words.first.name}"
+        puts "Deleted: #{image.id}"
       end
     end
   end
