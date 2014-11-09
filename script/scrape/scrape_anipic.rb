@@ -81,14 +81,14 @@ module Scrape
 
         # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-        image_data = self.get_data(xml, page_url)
-        @logger.debug image_data.inspect
+        #image_data = self.get_data(xml, page_url)
+        #@logger.debug image_data.inspect
         begin
-          #image_data = self.get_data(xml, page_url)
-          #@logger.debug "src_url: #{image_data.src_url}"
+          image_data = self.get_data(xml, page_url)
+          @logger.debug "src_url: #{image_data.src_url}"
         rescue => e
           @logger.error "An error has occurred inside get_data method. count: #{count}"
-          send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
+          #send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
           next
         end
         options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
