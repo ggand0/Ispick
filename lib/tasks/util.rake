@@ -25,6 +25,8 @@ namespace :util do
       end
     end
   end
+
+  desc "Redownload the thumbnail of an Image record"
   task :redownload, [:id]=> :environment do |t, args|
     count=0
     if args[:id]
@@ -43,7 +45,8 @@ namespace :util do
       puts "#{image.id} thumb redownload failed."
     end
   end
-  desc "Refresh last 1000 thumbnails"
+
+  desc "Refresh last n thumbnails"
   task :refresh_thumbs, [:limit]=> :environment do |t, args|
     count=0
     if args[:limit]
@@ -60,8 +63,6 @@ namespace :util do
         puts e
         puts "#{image.id} thumb refresh failed."
       end
-
-      #break if count >= limit
     end
   end
 
@@ -92,7 +93,7 @@ namespace :util do
     end
   end
 
-  desc "Delete images with irrelevant words"
+  desc "Delete images with irrelevant or banned words"
   task :delete_banned, [:limit] => :environment do |t, args|
     if args[:limit]
       limit = args[:limit]
@@ -101,9 +102,9 @@ namespace :util do
     end
 
     Image.order('created_at DESC').limit(limit).each do |image|
-      if Scrape::Client.is_adult(image.tags)
+      if Scrape::Client.check_banned(image)
         image.destroy
-        puts "Deleted: #{image.id} / #{image.target_words.first.name}"
+        puts "Deleted: #{image.id}"
       end
     end
   end
