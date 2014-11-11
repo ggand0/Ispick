@@ -5,9 +5,6 @@ require "#{Rails.root}/app/helpers/application_helper"
 include ApplicationHelper
 
 namespace :deliver do
-  @MAX_DELIVER_NUM = 100  # 1回の配信で、1ユーザーに対して配信する推薦イラストの数
-  @MAX_DELIVER_SIZE = 100 # 1回の配信で、1ユーザーに対して配信するイラストのサイズ[MB]
-
   desc "Associate all target_words with images"
   task associate: :environment do
     start = Time.now

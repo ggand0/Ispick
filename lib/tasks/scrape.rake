@@ -9,6 +9,7 @@ require "#{Rails.root}/script/scrape/scrape_giphy.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
 require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
+require "#{Rails.root}/script/scrape/scrape_shushu.rb"
 
 namespace :scrape do
   @DEFAULT_MN = 10000
@@ -232,5 +233,12 @@ namespace :scrape do
   task :anipic, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Anipic.new.scrape(interval.to_i)
+  end
+  
+  # shushuから画像を抽出する
+  desc "Scrape images from 'Shushu'"
+  task :shushu, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Shushu.new.scrape(interval.to_i)
   end
 end

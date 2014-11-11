@@ -27,7 +27,8 @@ module Scrape
       @limit = 20
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      scrape_target_words('Scrape::Anipic', interval)
+      #scrape_target_words('Scrape::Anipic', interval)
+      scrape_RSS()
     end
 
     # キーワードによる抽出処理を行う
@@ -59,7 +60,6 @@ module Scrape
         return result_hash
       end
       @logger.info "query=#{query}"
-
 
       # Mecanizeによりクエリ検索結果のページを取得
       page = self.get_search_result(query)
@@ -116,6 +116,75 @@ module Scrape
 
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
+    end
+    
+   # RSSを取得する
+    def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=false, english=false)
+      @logger.debug "#{target_word.inspect}"
+      result_hash = Scrape.get_result_hash
+
+      page_num = -1
+      image_data={}
+      image_data[:posted_at] = DateTime.now.to_date
+      
+      while(image_data[:posted_at].to_date == DateTime.now.to_date)
+        page_num = page_num+1
+        rss_url = ROOT_URL + "/pictures/view_posts/" + page_num.to_s
+        page = Nokogiri::HTML(open(rss_url))
+
+        page.search("span[class='img_block_big']").each_with_index do |image, count|
+        
+          # 広告又はR18画像はスキップ
+          if image.children.search('img').first.nil?
+            result_hash[:skipped] += 1
+            next
+          else
+            # サーチ結果ページから、ソースページのURLを取得
+            page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
+          end
+
+          # ソースページのパース
+          xml = Nokogiri::XML(open(page_url))
+
+          # ソースページから画像情報を取得してDBへ保存する
+          start = Time.now
+          image_data = self.get_data(xml, page_url)
+          @logger.debug image_data.inspect
+          begin
+            #image_data = self.get_data(xml, page_url)
+            #@logger.debug "src_url: #{image_data.src_url}"
+          rescue => e
+            @logger.error "An error has occurred inside get_data method. count: #{count}"
+            send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
+            next
+          end
+          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+          tags = self.get_tags_original(xml)
+
+          # 保存に必要なものはimage_data, tags, validetion
+          image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+
+          result_hash[:duplicates] += image_id ? 0 : 1
+          result_hash[:scraped] += 1 if image_id
+          elapsed_time = Time.now - start
+          result_hash[:avg_time] += elapsed_time
+          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+
+          # Resqueで非同期的に画像解析を行う
+          # 始めに画像をダウンロードし、終わり次第ユーザに配信
+          if image_id and (not user_id.nil?)
+            self.class.generate_jobs(image_id, image_data[:src_url], false,
+              target_word.class.name, target_word.id)
+          end
+
+          # 80枚（1pageの最大数）抽出するまで
+          break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
+        end
+      end
+
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
+    
     end
 
     # Mechanizeにより検索結果を取得
