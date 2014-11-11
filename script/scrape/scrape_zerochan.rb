@@ -5,13 +5,13 @@ require "#{Rails.root}/script/scrape/client"
 
 
 module Scrape
-  class Shushu < Client
-    ROOT_URL = 'http://e-shuushuu.net/'
+  class Zerochan < Client
+    ROOT_URL = 'http://www.zerochan.net/'
 
     def initialize(logger=nil, limit=20)
       self.limit = limit
       if logger.nil?
-        self.logger = Logger.new('log/scrape_shushu_cron.log')
+        self.logger = Logger.new('log/scrape_zerochan_cron.log')
       else
         self.logger = logger
       end
@@ -19,15 +19,15 @@ module Scrape
     end
 
     # 取得するPostの上限数。APIの仕様で20postsが限度
-    # Scrape images from shushu. The latter two params are used for testing.
+    # Scrape images from zerochan. The latter two params are used for testing.
     # @param [Integer] min
     # @param [Boolean] whether it's called for debug or not
     # @param [Boolean] whether it's called for debug or not
     def scrape(interval=60)
       @limit = 100
-      @logger = Logger.new('log/scrape_shushu_cron.log')
+      @logger = Logger.new('log/scrape_zerochan_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      #scrape_target_words('Scrape::Shushu', interval)
+      #scrape_target_words('Scrape::Zerochan', interval)
       scrape_RSS()
     end
 
@@ -37,49 +37,63 @@ module Scrape
       scraped = 0
       avg_time = 0
       start = Time.now
-    
-      rss_url = ROOT_URL + "index.rss"
-      xml = Nokogiri::XML(open(rss_url))
       
-      xml.search("item").each_with_index do |item,count|
-          # 画像のidを取得        
-        id = item.search("link").first.content.split("/")[4].split("-")[3].split(".")[0]
+      # ページ数
+      page_count = 0
+      # 抽出したイラスト数
+      count = 0
+      image_data[:posted_at] = DateTime.now.to_date
+      
+      # 当日中のイラスト
+      while(image_data[:posted_at].to_date == DateTime.now.to_date && count<limit)
+        page_count = page_count+1    
+        rss_url = ROOT_URL + "?p=" + page_count.to_s      
+        page = agent.get(rss_url)
+              
+        page.search("div[id='content']").first.search("ul[id='thumbs2']").first.search("li").each do |item|     
+          count = count+1
+          
+          # 画像のidを取得
+          id = item.search("a").first.attributes["href"].value.gsub("\/","")
           # 画像のURLを取得
-        image_url = item.search("link").first.content
+          image_url = item.search("img").first.attribute["src"].value
           # 詳細ページのURLを取得
-        page_url = ROOT_URL + "image/#{id}/"
-        
-        html = Nokogiri::HTML(open(page_url))
+          page_url = ROOT_URL + "/" + id.to_s
 
-        tags = self.get_tags_original(html)
-        image_data = self.get_data(html, id)
-        #puts image_data
-        
-       options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: true
-        }
-          # 保存に必要なものはimage_data, tags, validetion
-        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+          # 詳細ページをパース        
+          html = agent.get(page_url)
 
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
-        elapsed_time = Time.now - start
-        avg_time += elapsed_time
-        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging
+          tags = self.get_tags_original(html)
+          image_data = self.get_data(html, id)
+          #puts image_data
+          
+         options = {
+            validation: validation,
+            large: false,
+            verbose: false,
+            resque: true
+          }
+            # 保存に必要なものはimage_data, tags, validetion
+          image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
-#=begin
-        # Resqueで非同期的に画像解析を行う
-          # 始めに画像をダウンロードし、終わり次第ユーザに配信
-        if image_id and (not user_id.nil?)
-          self.class.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+          duplicates += image_id ? 0 : 1
+          scraped += 1 if image_id
+          elapsed_time = Time.now - start
+          avg_time += elapsed_time
+          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging
+
+          # Resqueで非同期的に画像解析を行う
+            # 始めに画像をダウンロードし、終わり次第ユーザに配信
+          if image_id and (not user_id.nil?)
+            self.class.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+          end
+      
+           # limitを越えるか、その日に投稿された画像でなくなるまで
+          break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
         end
-#=end        
-         # limitを越えるか、その日に投稿された画像でなくなるまで
-        break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
+      
       end
+      
       { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
     
     end
@@ -221,16 +235,8 @@ module Scrape
     def get_tags_original(html)
       result = []
       
-       # その他の取得
-      html.css("div[id='content']").first.css("dt").each do |dt|
-        if dt.content.gsub!(/\t|\n/,"") == "Tags" || dt.content.gsub!(/\t|\n/,"") == "Source" || dt.content.gsub!(/\t|\n/,"") == "Character" then
-          tags = dt.next.next.gsub!(/\t|\n/,"").split("\"")
-          tags.each do |tag|
-            if tag != ""
-              result << tag
-            end
-          end
-        end
+      page.search("ul[id='tags']").first.search("a").each do |a|
+        result << a.content
       end
 
       return result
@@ -243,58 +249,27 @@ module Scrape
     # @return [Hash]
     def get_data(html, id)
       # titleの取得
-      title = "shushu:Image #" + id
-      caption = title
-      time = nil
-      src_url = nil
-      original_url = nil
-      author = nil
+      title = html.search("title").first.content
+      caption = page.search("div[id='content']").first.search("h1").first.content
+      time = Time.parse( page.search("div[id='content']").first.search("span")[1].attributes['title'].value )
+      src_url = page.search("div[id='large']").first.search("img").first.attributes['src'].value
+      original_url = page.search("div[id='large']").first.search("a").first.attributes['href'].value
+
       favorite_count = nil
       height = nil
       width = nil
-       # その他の取得
-      html.css("div[id='content']").first.css("dt").each do |dt|
-        #puts dt.content.gsub(/\t|\n/,"")
-        case dt.content.gsub(/\t|\n/,"")
-        when "Submitted On:" then
-          # posted_atの取得
-          time = DateTime.parse(dt.next.next.content)
-          
-        when "Filename:" then
-          # src_urlの取得
-          src_url = ROOT_URL + "images/thumbs/#{dt.next.next.content.split(".").first}.jpeg"
-          # original_urlの取得
-          original_url = ROOT_URL + "images/#{dt.next.next.content}"
-        when "Artist:" then
-          # authorの取得
-          author = dt.next.next.content.gsub!(/\t|\n|\/|\"/,"")
-        
-        when "Image Rating:" then
-          # favorite_countの取得
-          favorite_count = dt.next.next.content.gsub!(/\t|\n"/,"")
-          if favorite_count == "N/A"
-            favorite_count = 0
-          else
-            favorite_count = favorite_count.to_i
-          end
-        when "Dimensions:" then
-          height = dt.next.next.content.split(" ").first.split("x").second.to_i
-          width = dt.next.next.content.split(" ").first.split("x").first.to_i
-        else
-        end
-      end
 
       hash = {
         title: title,
         caption: caption,
-        page_url: ROOT_URL + "image/#{id}/",
+        page_url: ROOT_URL + "#{id}",
         posted_at: time,
         original_view_count: nil,
         src_url: src_url,
         original_url: original_url,
         original_favorite_count: favorite_count,             # Image Rating
-        site_name: 'shushu',
-        module_name: 'Scrape::Shushu',
+        site_name: 'zerochan',
+        module_name: 'Scrape::Zerochan',
         artist: author,
         height: height,
         width: width,
@@ -303,6 +278,22 @@ module Scrape
       }
 
       return hash
+    end
+    
+    # Mechanizeにより検索結果を取得
+    # @param [String]
+    # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
+    def get_search_result(query)
+      agent = Mechanize.new
+      agent.ssl_version = 'SSLv3'
+      page = agent.get(ROOT_URL+'login')
+
+      # login作業
+      page.forms[1]['name'] = CONFIG['zerochan_username']
+      page.forms[1]['password'] = CONFIG['zerochan_password']
+      result = page.forms[1].click_button()
+
+      return result
     end
 
   end
