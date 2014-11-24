@@ -67,6 +67,28 @@ class UsersController < ApplicationController
     @disable_fotter = true
   end
 
+
+  # GET /users/rss
+  # Render streams of crawled websites.
+  def rss
+    # Get images: For a new user, display the newer images
+    images = current_user.get_images
+    images.reorder!('posted_at DESC') if params[:sort]
+    images.reorder!('original_favorite_count DESC') if params[:fav]
+    images.uniq!
+
+    # Filter images by sites
+    if params[:site]
+      images = Image.get_recent_images(images, params[:site])
+    else
+      images = Image.get_recent_images(images, 'anipic')
+    end
+
+    @images = images.page(params[:page]).per(10)
+    @disable_fotter = true
+  end
+
+
   # GET
   def search
     images = Image.search_images(params[:query])

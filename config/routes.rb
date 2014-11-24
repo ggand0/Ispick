@@ -52,6 +52,7 @@ Ispick::Application.routes.draw do
       get 'settings'
       get 'new_avatar'
       post 'create_avatar'
+      get 'rss'
       get 'preferences'
       post 'preferences'
       get 'boards'

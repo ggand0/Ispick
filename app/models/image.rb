@@ -91,8 +91,12 @@ class Image < ActiveRecord::Base
   # Get images that is recently created.
   # @param limit [Integer] The number of images
   # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
-  def self.get_recent_images(limit)
-    Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
+  def self.get_recent_images(limit, site=nil)
+    if site
+      Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit).where(site_name: site)
+    else
+      Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
+    end
   end
 
   # Search images which is shown at user's home page.
