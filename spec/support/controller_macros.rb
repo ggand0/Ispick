@@ -1,3 +1,4 @@
+# Provides login methods that create and sign in oauth users
 module ControllerMacros
   def login_user
     controller.stub(:authenticate_user!).and_return true

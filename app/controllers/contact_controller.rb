@@ -7,6 +7,7 @@ class ContactController < ApplicationController
   def create
     @message = Message.new(message_params)
 
+    # TODO: display notice in the page when it fails to send data.
     if @message.valid?
       NotificationsMailer.new_message(@message).deliver
       redirect_to(home_users_path, :notice => "Message was successfully sent.")

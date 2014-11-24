@@ -5,7 +5,7 @@
 #= require 'scroll'
 
 $(document).on 'ready page:load', ->
-  logging = false
+  logging = true
   imgLoad = imagesLoaded($('.wrapper'))
   imgLoad.on( 'progress', ( instance, image ) ->
     result = image.isLoaded ? 'loaded' : 'broken'

@@ -29,7 +29,11 @@ describe Image do
 
   describe "search_images method" do
     it "returns a valid image relation" do
-      FactoryGirl.create(:tag_with_images, images_count: 5)
+      #FactoryGirl.create(:tag_with_images, images_count: 5)
+
+      # Note that search_images exclude image records without actual file
+      FactoryGirl.create(:tag_with_image_file, images_count: 5)
+      puts Image.first.tags.first.name
       images = Image.search_images('鹿目まどか1')
       expect(images.count).to eq(5)
     end

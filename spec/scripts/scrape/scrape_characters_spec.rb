@@ -176,7 +176,7 @@ describe "Scrape::Wiki::Character" do
         '魔法少女まどか☆マギカ', html)
       #result.each { |n| puts "#{n.count}, #{n}" }
       expect(result).to be_a(Array)
-      expect(result.count).to eq(75)
+      expect(result.count).to eq(81)
     end
   end
 

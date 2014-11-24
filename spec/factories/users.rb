@@ -7,8 +7,7 @@ FactoryGirl.define do
     sequence(:password) { |n| "#{n}2345678" }
     sequence(:name) { |n| "ispick#{n}" }
 
-    # デフォルトでユーザーが持つFavoredImageを作成
-    # Create a default FavoredImage object of an user
+    # Create a default FavoredImage object of the user
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
       user.authorizations << create(:authorization)
@@ -41,12 +40,13 @@ FactoryGirl.define do
     uid '12345678'
     sequence(:name) { |n| "ispick_twitter#{n}" }
 
-    # Create a FavoredImage record as default one
+    # Create default data including a favorite image
     after(:create) do |user|
       1.times do
         create(:favored_image_file, image_board: user.image_boards.first)
         user.image_boards << create(:image_board_min)
         user.authorizations << create(:authorization)
+        user.authorizations << create(:authorization_tumblr)
       end
     end
 

@@ -11,7 +11,7 @@ class TargetWord < ActiveRecord::Base
   validates_uniqueness_of :name
 
   # 自分の次にidが小さいレコードを返す。クロール時に使用
-  # Return the record that has the smalledst id value next to self.
+  # Return the record that has the smallest id value next to this instance.
   def next
     TargetWord.where("id > ?", id).first
   end

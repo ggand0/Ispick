@@ -21,14 +21,12 @@ module Scrape
     # 取得するPostの上限数。APIの仕様で20postsが限度
     # Scrape images from anipic. The latter two params are used for testing.
     # @param [Integer] min
-    # @param [Boolean] whether it's called for debug or not
-    # @param [Boolean] whether it's called for debug or not
     def scrape(interval=60)
       @limit = 20
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      #scrape_target_words('Scrape::Anipic', interval)
-      scrape_RSS()
+      scrape_target_words('Scrape::Anipic', interval)
+      #scrape_RSS()
     end
 
     # キーワードによる抽出処理を行う
@@ -117,7 +115,7 @@ module Scrape
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
     end
-    
+
    # RSSを取得する
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=false, english=false)
       @logger.debug "#{target_word.inspect}"
@@ -126,14 +124,14 @@ module Scrape
       page_num = -1
       image_data={}
       image_data[:posted_at] = DateTime.now.to_date
-      
+
       while(image_data[:posted_at].to_date == DateTime.now.to_date)
         page_num = page_num+1
         rss_url = ROOT_URL + "/pictures/view_posts/" + page_num.to_s
         page = Nokogiri::HTML(open(rss_url))
 
         page.search("span[class='img_block_big']").each_with_index do |image, count|
-        
+
           # 広告又はR18画像はスキップ
           if image.children.search('img').first.nil?
             result_hash[:skipped] += 1
@@ -184,7 +182,7 @@ module Scrape
 
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
-    
+
     end
 
     # Mechanizeにより検索結果を取得
@@ -193,6 +191,7 @@ module Scrape
     def get_search_result(query)
       agent = Mechanize.new
       agent.ssl_version = 'SSLv3'
+      agent.keep_alive = false
       page = agent.get(ROOT_URL)
 
       # login作業

@@ -4,7 +4,7 @@ describe ContactController do
 
   describe "GET 'index'" do
     it "returns http success" do
-      get 'index'
+      get 'new'
       response.should be_success
     end
   end

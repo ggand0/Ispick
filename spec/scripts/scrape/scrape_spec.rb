@@ -70,7 +70,7 @@ describe Scrape do
     it "return the valid string based on a result hash" do
       result = Scrape.get_result_hash
       string = Scrape.get_result_string(result)
-      valid_string = 'scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: '
+      valid_string = 'scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: none'
       expect(string).to eq(valid_string)
     end
   end

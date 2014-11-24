@@ -20,7 +20,7 @@ describe "user's home page" do
     it "displays crawled images" do
       visit home_users_path
       #save_and_open_page
-      expect(page).to have_css('.wrap .box .boxInner')
+      expect(page).to have_css('.wrapper .block .titleBox')
     end
 
     # クリックすると画像の詳細情報を閲覧出来る
@@ -54,7 +54,7 @@ describe "user's home page" do
     # 'Clip'ボタンをクリックし、ボード名のボタンをさらにクリックする事で
     # お気に入り画像をそのボードに登録出来る
     it "clips an image by clicking the 'Clip' button" do
-      page.find('.boxInner').hover
+      page.find('.block').hover
       expect(page).to have_css('span.glyphicon-paperclip')
       find('.glyphicon-paperclip').click
       wait_for_ajax
@@ -87,11 +87,17 @@ describe "user's home page" do
     # 無限スクロール機能によってより多くの画像を１画面で見る事が出来る
     it "watches more images by infinite scrolling" do
       default_per_page = Kaminari.config.default_per_page
+      puts default_per_page
       Image.count.should > default_per_page
 
-      page.should have_css('.box', :count => default_per_page)
+      page.should have_css('.block', :count => default_per_page)
+=begin
       page.execute_script('window.scrollBy(0,100000)')
-      page.should have_css('.box', :count => Image.count)
+      wait_for_ajax
+      page.execute_script('window.scrollBy(0,100000)')
+      wait_for_ajax
+      page.should have_css('.block', :count => Image.count)
+=end
     end
   end
 

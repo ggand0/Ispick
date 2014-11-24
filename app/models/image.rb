@@ -9,7 +9,7 @@ class Image < ActiveRecord::Base
   has_many :target_words, :through => :images_target_words
 
 
-  # 明示的にテーブル名を指定することでエラー回避している
+  # Aboid error by explicitly setting table name
   default_scope { order("#{table_name}.created_at DESC") }
   paginates_per 100
 
@@ -36,11 +36,13 @@ class Image < ActiveRecord::Base
   TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga']
   TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga']
 
-  # @return [String] デフォルトでattachmentに設定される画像のpath
+  # Set the default url of the paperclip attachment ('data' attribute)
+  # @return [String]
   def set_default_url
     ActionController::Base.helpers.asset_path('default_image_thumb.png')
   end
 
+  # Get the default url of the paperclip attachment ('data' attribute)
   def self.get_default_url
     '/assets/default_image_thumb.png'
   end
@@ -52,6 +54,7 @@ class Image < ActiveRecord::Base
     self.data.destroy
   end
 
+  # Delete the image from the storage and set the default path instead.
   # ストレージから画像を削除し、デフォルトパスを指定する。
   def destroy_image_files
     tmp = self
@@ -59,8 +62,8 @@ class Image < ActiveRecord::Base
     tmp.save
   end
 
+  # Generate MD5 checksum value from the file.
   # 与えられたFileオブジェクトからMD5チェックサムを生成する
-  # Generate MD5 checksum value from the file
   # @param file [File] A file object that we need to get MD5 hash
   # @return [String] MD5 checksum value
   def generate_md5_checksum(file)
