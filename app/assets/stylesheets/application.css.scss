@@ -20,11 +20,20 @@
  *= require rails_bootstrap_forms
  *= require bootstrap-social
  *= require font-awesome
+ *= require navbar_custom
+ *= require button_custom
  *
  */
 
 @import "bootstrap-sprockets";
 @import "bootstrap";
+// Override button color
+$color: #E4F5F5;
+$background: #5B9B9B;//#79CECE;
+$border: #5B9B9B;//#79CECE;
+.btn-info {
+  @include button-variant($color, $background, $border);
+}
 
 #footer {
   clear:  left;
@@ -33,13 +42,20 @@
   height: 100px;
 }
 
-// headerのロゴ部分
-a.logo {
-  float:left;
-  display:block;
-  height:40px;
-  width:160px;
+
+// Header's logo related styles
+.navbar-inverse {
+  background-color: #79CECE;//#3F3F3F;
+  border-color: #79CECE;//#3F3F3F;
 }
-a.logo:hover {
-  background-color: #fff;
+
+.collapse-item {
+  padding-top: 10px;
+  //padding-bottom: 10px;
+}
+
+.logo {
+  float:left;
+  display: inline-block;
+  vertical-align: middle;
 }

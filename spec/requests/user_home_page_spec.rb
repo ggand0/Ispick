@@ -10,12 +10,14 @@ describe "user's home page" do
       #save_and_open_page
     end
 
+    # Verify the url
     # URIが正しい
     it "moves to /users/home" do
       uri = URI.parse(current_url)
       expect(uri.to_s).to include(home_users_path)
     end
 
+    # Whether the user can see the thumbnails of images
     # 配信された画像のサムネを見る事が出来る
     it "displays crawled images" do
       visit home_users_path
@@ -23,6 +25,7 @@ describe "user's home page" do
       expect(page).to have_css('.wrapper .block .titleBox')
     end
 
+    # Whether the user can see the detail info of an image
     # クリックすると画像の詳細情報を閲覧出来る
     it "displays an image's details by clicking the picture" do
       visit home_users_path
