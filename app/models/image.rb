@@ -20,7 +20,7 @@ class Image < ActiveRecord::Base
       #thumb_gif: "300x300#",
       original: "600x800>"
     },
-    default_url: lambda { |data| data.instance.set_default_url},
+    default_url: lambda { |data| data.instance.set_default_url },
     use_timestamp: false
   after_post_process :save_image_dimensions
 
@@ -33,8 +33,8 @@ class Image < ActiveRecord::Base
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
 
-  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga']
-  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga']
+  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga', 'shushu', 'zerochan']
+  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga', 'e-shuushuu', 'zerochan']
 
   # Set the default url of the paperclip attachment ('data' attribute)
   # @return [String]
