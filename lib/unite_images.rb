@@ -1,5 +1,6 @@
 require 'fileutils'
 
+=begin
 def copy_with_path(src, dst)
   FileUtils.mkdir_p(File.dirname(dst))
   FileUtils.cp(src, dst)
@@ -11,3 +12,4 @@ Image.all.each_with_index do |image, count|
   copy_with_path(image.data.path, file_path)
   puts "#{count} images output"
 end
+=end
