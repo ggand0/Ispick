@@ -26,28 +26,35 @@ every 12.hours do
 end
 
 every 6.hours do
-  rake 'scrape:nico[360]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+  #rake 'scrape:nico[360]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
 every 6.hours do
   rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
-every 6.hours do
-  #rake 'scrape:fchan'
+every 3.hours do
+  rake 'scrape:shushu', output: { error: 'log/scrape_shushu_error.log', standard: 'log/scrape_shushu_cron.log' }
 end
+
+every 3.hours do
+  rake 'scrape:zerochan', output: { error: 'log/scrape_zerochan_error.log', standard: 'log/scrape_zerochan_cron.log' }
+end
+
+every 1.day, :at => '4:30 am' do
+  #runner "MyModel.task_to_run_at_four_thirty_in_the_morning"
+end
+
 
 
 # Delivery and deletion processes
 every 6.hours do
   # TargetWordと同名のTagを持つImageをTargetWordと関連づける処理
   #rake 'deliver:associate', output: 'log/deliver.log'
-  
+
   # 指定枚数を越えたらその分Imagesから画像ファイルを削除
   rake 'scrape:delete_excess_image_files[500000]', output: 'log/deliver.log'
 
   # 指定枚数を超えたらその分Imagesから削除
   rake 'scrape:delete_excess[1000000]', output: 'log/deliver.log'
-  
-
 end

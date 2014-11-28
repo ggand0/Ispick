@@ -85,6 +85,7 @@ class UsersController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(10)
+    @images_all = images
     @disable_fotter = true
   end
 
