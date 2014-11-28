@@ -51,6 +51,26 @@ class DebugController < ApplicationController
     temp_file.close
   end
 
+
+  # [DEBUG] Download last 1000 images.
+  def download_images_n
+    limit = 1000
+    @images = Image.get_recent_n(limit)
+    file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
+
+    temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      @images.each do |image|
+        title = "#{image.title}#{File.extname(image.data.path)}"
+        zos.put_next_entry(title)
+        zos.print IO.read(image.data.path)
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
   # The page for debugging illust detection feature.
   # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection

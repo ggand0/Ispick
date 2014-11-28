@@ -99,6 +99,17 @@ class Image < ActiveRecord::Base
     end
   end
 
+  # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
+  # Get images that is recently created.
+  # @param limit [Integer] The number of images
+  # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
+  def self.get_recent_n(limit)
+    target_sites = ['anipic', 'shushu', 'zerochan']
+    images = Image.where("site_name IN (?)", target_sites).limit(limit)
+    images = images.reorder("created_at DESC").where.not(data_updated_at: nil)
+    images
+  end
+
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
