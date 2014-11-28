@@ -32,42 +32,30 @@ module Scrape
     end
 
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true)
-      duplicates = 0
-      skipped = 0
-      scraped = 0
-      avg_time = 0
+      result_hash = Scrape.get_result_hash
       start = Time.now
 
       rss_url = ROOT_URL + "index.rss"
       xml = Nokogiri::XML(open(rss_url))
 
-      xml.search("item").each_with_index do |item,count|
-        # 画像のidを取得
-        id = item.search("link").first.content.split("/")[4].split("-")[3].split(".")[0]
-        # 画像のURLを取得
-        image_url = item.search("link").first.content
-        # 詳細ページのURLを取得
-        page_url = ROOT_URL + "image/#{id}/"
-
+      xml.search("item").each_with_index do |item, count|
+        id = item.search("link").first.content.split("/")[4].split("-")[3].split(".")[0]  # 画像のidを取得
+        image_url = item.search("link").first.content                                     # 画像のURLを取得
+        page_url = ROOT_URL + "image/#{id}/"                                              # 詳細ページのURLを取得
         html = Nokogiri::HTML(open(page_url))
 
         tags = self.get_tags_original(html)
         image_data = self.get_data(html, id)
+        options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
 
-        options = {
-          validation: validation,
-          large: false,
-          verbose: false,
-          resque: (not user_id.nil?)
-        }
-          # 保存に必要なものはimage_data, tags, validetion
+        # 保存に必要なものはimage_data, tags, validetion
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
-        duplicates += image_id ? 0 : 1
-        scraped += 1 if image_id
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
-        avg_time += elapsed_time
-        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging
+        result_hash[:avg_time] += elapsed_time
+        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
 
 
         # Resqueで非同期的に画像解析を行う
@@ -77,11 +65,14 @@ module Scrape
         end
 
         # limitを越えるか、その日に投稿された画像でなくなるまで
-        break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
+        #break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
+        #@logger.debug (count+1 >= @limit or (image_data[:posted_at].to_date - Date.yesterday) <= 0).inspect
+        @logger.debug image_data[:posted_at].to_date
+        break if count+1 >= @limit or image_data[:posted_at].to_date - (Date.today - 1.day) <= 0
       end
 
-
-      { scraped: scraped, duplicates: duplicates, skipped: skipped, avg_time: avg_time / ((scraped+duplicates)*1.0) }
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
     end
 
 
@@ -90,17 +81,21 @@ module Scrape
     # @return [Array::String]
     def get_tags_original(html)
       result = []
+      labels = ['Tags:', 'Source:', 'Character:']
 
        # その他の取得
       html.css("div[id='content']").first.css("dt").each do |dt|
-        if dt.content.gsub!(/\t|\n/,"") == "Tags" || dt.content.gsub!(/\t|\n/,"") == "Source" || dt.content.gsub!(/\t|\n/,"") == "Character" then
-          tags = dt.next.next.gsub!(/\t|\n/,"").split("\"")
+        #if dt.content.gsub!(/\t|\n/,"") == "Tags:" or dt.content.gsub!(/\t|\n/,"") == "Source:" || dt.content.gsub!(/\t|\n/,"") == "Character:" then
+        if labels.include?(dt.content.gsub!(/\t|\n/,""))
+          tags = dt.next.next.content.gsub!(/\t|\n/,"").split("\"")
+          tags.reject! { |t| t.empty? or t==" "}
           tags.each do |tag|
             if tag != ""
               result << tag
             end
           end
         end
+
       end
 
       return result
@@ -122,7 +117,7 @@ module Scrape
       favorite_count = nil
       height = nil
       width = nil
-       # その他の取得
+      # その他の取得
       html.css("div[id='content']").first.css("dt").each do |dt|
         #puts dt.content.gsub(/\t|\n/,"")
         case dt.content.gsub(/\t|\n/,"")

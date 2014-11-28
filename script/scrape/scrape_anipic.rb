@@ -122,11 +122,13 @@ module Scrape
 
       page_num = -1
       image_data = {}
-      image_data[:posted_at] = Date.today#DateTime.now.to_date
+      image_data[:posted_at] = Date.today
+      yesterday = Date.today - 1.day
 
       # When you need to scrape images that are posted at that day:
       # 当日分だけ抽出する場合
-      while (image_data[:posted_at].to_date - Date.yesterday) <= 1# and result_hash[:duplicates] < 5
+      @logger.debug (image_data[:posted_at].to_date - yesterday <= 1).inspect
+      while (image_data[:posted_at].to_date - yesterday) <= 1# and result_hash[:duplicates] < 5
         @logger.debug "#{image_data[:posted_at]}, #{Date.yesterday} | page_num=#{page_num}"
         page_num = page_num+1
 
@@ -162,7 +164,7 @@ module Scrape
             next
           end
 
-          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+          options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
           tags = self.get_tags_original(xml)
 
           # 保存に必要なものはimage_data, tags, validetion
@@ -170,9 +172,9 @@ module Scrape
 
           result_hash[:duplicates] += image_id ? 0 : 1
           result_hash[:scraped] += 1 if image_id
-          elapsed_time = T f ime.now - start
+          elapsed_time = Time.now - start
           result_hash[:avg_time] += elapsed_time
-          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
 
           # Resqueで非同期的に画像解析を行う
           # 始めに画像をダウンロードし、終わり次第ユーザに配信
@@ -182,7 +184,10 @@ module Scrape
           end
 
           # 80枚（1pageの最大数）抽出するまで
-          break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
+          #break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
+          @logger.debug image_data[:posted_at].to_date
+          break if count+1 >= 80 or (image_data[:posted_at].to_date - Date.yesterday) <= 0
+
           # Finish scraping if it's detected
           #break if result_hash[:duplicates] >= 5
         end

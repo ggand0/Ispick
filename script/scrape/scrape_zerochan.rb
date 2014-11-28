@@ -45,36 +45,37 @@ module Scrape
 
       # ページ数
       page_count = 0
-      # 抽出したイラスト数
       count = 0
+      # 抽出したイラスト数
       image_data = {}
       image_data[:posted_at] = DateTime.now.to_date
+      yesterday = Date.today - 1.day
 
       # 当日中のイラスト
       #while(image_data[:posted_at].to_date == DateTime.now.to_date and count<limit)
-      while(image_data[:posted_at].to_date - Date.yesterday) <= 1 and count<limit
+      while(image_data[:posted_at].to_date - yesterday) <= 1 and count < @limit
         page_count = page_count+1
         rss_url = ROOT_URL + "?p=" + page_count.to_s
-        page = agent.get(rss_url)
+
+        begin
+          page = agent.get(rss_url)#SocketError: getaddrinfo: nodename nor servname provided, or not known
+        rescue => e
+          @logger.error e.inspect
+          @logger.error "zerochan server is down. Aborting..."
+          break
+        end
 
         page.search("div[id='content']").first.search("ul[id='thumbs2']").first.search("li").each do |item|
-          count = count+1
+          count = count + 1
 
-          # 画像のidを取得
-          id = item.search("a").first.attributes["href"].value.gsub("\/","")
-          # 画像のURLを取得
-          image_url = item.search("img").first.attribute("src").value
-          # 詳細ページのURLを取得
-          page_url = ROOT_URL + id.to_s
-
-          # 詳細ページをパース
-          html = agent.get(page_url)
-
+          id = item.search("a").first.attributes["href"].value.gsub("\/","")  # 画像のidを取得
+          image_url = item.search("img").first.attribute("src").value         # 画像のURLを取得
+          page_url = ROOT_URL + id.to_s                                       # 詳細ページのURLを取得
+          html = agent.get(page_url)                                          # 詳細ページをパース
           tags = self.get_tags_original(html)
           image_data = self.get_data(html, id)
-          #puts image_data
 
-          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+          options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
           # 保存に必要なものはimage_data, tags, validetion
           image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
@@ -91,7 +92,10 @@ module Scrape
           end
 
           # limitを越えるか、その日に投稿された画像でなくなるまで
-          break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
+          #break if count >= limit || image_data[:posted_at].to_date != DateTime.now.to_date
+          @logger.debug image_data[:posted_at].to_date
+          @logger.debug count >= @limit or (image_data[:posted_at].to_date - yesterday) <= 0
+          break if count >= @limit or (image_data[:posted_at].to_date - yesterday) <= 0
         end
 
       end
