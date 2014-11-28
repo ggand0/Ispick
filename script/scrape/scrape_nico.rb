@@ -29,7 +29,7 @@ module Scrape
 
 
     # Scrape images from nicoseiga, using single TargetWord object.
-     # キーワードによる検索・抽出を行う
+    # キーワードによる検索・抽出を行う
     # @param user_id [Integer]
     # @param target_word [TargetWord]
     def scrape_target_word(user_id, target_word)
@@ -160,6 +160,7 @@ module Scrape
     def self.get_client
       agent = Mechanize.new
       agent.ssl_version = 'SSLv3'
+      agent.keep_alive = false
       agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
         'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
       agent
