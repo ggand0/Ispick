@@ -54,7 +54,7 @@ class DebugController < ApplicationController
 
   # [DEBUG] Download last 1000 images.
   def download_images_n
-    limit = 1000
+    limit = params[:limit]
     @images = Image.get_recent_n(limit)
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
