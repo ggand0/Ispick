@@ -110,6 +110,19 @@ class Image < ActiveRecord::Base
     images
   end
 
+  # Create the list of image names from an Image relation object
+  # @param image [ActiveRecord::Relation::ActiveRecord_Relation_Image]
+  # @return [File]
+  def self.create_list_file(images)
+    file = File.open('imagelist', 'w') do |file|
+      images.each do |image|
+        name = image.data.original_filename
+        file.write(name)
+      end
+    end
+    file
+  end
+
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
