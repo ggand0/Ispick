@@ -129,7 +129,7 @@ class Image < ActiveRecord::Base
   def get_title
     title = "#{self.title}#{File.extname(self.data.path)}"
     title = title.gsub(/\//, '_') if title.include?("/")
-    #title = title.gsub(/\s+/, "")
+    title = title.gsub(/\s+/, "_")
     title = Scrape.remove_nonascii(title)
     title
   end
