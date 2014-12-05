@@ -118,7 +118,7 @@ class Image < ActiveRecord::Base
     images.each do |image|
       #name = image.data.original_filename
       name = image.get_title
-      file.write(name)
+      file.write(name + "\s0")
       file.write "\n"
     end
     file
