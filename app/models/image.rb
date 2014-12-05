@@ -114,12 +114,13 @@ class Image < ActiveRecord::Base
   # @param image [ActiveRecord::Relation::ActiveRecord_Relation_Image]
   # @return [File]
   def self.create_list_file(images)
-    file = File.open('imagelist', 'w') do |file|
-      images.each do |image|
-        name = image.data.original_filename
-        file.write(name)
-      end
+    file = Tempfile.new("imagelist#{DateTime.now}")
+    images.each do |image|
+      name = image.data.original_filename
+      file.write(name)
+      file.write "\n"
     end
+
     file
   end
 

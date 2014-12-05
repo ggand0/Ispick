@@ -27,6 +27,15 @@ describe Image do
     end
   end
 
+  describe "create_list_file" do
+    it "writes image names to a file" do
+      images = FactoryGirl.create_list(:image_file, 2)
+      result = Image.create_list_file(images)
+      puts result.inspect
+      expect(result).to be_a(Tempfile)
+    end
+  end
+
   describe "search_images method" do
     it "returns a valid image relation" do
       #FactoryGirl.create(:tag_with_images, images_count: 5)

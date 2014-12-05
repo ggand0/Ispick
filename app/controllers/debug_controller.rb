@@ -56,16 +56,20 @@ class DebugController < ApplicationController
   def download_images_n
     limit = 1000
     @images = Image.get_recent_n(limit)
-    file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
+    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 
-    temp_file  = Tempfile.new("#{file_name}-#{current_user.id}")
     Zip::OutputStream.open(temp_file.path) do |zos|
-      #zos.add('imagelist', Image.create_list_file(@images))
       zos.put_next_entry 'imagelist'
-      zos.print Image.create_list_file(@images)
+      zos.print IO.read(Image.create_list_file(@images))
       @images.each do |image|
         title = "#{image.title}#{File.extname(image.data.path)}"
+        # To avoid creating nested directory, remove slashes
+        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+        puts title = title.gsub!(/\//, '_') if title.include?("/")
         zos.put_next_entry(title)
+
+        #puts image.data.path if image.site_name == 'zerochan'
         zos.print IO.read(image.data.path)
       end
     end
