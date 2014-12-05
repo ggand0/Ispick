@@ -116,12 +116,22 @@ class Image < ActiveRecord::Base
   def self.create_list_file(images)
     file = Tempfile.new("imagelist#{DateTime.now}")
     images.each do |image|
-      name = image.data.original_filename
+      #name = image.data.original_filename
+      name = image.get_title
       file.write(name)
       file.write "\n"
     end
-
     file
+  end
+
+  # Generate unique title string of the image
+  # @return [String]
+  def get_title
+    title = "#{self.title}#{File.extname(self.data.path)}"
+    title = title.gsub(/\//, '_') if title.include?("/")
+    #title = title.gsub(/\s+/, "")
+    title = Scrape.remove_nonascii(title)
+    title
   end
 
   # Search images which is shown at user's home page.

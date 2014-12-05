@@ -27,6 +27,17 @@ describe Image do
     end
   end
 
+  describe "get_title" do
+    it "returns a valid string" do
+      image = FactoryGirl.create(:image_file)
+      result = image.get_title
+      puts result
+
+      expect(result).to be_a(String)
+      expect(result).to eq('madoka.jpg')
+    end
+  end
+
   describe "create_list_file" do
     it "writes image names to a file" do
       images = FactoryGirl.create_list(:image_file, 2)

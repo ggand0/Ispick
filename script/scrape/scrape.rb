@@ -145,4 +145,12 @@ module Scrape
     string.each_char.select{ |c| c.bytes.count < 4 }.join('')
   end
 
+  def self.remove_nonascii(string)
+    return nil if string.nil?
+    if string.match(/\P{ASCII}/)
+      string = string.gsub(/\P{ASCII}/, '').to_s
+    end
+    string
+  end
+
 end

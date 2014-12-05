@@ -15,6 +15,20 @@ describe DebugController do
     end
   end
 
+  describe "GET download_recent_images" do
+    it "downloads recent images" do
+      login_user
+      controller.stub(:render).and_return nil
+      controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
+      get :download_images_n, {}
+    end
+
+    it "downloads recent images that have proper filenames" do
+      login_user
+      get :download_images_n, {}
+    end
+  end
+
 =begin
   describe "GET download_favored_images" do
     # see: http://stackoverflow.com/questions/4701108/rspec-send-file-testing

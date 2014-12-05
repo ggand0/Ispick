@@ -63,10 +63,12 @@ class DebugController < ApplicationController
       zos.put_next_entry 'imagelist'
       zos.print IO.read(Image.create_list_file(@images))
       @images.each do |image|
-        title = "#{image.title}#{File.extname(image.data.path)}"
+        #title = "#{image.title}#{File.extname(image.data.path)}"
         # To avoid creating nested directory, remove slashes
         # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
-        puts title = title.gsub!(/\//, '_') if title.include?("/")
+        #puts title = title.gsub!(/\//, '_') if title.include?("/")
+        title = image.get_title
+        puts title
         zos.put_next_entry(title)
 
         #puts image.data.path if image.site_name == 'zerochan'
