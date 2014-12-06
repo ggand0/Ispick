@@ -114,7 +114,9 @@ class Image < ActiveRecord::Base
   def self.get_recent_n(limit)
     target_sites = ['anipic', 'shushu', 'zerochan']
     images = Image.where("site_name IN (?)", target_sites).limit(limit)
-    images = images.reorder("created_at DESC").where.not(data_updated_at: nil)
+    images = images.reorder("created_at DESC").
+      where.not(data_updated_at: nil).
+      where.not(data_content_type: 'image/gif')
     images
   end
 

@@ -16,6 +16,7 @@ Ispick::Application.routes.draw do
     get '/home' => 'debug#home', as: "home_debug"
     get '/download' => 'debug#download_favored_images', as: "download_debug"
     get '/download_recent' => 'debug#download_images_n', as: "download_recent"
+    get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
     get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
     get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"

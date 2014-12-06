@@ -51,6 +51,33 @@ class DebugController < ApplicationController
     temp_file.close
   end
 
+  # [DEBUG] Download images that have a specific tag from an optional site.
+  def download_images_tag
+    limit = params[:limit]
+    site = params[:site]
+    tag = params[:tag]
+    @images = Image.search_images(tag)
+    @images = @images.where(site_name: site) if site
+    @images = @images.limit(limit) if limit
+    file_name = "#{site}_#{tag}#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file(@images))
+      @images.each do |image|
+        # To avoid creating nested directory, remove slashes
+        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+        title = image.get_title
+        zos.put_next_entry(title)
+        zos.print IO.read(image.data.path)
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
 
   # [DEBUG] Download last 1000 images.
   def download_images_n
