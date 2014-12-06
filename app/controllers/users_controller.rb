@@ -79,9 +79,9 @@ class UsersController < ApplicationController
 
     # Filter images by sites
     if params[:site]
-      images = Image.get_recent_images(images, params[:site])
+      images = Image.get_recent_images_relation(images, params[:site])
     else
-      images = Image.get_recent_images(images, 'anipic')
+      images = Image.get_recent_images_relation(images, 'anipic')
     end
 
     @images = images.page(params[:page]).per(10)

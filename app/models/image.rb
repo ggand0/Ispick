@@ -99,6 +99,14 @@ class Image < ActiveRecord::Base
     end
   end
 
+  def self.get_recent_images_relation(images, site=nil)
+    if site
+      images.where(site_name: site)
+    else
+      images
+    end
+  end
+
   # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
   # Get images that is recently created.
   # @param limit [Integer] The number of images

@@ -27,6 +27,15 @@ describe Image do
     end
   end
 
+  describe "get_recent_images_relation" do
+    it "returns a valid relation" do
+      FactoryGirl.create_list(:image, 2)
+      images = Image.all
+      result = Image.get_recent_images_relation(images, 'nicoseiga')
+      expect(result.count).to eq(1)
+    end
+  end
+
   describe "get_title" do
     it "returns a valid string" do
       image = FactoryGirl.create(:image_file)
