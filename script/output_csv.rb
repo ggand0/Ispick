@@ -6,7 +6,7 @@ module OutputCSV
   # 画像を抽出して保存
   def self.output_images()
     CSV.open("#{Rails.root}/csv/Images.csv","wb") do |csv|
-      row = ["image_id","page_url","original_width","original_height","artist","tags"]
+      row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
       csv << row
     
       Image.all.each do |image|
@@ -41,8 +41,5 @@ module OutputCSV
     
     end
   end
-  
-  self.output_images()
-  self.output_fi()
 
 end
