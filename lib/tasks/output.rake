@@ -3,12 +3,17 @@ require "#{Rails.root}/script/output_csv.rb"
 
 
 namespace :output do
-  # Image情報及びFavoredImageのcsvデータを出力
+  # 指定したソースのImage情報及びFavoredImageのcsvデータを出力
   desc "Output Image and Boards data"
-  task :csv, :environment do
+  task :csv, [:src]=> :environment  do |t,args|
     puts 'output CSV...'
-    OutputCSV.output_images()
-    OutputCSV.output_fi()
+    if args[:src]
+      src=args[:src]
+    else
+      src="all"
+    end
+    OutputCSV.output_images(src)
+    OutputCSV.output_fi(src)
   end
 
 end
