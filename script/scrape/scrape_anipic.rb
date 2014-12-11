@@ -116,7 +116,7 @@ module Scrape
       result_hash
     end
 
-   # RSSを取得する
+    # RSSを取得する
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
 
@@ -143,8 +143,8 @@ module Scrape
             result_hash[:skipped] += 1
             @logger.debug "skipped, #{count}"
             next
+          # サーチ結果ページから、ソースページのURLを取得
           else
-            # サーチ結果ページから、ソースページのURLを取得
             page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
             @logger.debug "page_url: #{page_url}"
           end

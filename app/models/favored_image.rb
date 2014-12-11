@@ -11,10 +11,8 @@ class FavoredImage < ActiveRecord::Base
 
   before_destroy :destroy_attachment
 
-  # attachmentを削除し、ストレージにある画像ファイルも削除する
-  # Destroys paperclip attachment, including image files in the storage
+  # Destroys the paperclip attachment, including image files in the storage
   def destroy_attachment
-    # data.destroyは画像を削除するだけ、すなわちパスの指定は変更されない（デフォルトパスが指定されない）
     self.data.destroy
   end
 
