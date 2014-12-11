@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   #before_filter :authenticate
+  before_filter :set_search
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
   before_filter :your_function
@@ -14,6 +15,11 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
+  end
 
   # production環境のみBASIC認証する
   def authenticate

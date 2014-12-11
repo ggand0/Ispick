@@ -20,7 +20,7 @@ class Image < ActiveRecord::Base
       #thumb_gif: "300x300#",
       original: "600x800>"
     },
-    default_url: lambda { |data| data.instance.set_default_url},
+    default_url: lambda { |data| data.instance.set_default_url },
     use_timestamp: false
   after_post_process :save_image_dimensions
 
@@ -33,8 +33,8 @@ class Image < ActiveRecord::Base
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
 
-  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga']
-  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga']
+  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga', 'shushu', 'zerochan']
+  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga', 'e-shuushuu', 'zerochan']
 
   # Set the default url of the paperclip attachment ('data' attribute)
   # @return [String]
@@ -91,14 +91,73 @@ class Image < ActiveRecord::Base
   # Get images that is recently created.
   # @param limit [Integer] The number of images
   # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
-  def self.get_recent_images(limit)
-    Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
+  def self.get_recent_images(limit, site=nil)
+    if site
+      Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit).where(site_name: site)
+    else
+      Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
+    end
+  end
+
+  def self.get_recent_images_relation(images, site=nil)
+    if site
+      images.where(site_name: site)
+    else
+      images
+    end
+  end
+
+  # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
+  # Get images that is recently created.
+  # @param limit [Integer] The number of images
+  # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
+  def self.get_recent_n(limit)
+    target_sites = ['anipic', 'shushu', 'zerochan']
+    images = Image.where("site_name IN (?)", target_sites).limit(limit)
+    images = images.reorder("created_at DESC").
+      where.not(data_updated_at: nil).
+      where.not(data_content_type: 'image/gif')
+    images.uniq
+  end
+
+  # Create the list of image names from an Image relation object
+  # @param image [ActiveRecord::Relation::ActiveRecord_Relation_Image]
+  # @return [File]
+  def self.create_list_file(images)
+    file = Tempfile.new("imagelist#{DateTime.now}")
+    images.each do |image|
+      #name = image.data.original_filename
+      name = image.get_title
+      file.write(name + "\s0")
+      file.write "\n"
+    end
+    file
+  end
+
+  # Generate unique title string of the image
+  # @return [String]
+  def get_title
+    title = "#{self.title}#{File.extname(self.data.path)}"
+    title = title.gsub(/\//, '_') if title.include?("/")
+    title = title.gsub(/\s+/, "_")
+    title = Scrape.remove_nonascii(title)
+    title
   end
 
   # Search images which is shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
     Image.joins(:tags).where(tags: { name: query }).
+      where.not(data_updated_at: nil).
+      where.not(data_content_type: 'image/gif').
+      references(:tags)
+  end
+
+  # Search images which is shown at user's home page.
+  # @param query [Array] An array of tags used for search.
+  # @return [ActiveRecord::AssociationRelation]
+  def self.search_images_tags(query)
+    Image.joins(:tags).where("tags.name IN (?)", query).
       where.not(data_updated_at: nil).
       where.not(data_content_type: 'image/gif').
       references(:tags)

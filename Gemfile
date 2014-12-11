@@ -143,8 +143,8 @@ group :development, :test do
 
 
   # RSpec
-  gem 'rspec-rails', '~> 2.99.0'                    # Testing framework
-  gem 'rspec-its'                                   # Provides the 'its' method
+  gem 'rspec-rails', '~> 3.0.0.beta1'#'~> 3.0'                    # Testing framework
+  #gem 'rspec-its'                                   # Provides the 'its' method
   gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
   gem 'simplecov', :require => false                # カバレッジ測定
   gem 'simplecov-rcov', :require => false

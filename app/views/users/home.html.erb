@@ -6,7 +6,7 @@
 
 <!-- Render images and the dropdown for filtering them -->
 <p>
-  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
+  <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
 
 
   <!-- Render the dropdown to provide filtering and sorting functionality-->

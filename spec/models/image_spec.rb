@@ -27,6 +27,35 @@ describe Image do
     end
   end
 
+  describe "get_recent_images_relation" do
+    it "returns a valid relation" do
+      FactoryGirl.create_list(:image, 2)
+      images = Image.all
+      result = Image.get_recent_images_relation(images, 'nicoseiga')
+      expect(result.count).to eq(1)
+    end
+  end
+
+  describe "get_title" do
+    it "returns a valid string" do
+      image = FactoryGirl.create(:image_file)
+      result = image.get_title
+      puts result
+
+      expect(result).to be_a(String)
+      expect(result).to eq('madoka.jpg')
+    end
+  end
+
+  describe "create_list_file" do
+    it "writes image names to a file" do
+      images = FactoryGirl.create_list(:image_file, 2)
+      result = Image.create_list_file(images)
+      puts result.inspect
+      expect(result).to be_a(Tempfile)
+    end
+  end
+
   describe "search_images method" do
     it "returns a valid image relation" do
       #FactoryGirl.create(:tag_with_images, images_count: 5)

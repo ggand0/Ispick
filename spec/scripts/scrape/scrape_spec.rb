@@ -94,4 +94,18 @@ describe Scrape do
     end
   end
 
+  describe "remove_nonascii method" do
+    it "replaces non-ascii characters to empty strings" do
+      string = '№'
+      result = Scrape.remove_nonascii(string)
+      expect(result).to eq('')
+    end
+
+    it "keep other characters" do
+      string = 'this is ascii characters1234'
+      result = Scrape.remove_nonascii(string)
+      expect(result).to eq(string)
+    end
+  end
+
 end

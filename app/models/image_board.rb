@@ -12,6 +12,7 @@ class ImageBoard < ActiveRecord::Base
     total_size = 0
     self.favored_images.each do |favored_image|
 
+      # When the source Image record is still alive:
       # ソース元のImageが生きている時
       if favored_image.image_id
         begin
@@ -21,6 +22,7 @@ class ImageBoard < ActiveRecord::Base
           total_size += favored_image.data.size
           next
         end
+      # When the source Image record is dead or deleted:
       # ソース元のImageは削除されている時
       else
         total_size += favored_image.data.size

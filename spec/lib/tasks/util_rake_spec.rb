@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+=begin
+
 describe "util:delete_banned" do
   before do
     IO.any_instance.stub(:puts)
@@ -17,3 +19,4 @@ describe "util:delete_banned" do
     Image.count.should eq(9)
   end
 end
+=end

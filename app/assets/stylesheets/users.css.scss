@@ -59,6 +59,12 @@ span.glyphicon {
   margin-top: -5px;
 }
 
+// To get rid of gaps at the search form
+.custom-search-form {
+  padding-right: 0;
+  margin-right: 0;
+}
+
 .after-header { padding: -500px 0px; }
 
 // タグ登録ページで使用

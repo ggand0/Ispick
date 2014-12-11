@@ -1,0 +1,73 @@
+// Use and customize this file if you need to customize entire navbar style.
+// For now, it is partly overrided in the application.css.scss file, and these styles are not in use.
+
+/* navbar */
+.navbar-ispick {
+    background-color: #79CECE;//#3F3F3F;//#939393;//#F8F8F8;
+    border-color: #79CECE;//#3F3F3F;
+    border-bottom-color: #FFFFFF;
+}
+/* title */
+.navbar-ispick .navbar-brand {
+    color: #777;
+}
+.navbar-ispick .navbar-brand:hover,
+.navbar-ispick .navbar-brand:focus {
+    color: #5E5E5E;
+}
+/* link */
+.navbar-ispick .navbar-nav > li > a {
+    color: #E4F5F5;//#777;
+}
+.navbar-ispick .navbar-nav > li > a:hover,
+.navbar-ispick .navbar-nav > li > a:focus {
+    color: #5B9B9B;//#333;
+}
+.navbar-ispick .navbar-nav > .active > a,
+.navbar-ispick .navbar-nav > .active > a:hover,
+.navbar-ispick .navbar-nav > .active > a:focus {
+    color: #E4F5F5;//#555;
+    background-color: #5B9B9B;//#E7E7E7;
+}
+.navbar-ispick .navbar-nav > .open > a,
+.navbar-ispick .navbar-nav > .open > a:hover,
+.navbar-ispick .navbar-nav > .open > a:focus {
+    color: #E4F5F5;//#555;
+    background-color: #5B9B9B;//#D5D5D5;
+}
+/* caret */
+.navbar-ispick .navbar-nav > .dropdown > a .caret {
+    border-top-color: #E4F5F5;//#777;
+    border-bottom-color: #E4F5F5;//#777;
+}
+.navbar-ispick .navbar-nav > .dropdown > a:hover .caret,
+.navbar-ispick .navbar-nav > .dropdown > a:focus .caret {
+    border-top-color: #5B9B9B;//#333;
+    border-bottom-color: #5B9B9B;//#333;
+}
+.navbar-ispick .navbar-nav > .open > a .caret,
+.navbar-ispick .navbar-nav > .open > a:hover .caret,
+.navbar-ispick .navbar-nav > .open > a:focus .caret {
+    border-top-color: #5B9B9B;//#555;
+    border-bottom-color: #5B9B9B;//#555;
+}
+/* mobile version */
+.navbar-ispick .navbar-toggle {
+    border-color: #DDD;
+}
+.navbar-ispick .navbar-toggle:hover,
+.navbar-ispick .navbar-toggle:focus {
+    background-color: #DDD;
+}
+.navbar-ispick .navbar-toggle .icon-bar {
+    background-color: #CCC;
+}
+@media (max-width: 767px) {
+    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a {
+        color: #777;
+    }
+    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:hover,
+    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:focus {
+        color: #333;
+    }
+}

@@ -25,8 +25,8 @@ module Scrape
       @limit = 20
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      scrape_target_words('Scrape::Anipic', interval)
-      #scrape_RSS()
+      #scrape_target_words('Scrape::Anipic', interval)
+      scrape_RSS()
     end
 
     # キーワードによる抽出処理を行う
@@ -79,13 +79,13 @@ module Scrape
 
         # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
-        image_data = self.get_data(xml, page_url)
+
         @logger.debug image_data.inspect
         begin
-          #image_data = self.get_data(xml, page_url)
+          image_data = self.get_data(xml, page_url)
           #@logger.debug "src_url: #{image_data.src_url}"
         rescue => e
-          @logger.error "An error has occurred inside get_data method. count: #{count}"
+          @logger.error "An error has occurred inside the get_data method. count: #{count}"
           send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
           next
         end
@@ -116,17 +116,23 @@ module Scrape
       result_hash
     end
 
-   # RSSを取得する
-    def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=false, english=false)
-      @logger.debug "#{target_word.inspect}"
+    # RSSを取得する
+    def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
 
       page_num = -1
-      image_data={}
-      image_data[:posted_at] = DateTime.now.to_date
+      image_data = {}
+      image_data[:posted_at] = Date.today
+      yesterday = Date.today - 1.day
 
-      while(image_data[:posted_at].to_date == DateTime.now.to_date)
+      # When you need to scrape images that are posted at that day:
+      # 当日分だけ抽出する場合
+      @logger.debug (image_data[:posted_at].to_date - yesterday <= 1).inspect
+      while (image_data[:posted_at].to_date - yesterday) <= 1# and result_hash[:duplicates] < 5
+        @logger.debug "#{image_data[:posted_at]}, #{Date.yesterday} | page_num=#{page_num}"
         page_num = page_num+1
+
+        # E.g. http://anime-pictures.net/pictures/view_posts/0
         rss_url = ROOT_URL + "/pictures/view_posts/" + page_num.to_s
         page = Nokogiri::HTML(open(rss_url))
 
@@ -135,10 +141,12 @@ module Scrape
           # 広告又はR18画像はスキップ
           if image.children.search('img').first.nil?
             result_hash[:skipped] += 1
+            @logger.debug "skipped, #{count}"
             next
+          # サーチ結果ページから、ソースページのURLを取得
           else
-            # サーチ結果ページから、ソースページのURLを取得
             page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
+            @logger.debug "page_url: #{page_url}"
           end
 
           # ソースページのパース
@@ -146,17 +154,17 @@ module Scrape
 
           # ソースページから画像情報を取得してDBへ保存する
           start = Time.now
-          image_data = self.get_data(xml, page_url)
-          @logger.debug image_data.inspect
+
           begin
-            #image_data = self.get_data(xml, page_url)
-            #@logger.debug "src_url: #{image_data.src_url}"
+            image_data = self.get_data(xml, page_url)
+            @logger.debug "src_url: #{image_data[:src_url]}"
           rescue => e
             @logger.error "An error has occurred inside get_data method. count: #{count}"
             send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
             next
           end
-          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+
+          options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
           tags = self.get_tags_original(xml)
 
           # 保存に必要なものはimage_data, tags, validetion
@@ -166,7 +174,7 @@ module Scrape
           result_hash[:scraped] += 1 if image_id
           elapsed_time = Time.now - start
           result_hash[:avg_time] += elapsed_time
-          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
 
           # Resqueで非同期的に画像解析を行う
           # 始めに画像をダウンロードし、終わり次第ユーザに配信
@@ -176,15 +184,20 @@ module Scrape
           end
 
           # 80枚（1pageの最大数）抽出するまで
-          break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
+          #break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
+          @logger.debug image_data[:posted_at].to_date
+          break if count+1 >= 80 or (image_data[:posted_at].to_date - Date.yesterday) <= 0
+
+          # Finish scraping if it's detected
+          #break if result_hash[:duplicates] >= 5
         end
       end
 
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
-
     end
 
+    # Get the result of search, using Mechanize.
     # Mechanizeにより検索結果を取得
     # @param [String]
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
@@ -206,6 +219,7 @@ module Scrape
       return result
     end
 
+    # Get tags from a XML object.
     # xmlからタグを取得
     # @param [Nokogiri::XML]
     # @return [Array::String]
@@ -220,6 +234,7 @@ module Scrape
       return result
     end
 
+    # TODO: Refactoring
     def self.get_time(time_string)
       # 整形
       time = time_string
@@ -266,10 +281,9 @@ module Scrape
       time = Time.parse(time)
 
       # src_urlの取得
-      image_url_div = xml.css("div[id='big_preview_cont']")
       #src_url = image_url_div.css("img").first.attributes['src'].value.gsub!(/ /,'')
+      image_url_div = xml.css("div[id='big_preview_cont']")
       src_url = image_url_div.css("img").first.attributes['src'].value
-      @logger.debug src_url.inspect
 
       # original_urlの取得
       # aタグが上手くパース出来なかったときの例外処理
@@ -288,8 +302,9 @@ module Scrape
         end
       end
 
-      # votesの取得
-      votes = xml.css("div[class='post_content']").first.css("b")[10].next_element.content
+      # Get 'votes' count
+      # 14/11/25 Fixed according to the update of html structure
+      votes = xml.css("div[class='post_vote_block']").first.css("span[id='score_n']").first.content
 
       # Get resolution
       resolution = xml.css("div[class='post_content']").first.css('b')[4].next_element.content
@@ -305,7 +320,7 @@ module Scrape
         original_url: original_url,
         original_width: size[0],
         original_height: size[1],
-        original_favorite_count: votes,             # votesの数
+        original_favorite_count: votes,
         site_name: 'anipic',
         module_name: 'Scrape::Anipic',
         artist: author,

@@ -15,6 +15,9 @@ Ispick::Application.routes.draw do
     get "/index" => "debug#index", as: "index_debug"
     get '/home' => 'debug#home', as: "home_debug"
     get '/download' => 'debug#download_favored_images', as: "download_debug"
+    get '/download_recent' => 'debug#download_images_n', as: "download_recent"
+    get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
+    get '/download_tags' => 'debug#download_images_tags', as: "download_tags"
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
     get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
     get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
@@ -52,10 +55,12 @@ Ispick::Application.routes.draw do
       get 'settings'
       get 'new_avatar'
       post 'create_avatar'
+      get 'rss'
       get 'preferences'
       post 'preferences'
       get 'boards'
       get 'search'
+      post 'search'
       delete 'delete_target_word'
       delete 'delete_tag'
 

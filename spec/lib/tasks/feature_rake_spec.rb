@@ -1,3 +1,4 @@
+=begin
 describe "feature:face_targets" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない
   before do
@@ -36,3 +37,4 @@ describe "feature:face_images" do
     Image.first.feature.face.should eq ('[]'.to_json)
   end
 end
+=end

@@ -220,12 +220,12 @@ module Scrape
         # target_wordオブジェクトに関連づける
         # nilの場合(RSSのスクレイピング時等)は、後でスクリプトを走らせて別途関連づける
         target_word.images << image unless target_word.nil?
-
         Scrape::Client.generate_jobs(image.id, attributes[:src_url], options[:large]) unless options[:resque]
       else
         logger.info 'Image model saving failed. (maybe due to duplication)'
         return
       end
+
       image.id
     end
 

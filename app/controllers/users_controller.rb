@@ -4,6 +4,7 @@ require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
+  before_filter :set_search
   before_filter :set_user, only: [:edit, :update, :settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
   before_filter :authenticate, only: [:show_target_images]
@@ -67,9 +68,38 @@ class UsersController < ApplicationController
     @disable_fotter = true
   end
 
-  # GET
+
+  # GET /users/rss
+  # Render streams of crawled websites.
+  def rss
+    # Get images: For a new user, display the newer images
+    images = current_user.get_images
+    images.reorder!('posted_at DESC') if params[:sort]
+    images.reorder!('original_favorite_count DESC') if params[:fav]
+    images.uniq!
+
+    # Filter images by sites
+    if params[:site]
+      images = Image.get_recent_images_relation(images, params[:site])
+    else
+      images = Image.get_recent_images_relation(images, 'anipic')
+    end
+
+    @images = images.page(params[:page]).per(10)
+    @images_all = images
+    @disable_fotter = true
+  end
+
+
+  # GET/POST search
   def search
-    images = Image.search_images(params[:query])
+    if request.post?
+      # @search var is already set in the private method
+      images = @search.result(distinct: true)
+    else
+      images = Image.search_images(params[:query])
+    end
+
     images.reorder!('posted_at DESC') if params[:sort]
 
     # Filter images by date
@@ -207,6 +237,11 @@ class UsersController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_user
     @user = User.find(current_user.id)
+  end
+
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
   end
 
   def user_params
