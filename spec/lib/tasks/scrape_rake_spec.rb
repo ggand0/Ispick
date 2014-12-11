@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 # Deleting tasks
+=begin
 describe "scrape:delete_old" do
   before do
     IO.any_instance.stub(:puts)
@@ -86,3 +87,4 @@ describe "scrape:keyword" do
     subject.invoke
   end
 end
+=end
