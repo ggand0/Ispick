@@ -32,6 +32,43 @@ class DebugController < ApplicationController
     @images_all = images
   end
 
+
+  def download_csv
+    limit = params[:limit]
+    all = params[:all]
+    file_name  = "Ispick_csv_#{DateTime.now}.csv"
+    temp_file  = Tempfile.new("#{file_name}")
+
+    # This code is copied from OutputCSV module
+    # TODO: Refactoring!
+    CSV.open(temp_file.path, "wb") do |csv|
+      row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
+      csv << row
+
+      images = Image.all.limit(limit)
+      images = Image.all if all
+      images.each do |image|
+        row = []
+        row.push(image.id)
+        row.push(image.page_url)
+        row.push(image.original_width)
+        row.push(image.original_height)
+        row.push(image.artist)
+
+        tags = ""
+        ImagesTag.where(image_id: image.id).each do |tag|
+            tags = tags + Tag.find(tag.tag_id).name + ";"
+        end
+        row.push(tags)
+        csv << row
+      end
+    end
+
+    send_file temp_file.path, type: 'application/csv',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
   # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
   # 画像のダウンロード：releaseする時にこの機能は削除する。
