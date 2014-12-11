@@ -1,4 +1,5 @@
 class DebugController < ApplicationController
+  before_filter :set_search
   before_action :render_sign_in_page
   before_filter :authenticate
   before_action :set_image, only: [:favor_another, :show_debug]
@@ -71,6 +72,38 @@ class DebugController < ApplicationController
         title = image.get_title
         zos.put_next_entry(title)
         zos.print IO.read(image.data.path)
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
+  # [DEBUG] Download images that have a specific tag from an optional site.
+  def download_images_tags
+    limit = params[:limit]
+    site = params[:site]
+    tag = params[:tag]
+    tag = tag.split(',')
+
+    @images = Image.search_images(tag)
+    @images.uniq!
+    @images = @images.where(site_name: site) if site
+    @images = @images.limit(limit) if limit
+    file_name = "#{site}_#{tag}#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file(@images))
+      @images.each_with_index do |image, i|
+        # To avoid creating nested directory, remove slashes
+        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+        title = image.get_title
+        puts "#{title},#{i},#{image.src_url}"
+        zos.put_next_entry(title)
+        zos.print IO.read(image.data.path)
+        #break if i >= 20#19to20
       end
     end
     send_file temp_file.path, type: 'application/zip',
@@ -213,6 +246,11 @@ class DebugController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_image
     @image = Image.find(params[:id])
+  end
+
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

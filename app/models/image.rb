@@ -117,7 +117,7 @@ class Image < ActiveRecord::Base
     images = images.reorder("created_at DESC").
       where.not(data_updated_at: nil).
       where.not(data_content_type: 'image/gif')
-    images
+    images.uniq
   end
 
   # Create the list of image names from an Image relation object
@@ -148,6 +148,16 @@ class Image < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def self.search_images(query)
     Image.joins(:tags).where(tags: { name: query }).
+      where.not(data_updated_at: nil).
+      where.not(data_content_type: 'image/gif').
+      references(:tags)
+  end
+
+  # Search images which is shown at user's home page.
+  # @param query [Array] An array of tags used for search.
+  # @return [ActiveRecord::AssociationRelation]
+  def self.search_images_tags(query)
+    Image.joins(:tags).where("tags.name IN (?)", query).
       where.not(data_updated_at: nil).
       where.not(data_content_type: 'image/gif').
       references(:tags)
