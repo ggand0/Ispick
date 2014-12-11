@@ -108,6 +108,9 @@ module UsersHelper
   def file_glyphicon
     '<span class="glyphicon glyphicon-file" style="vertical-align:middle"></span>'.html_safe
   end
+  def search_glyphicon
+    '<span class="glyphicon glyphicon-search" style="vertical-align:middle"></span>'.html_safe
+  end
 
 
 

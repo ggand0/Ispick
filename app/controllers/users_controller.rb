@@ -4,6 +4,7 @@ require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
+  before_filter :set_search
   before_filter :set_user, only: [:edit, :update, :settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
   before_filter :authenticate, only: [:show_target_images]
@@ -90,9 +91,15 @@ class UsersController < ApplicationController
   end
 
 
-  # GET
+  # GET/POST search
   def search
-    images = Image.search_images(params[:query])
+    if request.post?
+      # @search var is already set in the private method
+      images = @search.result(distinct: true).page(params[:page]).per(10)
+    else
+      images = Image.search_images(params[:query])
+    end
+
     images.reorder!('posted_at DESC') if params[:sort]
 
     # Filter images by date
@@ -230,6 +237,11 @@ class UsersController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_user
     @user = User.find(current_user.id)
+  end
+
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
   end
 
   def user_params

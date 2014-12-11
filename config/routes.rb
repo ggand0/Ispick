@@ -59,6 +59,7 @@ Ispick::Application.routes.draw do
       post 'preferences'
       get 'boards'
       get 'search'
+      post 'search'
       delete 'delete_target_word'
       delete 'delete_tag'
 
