@@ -95,7 +95,7 @@ class UsersController < ApplicationController
   def search
     if request.post?
       # @search var is already set in the private method
-      images = @search.result(distinct: true).page(params[:page]).per(10)
+      images = @search.result(distinct: true)
     else
       images = Image.search_images(params[:query])
     end
