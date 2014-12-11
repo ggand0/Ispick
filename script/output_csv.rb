@@ -4,14 +4,21 @@
 module OutputCSV
 
   # 画像を抽出して保存
-  def self.output_images()
+  def self.output_images(src)
     CSV.open("#{Rails.root}/csv/Images.csv","wb") do |csv|
-      row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
+      row = ["image_id","src","page_url","original_width","original_height","artist","tags(separate by ';')"]
       csv << row
     
-      Image.all.each do |image|
+      if(src=="all") then
+        images = Image.all
+      else
+        images = Image.where(site_name: src)
+      end
+    
+      images.each do |image|
         row = []
         row.push(image.id)
+        row.push(image.site_name)
         row.push(image.page_url)
         row.push(image.original_width)
         row.push(image.original_height)
@@ -28,11 +35,11 @@ module OutputCSV
     end
   end
   
-  def self.output_fi()
+  def self.output_fi(src)
     CSV.open("#{Rails.root}/csv/ImageBoards.csv","wb") do |csv|
       row = ["board_id","image_id"]
       csv << row
-      FavoredImage.all.each do |fi|
+      FavoredImage.where(site_name:src).each do |fi|
         row=[]
         row.push(fi.image_board_id)
         row.push(fi.image_id)
