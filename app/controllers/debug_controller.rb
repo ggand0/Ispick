@@ -33,6 +33,7 @@ class DebugController < ApplicationController
   end
 
 
+  # Download CSV file that enumerates all csv attributes
   def download_csv
     limit = params[:limit]
     all = params[:all]
@@ -44,11 +45,10 @@ class DebugController < ApplicationController
     CSV.open(temp_file.path, "wb") do |csv|
       row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
       csv << row
+      images = Image.all.limit(limit)
+      images = Image.all if all
 
-      #images = Image.all.limit(limit)
-      #images = Image.all if all
-      images = Image.all
-      #images.joins(:tags).each do |image|
+      # Includes joining table
       images.includes(:tags).find_each do |image|
         row = []
         row.push(image.id)
