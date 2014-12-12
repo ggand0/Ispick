@@ -45,9 +45,11 @@ class DebugController < ApplicationController
       row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
       csv << row
 
-      images = Image.all.limit(limit)
-      images = Image.all if all
-      images.each do |image|
+      #images = Image.all.limit(limit)
+      #images = Image.all if all
+      images = Image.all
+      #images.joins(:tags).each do |image|
+      images.includes(:tags).find_each do |image|
         row = []
         row.push(image.id)
         row.push(image.page_url)
@@ -55,11 +57,15 @@ class DebugController < ApplicationController
         row.push(image.original_height)
         row.push(image.artist)
 
-        tags = ""
-        ImagesTag.where(image_id: image.id).each do |tag|
-            tags = tags + Tag.find(tag.tag_id).name + ";"
+        tag_string = ""
+        #ImagesTag.where(image_id: image.id).each do |tag|
+        #  tags = tags + Tag.find(tag.tag_id).name + ";"
+        #end
+        image.tags.each do |tag|
+          tag_string += "#{tag};"
         end
-        row.push(tags)
+
+        row.push(tag_string)
         csv << row
       end
     end
