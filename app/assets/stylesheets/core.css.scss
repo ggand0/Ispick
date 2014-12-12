@@ -28,3 +28,21 @@
 .modal.modal-images .modal-dialog { width: 800px; }
 
 .modal.modal-boards .modal-dialog { width: 300px; }
+
+
+
+body.modal-open{
+overflow: hidden;
+height: 100%;
+}
+
+.modal-content,
+.modal-dialog,
+.modal-body {
+height: inherit;
+min-height: 100%;
+}
+
+.modal {
+min-height: 100%;
+}
