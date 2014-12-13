@@ -41,12 +41,15 @@ class DebugController < ApplicationController
     temp_file  = Tempfile.new("#{file_name}")
 
     # This code is copied from OutputCSV module
-    # TODO: Refactoring!
+    # TODO: Refactor this!
     CSV.open(temp_file.path, "wb") do |csv|
       row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
       csv << row
-      images = Image.all.limit(limit)
-      images = Image.all if all
+
+      images = Image.select('id, page_url, original_width, original_height, artist').all.limit(limit)
+      images = Image.select('id, page_url, original_width, original_height, artist').all if all
+      puts "==========================DEBUG: #{limit}"
+      puts "==========================DEBUG: #{limit}"
 
       # Includes joining table
       images.includes(:tags).find_each do |image|
@@ -58,14 +61,11 @@ class DebugController < ApplicationController
         row.push(image.artist)
 
         tag_string = ""
-        #ImagesTag.where(image_id: image.id).each do |tag|
-        #  tags = tags + Tag.find(tag.tag_id).name + ";"
-        #end
         image.tags.each do |tag|
-          tag_string += "#{tag};"
+          tag_string += "#{tag.name};"
         end
-
         row.push(tag_string)
+
         csv << row
       end
     end
@@ -186,7 +186,7 @@ class DebugController < ApplicationController
   # The page for debugging illust detection feature.
   # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
-    # Get images
+    # Get images first
     if session[:all]
       images = current_user.get_images_all
     else
