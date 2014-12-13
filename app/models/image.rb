@@ -156,11 +156,32 @@ class Image < ActiveRecord::Base
   # Search images which is shown at user's home page.
   # @param query [Array] An array of tags used for search.
   # @return [ActiveRecord::AssociationRelation]
-  def self.search_images_tags(query)
-    Image.joins(:tags).where("tags.name IN (?)", query).
-      where.not(data_updated_at: nil).
-      where.not(data_content_type: 'image/gif').
-      references(:tags)
+  def self.search_images_tags(query, condition='or')
+    # Use array to search with OR condition
+    if condition == 'or'
+      Image.joins(:tags).where("tags.name IN (?)", query).
+        where.not(data_updated_at: nil).
+        where.not(data_content_type: 'image/gif').
+        references(:tags)
+
+    # Dynamically merge relations and return the result
+    elsif condition == 'and'
+      relations = []
+      query.each_with_index do |q, c|
+        relations.push(Image.joins(:tags).where("tags.name = (?)", q))
+      end
+
+      condition = ""
+      relations.each_with_index do |r, c|
+        condition += "relations[#{c}]&"
+      end
+
+      #E.g. Image.where(id: (eval "i1 & i2")).
+      Image.where(id: (eval condition[0..-2])).
+        where.not(data_updated_at: nil).
+        where.not(data_content_type: 'image/gif').
+        references(:tags)
+    end
   end
 
   # @param images [ActiveRecord::CollectionProxy]

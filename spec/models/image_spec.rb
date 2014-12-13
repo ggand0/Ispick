@@ -68,6 +68,21 @@ describe Image do
     end
   end
 
+  describe "search_images_tags method" do
+    it "returns a valid relation with OR condition" do
+      FactoryGirl.create(:image_madoka)
+      FactoryGirl.create(:image_sayaka)
+    end
+    it "returns a valid relation with AND condition" do
+      FactoryGirl.create(:image_madoka)
+      FactoryGirl.create(:image_madoka_single)
+
+      images = Image.search_images_tags(['Madoka Kaname', 'single'], 'and')
+      puts images.inspect
+      expect(images.count).to eq(1)
+    end
+  end
+
   describe "filter_by_date method" do
     it "returns proper relation object" do
       user = FactoryGirl.create(:user_with_tag_images, images_count: 1)

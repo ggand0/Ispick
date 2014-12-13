@@ -128,7 +128,7 @@ FactoryGirl.define do
     end
   end
 
-  # Scrape::Nico.get_stats用
+  # For testing Scrape::Nico.get_stats
   factory :image_nicoseiga, class: Image do
     src_url 'http://lohas.nicoseiga.jp/thumb/3932299i'
     page_url 'http://seiga.nicovideo.jp/seiga/im3932299'
@@ -137,11 +137,46 @@ FactoryGirl.define do
     end
   end
 
-  # Image with related title and caption
+
+
+  # Used in image_spec
   factory :image_madoka, class: Image do
     title 'Madoka Kaname(鹿目まどか)'
     caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
     src_url 'http://i.4cdn.org/c/1399620027799.jpg'
     page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
+
+    after(:create) do |image|
+      image.tags << create(:tag_madoka)
+    end
+  end
+
+  factory :image_madoka_single, class: Image do
+    title 'Madoka Kaname(鹿目まどか)'
+    caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
+    src_url 'http://i.4cdn.org/c/some_single_madoka_image.jpg'
+    page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
+
+    after(:create) do |image|
+      # This factory is used together with 'image_madoka' factory
+      image.tags << Tag.where(name: 'Madoka Kaname').first
+      image.tags << create(:tag_single)
+    end
+  end
+
+  # Image with related title and caption
+  factory :image_sayaka, class: Image do
+    title 'Sayaka Miki(美樹さやか)'
+    caption 'I can be so stupid.'
+    src_url 'http://i.4cdn.org/c/some_sayaka_meme.jpg'
+    page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
+
+    after(:create) do |image|
+      image.tags << create(:tag_sayaka)
+      image.tags << create(:tag_single)
+    end
   end
 end

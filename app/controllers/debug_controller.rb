@@ -129,7 +129,7 @@ class DebugController < ApplicationController
     tag = params[:tag]
     tag = tag.split(',')
 
-    @images = Image.search_images(tag)
+    @images = Image.search_images(tag, 'and')
     @images.uniq!
     @images = @images.where(site_name: site) if site
     @images = @images.limit(limit) if limit
