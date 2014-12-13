@@ -127,26 +127,34 @@ class DebugController < ApplicationController
     limit = params[:limit]
     site = params[:site]
     tag = params[:tag]
-    tag = tag.split(',')
+    @image_array = []
+    tags = tag.split(':')#
 
-    @images = Image.search_images(tag, 'and')
-    @images.uniq!
-    @images = @images.where(site_name: site) if site
-    @images = @images.limit(limit) if limit
+    tags.each do |tag|
+      t = tag.split(',')#
+      ims = Image.search_images_tags(t, 'and')#
+      ims.uniq!
+      ims = ims.where(site_name: site) if site
+      ims = ims.limit(limit) if limit
+      @image_array.push({images: ims, label: t[0]})
+    end
+
     file_name = "#{site}_#{tag}#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 
+
     Zip::OutputStream.open(temp_file.path) do |zos|
       zos.put_next_entry 'imagelist'
-      zos.print IO.read(Image.create_list_file(@images))
-      @images.each_with_index do |image, i|
-        # To avoid creating nested directory, remove slashes
-        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
-        title = image.get_title
-        puts "#{title},#{i},#{image.src_url}"
-        zos.put_next_entry(title)
-        zos.print IO.read(image.data.path)
-        #break if i >= 20#19to20
+      zos.print IO.read(Image.create_list_file_labels(@image_array))
+
+      @image_array.each_with_index do |images, i|
+        images[:images].each do |image|
+          # To avoid creating nested directory, remove slashes
+          # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+          title = image.get_title
+          zos.put_next_entry(title)
+          zos.print IO.read(image.data.path)
+        end
       end
     end
     send_file temp_file.path, type: 'application/zip',
