@@ -184,6 +184,19 @@ class Image < ActiveRecord::Base
     end
   end
 
+  # Get the common records of all given relations
+  # @param relations [ActiveRecord::AssociationRelation_Image]
+  # @return [ActiveRecord::AssociationRelation_Image]
+  def self.and_search(relations)
+    condition = ""
+    relations.each_with_index do |r, c|
+      condition += "relations[#{c}]&"
+    end
+
+    #E.g. Image.where(id: (eval "i1 & i2")).
+    Image.where(id: (eval condition[0..-2]))
+  end
+
   # @param images [ActiveRecord::CollectionProxy]
   # @param date [Date] date
   # @return [ActiveRecord::CollectionProxy]

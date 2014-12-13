@@ -93,9 +93,19 @@ class UsersController < ApplicationController
 
   # GET/POST search
   def search
+    #@search = Image.search(params[:q])
+    relations = []
+    queries = params[:q]['tags_name_cont'].split(',')
+    queries.each do |query|
+      q = {'tags_name_cont'=>query}
+      relations.push Image.search(q).result(distinct: true)
+    end
+
     if request.post?
       # @search var is already set in the private method
-      images = @search.result(distinct: true)
+      #images = @search.result(distinct: true)
+      images = Image.and_search(relations)
+      images = images.where.not(data_updated_at: nil)
     else
       images = Image.search_images(params[:query])
     end
