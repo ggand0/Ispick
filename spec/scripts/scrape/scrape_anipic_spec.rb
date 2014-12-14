@@ -3,10 +3,9 @@ require "#{Rails.root}/script/scrape/scrape"
 require "#{Rails.root}/script/scrape/scrape_anipic"
 
 describe Scrape::Anipic do
-  let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
-  #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'tumblr_api_response')) }
+  let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'anipic_rss.html')) }
   before do
-    IO.any_instance.stub(:puts)             # Surpress console outputs
+    #IO.any_instance.stub(:puts)             # Surpress console outputs
     Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
     @client = Scrape::Anipic.new(nil, 5)
     #@response = JSON.parse(response)['response']
@@ -36,6 +35,26 @@ describe Scrape::Anipic do
 
       result_hash = @client.scrape_using_api(target_word)
       puts result_hash.inspect
+    end
+  end
+
+  describe "is_range method" do
+    it "returns true when target's in range" do
+      target =  Date.today
+      puts result = Scrape::Anipic.is_range(target)
+      expect(result).to eq(true)
+    end
+
+    it "returns false otherwise" do
+      target =  Date.today - 3.day
+      puts result = Scrape::Anipic.is_range(target)
+      expect(result).to eq(false)
+    end
+  end
+
+  describe "scrape_RSS method" do
+    it "stops scraping if it's out of range" do
+
     end
   end
 

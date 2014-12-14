@@ -26,7 +26,10 @@ module Scrape
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
       #scrape_target_words('Scrape::Anipic', interval)
-      scrape_RSS()
+      result = scrape_RSS()
+
+      @logger.info result
+      @logger.info 'DONE!'
     end
 
     # キーワードによる抽出処理を行う
@@ -116,7 +119,14 @@ module Scrape
       result_hash
     end
 
-    # RSSを取得する
+    def self.is_range(target)
+      yesterday = Date.today - 1.day
+      #puts (target.to_date - yesterday).abs
+      #puts (target.to_date - yesterday).to_i.abs
+      (target.to_date - yesterday).abs <= 1
+    end
+
+    # Get RSS
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
 
@@ -127,8 +137,8 @@ module Scrape
 
       # When you need to scrape images that are posted at that day:
       # 当日分だけ抽出する場合
-      @logger.debug (image_data[:posted_at].to_date - yesterday <= 1).inspect
-      while (image_data[:posted_at].to_date - yesterday) <= 1# and result_hash[:duplicates] < 5
+      @logger.debug self.class.is_range(image_data[:posted_at]).inspect
+      while self.class.is_range(image_data[:posted_at])# and result_hash[:duplicates] < 5
         @logger.debug "#{image_data[:posted_at]}, #{Date.yesterday} | page_num=#{page_num}"
         page_num = page_num+1
 
