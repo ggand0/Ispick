@@ -93,14 +93,17 @@ class UsersController < ApplicationController
 
   # GET/POST search
   def search
+    # Get images
     if request.post?
-      relations = []
       queries = params[:q]['tags_name_cont'].split(',')
+
+      relations = []
       queries.each do |query|
         #q = {'tags_name_cont'=>query}
         #relations.push Image.search(q).result(distinct: true)
         #relations.push Image.select('images.id').joins(:tags).where(tags:{name: query})
-        relations.push Image.select('images.id').joins(:tags).where("tags.name like ?", "%#{query}%")
+        #relations.push Image.joins(:tags).where("tags.name like ?", "#{query}").references(:tags)
+        relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
       end
 
       # @search var is already set in the private method
@@ -110,6 +113,7 @@ class UsersController < ApplicationController
     else
       images = Image.search_images(params[:query])
     end
+
 
     images.reorder!('posted_at DESC') if params[:sort]
 
