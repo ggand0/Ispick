@@ -96,7 +96,7 @@ class UsersController < ApplicationController
     # Get images
     if request.post?
       queries = params[:q]['tags_name_cont'].split(',')
-
+=begin
       relations = []
       queries.each do |query|
         #q = {'tags_name_cont'=>query}
@@ -107,27 +107,28 @@ class UsersController < ApplicationController
         #relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
         relations.push  Image.joins(:tags).where(tags: {name: "#{query}"})
       end
+=end
 
-      # @search var is already set in the private method
-      #images = @search.result(distinct: true)
-      images = Image.and_search(relations)
+      images = Image.joins(:tags).
+        where('tags.name' => queries).
+        #where("tags.name like ?", "%#{queries}%").
+        group("images.id").having("count(*)= #{queries.count}")
       images = images.where.not(data_updated_at: nil)
+      @count = images.select('images.id').count.keys.count
     else
       images = Image.search_images(params[:query])
     end
 
-
+    # Filter or sort images
     images.reorder!('posted_at DESC') if params[:sort]
-
-    # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
       images = Image.filter_by_date(images, date)
+      @count = images.select('images.id').count
     end
 
-    @images = images.page(params[:page]).per(10)
-    @count = images.select('images.id').count
     @disable_fotter = true
+    @images = images.page(params[:page]).per(10)
     render action: 'home'
   end
 

@@ -62,7 +62,7 @@ describe Image do
 
       # Note that search_images exclude image records without actual file
       FactoryGirl.create(:tag_with_image_file, images_count: 5)
-      puts Image.first.tags.first.name
+      #puts Image.first.tags.first.name
       images = Image.search_images('鹿目まどか1')
       expect(images.count).to eq(5)
     end

@@ -211,7 +211,8 @@ class Image < ActiveRecord::Base
     end
 
     #E.g. Image.where(id: (eval "i1 & i2")).
-    Image.where(id: (eval condition[0..-2]))
+    #Image.where(id: (eval condition[0..-2]))
+    eval condition[0..-2]
   end
 
   # @param images [ActiveRecord::CollectionProxy]
