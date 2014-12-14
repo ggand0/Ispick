@@ -64,7 +64,7 @@ class UsersController < ApplicationController
     images = images.where.not(site_name: 'nicoseiga') if params[:nico]
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
   end
 
@@ -86,7 +86,7 @@ class UsersController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
   end
 
@@ -101,9 +101,11 @@ class UsersController < ApplicationController
       queries.each do |query|
         #q = {'tags_name_cont'=>query}
         #relations.push Image.search(q).result(distinct: true)
+        #Image.search('madoka').result(distinct: true)
         #relations.push Image.select('images.id').joins(:tags).where(tags:{name: query})
         #relations.push Image.joins(:tags).where("tags.name like ?", "#{query}").references(:tags)
-        relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
+        #relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
+        relations.push  Image.joins(:tags).where(tags: {name: "#{query}"})
       end
 
       # @search var is already set in the private method
@@ -124,7 +126,7 @@ class UsersController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
     render action: 'home'
   end
