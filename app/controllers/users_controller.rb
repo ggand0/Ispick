@@ -97,8 +97,10 @@ class UsersController < ApplicationController
       relations = []
       queries = params[:q]['tags_name_cont'].split(',')
       queries.each do |query|
-        q = {'tags_name_cont'=>query}
-        relations.push Image.search(q).result(distinct: true)
+        #q = {'tags_name_cont'=>query}
+        #relations.push Image.search(q).result(distinct: true)
+        #relations.push Image.select('images.id').joins(:tags).where(tags:{name: query})
+        relations.push Image.select('images.id').joins(:tags).where("tags.name like ?", "%#{query}%")
       end
 
       # @search var is already set in the private method
