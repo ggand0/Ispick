@@ -3,7 +3,7 @@ class ImageFeature
   @queue = :image_feature
 
   def self.deploy_prototxt(image, temp_dir_path, mean_file_path)
-    imagelist_path = ""
+    imagelist_path = Image.create_listfile(Image.find(image.id))
 
     # Copy the template to tmp directory
     file_name = 'imagenet_features_template.prototxt'
@@ -20,23 +20,26 @@ class ImageFeature
     file_name
   end
 
+
   # @param [Image/TargetImage] A record of TargetImage model which has already saved.
   # @return [Hash] ImageNet categories included.
-  def self.get_categories(image)
+  def self.extract_features(image)
+    #model_path = ""       # .prototxt file for feature extraction
+    pretrained_file = "caffenet_train_pmmm350_iter_6000.caffemodel"
+    pretrained_path = "#{CONFIG['caffe_path']}/models/Ispick/#{pretrained_file}"  # .caffemodel file
+    mean_file_path = "#{CONFIG['caffe_path']}/data/Ispick/pmmm350_mean.npy"                           # .npy file converted from .binaryproto file which was used for training
+    #script_path = "/home/"      # Path of feature_extraction.py
 
-#./build/tools/extract_features.bin models/ispick/caffenet_train_iter_20000.caffemodel features/imagenet_val.prototxt fc7 features/_temp1 1
-#python dump_features.py features/_temp1
-#/tmp/d20141215-6041-kwd2cq
-    
-    #temp_file = Tempfile.new('caffe_feature_extraction')
     Dir.mktmpdir do |temp_dir_path|
-      tool_exec = "./build/tools/extract_features.bin models/ispick/caffenet_train_pmmm350_iter_2000.caffemodel features/imagenet_val.prototxt fc7 #{temp_dir_path} 1"
+      # Memo: feature extraction with C++ (WIP)
+      #tool_exec = "./build/tools/extract_features.bin models/ispick/caffenet_train_pmmm350_iter_2000.caffemodel features/imagenet_val.prototxt fc7 #{temp_dir_path} 1"
+      #result = %x('cd' #{CONFIG['caffe_path']}; #{tool_exec})
 
-      #result = %x(#{tool_path} #{image.data.path} #{network_path})
-      result = %x('cd' #{CONFIG['caffe_path']}; #{tool_exec})
+      # Configure prototxt file
+      model_file_path = self.deploy_prototxt(image, temp_dir_path, mean_file_path)
 
-      #dump_exec = "python get_features.py #{temp_dir_path}"
-      dump_exec = "python extract_features.py #{temp_dir_path}"
+      # Execute the script and extract feature vectors
+      dump_exec = "python #{CONFIG['caffe_path']}/extract_features.py #{mean_file_path} #{model_file_path} #{pretrained_path}"
       result = %x('cd' #{CONFIG['caffe_path']}; #{dump_exec})
       arr = result[0..-2].split(',')
     end
@@ -59,8 +62,6 @@ class ImageFeature
 
   def self.perform(image_type, image_id)
     image = Object::const_get(image_type).find(image_id)
-
-    # ImageNetのカテゴリ分類処理
     logger.info json_string = self.get_categories(image).to_json
     feature = Feature.new(categ_imagenet: json_string)
 
