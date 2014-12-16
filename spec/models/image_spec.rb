@@ -62,9 +62,24 @@ describe Image do
 
       # Note that search_images exclude image records without actual file
       FactoryGirl.create(:tag_with_image_file, images_count: 5)
-      puts Image.first.tags.first.name
+      #puts Image.first.tags.first.name
       images = Image.search_images('鹿目まどか1')
       expect(images.count).to eq(5)
+    end
+  end
+
+  describe "search_images_tags method" do
+    it "returns a valid relation with OR condition" do
+      FactoryGirl.create(:image_madoka)
+      FactoryGirl.create(:image_sayaka)
+    end
+    it "returns a valid relation with AND condition" do
+      FactoryGirl.create(:image_madoka)
+      FactoryGirl.create(:image_madoka_single)
+
+      images = Image.search_images_tags(['Madoka Kaname', 'single'], 'and')
+      puts images.inspect
+      expect(images.count).to eq(1)
     end
   end
 

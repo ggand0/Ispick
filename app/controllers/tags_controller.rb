@@ -37,7 +37,7 @@ class TagsController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
 
     respond_to do |format|

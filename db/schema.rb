@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141016181815) do
+ActiveRecord::Schema.define(version: 20141214034129) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 20141016181815) do
 
   create_table "features", force: true do |t|
     t.text     "face"
-    t.text     "categ_imagenet"
+    t.text     "convnet_feature"
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20141016181815) do
   end
 
   add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
+  add_index "images_tags", ["tag_id"], name: "index_images_tags_on_tag_id", using: :btree
 
   create_table "images_target_words", force: true do |t|
     t.integer "image_id",       null: false

@@ -155,7 +155,7 @@ module Scrape
         page_url: ROOT_URL + "image/#{id}/",
         posted_at: time,
         original_view_count: nil,
-        src_url: src_url,
+        src_url: original_url,#src_url,
         original_url: original_url,
         original_favorite_count: favorite_count,             # Image Rating
         site_name: 'shushu',

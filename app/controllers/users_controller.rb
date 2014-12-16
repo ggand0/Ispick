@@ -64,7 +64,7 @@ class UsersController < ApplicationController
     images = images.where.not(site_name: 'nicoseiga') if params[:nico]
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
   end
 
@@ -86,31 +86,49 @@ class UsersController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(10)
-    @images_all = images
+    @count = images.select('images.id').count
     @disable_fotter = true
   end
 
 
   # GET/POST search
   def search
+    # Get images
     if request.post?
-      # @search var is already set in the private method
-      images = @search.result(distinct: true)
+      queries = params[:q]['tags_name_cont'].split(',')
+=begin
+      relations = []
+      queries.each do |query|
+        #q = {'tags_name_cont'=>query}
+        #relations.push Image.search(q).result(distinct: true)
+        #Image.search('madoka').result(distinct: true)
+        #relations.push Image.select('images.id').joins(:tags).where(tags:{name: query})
+        #relations.push Image.joins(:tags).where("tags.name like ?", "#{query}").references(:tags)
+        #relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
+        relations.push  Image.joins(:tags).where(tags: {name: "#{query}"})
+      end
+=end
+
+      images = Image.joins(:tags).
+        where('tags.name' => queries).
+        #where("tags.name like ?", "%#{queries}%").
+        group("images.id").having("count(*)= #{queries.count}")
+      images = images.where.not(data_updated_at: nil)
+      @count = images.select('images.id').count.keys.count
     else
       images = Image.search_images(params[:query])
     end
 
+    # Filter or sort images
     images.reorder!('posted_at DESC') if params[:sort]
-
-    # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
       images = Image.filter_by_date(images, date)
+      @count = images.select('images.id').count
     end
 
-    @images = images.page(params[:page]).per(10)
-    @images_all = images
     @disable_fotter = true
+    @images = images.page(params[:page]).per(10)
     render action: 'home'
   end
 
@@ -150,9 +168,9 @@ class UsersController < ApplicationController
     @tags = current_user.tags
     @tag = Tag.new
 
-    @search = Tag.search(params[:q])
+    @search_tags = Tag.search(params[:q])
     if params[:q]
-      @tags_result = @search.result(distinct: true).page(params[:page]).per(50)
+      @tags_result = @search_tags.result(distinct: true).page(params[:page]).per(50)
     end
 
     respond_to do |format|

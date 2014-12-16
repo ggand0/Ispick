@@ -156,7 +156,7 @@ module UsersHelper
   # Returns html code for debugging.
   # @params image [ActiveRecord::AssociationRelation] A relation object of Image class.
   # @return [String] html code with the count of input relation.
-  def get_debug_html(images)
-    "<strong>Found #{images.count} images.</strong>".html_safe
+  def get_debug_html(count)
+    "<strong>Found #{count} images.</strong>".html_safe
   end
 end

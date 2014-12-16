@@ -134,6 +134,23 @@ class Image < ActiveRecord::Base
     file
   end
 
+  # Create the list of image names from an Image relation object with multiple type of labels.
+  # @param image [Array] Array of hashes: [{images: relation, label: 'string'},...]
+  # @return [File]
+  def self.create_list_file_labels(image_array)
+    file = Tempfile.new("imagelist#{DateTime.now}")
+
+    image_array.each_with_index do |hash, counter|
+      hash[:images].each do |image|
+        name = image.get_title
+        file.write(name + "\s#{counter}")
+        file.write "\n"
+      end
+    end
+    file.flush
+    file
+  end
+
   # Generate unique title string of the image
   # @return [String]
   def get_title
@@ -156,11 +173,46 @@ class Image < ActiveRecord::Base
   # Search images which is shown at user's home page.
   # @param query [Array] An array of tags used for search.
   # @return [ActiveRecord::AssociationRelation]
-  def self.search_images_tags(query)
-    Image.joins(:tags).where("tags.name IN (?)", query).
-      where.not(data_updated_at: nil).
-      where.not(data_content_type: 'image/gif').
-      references(:tags)
+  def self.search_images_tags(query, condition='or')
+    # Use array to search with OR condition
+    if condition == 'or'
+      Image.joins(:tags).where("tags.name IN (?)", query).
+        where.not(data_updated_at: nil).
+        where.not(data_content_type: 'image/gif').
+        references(:tags)
+
+    # Dynamically merge relations and return the result
+    elsif condition == 'and'
+      relations = []
+      query.each_with_index do |q, c|
+        relations.push(Image.joins(:tags).where("tags.name = (?)", q))
+      end
+
+      condition = ""
+      relations.each_with_index do |r, c|
+        condition += "relations[#{c}]&"
+      end
+
+      #E.g. Image.where(id: (eval "i1 & i2")).
+      Image.where(id: (eval condition[0..-2])).
+        where.not(data_updated_at: nil).
+        where.not(data_content_type: 'image/gif').
+        references(:tags)
+    end
+  end
+
+  # Get the common records of all given relations
+  # @param relations [ActiveRecord::AssociationRelation_Image]
+  # @return [ActiveRecord::AssociationRelation_Image]
+  def self.and_search(relations)
+    condition = ""
+    relations.each_with_index do |r, c|
+      condition += "relations[#{c}]&"
+    end
+
+    #E.g. Image.where(id: (eval "i1 & i2")).
+    #Image.where(id: (eval condition[0..-2]))
+    eval condition[0..-2]
   end
 
   # @param images [ActiveRecord::CollectionProxy]

@@ -150,7 +150,7 @@ class TargetWordsController < ApplicationController
     end
 
     @images = images.page(params[:page]).per(25)
-    @images_all = images
+    @count = images.select('images.id').count
     render action: '../users/home'
   end
 
