@@ -1,21 +1,9 @@
 name: "CaffeNet"
-layers {
-  name: "data"
-  type: IMAGE_DATA
-  top: "data"
-  top: "label"
-  image_data_param {
-    source: "imagelist_file"#
-    batch_size: 100#50
-    new_height: 128#256
-    new_width: 128#256
-  }
-  transform_param {
-    crop_size: 114#227
-    mean_file: "images_mean.binaryproto"#
-    mirror: false
-  }
-}
+input: "data"
+input_dim: 10
+input_dim: 3
+input_dim: 114
+input_dim: 114
 layers {
   name: "conv1"
   type: CONVOLUTION
@@ -163,7 +151,7 @@ layers {
   name: "fc6"
   type: INNER_PRODUCT
   bottom: "pool5"
-  top: "fc6"
+  top: "fc6wi"
   inner_product_param {
     num_output: 4096
   }
@@ -171,7 +159,7 @@ layers {
 layers {
   name: "relu6"
   type: RELU
-  bottom: "fc6"
+  bottom: "fc6wi"
   top: "fc6"
 }
 layers {
@@ -221,18 +209,4 @@ layers {
   type: SOFTMAX
   bottom: "fc8"
   top: "prob"
-}
-layers {
-  name: "accuracy"
-  type: ACCURACY
-  bottom: "prob"
-  bottom: "label"
-  top: "accuracy"
-}
-layers {
-  name: "loss"
-  type: SOFTMAX_LOSS
-  bottom: "fc8"
-  bottom: "label"
-  top: "loss"
 }
