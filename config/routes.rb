@@ -95,6 +95,7 @@ Ispick::Application.routes.draw do
   resources :target_images do
     member do
       get 'prefer'
+      get 'similar_convnet'
       get 'show_delivered'
       get 'switch'
     end
