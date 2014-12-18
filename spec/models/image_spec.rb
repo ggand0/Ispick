@@ -97,6 +97,20 @@ describe Image do
       puts result
       expect(result.count).to eq(2)
     end
+
+    it "returns a valid relation" do
+      # Gather all single character images
+      FactoryGirl.create(:person_madoka)
+      FactoryGirl.create(:person_sayaka)
+      FactoryGirl.create(:image_madoka)
+      FactoryGirl.create(:image_sayaka)
+      i1 = FactoryGirl.create(:image_madoka_single)
+      i2 = FactoryGirl.create(:image_sayaka_single)
+
+      result = Image.search_images_custom(1)
+      puts result
+      expect(result.count).to eq(1)
+    end
   end
 
 

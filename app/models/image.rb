@@ -216,8 +216,13 @@ class Image < ActiveRecord::Base
   end
 
   # For research or debugging
-  def self.search_images_custom
-    tags = Person.where(name_type: 'Character').map{ |person| person.name_roman }
+  def self.search_images_custom(limit=nil)
+    if limit
+      tags = Person.where(name_type: 'Character').limit(limit)
+    else
+      tags = Person.where(name_type: 'Character')
+    end
+    tags = tags.map{ |person| person.name_roman }
     images_result = []
 
 
