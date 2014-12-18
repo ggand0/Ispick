@@ -137,13 +137,13 @@ class Image < ActiveRecord::Base
   # Create the list of image names from an Image relation object with multiple type of labels.
   # @param image [Array] Array of hashes: [{images: relation, label: 'string'},...]
   # @return [File]
-  def self.create_list_file_labels(image_array)
+  def self.create_list_file_labels(image_array, start=0)
     file = Tempfile.new("imagelist#{DateTime.now}")
 
     image_array.each_with_index do |hash, counter|
       hash[:images].each do |image|
         name = image.get_title
-        file.write(name + "\s#{counter}")
+        file.write(name + "\s#{counter+start}")
         file.write "\n"
       end
     end

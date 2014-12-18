@@ -193,15 +193,16 @@ class DebugController < ApplicationController
   end
 
   def download_images_custom
-    limit = params[:limit]
-    start = params[:start]
+    puts limit = params[:limit].to_i
+    puts start = params[:start].to_i
+
     @image_array = Image.search_images_custom(limit, start)
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 
     Zip::OutputStream.open(temp_file.path) do |zos|
       zos.put_next_entry 'imagelist'
-      zos.print IO.read(Image.create_list_file_labels(@image_array))
+      zos.print IO.read(Image.create_list_file_labels(@image_array, start))
 
       titles = []
       @image_array.each_with_index do |images, i|
