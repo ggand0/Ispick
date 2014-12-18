@@ -82,8 +82,14 @@ FactoryGirl.define do
   factory :tag_madoka, class: Tag do
     name 'Madoka Kaname'
   end
+  factory :tag_madoka_roman, class: Tag do
+    name 'Kaname Madoka'
+  end
   factory :tag_sayaka, class: Tag do
     name 'Sayaka Miki'
+  end
+  factory :tag_sayaka_roman, class: Tag do
+    name 'Miki Sayaka'
   end
   factory :tag_single, class: Tag do
     name 'single'

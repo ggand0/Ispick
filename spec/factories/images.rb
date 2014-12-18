@@ -149,6 +149,20 @@ FactoryGirl.define do
 
     after(:create) do |image|
       image.tags << create(:tag_madoka)
+      image.tags << create(:tag_madoka_roman)
+    end
+  end
+
+  factory :image_sayaka, class: Image do
+    title 'Sayaka Miki'
+    caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
+    src_url 'http://i.4cdn.org/c/1399620027799ssss.jpg'
+    page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
+    data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
+
+    after(:create) do |image|
+      image.tags << create(:tag_sayaka)
+      image.tags << create(:tag_sayaka_roman)
     end
   end
 
@@ -162,21 +176,24 @@ FactoryGirl.define do
     after(:create) do |image|
       # This factory is used together with 'image_madoka' factory
       image.tags << Tag.where(name: 'Madoka Kaname').first
+      image.tags << Tag.where(name: 'Kaname Madoka').first
       image.tags << create(:tag_single)
     end
   end
 
-  # Image with related title and caption
-  factory :image_sayaka, class: Image do
-    title 'Sayaka Miki(美樹さやか)'
-    caption 'I can be so stupid.'
-    src_url 'http://i.4cdn.org/c/some_sayaka_meme.jpg'
-    page_url 'http://boards.4chan.org/c/thread/2222110/madoka-kaname'
+  factory :image_sayaka_single, class: Image do
+    title 'Sayaka Miki'
+    caption '"For Madokami so loved the world that She gave us Her Only Self, that whoever believes in Her shall not despair but have everlasting Hope." --Homu 3:16'
+    src_url 'http://i.4cdn.org/c/some_single_sayaka_image.jpg'
+    page_url 'http://boards.4chan.org/c/thread/2222110/sayaka-miki'
     data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
 
     after(:create) do |image|
-      image.tags << create(:tag_sayaka)
-      image.tags << create(:tag_single)
+      # This factory is used together with 'image_madoka' factory
+      image.tags << Tag.where(name: 'Sayaka Miki').first
+      image.tags << Tag.where(name: 'Miki Sayaka').first
+      image.tags << Tag.where(name: 'single').first
     end
   end
+
 end

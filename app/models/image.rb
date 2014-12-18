@@ -215,6 +215,39 @@ class Image < ActiveRecord::Base
     eval condition[0..-2]
   end
 
+  # For research or debugging
+  def self.search_images_custom
+    tags = Person.where(name_type: 'Character').map{ |person| person.name_roman }
+    images_result = []
+
+
+    counts = []
+    tags.each do |tag|
+      queries = [tag, 'single']
+
+      # Get 'and' search result
+      images = Image.joins(:tags).
+        where('tags.name' => queries).
+        group("images.id").having("count(*)= #{queries.count}")
+
+      images = images.where.not(data_updated_at: nil)
+      images.uniq!
+      counts.push images.count
+
+      images_result.push({ images: images, label: tag })
+    end
+
+    puts '=======================DEBUG'
+    puts counts.inspect
+
+    images_result
+  end
+
+
+  #=========================
+  # Filter methods
+  #=========================
+
   # @param images [ActiveRecord::CollectionProxy]
   # @param date [Date] date
   # @return [ActiveRecord::CollectionProxy]

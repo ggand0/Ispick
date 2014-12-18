@@ -152,6 +152,7 @@ class DebugController < ApplicationController
           # To avoid creating nested directory, remove slashes
           # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
           title = image.get_title
+
           zos.put_next_entry(title)
           zos.print IO.read(image.data.path)
         end
@@ -190,6 +191,40 @@ class DebugController < ApplicationController
       disposition: 'attachment', filename: file_name
     temp_file.close
   end
+
+  def download_images_custom
+    @image_array = Image.search_images_custom()
+    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file_labels(@image_array))
+
+      titles = []
+      @image_array.each_with_index do |images, i|
+        images[:images].each do |image|
+          title = image.get_title
+          titles.push title
+
+          # Detect duplication and rename the latest title for making extracting zip file be sucessful
+          if titles.uniq.length != titles.length
+            title += Random.rand(10000).to_s
+          end
+
+          zos.put_next_entry(title)
+          zos.print IO.read(image.data.path)
+        end
+      end
+      puts '=========================DEBUG'
+      puts titles.uniq.length == titles.length
+
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
 
   # The page for debugging illust detection feature.
   # イラスト判定ツールのデバッグ用ページを表示する。

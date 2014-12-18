@@ -111,7 +111,6 @@ class UsersController < ApplicationController
 
       images = Image.joins(:tags).
         where('tags.name' => queries).
-        #where("tags.name like ?", "%#{queries}%").
         group("images.id").having("count(*)= #{queries.count}")
       images = images.where.not(data_updated_at: nil)
       @count = images.select('images.id').count.keys.count

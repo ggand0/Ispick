@@ -17,6 +17,7 @@ Ispick::Application.routes.draw do
     get '/download' => 'debug#download_favored_images', as: "download_debug"
     get '/download_recent' => 'debug#download_images_n', as: "download_recent"
     get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
+    get '/download_custom' => 'debug#download_images_custom', as: "download_custom"
     get '/download_csv' => 'debug#download_csv', as: "download_csv"
     get '/download_tags' => 'debug#download_images_tags', as: "download_tags"
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
