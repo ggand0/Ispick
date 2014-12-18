@@ -194,7 +194,8 @@ class DebugController < ApplicationController
 
   def download_images_custom
     limit = params[:limit]
-    @image_array = Image.search_images_custom(limit)
+    start = params[:start]
+    @image_array = Image.search_images_custom(limit, start)
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 

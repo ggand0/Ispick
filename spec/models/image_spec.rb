@@ -94,7 +94,6 @@ describe Image do
       i2 = FactoryGirl.create(:image_sayaka_single)
 
       result = Image.search_images_custom
-      puts result
       expect(result.count).to eq(2)
     end
 
@@ -108,7 +107,6 @@ describe Image do
       i2 = FactoryGirl.create(:image_sayaka_single)
 
       result = Image.search_images_custom(1)
-      puts result
       expect(result.count).to eq(1)
     end
   end
