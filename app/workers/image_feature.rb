@@ -22,10 +22,12 @@ class ImageFeature
 
   def self.exec_script(image)
     # .caffemodel file
-    pretrained_file = "caffenet_train_pmmm350_iter_6000.caffemodel"
+    #pretrained_file = "caffenet_train_pmmm350_iter_6000.caffemodel"
+    pretrained_file = 'caffenet_train_iter_20000.caffemodel'
     pretrained_path = "#{CONFIG['caffe_path']}/models/ispick/#{pretrained_file}"
     # .npy file converted from .binaryproto file which was used for training
-    mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/pmmm350_mean.npy"
+    #mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/pmmm350_mean.npy"
+    mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/anipic_singles_mean.npy"
     model_file_path = "#{Rails.root}/script/caffe/imagenet_features_template.prototxt"
 
     #Dir.mktmpdir do |temp_dir_path|
