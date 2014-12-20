@@ -236,6 +236,13 @@ namespace :scrape do
     Scrape::Anipic.new.scrape(interval.to_i)
   end
 
+  # Anime pictures and wallpapersから画像抽出する
+  desc "Scrape images from 'Anime pictures and wallpapers'"
+  task :anipic_tag, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Anipic.new.scrape_tag(interval.to_i)
+  end
+
   # shushuから画像を抽出する
   desc "Scrape images from 'Shushu'"
   task :shushu, [:interval] => :environment do |t, args|

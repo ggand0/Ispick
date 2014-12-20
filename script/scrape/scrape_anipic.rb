@@ -32,6 +32,16 @@ module Scrape
       @logger.info 'DONE!'
     end
 
+    def scrape_tag(interval=60)
+      @limit = 20
+      @logger = Logger.new('log/scrape_anipic_cron.log')
+      @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
+      result = scrape_target_words('Scrape::Anipic', interval)
+
+      @logger.info result
+      @logger.info 'DONE!'
+    end
+
     # キーワードによる抽出処理を行う
     # @param [TargetWord]
     def scrape_target_word(user_id, target_word, english=false)
@@ -48,6 +58,7 @@ module Scrape
     # @param [Boolean]
     # @return [Hash] Scraping result
     def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
+      @limit = 200
       @logger.debug "#{target_word.inspect}"
       result_hash = Scrape.get_result_hash
 
@@ -83,7 +94,6 @@ module Scrape
         # ソースページから画像情報を取得してDBへ保存する
         start = Time.now
 
-        @logger.debug image_data.inspect
         begin
           image_data = self.get_data(xml, page_url)
           #@logger.debug "src_url: #{image_data.src_url}"
