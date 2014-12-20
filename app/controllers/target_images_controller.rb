@@ -87,7 +87,7 @@ class TargetImagesController < ApplicationController
     similar = @target_image.get_similar_convnet_images()
 
     # Pagenate the array
-    @similars = Kaminari.paginate_array(similar).page(params[:page]).per(10)
+    @similars = Kaminari.paginate_array(similar).page(params[:page]).per(50)
   end
 
 

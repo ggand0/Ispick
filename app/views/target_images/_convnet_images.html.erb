@@ -1,6 +1,16 @@
-<div class="wrapper">
+<%= content_tag :div, class: "temp_information", data: { align: false } do %>
+<% end %>
+
+
+  <ul class="boxline">
   <% similars.each_with_index do |image, index| %>
-    <div class="block has-gutters">
+    <%= image[:distance] %>
+
+    <li>
+      <%= link_to image_tag(image[:image].data.url(:thumb)), { controller: 'debug', action: 'show_debug', id: image[:image].id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
+    </li>
+
+    <!--<div class="block has-gutters">
       <div class="height"><%= image[:image].height %></div>
 
       <%= image[:distance] %>
@@ -23,12 +33,14 @@
             <br /><%= "PA: #{get_jst_string(image[:image].posted_at)}" %>
           </div>
         </div>
-    </div>
+    </div>-->
   <% end %>
   <div id="loader">
     <%= image_tag asset_path('round_loader_mini.gif')%>
   </div>
 
-</div>
+  </ul>
 
-<%= paginate_target_images(@message, @similars) %>
+
+<%# paginate_target_images(@message, @similars) %>
+<%= paginate @similars %>
