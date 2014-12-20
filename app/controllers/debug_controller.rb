@@ -4,6 +4,7 @@ class DebugController < ApplicationController
   before_filter :authenticate
   before_action :set_image, only: [:favor_another, :show_debug]
   #before_action :set_image_board, only: [:create_another]
+  include ActionController::Live
 
   def index
   end
@@ -32,6 +33,42 @@ class DebugController < ApplicationController
     @images_all = images
   end
 
+
+  def stream_csv
+    limit=params[:limit]
+    # .. store current accessing user
+
+    # Set the response header to keep client open
+    response.headers['Content-Type'] = 'text/event-stream'
+
+    # .. list of users who are current streaming the list
+    #list_of_current_streamers = Users.streamers
+
+    # loop infinitely, users can just close the browser
+    begin
+      images = Image.select('id, page_url, original_width, original_height, artist').limit(limit)
+      puts images.class.name
+
+      # Includes joining table
+      images.includes(:tags).find_each do |image|
+        tag_string = ""
+        image.tags.each do |tag|
+          tag_string += "#{tag.name};"
+        end
+
+        response.stream.write "#{image.id},#{image.page_url.inspect},#{image.original_width.inspect},#{image.original_height.inspect},#{image.artist.inspect},#{tag_string}\n"
+        sleep 0.1
+      end
+     rescue IOError
+        # client disconnected.
+        # .. update database streamers to remove disconnected client
+     ensure
+        # clean up the stream by closing it.
+        response.stream.close
+     end
+
+     render stream: true
+  end
 
   # Download CSV file that enumerates all csv attributes
   def download_csv

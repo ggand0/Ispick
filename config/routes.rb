@@ -19,6 +19,7 @@ Ispick::Application.routes.draw do
     get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
     get '/download_custom' => 'debug#download_images_custom', as: "download_custom"
     get '/download_csv' => 'debug#download_csv', as: "download_csv"
+    get '/stream_csv' => 'debug#stream_csv', as: "stream_csv"
     get '/download_tags' => 'debug#download_images_tags', as: "download_tags"
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
     get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
