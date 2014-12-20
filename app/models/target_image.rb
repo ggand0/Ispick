@@ -29,15 +29,25 @@ class TargetImage < ActiveRecord::Base
 
   def get_similar_convnet_images(limit=1000)
     images = Image.all.limit(limit)
+    #images = Image.joins(:tags).where(tags:{name:'Kaname Madoka'}).limit(limit)
+    #images = Image.joins(:tags).where(tags:{name:'single'}).limit(limit)
+
     similar = []
     my_feature = JSON.parse(self.feature.convnet_feature)['features']
     my_feature = my_feature.map(&:to_i)
 
-    images.each do |image|
-      image_feature = JSON.parse(image.feature.convnet_feature)['features']
-      image_feature = image_feature.map(&:to_i)
-
-      distance = self.class.get_distance(my_feature, image_feature)
+    images.includes(:feature).each do |image|
+      if image.feature.nil?
+        distance = 9999
+      else
+        image_feature = JSON.parse(image.feature.convnet_feature)['features']
+        image_feature = image_feature.map(&:to_i)
+        if image_feature.nil? or image_feature.count == 0
+          distance = 9999
+        else
+          distance = self.class.get_distance(my_feature, image_feature)
+        end
+      end
       similar.push({ image: image, distance: distance })
     end
 
@@ -56,6 +66,14 @@ class TargetImage < ActiveRecord::Base
     sum = 0
     (0..v1.count-1).each do |index|
       sum += (v1[index]-v2[index])*(v1[index]-v2[index])
+    end
+    Math.sqrt(sum)
+  end
+
+  def self.get_distance_1d(v1, v2)
+    sum = 0
+    (0..v1.count-1).each do |index|
+      sum += Math.abs(v1[index]-v2[index])
     end
     Math.sqrt(sum)
   end
