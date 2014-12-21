@@ -72,6 +72,7 @@ class UsersController < ApplicationController
   # GET /users/rss
   # Render streams of crawled websites.
   def rss
+=begin
     # Get images: For a new user, display the newer images
     images = current_user.get_images
     images.reorder!('posted_at DESC') if params[:sort]
@@ -84,8 +85,19 @@ class UsersController < ApplicationController
     else
       images = Image.get_recent_images_relation(images, 'anipic')
     end
+=end
+    # Filter images by sites
+    if params[:site]
+      images = Image.where(site_name: params[:site])
+    else
+      images = Image.where(site_name: 'anipic')
+    end
+    images = images.where.not(data_updated_at: nil)
+    images.reorder!('posted_at DESC') if params[:sort]
+    images.reorder!('original_favorite_count DESC') if params[:fav]
+    images.uniq!
 
-    @images = images.page(params[:page]).per(10)
+    @images = images.limit(1000).page(params[:page]).per(10)
     @count = images.select('images.id').count
     @disable_fotter = true
   end
@@ -96,19 +108,6 @@ class UsersController < ApplicationController
     # Get images
     if request.post?
       queries = params[:q]['tags_name_cont'].split(',')
-=begin
-      relations = []
-      queries.each do |query|
-        #q = {'tags_name_cont'=>query}
-        #relations.push Image.search(q).result(distinct: true)
-        #Image.search('madoka').result(distinct: true)
-        #relations.push Image.select('images.id').joins(:tags).where(tags:{name: query})
-        #relations.push Image.joins(:tags).where("tags.name like ?", "#{query}").references(:tags)
-        #relations.push  Image.joins(:tags).where("tags.name like ?", "#{query}")
-        relations.push  Image.joins(:tags).where(tags: {name: "#{query}"})
-      end
-=end
-
       images = Image.joins(:tags).
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")

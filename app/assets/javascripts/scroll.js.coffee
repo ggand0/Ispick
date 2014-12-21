@@ -29,6 +29,7 @@ class @Scroll
     window.blocks=[]
     window.promisesArray=[]
     @counter = 0
+    @scrollHeight = 200
 
   masonry: () ->
     $container = $('.wrapper')
@@ -111,6 +112,7 @@ class @Scroll
   # Update loading icon's position
   updateSpinner: ()=>
     max = Array.max(window.blocks)
+    #max = Array.max(window.blocks) - 100
     $('#loader').css({
       'top':max+'px'
       'left':(@colCount/2)*@colWidth+'px'
@@ -188,7 +190,7 @@ class @Scroll
       return if window.scrollReady == false
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
-      if url and $(window).scrollTop() > $(document).height() - $(window).height() - 50
+      if url and $(window).scrollTop() > $(document).height() - $(window).height() - @scrollHeight
         console.log('with scrollbar') if @logging
         @.loadImages(url)
 

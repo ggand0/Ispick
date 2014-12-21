@@ -52,7 +52,7 @@ class User < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = tags.map{ |tag| tag.name }
-    Image.joins(:tags).where("tags.name IN (?)", words).
+    Image.joins(:tags).where("tags.name IN (?)", words).limit(10000).
       where.not(data_updated_at: nil).references(:tags)
   end
 
