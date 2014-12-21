@@ -13,7 +13,7 @@
       <li><%= link_to "#{site}", rss_users_path(site: Image::TARGET_SITES[count]) %></li>
     <% end %>
   <% end %>
-  <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
+  <%= "  #{get_debug_html(@count)}".html_safe if @count %>
 </p>
   <br />
 
