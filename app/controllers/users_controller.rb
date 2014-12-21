@@ -49,6 +49,7 @@ class UsersController < ApplicationController
     end
     images.uniq!
 
+
     # Filter images by date
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
@@ -59,9 +60,6 @@ class UsersController < ApplicationController
     if params[:site]
       images = Image.filter_by_date(images, params[:site])
     end
-
-    # TMP FEATURE
-    images = images.where.not(site_name: 'nicoseiga') if params[:nico]
 
     @images = images.page(params[:page]).per(10)
     @count = images.select('images.id').count
@@ -92,12 +90,12 @@ class UsersController < ApplicationController
     else
       images = Image.where(site_name: 'anipic')
     end
-    images = images.where.not(data_updated_at: nil)
+    images = images.where.not(data_updated_at: nil).limit(100)
     images.reorder!('posted_at DESC') if params[:sort]
     images.reorder!('original_favorite_count DESC') if params[:fav]
     images.uniq!
 
-    @images = images.limit(1000).page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(10)
     @count = images.select('images.id').count
     @disable_fotter = true
   end
