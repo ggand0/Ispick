@@ -35,7 +35,8 @@ class DebugController < ApplicationController
 
 
   def stream_csv
-    limit=params[:limit]
+    limit = params[:limit].to_i
+    puts limit.class.name
     # .. store current accessing user
 
     # Set the response header to keep client open
@@ -46,11 +47,13 @@ class DebugController < ApplicationController
 
     # loop infinitely, users can just close the browser
     begin
-      images = Image.select('id, page_url, original_width, original_height, artist').limit(limit)
+      images = Image.select('id, page_url, original_width, original_height, artist').order(:created_at).limit(limit)
       puts images.class.name
+      puts images.count
 
       # Includes joining table
-      images.includes(:tags).find_each do |image|
+      #images.includes(:tags).find_each do |image|
+      images.includes(:tags).each do |image|
         tag_string = ""
         image.tags.each do |tag|
           tag_string += "#{tag.name};"
