@@ -70,27 +70,13 @@ class UsersController < ApplicationController
   # GET /users/rss
   # Render streams of crawled websites.
   def rss
-=begin
-    # Get images: For a new user, display the newer images
-    images = current_user.get_images
-    images.reorder!('posted_at DESC') if params[:sort]
-    images.reorder!('original_favorite_count DESC') if params[:fav]
-    images.uniq!
-
-    # Filter images by sites
-    if params[:site]
-      images = Image.get_recent_images_relation(images, params[:site])
-    else
-      images = Image.get_recent_images_relation(images, 'anipic')
-    end
-=end
     # Filter images by sites
     if params[:site]
       images = Image.where(site_name: params[:site])
     else
       images = Image.where(site_name: 'anipic')
     end
-    images = images.where.not(data_updated_at: nil).limit(100)
+    images = images.where.not(data_updated_at: nil).limit(1000)
     images.reorder!('posted_at DESC') if params[:sort]
     images.reorder!('original_favorite_count DESC') if params[:fav]
     images.uniq!
@@ -103,14 +89,15 @@ class UsersController < ApplicationController
 
   # GET/POST search
   def search
-    # Get images
-    if request.post?
+    # Ransack search
+    if params[:q]['tags_name_cont']
       queries = params[:q]['tags_name_cont'].split(',')
       images = Image.joins(:tags).
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")
       images = images.where.not(data_updated_at: nil)
       @count = images.select('images.id').count.keys.count
+    # Single search
     else
       images = Image.search_images(params[:query])
     end
@@ -125,7 +112,9 @@ class UsersController < ApplicationController
 
     @disable_fotter = true
     @images = images.page(params[:page]).per(10)
-    render action: 'home'
+
+
+    render template: 'users/home'
   end
 
   # GET

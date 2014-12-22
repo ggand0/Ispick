@@ -31,6 +31,17 @@ class @Scroll
     @counter = 0
     @scrollHeight = 200
 
+    # Get GET parameters(not used)
+    @GET = {}
+    document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, =>
+      decode = (s) =>
+        return decodeURIComponent(s.split("+").join(" "))
+
+      @GET[decode(arguments[1])] = decode(arguments[2])
+    )
+    #console.log(@GET)
+    #console.log(@GET.hasOwnProperty('q[tags_name_cont]'))
+
   masonry: () ->
     $container = $('.wrapper')
     $container.masonry({
@@ -128,18 +139,26 @@ class @Scroll
     else# normal slow scroll in other pages
       console.log('other than home')###
 
+
+
+
+
   loadImages: (url) =>
     console.log('Fetching...') if @logging
     $('.pagination').text("Fetching more images...")
     window.scrollReady = false
+
     $.getScript(url)
     $.ajax({
       cache: false,
       url: url,
       type: 'GET',
       dataType: 'html',
+
       success: (data) =>
+        console.log(data)
         $newElements = $(data).find('.block')
+        console.log($newElements)
         $newElements.hide()
         window.listView.append($newElements)
         count = window.listView.pages[0].items.length
@@ -179,7 +198,6 @@ class @Scroll
       return if window.scrollReady == false
       hasScrollBar = $(document).height() > $(window).height()
       url = $('nav.pagination a[rel=next]').attr('href')
-      #console.log(e.originalEvent.deltaY) if @logging
       if e.originalEvent.deltaY > 0 and !hasScrollBar
         console.log('without scrollbar') if @logging
         @.loadImages(url)
