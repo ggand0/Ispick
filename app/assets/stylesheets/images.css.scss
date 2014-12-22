@@ -14,7 +14,7 @@
   height: auto;
 }
 
-// デバッグ用の画像一覧ページで使用。
+
 // Classes used at 'View all images' page (for debugging)
 // from: http://goo.gl/zsi5mT
 ul.boxline {
@@ -46,7 +46,7 @@ ul.boxline li img {
 
 
 
-// Home画面の画像整列で使用している
+
 // Classes used at 'User's home' page
 // from: http://www.dwuser.com/education/content/creating-responsive-tiled-layout-with-pure-css/
 body {
@@ -54,8 +54,6 @@ body {
    padding: 0;
    background: #EEE;
 }
-
-// new version
 .block .titleBox {
    position: absolute;
    visibility: hidden;

@@ -2,22 +2,24 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-// Image.idをhtmlに埋め込むために使用
+// Used for embedding Image.id in a html
 .id {
   display: none;
 }
+// Used for embedding thumbnails' heights in a html
 .height {
   display: none;
 }
 
-// titleBox内の時間表記用
+
+// Style the format of time inside a titleBox div
 .time-string {
   font-size: 8px;
   line-height: 8px;
   text-align: right;
   align: right;
   float: right;
-  width: 150px;
+  width: 200px;
 }
 // for home_debug action
 .time-string-debug {
@@ -34,7 +36,8 @@
   width: 10px;
 }
 
-// クリップする際に表示させるモーダル内で使用
+
+// Used in clipping modals
 .favored_board {
   background-color: #5B9B9B;
 }
@@ -42,7 +45,8 @@
   text-align: right;
 }
 
-// Bootstrapのbutton関連
+
+// Tweak Bootstrap buttons
 .blocks .btn-default {
   margin: 0 5px;
   border-radius: 0;
@@ -53,6 +57,7 @@
 }
 
 // glyphiconがbutton上で微妙にずれる問題への対策
+// Address the problem that bootstrap glyphicons aren't positioned correctly
 // from: http://stackoverflow.com/questions/14082826/bootstrap-icons-glyphicons-are-positioned-slightly-up-when-using-google-fonts
 span.glyphicon {
   vertical-align: middle;
@@ -67,7 +72,8 @@ span.glyphicon {
 
 .after-header { padding: -500px 0px; }
 
-// タグ登録ページで使用
+
+// Classes in the 'Tags' page
 .arrow {
   position: relative;
   top: 175px;
@@ -107,7 +113,7 @@ span.glyphicon {
 }
 
 
-// Dropdowns related styles
+// Nested dropdowns styles
 .dropdown-submenu {
     position:relative;
 }

@@ -14,11 +14,11 @@
         <br />
       </div>
       <div class="title">
-          <%= image.title.to_s %><br />
-          <div class="time-string">
-            <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
-          </div>
+        <%= image.title.to_s %><br />
+        <div class="time-string">
+          <br /><%= "Posted at: #{get_jst_string(image.posted_at)}" %>
         </div>
+      </div>
     </div>
   <% end %>
   <div id="loader">
