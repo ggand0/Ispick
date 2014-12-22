@@ -1,5 +1,7 @@
 <div class="wrapper">
   <% images.each_with_index do |image, index| %>
+    <!---->
+
     <div class="block has-gutters">
       <div class="height"><%= image.height %></div>
       <%= render_image(image) %>
@@ -13,13 +15,18 @@
         <% end %>
         <br />
       </div>
-      <div class="title">
-        <%= image.title.to_s %><br />
-        <div class="time-string">
-          <br /><%= "Posted at: #{get_jst_string(image.posted_at)}" %>
+
+      <!-- Add another anchor to the modal as it gets unclickable when thumbnail's height is to short -->
+      <%= link_to ({ controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) do %>
+        <div class="title">
+          <%= image.title.to_s %><br />
+          <div class="time-string">
+            <br /><%= "Posted at: #{get_jst_string(image.posted_at)}" %>
+          </div>
         </div>
-      </div>
+      <% end %>
     </div>
+
   <% end %>
   <div id="loader">
     <%= image_tag asset_path('round_loader_mini.gif')%>
