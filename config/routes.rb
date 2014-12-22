@@ -4,8 +4,7 @@ Ispick::Application.routes.draw do
 
   # Root path
   root 'welcome#index'
-  #root 'welcome#signup', :as => 'signup_welcome'
-  #match '/' => 'welcome#index', :via => :get
+
   match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
@@ -115,6 +114,7 @@ Ispick::Application.routes.draw do
     collection do
       match 'search' => 'tags#search', via: [:get, :post], as: :search
       post 'attach'
+      get 'autocomplete'
     end
     member do
       get 'images'

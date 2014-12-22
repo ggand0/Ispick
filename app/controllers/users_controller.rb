@@ -73,8 +73,10 @@ class UsersController < ApplicationController
     # Filter images by sites
     if params[:site]
       images = Image.where(site_name: params[:site])
+      @site = params[:site_name]
     else
       images = Image.where(site_name: 'anipic')
+      @site = 'anime-pictures'
     end
     images = images.where.not(data_updated_at: nil).limit(1000)
     images.reorder!('posted_at DESC') if params[:sort]

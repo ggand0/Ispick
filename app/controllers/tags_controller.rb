@@ -24,7 +24,6 @@ class TagsController < ApplicationController
     images.reorder!('original_favorite_count DESC') if params[:fav]
 
     # Filter by created_at attribute
-    # 配信日で絞り込む場合
     if params[:date]
       date = params[:date]
       date = DateTime.parse(date).to_date
@@ -44,6 +43,17 @@ class TagsController < ApplicationController
       format.html { render action: 'home' }
       format.js { render action: 'home' }
       format.rss { render action: 'tag_images' }
+    end
+  end
+
+
+  def autocomplete
+    @tags = Tag.order(:name).where("name LIKE ?", "%#{params[:term]}%")
+    respond_to do |format|
+      format.html
+      format.json {
+        render json: @tags.map(&:name)
+      }
     end
   end
 
