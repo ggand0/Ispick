@@ -62,8 +62,7 @@ Ispick::Application.routes.draw do
       get 'preferences'
       post 'preferences'
       get 'boards'
-      get 'search'
-      #post 'search'
+
       delete 'delete_target_word'
       delete 'delete_tag'
 
@@ -82,10 +81,11 @@ Ispick::Application.routes.draw do
       get 'boards'
     end
   end
-  #resources :images, only: [:index, :show, :destroy]
+
   resources :images do
     collection do
       get 'rss_aqua'
+      get 'search'
     end
     member do
       put 'favor'

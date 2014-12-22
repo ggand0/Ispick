@@ -14,7 +14,12 @@
 </head>
 <body class="no-touch">
 
-<%= render 'shared/header' if signed_in? %>
+<%# render 'shared/header' if signed_in? %>
+<% if signed_in? %>
+  <%= render 'shared/header' %>
+<% else %>
+  <%= render 'shared/header_top' %>
+<% end %>
 
 <%= yield %>
 

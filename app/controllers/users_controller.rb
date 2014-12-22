@@ -87,36 +87,6 @@ class UsersController < ApplicationController
   end
 
 
-  # GET/POST search
-  def search
-    # Ransack search
-    if params[:q]['tags_name_cont']
-      queries = params[:q]['tags_name_cont'].split(',')
-      images = Image.joins(:tags).
-        where('tags.name' => queries).
-        group("images.id").having("count(*)= #{queries.count}")
-      images = images.where.not(data_updated_at: nil)
-      @count = images.select('images.id').count.keys.count
-    # Single search
-    else
-      images = Image.search_images(params[:query])
-    end
-
-    # Filter or sort images
-    images.reorder!('posted_at DESC') if params[:sort]
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
-      @count = images.select('images.id').count
-    end
-
-    @disable_fotter = true
-    @images = images.page(params[:page]).per(10)
-
-
-    render template: 'users/home'
-  end
-
   # GET
   def new_avatar
     respond_to do |format|

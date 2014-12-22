@@ -23,7 +23,7 @@
   <br /><br />
   <%= tags_glyphicon %>
   <% image.tags.each do |tag| %>
-    <%= bs_button_to tag.name, { controller: 'users', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
+    <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
   <% end %>
 </div>
 
