@@ -4,6 +4,8 @@
 <div class="image-title">
   <%= strip_tags(image.title) %>
 </div>
+
+
 <div class="image-buttons">
 
   <div class="image-share">
@@ -20,23 +22,16 @@
     </div>
     <div class="share-button">
       <%= pinit_button(url: image.page_url, media: image.original_url, description: "#{strip_tags(image.caption)} via ispicks.com", icon: asset_path('icons/pinterest_32.png')) %>
-      <!--
-      <a href="https://www.pinterest.com/pin/create/button/
-        ?url=<%=u image.page_url %>
-        &media=<%=u image.original_url %>
-        &description=<%=u image.caption %>"
-        data-pin-do="buttonPin"
-        data-pin-config="above">
-        <img src="<%= asset_path('icons/pinterest_32.png') %>" />
-      </a>-->
     </div>
     <div class="share-button">
       <script src="http://platform.tumblr.com/v1/share.js"></script>
       <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:32px; height:32px; background:url(<%= asset_path('icons/tumblr_32.png') %>) top left no-repeat transparent;"></a>
     </div>
 
-    <div class="share-button"><%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
-      class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" %></div>
+    <div class="share-button">
+      <%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
+      class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" if current_user %>
+    </div>
   </div>
 </div>
 <%# render_like_button(image, 'btn') %>
