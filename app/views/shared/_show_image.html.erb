@@ -5,45 +5,76 @@
   <%= strip_tags(image.title) %>
 </div>
 <div class="image-buttons">
-  <%= render_clip_button(image, 'btn') %>
+
+  <div class="image-share">
+    <div class="share-button">
+      <%# tweet_button(count: 'none') %>
+      <style type="text/css" media="screen">#custom-tweet-button a {display: block; padding: 32px 0px 0px 32px; background: url("<%= asset_path('icons/twitter_32.png') %>") no-repeat; border: 0px; }</style>
+      <div id="custom-tweet-button">
+        <a href="https://twitter.com/share?text=your text&url=<%= image.page_url %>" target="_blank"/>
+      </div>
+    </div>
+    <div class="share-button">
+      <!-- We need to set the app public to use this like button -->
+      <%# like_button(CONFIG['facebook_app_id'].to_i) %>
+    </div>
+    <div class="share-button">
+      <%= pinit_button(url: image.page_url, media: image.original_url, description: "#{strip_tags(image.caption)} via ispicks.com", icon: asset_path('icons/pinterest_32.png')) %>
+      <!--
+      <a href="https://www.pinterest.com/pin/create/button/
+        ?url=<%=u image.page_url %>
+        &media=<%=u image.original_url %>
+        &description=<%=u image.caption %>"
+        data-pin-do="buttonPin"
+        data-pin-config="above">
+        <img src="<%= asset_path('icons/pinterest_32.png') %>" />
+      </a>-->
+    </div>
+    <div class="share-button">
+      <script src="http://platform.tumblr.com/v1/share.js"></script>
+      <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:32px; height:32px; background:url(<%= asset_path('icons/tumblr_32.png') %>) top left no-repeat transparent;"></a>
+    </div>
+
+    <div class="share-button"><%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
+      class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" %></div>
+  </div>
 </div>
 <%# render_like_button(image, 'btn') %>
+<br />
 <hr>
 
 <div class="image-detail">
-  <%= pencil_glyphicon %> <%= image.artist ? image.artist : 'Unknown artist' %>
-  <br /><br />
-  <%= comment_glyphicon %> <%= strip_tags(image.caption) if image.caption %>
-  <br /><br />
-  <%= link_glyphicon %> <%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %>
-  <br /><br />
-  Sharable size: <%= "#{image.original_width}, #{image.original_height}" %>
-  <br /><br />
-  Thumb size: <%= "#{image.width}, #{image.height}" %>
-  <br /><br />
+  <dl>
+    <dt>Artist: </dt>
+    <dd><%= image.artist ? image.artist : 'Unknown artist' %></dd>
+
+    <dt>Title: </dt>
+    <dd><%= strip_tags(image.title) if image.title %></dd>
+
+    <dt>Caption: </dt>
+    <dd><%= strip_tags(image.caption) if image.caption %></dd>
+
+    <dt>Page Url: </dt>
+    <dd><%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %></dd>
+
+    <dt>Sharable Size:</dt>
+    <dd><%= "#{image.original_width}, #{image.original_height}" %></dd>
+
+    <dt>Posted At:</dt>
+    <dd><%= "#{image.posted_at}" %></dd>
+
+    <dt>Created At:</dt>
+    <dd><%= "#{image.created_at}" %></dd>
+  </dl>
+
+
   <%= tags_glyphicon %>
   <% image.tags.each do |tag| %>
     <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
   <% end %>
 </div>
 
-<div class="image-share">
-  <div class="image-time"><%= "Created: #{get_jst_string(image.created_at)}".html_safe %><br /></div>
-  <div class="image-time"><%= "Posted:  #{get_jst_string(image.posted_at)}".html_safe %><br /></div>
 
-
-  <div class="share-button"><%= tweet_button(count: 'none') %></div>
-  <div class="share-button">
-    <!-- We need to set the app public to use this like button -->
-    <%# like_button(CONFIG['facebook_app_id'].to_i) %>
-  </div>
-  <div class="share-button"><%= pinit_button(url: image.page_url, media: image.original_url, description: "#{strip_tags(image.caption)} via ispicks.com") %></div>
-  <div class="share-button">
-    <script src="http://platform.tumblr.com/v1/share.js"></script>
-    <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:20px; height:20px; background:url('http://platform.tumblr.com/v1/share_4.png') top left no-repeat transparent;"></a>
-  </div>
-
-</div>
 
 <!-- Insert space -->
 <div style="clear: both;">

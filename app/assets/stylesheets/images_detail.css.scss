@@ -1,7 +1,8 @@
-// 画像詳細画面(modal)で使用するクラス
+// Used on image detail modals
 .image-title {
   font-size: 20pt;
-  width: 700px;//560px;
+  width: 600px;
+  height: 32px;
   float: left;
 }
 .image-detail {
@@ -30,7 +31,56 @@
   align: right;
 }
 
-// 画像詳細画面(html)で使用するクラス
+/*DL, DT, DD TAGS LIST DATA*/
+/*dl {
+    margin-bottom:50px;
+}
+
+dl dt {
+    background:#5f9be3;
+    color:#fff;
+    float:left;
+    font-weight:bold;
+    margin-right:10px;
+    padding:5px;
+    width:100px;
+}
+
+dl dd {
+    margin:2px 0;
+    padding:5px 0;
+}*/
+dl {
+  overflow: hidden;
+  width: 700px;
+}
+
+dt {
+  float: left;
+  clear: right;
+  width: 190px;
+  color: white;
+  background-color: #7ACECE;
+}
+
+dd {
+  float: right;
+  width: 510px;
+  margin-left: 0;
+  margin-bottom: 5px;
+  color: #444;
+  //border: 1px #cccccc solid;
+  border-left: none;
+}
+
+dt, dd {
+  //height: 56px;
+  //line-height: 56px;
+  padding-left: 14px;
+}
+
+
+// Used on html view of modals
 .detail-wrap {
   width: 800px;
 }

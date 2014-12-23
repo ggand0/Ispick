@@ -1,17 +1,31 @@
-// 配信画像のモーダル表示時の背景色
+// Bootstrap button size
+.btn-share {
+  //padding: 18px 28px;
+  padding: 5px 12px 5px 12px;
+  //font-size: 22px;
+  //border-radius: 8px;
+}
+
+// Override pinterest button image
+.pibfi_pinterest .xc_pin {
+  //background-image: url('assets/icons/pinterest_32.png');
+}
+
+
+// Set the background color of image detail modals.
 .modal-backdrop {
   background-color: #E4E1E3
 }
 
-// 背景が無いモーダル用のクラス（Avatar設定ダイアログ等）
+// Set the background color of other modals.
 .modal-color-none .modal-backdrop {
   background: none;
 }
 
 
-// アバター変更フォーム
+// Style of avatar setting form
 .modal.modal-avatar {
-  // TODO: hard codingを解消する
+  // TODO: Resolve hard coding
   position: fixed;
   top: 3%;
   left: -68.2%;
@@ -22,7 +36,7 @@
 }
 
 
-// モーダルのウィンドウ幅の設定
+// Configure window size of modals
 .modal.modal-avatar .modal-dialog { width: 250px; }
 
 .modal.modal-images .modal-dialog { width: 800px; }
@@ -30,19 +44,19 @@
 .modal.modal-boards .modal-dialog { width: 300px; }
 
 
-
+// For ipad
 body.modal-open{
-overflow: hidden;
-height: 100%;
+  overflow: hidden;
+  height: 100%;
 }
 
 .modal-content,
 .modal-dialog,
 .modal-body {
-height: inherit;
-min-height: 100%;
+  height: inherit;
+  min-height: 100%;
 }
 
 .modal {
-min-height: 100%;
+  min-height: 100%;
 }

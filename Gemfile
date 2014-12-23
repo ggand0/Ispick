@@ -68,7 +68,8 @@ gem 'omniauth-tumblr'
 
 # Manages sharing on social networks
 gem 'shareable'
-gem "social-buttons", '~> 0.3'
+#gem "social-buttons", '~> 0.3', git: 'git@github.com:pentiumx/social-buttons.git'
+gem "social-buttons", git: 'git@github.com:pentiumx/social-buttons.git'
 
 # System related gems
 gem 'nokogiri'                                        # For scraping
