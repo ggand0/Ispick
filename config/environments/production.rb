@@ -59,7 +59,9 @@ Ispick::Application.configure do
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-  config.assets.precompile += %w( *.js users.css images-detail.css )
+  config.assets.precompile += %w( *.js bootstrap-social.css.scss images.css.scss scaffolds.css.scss welcome.css.scss users.css.scss images-detail.css.scss core.css.scss )
+  # https://github.com/activeadmin/activeadmin/issues/3072
+  #config.assets.precompile << /\A(?!active_admin).*\.(css)\z/
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
