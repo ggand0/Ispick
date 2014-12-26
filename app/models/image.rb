@@ -101,7 +101,7 @@ class Image < ActiveRecord::Base
 
   def self.get_popular_recent_images(limit)
     sites = ['anipic', 'shushu', 'zerochan']
-    Image.where("site_name IN (?)", sites).reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
+    Image.where("site_name IN (?)", sites).where("original_favorite_count > (?)", 2).reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
   end
 
   def self.get_recent_images_relation(images, site=nil)

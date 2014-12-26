@@ -48,7 +48,7 @@ class TagsController < ApplicationController
 
 
   def autocomplete
-    @tags = Tag.order(:name).where("name LIKE ?", "%#{params[:term]}%")
+    @tags = Tag.order(:name).where("images_count > (?)", 1).where("name LIKE ?", "%#{params[:term]}%")
     respond_to do |format|
       format.html
       format.json {
