@@ -156,6 +156,33 @@ class Image < ActiveRecord::Base
     file
   end
 
+  def self.create_list_file_train_val(image_array, start=0)
+    train = Tempfile.new("train#{DateTime.now}")
+    val = Tempfile.new("val#{DateTime.now}")
+
+    image_array.each_with_index do |hash, counter|
+      # Write former names to 'train' file, later names to 'val'
+      hash[:images].each_with_index do |image, c|
+        name = image.get_title
+
+        #puts hash[:images].count.keys.count
+        #puts hash[:images].count.keys.count / 2.0
+        if c <= hash[:images].count.keys.count / 2.0
+          train.write(name + "\s#{counter+start}")
+          train.write "\n"
+        else
+          val.write(name + "\s#{counter+start}")
+          val.write "\n"
+        end
+      end
+    end
+
+    train.flush
+    val.flush
+    [train, val]
+  end
+
+
   # Generate unique title string of the image
   # @return [String]
   def get_title

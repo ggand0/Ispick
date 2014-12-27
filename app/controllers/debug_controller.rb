@@ -4,7 +4,8 @@ class DebugController < ApplicationController
   before_filter :authenticate
   before_action :set_image, only: [:favor_another, :show_debug]
   #before_action :set_image_board, only: [:create_another]
-  include ActionController::Live
+
+
 
   def index
   end
@@ -35,6 +36,7 @@ class DebugController < ApplicationController
 
 
   def stream_csv
+    include ActionController::Live
     limit = params[:limit].to_i
     puts limit.class.name
     # .. store current accessing user
@@ -73,47 +75,6 @@ class DebugController < ApplicationController
      render stream: true
   end
 
-  # Download CSV file that enumerates all csv attributes
-  def download_csv
-    limit = params[:limit]
-    all = params[:all]
-    file_name  = "Ispick_csv_#{DateTime.now}.csv"
-    temp_file  = Tempfile.new("#{file_name}")
-
-    # This code is copied from OutputCSV module
-    # TODO: Refactor this!
-    CSV.open(temp_file.path, "wb") do |csv|
-      row = ["image_id","page_url","original_width","original_height","artist","tags(separate by ';')"]
-      csv << row
-
-      images = Image.select('id, page_url, original_width, original_height, artist').all.limit(limit)
-      images = Image.select('id, page_url, original_width, original_height, artist').all if all
-      puts "==========================DEBUG: #{limit}"
-      puts "==========================DEBUG: #{limit}"
-
-      # Includes joining table
-      images.includes(:tags).find_each do |image|
-        row = []
-        row.push(image.id)
-        row.push(image.page_url)
-        row.push(image.original_width)
-        row.push(image.original_height)
-        row.push(image.artist)
-
-        tag_string = ""
-        image.tags.each do |tag|
-          tag_string += "#{tag.name};"
-        end
-        row.push(tag_string)
-
-        csv << row
-      end
-    end
-
-    send_file temp_file.path, type: 'application/csv',
-      disposition: 'attachment', filename: file_name
-    temp_file.close
-  end
 
   # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
@@ -241,6 +202,49 @@ class DebugController < ApplicationController
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 
     Zip::OutputStream.open(temp_file.path) do |zos|
+      train_val = Image.create_list_file_train_val(@image_array, start)
+      zos.put_next_entry('train')
+      zos.print IO.read(train_val[0])
+      zos.put_next_entry('val')
+      zos.print IO.read(train_val[1])
+
+      titles = []
+      @image_array.each_with_index do |images, i|
+        images[:images].each do |image|
+          title = image.get_title
+          titles.push title
+
+          # Detect duplication and rename the latest title for making extracting zip file be successful
+          if titles.uniq.length != titles.length
+            title += Random.rand(10000).to_s
+          end
+
+          zos.put_next_entry(title)
+          zos.print IO.read(image.data.path)
+        end
+      end
+    end
+
+    send_file temp_file.path, type: 'application/zip', disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
+
+=begin
+  def stream_images
+    puts limit = params[:limit].to_i
+    puts start = params[:start].to_i
+    limit = 100 if limit.nil?
+    start = 0 if start.nil?
+
+    @image_array = Image.search_images_custom(limit, start)
+    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+
+    # loop infinitely, users can just close the browser
+    begin
+      Zip::OutputStream.open(temp_file.path) do |zos|
       zos.put_next_entry 'imagelist'
       zos.print IO.read(Image.create_list_file_labels(@image_array, start))
 
@@ -250,7 +254,7 @@ class DebugController < ApplicationController
           title = image.get_title
           titles.push title
 
-          # Detect duplication and rename the latest title for making extracting zip file be sucessful
+          # Detect duplication and rename the latest title for making extracting zip file be successful
           if titles.uniq.length != titles.length
             title += Random.rand(10000).to_s
           end
@@ -258,15 +262,31 @@ class DebugController < ApplicationController
           zos.put_next_entry(title)
           zos.print IO.read(image.data.path)
         end
-      end
-      puts '=========================DEBUG'
-      puts titles.uniq.length == titles.length
 
+        puts "========================DEBUG count: #{i}/#{limit}"
+        sleep 0.1
+      end
+
+      send_file temp_file.path, type: 'application/zip', disposition: 'attachment', filename: file_name
+      temp_file.close
     end
-    send_file temp_file.path, type: 'application/zip',
-      disposition: 'attachment', filename: file_name
-    temp_file.close
+    rescue IOError
+        # client disconnected.
+        # .. update database streamers to remove disconnected client
+    ensure
+        # clean up the stream by closing it.
+        response.stream.close
+    end
+
+
+    render stream: true
   end
+=end
+
+
+  # ============================
+  #   Other debug methods
+  # ============================
 
 
   # The page for debugging illust detection feature.
