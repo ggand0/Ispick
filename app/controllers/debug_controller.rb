@@ -222,6 +222,7 @@ class DebugController < ApplicationController
           zos.put_next_entry(title)
           zos.print IO.read(image.data.path)
         end
+        Rails.logger.debug "download custom images: #{i}/#{@image_array.count} is complete!"
       end
     end
 
