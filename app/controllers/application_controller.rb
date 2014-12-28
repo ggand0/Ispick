@@ -57,8 +57,8 @@ class ApplicationController < ActionController::Base
   end
 
   def your_function
-    @controller = controller_name
-    @action = action_name
+    @controller_name = controller_name
+    @action_name = action_name
   end
 
   def set_cache_headers
