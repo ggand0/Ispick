@@ -116,7 +116,7 @@ class Image < ActiveRecord::Base
   # Get images that is recently created.
   # @param limit [Integer] The number of images
   # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
-  def self.get_recent_n(limit)
+  def self.get_recent_n(limit=1000)
     target_sites = ['anipic', 'shushu', 'zerochan']
     images = Image.where("site_name IN (?)", target_sites).limit(limit)
     images = images.reorder("created_at DESC").
