@@ -1,4 +1,5 @@
 class DebugController < ApplicationController
+  include ApplicationHelper
   before_filter :set_search
   before_action :render_sign_in_page
   before_filter :authenticate
@@ -47,14 +48,6 @@ class DebugController < ApplicationController
     # Single search
     else
       images = Image.search_images(params[:query])
-      @count = images.select('images.id').count
-    end
-
-    # Filter or sort images
-    images.reorder!('posted_at DESC') if params[:sort]
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
       @count = images.select('images.id').count
     end
 
@@ -224,8 +217,9 @@ class DebugController < ApplicationController
   end
 
   def download_images_custom
-    puts limit = params[:limit].to_i
-    puts start = params[:start].to_i
+    limit = params[:limit].to_i
+    start = params[:start].to_i
+    limit_per_tag = params[:l].to_i
 
     @image_array = Image.search_images_custom(limit, start)
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
@@ -240,13 +234,15 @@ class DebugController < ApplicationController
 
       titles = []
       @image_array.each_with_index do |images, i|
-        images[:images].each do |image|
+        images[:images].each_with_index do |image, c|
+          break if limit_per_tag and c > limit_per_tag# for debug
+
           title = image.get_title
           titles.push title
 
           # Detect duplication and rename the latest title for making extracting zip file be successful
           if titles.uniq.length != titles.length
-            title += Random.rand(10000).to_s
+            title += Random.rand(100000).to_s
           end
 
           zos.put_next_entry(title)
@@ -256,6 +252,8 @@ class DebugController < ApplicationController
       end
     end
 
+    #temp_file.flush
+    Rails.logger.debug bytes_to_megabytes(temp_file.size)
     send_file temp_file.path, type: 'application/zip', disposition: 'attachment', filename: file_name
     temp_file.close
   end
