@@ -34,6 +34,36 @@ class DebugController < ApplicationController
     @images_all = images
   end
 
+  # GET search
+  def search
+    # Ransack search
+    if params[:q] and params[:q]['tags_name_cont']
+      queries = params[:q]['tags_name_cont'].split(',')
+      images = Image.joins(:tags).
+        where('tags.name' => queries).
+        group("images.id").having("count(*)= #{queries.count}")
+      #images = images.where.not(data_updated_at: nil)
+      @count = images.select('images.id').count.keys.count
+    # Single search
+    else
+      images = Image.search_images(params[:query])
+      @count = images.select('images.id').count
+    end
+
+    # Filter or sort images
+    images.reorder!('posted_at DESC') if params[:sort]
+    if params[:date]
+      date = DateTime.parse(params[:date]).to_date
+      images = Image.filter_by_date(images, date)
+      @count = images.select('images.id').count
+    end
+
+    @disable_fotter = true
+    @images = images.page(params[:page]).per(100)
+
+    render template: 'images/index'
+  end
+
 
   def stream_csv
     include ActionController::Live
@@ -231,58 +261,6 @@ class DebugController < ApplicationController
   end
 
 
-=begin
-  def stream_images
-    puts limit = params[:limit].to_i
-    puts start = params[:start].to_i
-    limit = 100 if limit.nil?
-    start = 0 if start.nil?
-
-    @image_array = Image.search_images_custom(limit, start)
-    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
-    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
-
-
-    # loop infinitely, users can just close the browser
-    begin
-      Zip::OutputStream.open(temp_file.path) do |zos|
-      zos.put_next_entry 'imagelist'
-      zos.print IO.read(Image.create_list_file_labels(@image_array, start))
-
-      titles = []
-      @image_array.each_with_index do |images, i|
-        images[:images].each do |image|
-          title = image.get_title
-          titles.push title
-
-          # Detect duplication and rename the latest title for making extracting zip file be successful
-          if titles.uniq.length != titles.length
-            title += Random.rand(10000).to_s
-          end
-
-          zos.put_next_entry(title)
-          zos.print IO.read(image.data.path)
-        end
-
-        puts "========================DEBUG count: #{i}/#{limit}"
-        sleep 0.1
-      end
-
-      send_file temp_file.path, type: 'application/zip', disposition: 'attachment', filename: file_name
-      temp_file.close
-    end
-    rescue IOError
-        # client disconnected.
-        # .. update database streamers to remove disconnected client
-    ensure
-        # clean up the stream by closing it.
-        response.stream.close
-    end
-
-
-    render stream: true
-  end
-=end
 
 
   # ============================

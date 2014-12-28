@@ -13,6 +13,7 @@ Ispick::Application.routes.draw do
   scope "/debug" do
     get "/index" => "debug#index", as: "index_debug"
     get '/home' => 'debug#home', as: "home_debug"
+    get '/search' => 'debug#search', as: "search_debug"
     get '/download' => 'debug#download_favored_images', as: "download_debug"
     get '/download_recent' => 'debug#download_images_n', as: "download_recent"
     get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
