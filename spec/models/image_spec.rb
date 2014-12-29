@@ -56,6 +56,32 @@ describe Image do
     end
   end
 
+  describe "create_list_file_train_val method" do
+    it "writes image names to 'train' and 'val' file" do
+      images = FactoryGirl.create_list(:image_file, 5)
+      image_array = [
+        { image: images[0], label: 0 },
+        { image: images[1], label: 0 },
+        { image: images[2], label: 1 },
+        { image: images[3], label: 2 },
+        { image: images[4], label: 2 },
+      ]
+
+      result = Image.create_list_file_train_val(image_array)
+      puts result.inspect
+      expect(result[0]).to be_a(Tempfile)
+      expect(result[1]).to be_a(Tempfile)
+
+      # Check file content
+      puts File.read(result[0]).inspect
+      puts "\n"
+      puts File.read(result[1]).inspect
+
+      expect(File.read(result[0])).to eq("madoka.jpg 0\nmadoka.jpg 1\nmadoka.jpg 2\n")
+      expect(File.read(result[1])).to eq("madoka.jpg 0\nmadoka.jpg 2\n")
+    end
+  end
+
   describe "search_images method" do
     it "returns a valid image relation" do
       #FactoryGirl.create(:tag_with_images, images_count: 5)
@@ -94,6 +120,7 @@ describe Image do
       i2 = FactoryGirl.create(:image_sayaka_single)
 
       result = Image.search_images_custom
+      puts result
       expect(result.count).to eq(2)
     end
 

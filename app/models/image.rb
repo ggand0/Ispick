@@ -48,7 +48,7 @@ class Image < ActiveRecord::Base
   end
 
   # attachmentを削除し、ストレージにある画像ファイルも削除する
-  # Destroys paperclip attachment, including image files in the storage
+  # Destroys paperclip attachment, also destroys actual image file in the storage
   def destroy_attachment
     # data.destroyは画像を削除するだけ、すなわちパスの指定は変更されない（デフォルトパスが指定されない）
     self.data.destroy
@@ -160,13 +160,44 @@ class Image < ActiveRecord::Base
     train = Tempfile.new("train#{DateTime.now}")
     val = Tempfile.new("val#{DateTime.now}")
 
+
+    # Create another kind of array for convienience
+    max = image_array[image_array.count-1][:label]
+    tmp = []
+    (0..max).each do |count|
+      tmp.push(image_array.select { |element| element[:label] == count })
+    end
+
+    tmp.each_with_index do |arr, counter|
+      #puts arr.count
+      #puts arr.count/2.0
+      puts arr.count
+      #puts arr.map { |element| element[:label] }
+
+      # Write former names to 'train' file, later names to 'val'
+      arr.each_with_index do |hash, c|
+        name = hash[:image].get_title
+
+
+        if c < arr.count / 2.0
+          train.write(name + "\s#{counter+start}")
+          train.write "\n"
+        else
+          val.write(name + "\s#{counter+start}")
+          val.write "\n"
+        end
+      end
+    end
+
+
+
+=begin
     image_array.each_with_index do |hash, counter|
+
       # Write former names to 'train' file, later names to 'val'
       hash[:images].each_with_index do |image, c|
         name = image.get_title
 
-        #puts hash[:images].count.keys.count
-        #puts hash[:images].count.keys.count / 2.0
         if c <= hash[:images].count.keys.count / 2.0
           train.write(name + "\s#{counter+start}")
           train.write "\n"
@@ -176,6 +207,7 @@ class Image < ActiveRecord::Base
         end
       end
     end
+=end
 
     train.flush
     val.flush
@@ -254,27 +286,26 @@ class Image < ActiveRecord::Base
     puts tags.count
     tags = tags.map{ |person| person.name_roman }
     images_result = []
-
-
     counts = []
-    tags.each do |tag|
+
+    tags.each_with_index do |tag, count|
       queries = [tag, 'single']
 
       # Get 'and' search result
       images = Image.joins(:tags).
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")
-
       images = images.where.not(data_updated_at: nil)
       images.uniq!
-      counts.push images.count
 
-      images_result.push({ images: images, label: tag })
+      counts.push images.count
+      images = images.map { |image| { image: image, label: count } }
+      #images_result.push({ images: images, label: tag })
+      images_result += images
     end
 
-    puts '=======================DEBUG'
-    puts counts.inspect
-
+    # Remove duplicates again
+    images_result.uniq_by! { |image| image[:image] }
     images_result
   end
 

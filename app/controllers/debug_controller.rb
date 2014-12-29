@@ -225,6 +225,8 @@ class DebugController < ApplicationController
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
 
+
+    # Write image files and list file to temp_file
     Zip::OutputStream.open(temp_file.path) do |zos|
       train_val = Image.create_list_file_train_val(@image_array, start)
       zos.put_next_entry('train')
@@ -232,10 +234,36 @@ class DebugController < ApplicationController
       zos.put_next_entry('val')
       zos.print IO.read(train_val[1])
 
+      #puts @image_array[0][:label]
+      #puts @image_array[0][:image].id
+      #puts "=======================DEBUG"
+      #puts @image_array.count
+      #puts "=======================DEBUG"
+
+
+      titles = []
+      @image_array.each_with_index do |hash, i|
+        break if limit_per_tag and i > limit_per_tag  # for debug
+
+        title = hash[:image].get_title
+        titles.push title
+        puts title
+
+        # Detect duplication and rename the latest title for making extracting zip file be successful
+        if titles.uniq.length != titles.length
+          title += Random.rand(100000).to_s
+          Rails.logger "Duplicated record during download_images_custom!"
+          puts "Duplicated record during download_images_custom!"
+        end
+
+        zos.put_next_entry(title)
+        zos.print IO.read(hash[:image].data.path)
+      end
+=begin
       titles = []
       @image_array.each_with_index do |images, i|
         images[:images].each_with_index do |image, c|
-          break if limit_per_tag and c > limit_per_tag# for debug
+          break if limit_per_tag and c > limit_per_tag  # for debug
 
           title = image.get_title
           titles.push title
@@ -250,6 +278,9 @@ class DebugController < ApplicationController
         end
         Rails.logger.debug "download custom images: #{i}/#{@image_array.count} is complete!"
       end
+=end
+
+
     end
 
     #temp_file.flush
