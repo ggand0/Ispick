@@ -56,7 +56,8 @@
   border-radius: 0;
 }
 
-// glyphiconがbutton上で微妙にずれる問題への対策
+
+
 // Address the problem that bootstrap glyphicons aren't positioned correctly
 // from: http://stackoverflow.com/questions/14082826/bootstrap-icons-glyphicons-are-positioned-slightly-up-when-using-google-fonts
 span.glyphicon {
@@ -74,26 +75,34 @@ span.glyphicon {
 
 
 // Classes in the 'Tags' page
+
 .arrow {
   position: relative;
-  top: 175px;
-  left: 10px;
-  float: left;
-  width: 80px;
+  padding-left: 0px;
+  width: 100px;
   font-size: 50pt;
 }
+.vertical-align {
+  display: flex;
+  align-items: center;
+  //justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .wrapper-popular-tags {
-  float: left;
-  width: 400px;
+  //float: left;
+  width: 450px;
 }
 .wrapper-followed-tags {
-  float: left;
-  width: 400px;
+  //float: left;
+  width: 450px;
 }
 .popular-tags {
   width: 400px;
   height: 300px;
   border-style: solid;
+  border-width: 1px;
   border-color: #C3C3C3;
   overflow-y: scroll;
 }
@@ -101,6 +110,7 @@ span.glyphicon {
   width: 400px;
   height: 300px;
   border-style: solid;
+  border-width: 1px;
   border-color: #C3C3C3;
   overflow-y: scroll;
 }
@@ -113,7 +123,9 @@ span.glyphicon {
 }
 
 
+
 // Nested dropdowns styles
+// Used at image displaying pages
 .dropdown-submenu {
     position:relative;
 }
