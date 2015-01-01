@@ -56,13 +56,26 @@ class UsersController < ApplicationController
     end
 
     # Filter images by sites
-    if params[:site]
-      images = Image.filter_by_date(images, params[:site])
-    end
+    #if params[:site]
+    #  images = Image.filter_by_date(images, params[:site])
+    #end
+
+    images = images.where("site_name IN (?)", convert_sites(current_user.target_sites))
 
     @images = images.page(params[:page]).per(10)
     @count = images.select('images.id').count
     @disable_fotter = true
+  end
+
+  def convert_sites(sites)
+    result = []
+    sites = sites.map{ |site| site.name }
+    Image::TARGET_SITES_DISPLAY.each_with_index do |site, count|
+      if sites.include? site
+        result.push Image::TARGET_SITES[count]
+      end
+    end
+    result
   end
 
 
