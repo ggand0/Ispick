@@ -42,7 +42,7 @@
     <% unless @tags_result %>
       <% @tags.each_with_index do |tag, count| %>
       <tr>
-        <td><%= tag.name %></td>
+        <td><%= link_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: "tag" %></td>
         <td><%= tag.images_count %></td>
         <td><%= count %></td>
       </tr>
@@ -50,7 +50,7 @@
     <% else %>
       <% @tags_result.each_with_index do |tag, count| %>
       <tr>
-        <td><%= tag.name %></td>
+        <td><%= link_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: "tag" %></td>
         <td><%= tag.images_count %></td>
         <td><%= count %></td>
       </tr>
