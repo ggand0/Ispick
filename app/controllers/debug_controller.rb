@@ -224,6 +224,7 @@ class DebugController < ApplicationController
     @image_array = Image.search_images_custom(limit, start)
     file_name = "user#{current_user.id}-#{DateTime.now}.zip"
     temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+    temp_file = File.new("/tmp/#{file_name}-#{current_user.id}", "w")
 
 
     # Write image files and list file to temp_file

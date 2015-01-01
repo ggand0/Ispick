@@ -65,6 +65,7 @@ Ispick::Application.routes.draw do
 
       delete 'delete_target_word'
       delete 'delete_tag'
+      post 'set_sites'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }

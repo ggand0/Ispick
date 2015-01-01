@@ -35,7 +35,6 @@ class UsersController < ApplicationController
 
   # GET /users/home
   # Render an user's home page.
-  # ユーザ個別のホームページを表示する。
   def home
     # Get images: For a new user, display the newer images
     if current_user.tags.empty?
@@ -112,7 +111,6 @@ class UsersController < ApplicationController
   end
 
 
-  # タグ登録画面を表示する
   # Render the index page of tags.
   def preferences
     if params[:target_words]
@@ -136,7 +134,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # お気に入り画像一覧ページを表示する
+
   # Render the list of clipped images.
   def boards
     board_id = params[:board]
@@ -153,8 +151,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # 登録タグの削除：関連のみ削除する
   # Remove a registered text tag from user.tags.
+  # Only remove an association.
   def delete_target_word
     current_user.tags.delete(TargetWord.find(params[:id]))
     @tags = current_user.tags
@@ -165,8 +163,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # 登録タグの削除：関連のみ削除する
   # Remove a registered text tag from user.tags.
+  # Only remove an association.
   def delete_tag
     current_user.tags.delete(Tag.find(params[:id]))
     @tags = current_user.tags
@@ -177,14 +175,33 @@ class UsersController < ApplicationController
     end
   end
 
+  # POST
+  # Set User.sites after clearing it
+  def set_sites
+    current_user.target_sites.clear
+    @sites = []
+    Image::TARGET_SITES_DISPLAY.each do |site|
+      # Convert string to symbol
+      if params[site.parameterize.underscore.to_sym].to_i == 1
+        @sites.push site
+      end
+    end
+
+    @sites.each do |site|
+      current_user.target_sites << TargetSite.where(name: site).first
+    end
+
+    respond_to do |format|
+      format.html { redirect_to action: 'preferences' }
+      format.js { render partial: 'layouts/reload_followed_tags' }
+    end
+  end
 
 
   # ===============================
   #  Debugging / temporary actions
   # ===============================
-
-  # [Unused]画像登録画面を表示する
-  # Render the index page of target_images.
+  # [Unused] Render the index page of target_images.
   def show_target_images
     @target_images = current_user.target_images
     render partial: 'debug/show_target_images'
