@@ -58,7 +58,11 @@
   <%= bootstrap_form_tag url: set_sites_users_path, class: "col-md-5 col-lg-5 col-sm-5" do |f| %>
     <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
       <label class="checkbox-inline">
-      <%= f.check_box site.parameterize.underscore.to_sym, label: Image::TARGET_SITES_DISPLAY[count], label_class: "checkbox-inline" %>
+      <% if current_user.target_sites.where(name: site).count > 0 %>
+        <%= f.check_box site.parameterize.underscore.to_sym, label: Image::TARGET_SITES_DISPLAY[count], label_class: "checkbox-inline", checked: true %>
+      <% else %>
+        <%= f.check_box site.parameterize.underscore.to_sym, label: Image::TARGET_SITES_DISPLAY[count], label_class: "checkbox-inline" %>
+      <% end %>
     </label>
     <% end %>
     <%= f.submit %>
