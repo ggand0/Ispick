@@ -75,7 +75,9 @@ span.glyphicon {
 
 
 // Classes in the 'Tags' page
-
+.search-tags {
+  padding-left: 0px;
+}
 .arrow {
   position: relative;
   padding-left: 0px;
@@ -91,11 +93,9 @@ span.glyphicon {
 }
 
 .wrapper-popular-tags {
-  //float: left;
   width: 450px;
 }
 .wrapper-followed-tags {
-  //float: left;
   width: 450px;
 }
 .popular-tags {
@@ -115,12 +115,14 @@ span.glyphicon {
   overflow-y: scroll;
 }
 .tag-button {
-  color: #FFF;
-  background-color: #7ACECE;
+  color: #5B9B9B;//#F8F8F8;
+  background-color: #E4F5F5;//#7ACECE;
 }
-.tag-button a:visited {
-  color: #FFF;
+.tag-button:hover {
+  color: #5B9B9B;
+  background-color: #DDD;
 }
+
 
 
 
