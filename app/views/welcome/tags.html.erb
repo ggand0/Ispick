@@ -1,0 +1,32 @@
+<%= stylesheet_link_tag 'table_custom' %>
+
+<div class="container-fluid">
+  <h3>Popular tags</h3>
+
+
+  <%# bs_table_tag do %>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th align="left" class="col-md-1">Name</th>
+      <th align="left" class="col-md-1">Image Count</th>
+      <th align="left" class="col-md-1">Order</th>
+    </tr>
+    <!--<tr>
+      <th align="left">User Count</th>
+    </tr>-->
+  </thead>
+
+  <tbody>
+    <% @tags.each_with_index do |tag, count| %>
+    <tr>
+      <td><%= tag.name %></td>
+      <td><%= tag.images_count %></td>
+      <td><%= count %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<%# end %>
+
+</div>

@@ -6,6 +6,7 @@ Ispick::Application.routes.draw do
   root 'welcome#index'
 
   match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
+  match '/tags' => 'welcome#tags', :as => 'tags_welcome', :via => :get
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
 
