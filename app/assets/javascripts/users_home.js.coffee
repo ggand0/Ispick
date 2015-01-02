@@ -27,6 +27,7 @@ $(document).on 'ready page:load', ->
   # Initialize infinite scroll
   window.scroll = new Scroll(logging)
   window.scroll.infiniteScroll()
+  window.component.initCollapsables()
 
   # Display the calender (Datepicker)
   window.component.initCalender()
