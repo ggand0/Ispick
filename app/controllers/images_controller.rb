@@ -104,35 +104,21 @@ class ImagesController < ApplicationController
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")
       images = images.where.not(data_updated_at: nil)
+      images = filter_sort(images)
+
       @count = images.select('images.id').count.keys.count
       @query = { q: { "tags_name_cont" => params[:q]['tags_name_cont'] }}
 
     # Single search
     else
       images = Image.search_images(params[:query])
+      images = filter_sort(images)
       @count = images.select('images.id').count
       @query = { query: params[:query] }
     end
 
-    # Filter or sort images
-    images.reorder!('posted_at DESC') if params[:sort]
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
-      @count = images.select('images.id').count
-    end
-
-    # Filter images by sites
-    if params[:site]
-      images = Image.filter_by_date(images, params[:site])
-      @count = images.select('images.id').count.keys.count
-    end
-
     @disable_fotter = true
     @images = images.page(params[:page]).per(10)
-
-
-    #render template: 'users/home'
   end
 
 
@@ -140,5 +126,17 @@ class ImagesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_image
       @image = Image.find(params[:id])
+    end
+
+    def filter_sort(images)
+      images.reorder!('posted_at DESC') if params[:sort]
+      if params[:date]
+        date = DateTime.parse(params[:date]).to_date
+        images = Image.filter_by_date(images, date)
+      end
+      if params[:site]
+        images = Image.filter_by_date(images, params[:site])
+      end
+      images
     end
 end
