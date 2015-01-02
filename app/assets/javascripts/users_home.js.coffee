@@ -35,5 +35,3 @@ $(document).on 'ready page:load', ->
   # Popovers: close popover on click wherever except popover windows
   window.component.initPopovers()
 
-#$(document).ready(ready)
-#$(document).on('page:load', ready)

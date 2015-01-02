@@ -30,18 +30,19 @@ class @Scroll
     window.promisesArray=[]
     @counter = 0
     @scrollHeight = 200
+    @defHeight = 0          # Starting height
 
     # Get GET parameters(not used)
     @GET = {}
     document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, =>
       decode = (s) =>
         return decodeURIComponent(s.split("+").join(" "))
-
       @GET[decode(arguments[1])] = decode(arguments[2])
     )
-    #console.log(@GET)
-    #console.log(@GET.hasOwnProperty('q[tags_name_cont]'))
 
+
+  # Initialize masonry lib
+  # Not necessary when using fastInfiniteScroll method
   masonry: () ->
     $container = $('.wrapper')
     $container.masonry({
@@ -61,6 +62,7 @@ class @Scroll
     $container.masonry()
 
 
+  # Calculate window size and column size
   setupBlocks: ()=>
     @windowWidth = $(window).width()
     @colWidth = $('.block').outerWidth()
@@ -71,6 +73,7 @@ class @Scroll
     console.log(window.blocks) if @logging
 
 
+  # Calculate initial images' positions
   initPositionBlocks: ()=>
     self = @
     @colWidth = $('.block').outerWidth() if @colWidth is null
@@ -86,8 +89,9 @@ class @Scroll
         'top':min+'px'
       })
       $(this).show()
-      #$img = $(this).find('img')
-      #height = $img.height()
+
+      # Get thumbnail's height from html
+      # This data is rendered by Rails code, and read it on JS
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
       console.log(leftPos+','+height) if self.logging
@@ -95,6 +99,7 @@ class @Scroll
     )
     console.log(window.blocks) if @logging
 
+  # Calculate and position newly loaded images
   positionBlocks: (newElemsCount) =>
     self = @
     # Sometimes, especially after using the datepicker,
@@ -120,6 +125,7 @@ class @Scroll
     )
     console.log(window.blocks) if @logging
 
+
   # Update loading icon's position
   updateSpinner: ()=>
     max = Array.max(window.blocks)
@@ -130,25 +136,23 @@ class @Scroll
     })
 
 
+  # Calculate images' position and add primary events
   infiniteScroll: () =>
     console.log('infiniteScroll called') if @logging
     $('.pagination').hide()
     @.fastInfiniteScroll()
-    ###if document.URL.indexOf('home') > -1
-      console.log('home')
-    else# normal slow scroll in other pages
-      console.log('other than home')###
 
 
-
-
-
+  # Load next images to display
   loadImages: (url) =>
     console.log('Fetching...') if @logging
-    $('.pagination').text("Fetching more images...")
+    # Prevent loading next images until current loading is done
     window.scrollReady = false
 
+    # Get and execute javascript template of the current page
     $.getScript(url)
+
+    # Get next images
     $.ajax({
       cache: false,
       url: url,
@@ -156,46 +160,60 @@ class @Scroll
       dataType: 'html',
 
       success: (data) =>
-        console.log(data)
+        # Get image divs
         $newElements = $(data).find('.block')
-        console.log($newElements)
         $newElements.hide()
+
+        # Append them to the listView array
         window.listView.append($newElements)
         count = window.listView.pages[0].items.length
         console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
 
-        window.scrollReady = true
+        # Display loading gif icon
         @.updateSpinner()
-
         $('#loader').show()
+
+        # Add event to position newly loaded images
         $('.wrapper').imagesLoaded( =>
           console.log('images loaded') if @logging
           $('#loader').hide()
           @.positionBlocks($newElements.length)
         )
+
+        # Now we can load next images
+        window.scrollReady = true
       failure: (data) ->
         console.log('failed') if @logging
         window.scrollReady = true
     })
 
+  # Infinite scrolling with Infinity.js
   fastInfiniteScroll: ()=>
     console.log('fast scrolling with infinity.js') if @logging
+    # Initialize
     $('.block').hide()
     @.setupBlocks()
     @.updateSpinner()
 
+    # Position images after image files are loaded
     $('.wrapper').imagesLoaded( =>
       console.log('images loaded') if @logging
       $('#loader').hide()
       @initPositionBlocks()
     )
 
+    # Initialize window variables
     window.$el = $('.wrapper')
     window.listView = new infinity.ListView(window.$el)
     window.scrollReady = true
 
+
+    # Add event to load images when there's no scroll bars
     $(window).on('mousewheel', (e) =>
+      # Do nothing when it's not ready
       return if window.scrollReady == false
+
+      # Load new images if there's no scroll bars
       hasScrollBar = $(document).height() > $(window).height()
       url = $('nav.pagination a[rel=next]').attr('href')
       if e.originalEvent.deltaY > 0 and !hasScrollBar
@@ -203,9 +221,11 @@ class @Scroll
         @.loadImages(url)
     )
 
+    # Add event to load images when it's scrolled to the bottom
     $(window).scroll =>
       #console.log(window.scrollReady) if @logging
       return if window.scrollReady == false
+
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - @scrollHeight
@@ -213,6 +233,8 @@ class @Scroll
         @.loadImages(url)
 
 
+
+  # Infinite scrolling using Masonry.js
   normalInfiniteScroll: ()=>
     @.masonry()
     console.log('normal scrolling with infinite-scroll lib')
