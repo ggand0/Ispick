@@ -30,7 +30,7 @@ every 6.hours do
 end
 
 every 6.hours do
-  rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+  #rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
 end
 
 every 3.hours do

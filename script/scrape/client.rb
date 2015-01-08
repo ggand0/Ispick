@@ -238,6 +238,7 @@ module Scrape
       end
 
 
+=begin
       # If the image is a photo, save it to another table for machine learning
       # Return nil in either case
       if self.check_photo(image)
@@ -247,7 +248,7 @@ module Scrape
       end
       # Return if site's name is Tumblr anyway.
       return if image.site_name = 'tumblr'
-
+=end
 
 
       # Use src_url as original_url if the latter one is nil
