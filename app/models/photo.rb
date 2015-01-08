@@ -1,5 +1,6 @@
 class Photo < ActiveRecord::Base
-  has_many :tags
+  has_many :photos_tags, dependent: :destroy
+  has_many :tags, :through => :photos_tags
 
   # Aboid error by explicitly setting table name
   default_scope { order("#{table_name}.created_at DESC") }
@@ -8,8 +9,6 @@ class Photo < ActiveRecord::Base
   has_attached_file :data,
     styles: {
       thumb: "300x",
-      #thumb: { geometry: "300x300#", :processors => [:custom], :gif_first_frame_only => true },
-      #thumb_gif: "300x300#",
       original: "600x800>"
     },
     default_url: lambda { |data| data.instance.set_default_url },

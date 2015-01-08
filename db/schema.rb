@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150103000041) do
+ActiveRecord::Schema.define(version: 20150103065355) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -225,8 +225,20 @@ ActiveRecord::Schema.define(version: 20150103000041) do
     t.integer  "views"
     t.integer  "favorites"
     t.datetime "posted_at"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "artist"
+    t.text     "original_url"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+  end
+
+  create_table "photos_tags", force: true do |t|
+    t.integer "photo_id", null: false
+    t.integer "tag_id",   null: false
   end
 
   create_table "tags", force: true do |t|
