@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150101095810) do
+ActiveRecord::Schema.define(version: 20150103000041) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -207,6 +207,27 @@ ActiveRecord::Schema.define(version: 20150101095810) do
   end
 
   add_index "people_titles", ["person_id", "title_id"], name: "index_people_titles_on_person_id_and_title_id", using: :btree
+
+  create_table "photos", force: true do |t|
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.boolean  "is_illust"
+    t.float    "quality"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.string   "md5_checksum"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.string   "module_name"
+    t.integer  "views"
+    t.integer  "favorites"
+    t.datetime "posted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "tags", force: true do |t|
     t.string   "name"
