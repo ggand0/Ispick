@@ -90,6 +90,7 @@ gem 'activeadmin', github: 'activeadmin'
 gem 'obscenity', git: 'git@github.com:pentiumx/obscenity.git'
 gem 'fastimage'
 gem 'google-analytics-rails'
+gem 'turnout'
 
 # Twitter Bootstrap gems
 gem 'bootstrap-sass', '~> 3.2.0'
