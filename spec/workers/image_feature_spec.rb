@@ -10,6 +10,7 @@ describe ImageFace do
 
   describe "exec_script method" do
     it "executes the extraction script and gets the result" do
+      puts CONFIG.inspect
       image = FactoryGirl.create(:image_file)
       result = ImageFeature.exec_script(image)
 

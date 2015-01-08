@@ -6,8 +6,9 @@ class ImageFeature
     imagelist_path = Image.create_listfile(Image.find(image.id))
 
     # Copy the template to tmp directory
-    file_name = 'imagenet_features_template.prototxt'
-    template_path = "#{Rails.root}/script/caffe/#{file_name}"
+    #file_name = 'imagenet_features_template.prototxt'
+    #template_path = "#{Rails.root}/script/caffe/#{file_name}"
+    template_path = "#{CONFIG['template_path']}"
     FileUtils.cp(template_path, temp_dir_path)
 
     # Replace config strings
@@ -22,13 +23,14 @@ class ImageFeature
 
   def self.exec_script(image)
     # .caffemodel file
-    #pretrained_file = "caffenet_train_pmmm350_iter_6000.caffemodel"
-    pretrained_file = 'caffenet_train_iter_20000.caffemodel'
-    pretrained_path = "#{CONFIG['caffe_path']}/models/ispick/#{pretrained_file}"
+    #pretrained_file = 'caffenet_train_iter_20000.caffemodel'
+    #pretrained_path = "#{CONFIG['caffe_path']}/models/ispick/#{pretrained_file}"
+    pretrained_path = "#{CONFIG['pretrained_path']}"
     # .npy file converted from .binaryproto file which was used for training
-    #mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/pmmm350_mean.npy"
-    mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/anipic_singles_mean.npy"
-    model_file_path = "#{Rails.root}/script/caffe/imagenet_features_template.prototxt"
+    #mean_file_path = "#{CONFIG['caffe_path']}/data/ispick/anipic_singles_mean.npy"
+    mean_file_path = "#{CONFIG['mean_file_path']}"
+    #model_file_path = "#{Rails.root}/script/caffe/imagenet_features_template.prototxt"
+    model_file_path = "#{CONFIG['model_file_path']}"
 
     #Dir.mktmpdir do |temp_dir_path|
     # Memo: feature extraction with C++ (WIP)
@@ -36,8 +38,7 @@ class ImageFeature
     #result = %x('cd' #{CONFIG['caffe_path']}; #{tool_exec})
 
     # Configure prototxt file
-    #model_file_path = self.deploy_prototxt(image, temp_dir_path, mean_file_path)
-
+    #model_file_path = self.deploy_prototxt(image, temp_dir_path, mean_file_path
     # Execute the script and extract feature vectors
     dump_exec = "python #{CONFIG['caffe_path']}/extract_features.py #{mean_file_path} #{model_file_path} #{pretrained_path} #{image.data.path}"
     result = %x('cd' #{CONFIG['caffe_path']}; #{dump_exec})
