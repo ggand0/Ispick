@@ -35,7 +35,7 @@ class DownloadImage
         logger.info "Downloaded : Image.id=#{image_id}"
 
         # Image analysis
-        Resque.enqueue(DetectIllust, image.id)
+        #Resque.enqueue(DetectIllust, image.id)
         #Resque.enqueue(ImageFace, image.id)  # 14/07/05停止中
 
         # ===================================
