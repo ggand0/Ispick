@@ -6,9 +6,11 @@ require 'open-uri'
 module Scrape
   class Nico < Client
     RSS_URL = 'http://seiga.nicovideo.jp/rss/illust/new'
+    NEW_IMAGES_URL = 'http://seiga.nicovideo.jp/illust/list'
     TAG_SEARCH_URL = 'http://seiga.nicovideo.jp/api/tagslide/data'
     ROOT_URL = 'http://seiga.nicovideo.jp'
     USER_SEARCH_URL= 'http://seiga.nicovideo.jp/api/user/info'
+    USER_IMAGE_URL = 'http://seiga.nicovideo.jp/api/user/data'
 
 
     def initialize(logger=nil, limit=50)
@@ -24,7 +26,8 @@ module Scrape
     # Scrape images from nicoseiga, using all TargetWord records.
     # @param interval [Integer] The frequency of scraping images from NicoSeiga[min].
     def scrape(interval=60)
-      scrape_target_words('Scrape::Nico', interval)
+      #scrape_target_words('Scrape::Nico', interval)
+      scrape_popular_images()
     end
 
 
@@ -39,6 +42,80 @@ module Scrape
       result = scrape_using_api(target_word, user_id, true)
 
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
+    end
+    
+    # scrape images over 'threshold', from 'from_day' to 'to_day'.
+    def scrape_popular_images(target_word=nil,from_day=DateTime.now-1,to_day=DateTime.now, threshold=200,user_id=nil, validation=true, verbose=false)
+      result_hash = Scrape.get_result_hash
+      
+      # Get the xml file with api response
+      agent = self.class.get_client
+      flg = 0
+      page_num=0
+      while(flg==0)
+        page_num = page_num+1
+        url = NEW_IMAGES_URL + "?page=#{page_num}"
+        xml = agent.get(url)
+        puts(page_num)
+        xml.search("div[class='illust_list']").search("a").each do |item|
+          #compare popularity to threshold (popularity = 'view' or 'comment' or 'clip')
+          if item.search("li[class='clip']").text.to_i >= threshold then
+              page_url = ROOT_URL + item.attr("href")
+              page = agent.get(page_url)
+              start = Time.now
+              image_data = self.class.get_data2(page)
+              #compare posted_at to from_day and to_day
+              if image_data[:posted_at] >= from_day && image_data[:posted_at] <= to_day then
+
+                #save image_data
+                options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+                # get tags information
+                tags = page.search("meta[name='keywords']").attr("content").value.split(",")
+                image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+
+                result_hash[:duplicates] += image_id ? 0 : 1
+                result_hash[:scraped] += 1 if image_id
+                elapsed_time = Time.now - start
+                result_hash[:avg_time] += elapsed_time
+
+                # Resqueで非同期的に画像解析を行う
+                    # 始めに画像をダウンロードし、終わり次第ユーザに配信
+                if image_id and (not user_id.nil?)
+                  #@logger.debug "scrape_nico: user=#{user_id}"
+                  @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
+                  self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
+                  target_word.class.name, target_word.id, @logger)
+                end
+                  
+              # past than from_day
+              elsif image_data[:posted_at] < from_day then
+                flg = 1
+                break                
+              end              
+=begin
+              # There is no api(using img_num) for extracting illust information???
+              # by way of user information
+              page = agent.get(page_url)
+              user_id = page.search("div[class='user']").attr("data-id").value
+              image_id = item.attr("href").split("/")[2]
+              url = USER_IMAGE_URL + "?id=#{user_id}"
+              user_info = agent.get(url)
+              user_info.search("image").each do |image|
+                if image.search("id").text == image_id then
+                  image_data = self.class.get_data(image)
+                  break
+                end
+              end
+=end
+          end          
+        
+        end
+      
+      end
+      
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
+
     end
 
     # Scrape images from nicoseiga, using its (probablly unofficial) API.
@@ -132,6 +209,34 @@ module Scrape
       }
     end
 
+    # For extracting popular images
+    # @param [String] image page url
+    # @return [Hash] Attributes of Image model
+    def self.get_data2(page)
+      src_url = page.search("meta[property='og:image']").attr("content").value
+      size = FastImage.size(src_url)
+
+      {
+        artist: page.search("meta[property='og:title']").attr("content").value.split("\/")[1].split("さん")[0].gsub(" ",""),
+        poster: nil,
+        title: page.search("meta[property='og:title']").attr("content").value,
+        caption: page.search("meta[name='description']").attr("content").value,
+        src_url: src_url,
+        page_url: page.search("link[rel='canonical']").first.attr("href"),
+        #original_url: "http://seiga.nicovideo.jp/image/source/#{nico_image_id}",
+        original_url: src_url,
+        original_width: size[0],
+        original_height: size[1],
+        original_view_count: page.search("li[class='view']").first.content.gsub("閲覧","").to_i,
+        original_favorite_count: page.search("li[class='clip']").first.content.gsub("クリップ","").to_i,
+        # Parse JST posted_at datetime to utc
+        # JSTの投稿日時が返却されるのでUTCに変換する
+        posted_at: DateTime.strptime(page.search("li[class='date']").first.content, "%Y年%m月%d日 %H:%M").in_time_zone('Asia/Tokyo').utc,
+        site_name: 'nicoseiga',
+        module_name: 'Scrape::Nico',
+      }
+    end
+
     # [OLD]Scrape contents with actual HTML page based on page_url value.
     # @param page_url [String]
     # @param agent [Mechanize]
@@ -159,7 +264,8 @@ module Scrape
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
     def self.get_client
       agent = Mechanize.new
-      agent.ssl_version = 'SSLv3'
+      # ssl_versionを変えると上手くいかない？@2015/1/9
+      #agent.ssl_version = 'SSLv3'
       agent.keep_alive = false
       agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
         'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
