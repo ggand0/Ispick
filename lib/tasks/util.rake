@@ -109,6 +109,35 @@ namespace :util do
     end
   end
 
+  desc "Delete tags that aren't associated with any images"
+  task delete_tags: :environment do
+    count = 0
+    Tag.all.each do |tag|
+      if tag.images.count == 0
+        tag.destroy
+        puts "Deleted: #{tag.id}"
+        count += 1
+      end
+    end
+
+    puts "Number of tags destroyed: #{count}"
+  end
+
+  desc "Delete tags that aren't associated with any images"
+  task count_tags: :environment do
+    count = 0
+    Tag.all.each do |tag|
+      if tag.images.count == 0
+        #tag.destroy
+        #puts "Deleted: #{tag.id}"
+        count += 1
+      end
+    end
+
+    puts "Number of tags that are not associated with any images: #{count}"
+  end
+
+
   task :test => :environment do
     puts "debugging something..."
     Person.all.each do |person|
