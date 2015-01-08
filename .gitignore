@@ -28,6 +28,8 @@ config.yml
 database.yml
 fluent-logger.yml
 banned_words.yml
+banned_words_r18.yml
+banned_words_cosplay.yml
 
 *.rbc
 *.sassc
