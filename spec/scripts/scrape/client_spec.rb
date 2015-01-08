@@ -4,7 +4,7 @@ require "#{Rails.root}/script/scrape/client"
 
 describe Scrape::Client do
   before do
-    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
+    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
     Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
     @client = Scrape::Client.new
     # Uncomment and edit this if you don't want to let it write logs
@@ -97,6 +97,26 @@ describe Scrape::Client do
     end
   end
 
+  describe "check_photo method" do
+    it "returns false if the image contains no irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      expect(Scrape::Client.check_photo(image)).to eq(false)
+    end
+
+    it "returns true if its title contain irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.title = 'cosplay'
+      expect(Scrape::Client.check_photo(image)).to eq(true)
+    end
+
+    it "returns true if its caption contain irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.caption = 'cosplay'
+      expect(Scrape::Client.check_photo(image)).to eq(true)
+    end
+  end
+
+
   describe "is_banned method" do
     it "returns true if the tags contain irrelevant words" do
       image = FactoryGirl.create(:image_with_tags)
@@ -110,6 +130,25 @@ describe Scrape::Client do
       image.tags << Tag.new(name: 'cosplay')
 
       expect(Scrape::Client.is_banned(image.tags)).to eq(true)
+    end
+  end
+
+  describe "is_photo method" do
+    it "returns true if the tags contain irrelevant words" do
+      puts Obscenity.config.inspect
+      puts Obscenity.config.blacklist_another
+
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'cosplay')
+
+      expect(Scrape::Client.is_photo(image.tags)).to eq(true)
+    end
+
+    it "returns false if the tags contain r18 words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'r18')
+
+      expect(Scrape::Client.is_photo(image.tags)).to eq(false)
     end
   end
 
