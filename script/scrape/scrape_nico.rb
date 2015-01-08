@@ -26,8 +26,9 @@ module Scrape
     # Scrape images from nicoseiga, using all TargetWord records.
     # @param interval [Integer] The frequency of scraping images from NicoSeiga[min].
     def scrape(interval=60)
-      #scrape_target_words('Scrape::Nico', interval)
+      scrape_target_words('Scrape::Nico', interval)
       scrape_popular_images()
+      scrape_ranking_images()
     end
 
 
@@ -63,7 +64,16 @@ module Scrape
               page_url = ROOT_URL + item.attr("href")
               page = agent.get(page_url)
               start = Time.now
-              image_data = self.class.get_data2(page)
+              
+              # skip adult illust
+              begin
+                image_data = self.class.get_data2(page)
+                @logger.debug "src_url: #{image_data[:src_url]}"
+              rescue => e
+                @logger.error "An error has occurred inside get_data method."
+                next
+              end
+              
               #compare posted_at to from_day and to_day
               if image_data[:posted_at] >= from_day && image_data[:posted_at] <= to_day then
 
@@ -111,6 +121,55 @@ module Scrape
         
         end
       
+      end
+      
+      result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
+      result_hash
+
+    end
+    
+    # scrape images from yesterday ranking
+    def scrape_ranking_images(target_word=nil, user_id=nil, validation=true, verbose=false)
+      result_hash = Scrape.get_result_hash
+      
+      # Get the xml file with api response
+      agent = self.class.get_client
+      ranking_url = "http://ext.seiga.nicovideo.jp/api/illust/blogparts?mode=ranking&key=daily%2call"
+      ranking = agent.get(ranking_url)
+      
+      ranking.search("image").each do |image|
+        page_url = ROOT_URL+"/seiga/im#{image.search("id").text}"
+        start = Time.now
+        page = agent.get(page_url)
+ 
+        # skip adult illust
+        begin
+          image_data = self.class.get_data2(page)
+          @logger.debug "src_url: #{image_data[:src_url]}"
+        rescue => e
+          @logger.error "An error has occurred inside get_data method."
+          next
+        end
+
+         #save image_data
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+        # get tags information
+        tags = page.search("meta[name='keywords']").attr("content").value.split(",")
+        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
+        elapsed_time = Time.now - start
+        result_hash[:avg_time] += elapsed_time
+
+        # Resqueで非同期的に画像解析を行う
+        # 始めに画像をダウンロードし、終わり次第ユーザに配信
+        if image_id and (not user_id.nil?)
+          #@logger.debug "scrape_nico: user=#{user_id}"
+          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
+          self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
+          target_word.class.name, target_word.id, @logger)
+        end
       end
       
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
