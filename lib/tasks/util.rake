@@ -123,6 +123,13 @@ namespace :util do
     puts "Number of tags destroyed: #{count}"
   end
 
+  desc "Delete all Tumblr images"
+  task delete_tumblr: :environment do
+    Image.destroy_all(site_name: 'tumblr')
+
+    puts "DONE!"
+  end
+
   desc "Delete tags that aren't associated with any images"
   task count_tags: :environment do
     count = 0
