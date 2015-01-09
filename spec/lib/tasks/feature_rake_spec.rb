@@ -1,3 +1,21 @@
+require 'spec_helper'
+require 'rake'
+
+describe "feature:reset_convnet" do
+  before do
+    #IO.any_instance.stub(:puts)
+    Ispick::Application.load_tasks
+  end
+
+  it "calls valid methods" do
+    FactoryGirl.create(:image)
+
+    expect(Resque).to receive(:enqueue)
+    Rake::Task['feature:reset_convnet'].invoke
+    #expect(Image.first.feature).not_to eq(nil)
+  end
+end
+
 =begin
 describe "feature:face_targets" do
   # 諸々の初期化。gemの仕様的にこれ以上DRYにできない

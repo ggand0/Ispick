@@ -37,6 +37,7 @@ class DownloadImage
         # Image analysis
         #Resque.enqueue(DetectIllust, image.id)
         #Resque.enqueue(ImageFace, image.id)  # 14/07/05停止中
+        Resque.enqueue(ImageFeature, 'Image', image.id)
 
         # ===================================
         # Targetableの情報が設定されている場合は、

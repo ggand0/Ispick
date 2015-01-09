@@ -125,9 +125,9 @@ class Image < ActiveRecord::Base
     images.uniq
   end
 
-  # Create the list of image names from an Image relation object
+  # Create the list of image names from an Image relation object.
   # @param image [ActiveRecord::Relation::ActiveRecord_Relation_Image]
-  # @return [File]
+  # @return [Tempfile] A temporary file object is returned.
   def self.create_list_file(images)
     file = Tempfile.new("imagelist#{DateTime.now}")
     images.each do |image|

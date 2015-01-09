@@ -9,7 +9,7 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended that you check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system
 
 ActiveRecord::Schema.define(version: 20150103065355) do
 
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 20150103065355) do
 
   create_table "features", force: true do |t|
     t.text     "face"
-    t.text     "convnet_feature"
+    t.text     "convnet_feature", limit: 2147483647
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -151,6 +151,11 @@ ActiveRecord::Schema.define(version: 20150103065355) do
 
   add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
   add_index "images_tags", ["tag_id"], name: "index_images_tags_on_tag_id", using: :btree
+
+  create_table "images_target_images", force: true do |t|
+    t.integer "image_id",        null: false
+    t.integer "target_image_id", null: false
+  end
 
   create_table "images_target_words", force: true do |t|
     t.integer "image_id",       null: false
@@ -267,6 +272,9 @@ ActiveRecord::Schema.define(version: 20150103065355) do
     t.boolean  "enabled"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "images_count",      default: 0, null: false
+    t.integer  "width"
+    t.integer  "height"
   end
 
   create_table "target_sites", force: true do |t|
