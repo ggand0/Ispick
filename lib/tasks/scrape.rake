@@ -193,6 +193,17 @@ namespace :scrape do
     Scrape::Tags.scrape
   end
 
+  desc "Create TargetWord records for research"
+  task people0: :environment do
+    require 'csv'
+
+    csv_text = File.read "#{Rails.root}/db/seeds/people0.csv"
+    csv = CSV.parse(csv_text, :headers => true)
+    csv.each do |row|
+      Person.create!(row.to_hash)
+    end
+  end
+
 
   desc "ニコ静から画像抽出する"
   task :nico, [:interval] => :environment do |t, args|
@@ -236,6 +247,12 @@ namespace :scrape do
     Scrape::Anipic.new.scrape(interval.to_i)
   end
 
+  desc "Scrape images from 'Anime pictures and wallpapers'"
+  task :anipic_tag, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Anipic.new.scrape_tag(interval.to_i)
+  end
+
   # Anime pictures and wallpapersから画像抽出する
   desc "Scrape images from 'Anime pictures and wallpapers'"
   task :anipic_tag, [:interval] => :environment do |t, args|
@@ -251,12 +268,10 @@ namespace :scrape do
   end
 
   # zerochanから画像を抽出する
-
   desc "Scrape images from 'zerochan'"
   task :zerochan, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Zerochan.new.scrape(interval.to_i)
   end
-=begin
-=end
+
 end
