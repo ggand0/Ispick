@@ -8,6 +8,10 @@ module Scrape
   class Anipic < Client
     ROOT_URL = 'http://anime-pictures.net'
 
+
+    # Constructor.
+    # @param logger [ActiveSupport::Logger]
+    # @param limi [Integer] Maximum number of images to scrape
     def initialize(logger=nil, limit=20)
       self.limit = limit
       if logger.nil?
@@ -18,22 +22,23 @@ module Scrape
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     end
 
-    # 取得するPostの上限数。APIの仕様で20postsが限度
-    # Scrape images from anipic. The latter two params are used for testing.
-    # @param [Integer] min
+
+    # Scrape images from anipic RSS. The latter two params are used for testing.
+    # @param [Integer] Given time for scraping[min]
     def scrape(interval=60)
-      @limit = 20
+      @limit = 200
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      #scrape_target_words('Scrape::Anipic', interval)
       result = scrape_RSS()
 
       @logger.info result
       @logger.info 'DONE!'
     end
 
+    # Scrape images using TargetWord records.
+    # @param [Integer] Given time for scraping[min]
     def scrape_tag(interval=60)
-      @limit = 20
+      @limit = 2000
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
       result = scrape_target_words('Scrape::Anipic', interval)
@@ -42,26 +47,27 @@ module Scrape
       @logger.info 'DONE!'
     end
 
-    # キーワードによる抽出処理を行う
-    # @param [TargetWord]
+    # Scrape images using TargetWord records.
+    # @param target_word [TargetWord]
     def scrape_target_word(user_id, target_word, english=false)
-      @limit = 10
       @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
       result = scrape_using_api(target_word, user_id, true, false, english)
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
     end
 
-    # 対象のタグを持つPostの画像を抽出する
-    # @param [String]
-    # @param [Integer]
-    # @param [Boolean]
-    # @return [Hash] Scraping result
-    def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
-      @limit = 200
-      @logger.debug "#{target_word.inspect}"
-      result_hash = Scrape.get_result_hash
 
+
+    # Scrape images that have target tags.
+    # @param target_word [TargetWord] A TargetWord record.
+    # @param user_id [Integer] Not in use currently.
+    # @param validation [Boolean] Whether it validates values during saving
+    # @param logging [Boolean] Whether it outputs logs or not
+    # @param english [Boolean] Whether it's an English target_word or not
+    # @return [Hash] Summary of scraping
+    def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
+      # Initialize query from target_word
+      result_hash = Scrape.get_result_hash
       if english
         query = Scrape.get_query_en(target_word, 'roman')
       else
@@ -73,70 +79,100 @@ module Scrape
       end
       @logger.info "query=#{query}"
 
-      # Mecanizeによりクエリ検索結果のページを取得
+      # Get search result page by Mechanize
+      page_num = -1
       page = self.get_search_result(query)
-      # タグ検索：@limitで指定された数だけ画像を取得(最高80枚=1ページの最大表示数)　→ src_urlを投げる for anipic
-      return if page.search("span[class='img_block_big']").count == 0
+      url = page.uri.to_s
 
-      page.search("span[class='img_block_big']").each_with_index do |image, count|
-        # 広告又はR18画像はスキップ
-        if image.children.search('img').first.nil?
-          result_hash[:skipped] += 1
-          next
-        else
-          # サーチ結果ページから、ソースページのURLを取得
-          page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
-        end
+      # Actually scrape images page by page
+      while page.search("span[class='img_block_big']").count != 0 and result_hash[:scraped] < @limit
+        page_num += 1
 
-        # ソースページのパース
-        xml = Nokogiri::XML(open(page_url))
+        # Get URL of the next page
+        # E.g. "http://anime-pictures.net/pictures/view_posts/0?search_tag=kaname+madoka&lang=en"
 
-        # ソースページから画像情報を取得してDBへ保存する
-        start = Time.now
+        url.gsub!(/view_posts\/.*\?/, "view_posts/#{page_num}?")
+        page = Nokogiri::HTML(open(url))  # Use Nokogiri from the second time
 
-        begin
-          image_data = self.get_data(xml, page_url)
-          #@logger.debug "src_url: #{image_data.src_url}"
-        rescue => e
-          @logger.error "An error has occurred inside the get_data method. count: #{count}"
-          send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
-          next
-        end
-        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
-        tags = self.get_tags_original(xml)
-
-        # 保存に必要なものはimage_data, tags, validetion
-        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
-
-        result_hash[:duplicates] += image_id ? 0 : 1
-        result_hash[:scraped] += 1 if image_id
-        elapsed_time = Time.now - start
-        result_hash[:avg_time] += elapsed_time
-        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
-
-        # Resqueで非同期的に画像解析を行う
-        # 始めに画像をダウンロードし、終わり次第ユーザに配信
-        if image_id and (not user_id.nil?)
-          self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false,
-            target_word.class.name, target_word.id)
-        end
-
-        # @limit枚抽出したら終了
-        break if (count+1 - result_hash[:skipped]) >= @limit
+        # Scrape images in a page and save them to the DB
+        result_hash = self.scrape_page(page, result_hash, target_word, user_id, validation, logging)
       end
 
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
     end
 
+
+    # Scrape images in a list page. Calls get_data method directly inside the method.
+    # @param page [Mechanize::Page]
+    # @param result_hash [Hash]
+    # @param user_id [Integer] Not in use currently.
+    # @param validation [Boolean] Whether it validates values during saving
+    # @param logging [Boolean] Whether it outputs logs or not
+    def scrape_page(page, result_hash, target_word, user_id, validation, logging)
+      # Based on the tag search result.
+      # In case of anime-pictures, there are 80 images per page.
+      page.search("span[class='img_block_big']").each_with_index do |image, count|
+        # Skip R18 or advertisement images
+        if image.children.search('img').first.nil?
+          result_hash[:skipped] += 1
+          next
+        else
+          # Get source page's URL from the search result page
+          page_url = ROOT_URL + image.children.search('a').first.attributes['href'].value
+        end
+
+        # Parse the source page
+        xml = Nokogiri::XML(open(page_url))
+
+        # Get attributes from the source page
+        start = Time.now
+        begin
+          image_data = self.get_data(xml, page_url)
+        rescue => e
+          @logger.error "An error has occurred inside the get_data method. count: #{count}"
+          send_error_mail(e, 'Scrape::Anipic', target_word, "count=#{count}") if Rails.env.production?
+          next
+        end
+
+        # Save the image to DB, getting info
+        # image_data, tags, validation are essential for save
+        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+        tags = self.get_tags_original(xml)
+        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+
+        # Update statistic values
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
+        elapsed_time = Time.now - start
+        result_hash[:avg_time] += elapsed_time
+        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+
+
+        # Finish if it's scraped @limit images
+        break if (count+1 - result_hash[:skipped]) >= @limit
+
+        # ===================================================
+        #   Sleep 1 sec since we scrape a lot of images
+        # ===================================================
+        sleep(1)
+      end
+
+      result_hash
+    end
+
+
+
+
     def self.is_range(target)
       yesterday = Date.today - 1.day
-      #puts (target.to_date - yesterday).abs
-      #puts (target.to_date - yesterday).to_i.abs
       (target.to_date - yesterday).abs <= 1
     end
 
     # Get RSS
+    # @param user_id [Integer] Not in use currently.
+    # @param validation [Boolean] Whether it validates values during saving
+    # @param logging [Boolean] Whether it outputs logs or not
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
 
@@ -174,7 +210,6 @@ module Scrape
 
           # ソースページから画像情報を取得してDBへ保存する
           start = Time.now
-
           begin
             image_data = self.get_data(xml, page_url)
             @logger.debug "src_url: #{image_data[:src_url]}"
@@ -186,8 +221,6 @@ module Scrape
 
           options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
           tags = self.get_tags_original(xml)
-
-          # 保存に必要なものはimage_data, tags, validetion
           image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
           result_hash[:duplicates] += image_id ? 0 : 1
@@ -196,19 +229,12 @@ module Scrape
           result_hash[:avg_time] += elapsed_time
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
 
-          # Resqueで非同期的に画像解析を行う
-          # 始めに画像をダウンロードし、終わり次第ユーザに配信
-          if image_id and (not user_id.nil?)
-            self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false,
-              target_word.class.name, target_word.id)
-          end
-
           # 80枚（1pageの最大数）抽出するまで
           #break if count+1 >= 80 || image_data[:posted_at].to_date != DateTime.now.to_date
           @logger.debug image_data[:posted_at].to_date
           break if count+1 >= 80 or (image_data[:posted_at].to_date - Date.yesterday) <= 0
 
-          # Finish scraping if it's detected
+          # Finish scraping if it's detected duplications
           #break if result_hash[:duplicates] >= 5
         end
       end
@@ -217,8 +243,9 @@ module Scrape
       result_hash
     end
 
+
+
     # Get the result of search, using Mechanize.
-    # Mechanizeにより検索結果を取得
     # @param [String]
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
     def get_search_result(query)
@@ -227,20 +254,19 @@ module Scrape
       agent.keep_alive = false
       page = agent.get(ROOT_URL)
 
-      # login作業
+      # login examples:
       #page.forms[1]['login'] = 'xxx'
       #page.forms[1]['password'] = 'xxx'
       #page.forms[1].submit
 
       page.forms[2]['search_tag'] = query
-
       result = page.forms[2].submit
-      #puts(page.forms[2]['search_tags'])
-      return result
+
+      result
     end
 
+
     # Get tags from a XML object.
-    # xmlからタグを取得
     # @param [Nokogiri::XML]
     # @return [Array::String]
     def get_tags_original(xml)
@@ -256,7 +282,7 @@ module Scrape
 
     # TODO: Refactoring
     def self.get_time(time_string)
-      # 整形
+      # Organize format
       time = time_string
       time.gsub!(/\n|\t| /,'')
       time_t = time.split(/\/|,| /)
@@ -274,7 +300,7 @@ module Scrape
         time_t[3].gsub!(/AM/,'')
       end
 
-      # UTCに変換
+      # Convert to UTC
       time_t[2] + "/" + time_t[0] + "/" + time_t[1] + "/" + time_t[3]
     end
 
