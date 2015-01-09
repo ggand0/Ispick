@@ -61,7 +61,7 @@ module Scrape
         # Resqueで非同期的に画像解析を行う
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id and (not user_id.nil?)
-          self.class.generate_jobs(image_id, image_data[:src_url], false, target_word.class.name, target_word.id)
+          self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false, target_word.class.name, target_word.id)
         end
 
         # limitを越えるか、その日に投稿された画像でなくなるまで

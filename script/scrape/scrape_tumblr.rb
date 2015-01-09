@@ -7,6 +7,8 @@ module Scrape
   class Tumblr < Client
     ROOT_URL = 'https://tumblr.com'
 
+    # @params logger [ActiveSupport::Logger] A logger object which is used during the process
+    # @params limit [Integer] Max number of images to scrape
     def initialize(logger=nil, limit=20)
       self.limit = limit
       if logger.nil?
@@ -18,7 +20,6 @@ module Scrape
     end
 
 
-    # 取得するPostの上限数。APIの仕様で20postsまでに制限されている
     # Scrape images from tumblr. The latter two params are used for testing.
     # @param [Integer] min
     def scrape(interval=60)
@@ -87,7 +88,7 @@ module Scrape
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id and (not user_id.nil?)
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
-          self.class.generate_jobs(image_id, image_data[:src_url], false,
+          self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false,
             user_id, target_word.class.name, target_word.id, @logger)
         end
 

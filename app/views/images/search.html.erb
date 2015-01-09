@@ -1,0 +1,37 @@
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render images and the dropdown for filtering them -->
+<p>
+
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <div class="dropdown">
+    <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-default" data-target="#" href="/page.html">
+        Filter/Sort <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+      <li><%= link_to 'Sort by posted_at', search_images_path({sort: true}.merge @query) %></li>
+      <li><%= link_to 'Sort by favorites', search_images_path({fav: true}.merge @query) %></li>
+      <li class="divider"></li>
+      <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Filter by source</a>
+
+        <ul class="dropdown-menu">
+          <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+            <li><%= link_to "#{site}", search_images_path({ site: Image::TARGET_SITES[count] }.merge @query) %></li>
+          <% end %>
+        </ul>
+      </li>
+    </ul>
+    <%= "  #{get_debug_html(@count)}".html_safe if @count %>
+  </div>
+
+</p>
+  <br />
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images } %>

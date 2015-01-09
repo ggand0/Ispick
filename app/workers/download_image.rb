@@ -12,14 +12,16 @@ class DownloadImage
   # @param user_id [Integer]
   # @param target_type [String]
   # @param target_id [Integer]
-  def self.perform(image_id, src_url, user_id=nil, target_type=nil, target_id=nil)
-    image = Image.find(image_id)
+  def self.perform(image_id, image_type, src_url, user_id=nil, target_type=nil, target_id=nil)
+    image = Object::const_get(image_type).find(image_id)
 
     begin
-      # 画像をsource urlからダウンロード
+      # Download image from source url
       image.image_from_url(src_url)
       logger.info "user_id=#{user_id} image_id=#{image_id} src=#{src_url} #{target_id}"
 
+      # Delete if a record in DB has the exact same file(based on checksum) exists
+      # It's duplicate if the value is more than 1(because the file of given image is not saved yet)
       # 全く同一のファイルを持つレコードが既にDBに存在すれば削除する
       # 自分自身は、変更を加えた後まだ保存していないので含まれない、1以上なら重複
       duplicates = Image.where(md5_checksum: image.md5_checksum)
@@ -32,8 +34,8 @@ class DownloadImage
         image.save!
         logger.info "Downloaded : Image.id=#{image_id}"
 
-        # 画像解析処理
-        #Resque.enqueue(DetectIllust, image.id) # 14/09/04一時停止
+        # Image analysis
+        #Resque.enqueue(DetectIllust, image.id)
         #Resque.enqueue(ImageFace, image.id)  # 14/07/05停止中
 
         # ===================================

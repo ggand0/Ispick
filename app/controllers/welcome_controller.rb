@@ -17,4 +17,15 @@ class WelcomeController < ApplicationController
     @first = false if params[:page] and params[:page].to_i > 1
     @disable_fotter = true
   end
+
+  def tags
+    @tags = Tag.get_tags_with_images(1000)
+
+    #@search = Image.search(params[:q])
+    @search_tags = Tag.search(params[:q])
+    if params[:q]
+      @tags_result = @search_tags.result(distinct: true).page(params[:page]).per(1000)
+    end
+
+  end
 end

@@ -1,7 +1,7 @@
 require "#{Rails.root}/spec/support/consts"
 
 FactoryGirl.define do
-  # validationを通るだけのimage
+  # A factory that produces images which just go through validations.
   factory :image_min, class: Image do
     sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
@@ -11,7 +11,7 @@ FactoryGirl.define do
     title 'test'
     caption 'test'
     sequence(:src_url) { |n| "test#{n}@example.com" }
-    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # UTCで保存される
+    sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }  # Is saved in UTC format
     sequence(:page_url) { |n| "test#{n}@example.com/some_page" }
     sequence(:site_name) { |n| Constants::SITE_NAMES[n % Constants::SITE_NAMES.count] }
     sequence(:module_name) { |n| Constants::MODULE_NAMES[n % Constants::MODULE_NAMES.count] }
@@ -38,7 +38,10 @@ FactoryGirl.define do
         tags_count 5
       end
       after(:create) do |image, evaluator|
-        create_list(:tags, evaluator.tags_count, images: [image])
+        #create_list(:tags, evaluator.tags_count, images: [image])
+        (0..evaluator.tags_count-1).each do
+          image.tags << create(:tag)
+        end
       end
     end
 

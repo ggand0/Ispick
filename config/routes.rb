@@ -6,6 +6,7 @@ Ispick::Application.routes.draw do
   root 'welcome#index'
 
   match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
+  match '/tags' => 'welcome#tags', :as => 'tags_welcome', :via => [:get,:post]
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
 
@@ -65,6 +66,7 @@ Ispick::Application.routes.draw do
 
       delete 'delete_target_word'
       delete 'delete_tag'
+      post 'set_sites'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }

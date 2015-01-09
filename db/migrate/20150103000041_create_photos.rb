@@ -1,6 +1,6 @@
-class CreateImages < ActiveRecord::Migration
+class CreatePhotos < ActiveRecord::Migration
   def change
-    create_table :images do |t|
+    create_table :photos do |t|
       # Basic data
       t.text :title
       t.text :caption
@@ -17,6 +17,17 @@ class CreateImages < ActiveRecord::Migration
       t.integer :views
       t.integer :favorites
       t.datetime :posted_at
+
+      t.integer  :original_view_count
+      t.integer  :original_favorite_count
+      t.datetime :posted_at
+      t.datetime :created_at
+      t.datetime :updated_at
+      t.text     :artist
+      t.text     :original_url
+      t.text     :poster
+      t.integer  :original_width
+      t.integer  :original_height
 
       t.timestamps
     end

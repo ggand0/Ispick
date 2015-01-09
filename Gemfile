@@ -7,13 +7,13 @@ gem 'rails', '4.0.2'
 gem 'mysql2'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.0', :git => 'https://github.com/rails/sass-rails.git'
+gem 'sass-rails', :git => 'https://github.com/rails/sass-rails.git'
 
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 
 # Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0', :git => 'https://github.com/rails/coffee-rails.git'
+gem 'coffee-rails', :git => 'https://github.com/rails/coffee-rails.git'
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 #gem 'therubyracer', platforms: :ruby
@@ -87,9 +87,10 @@ gem 'factory_girl_rails'                              # A fixtures replacement
 gem 'engtagger'
 gem 'letter_opener', group: :development              # Open emails on browser
 gem 'activeadmin', github: 'activeadmin'
-gem 'obscenity'
+gem 'obscenity', git: 'git@github.com:pentiumx/obscenity.git'
 gem 'fastimage'
 gem 'google-analytics-rails'
+gem 'turnout'
 
 # Twitter Bootstrap gems
 gem 'bootstrap-sass', '~> 3.2.0'

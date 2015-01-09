@@ -28,13 +28,14 @@ class ImagesController < ApplicationController
 
 
   # PUT favor
-  # imageをお気に入り画像として追加する。
+  # Add image to board as a favored_image.
+  # TODO: Refactor!
   def favor
     board_name = params[:board]
 
-    # FavoredImageオブジェクト作成
-    # src_urlが重複していた場合はvalidationでfalseが返る
-    # Board名のリンクをクリックして呼ばれるので必ず対応するboardがあると仮定
+    # Create a FavoredImage object
+    # If src_url was duplicate, it returns false due to the validation
+    # This code assumes that parameters contain a board name
     board = current_user.image_boards.where(name: board_name).first
     favored_image = board.favored_images.build(
       artist: @image.artist,
@@ -56,12 +57,12 @@ class ImagesController < ApplicationController
       favored_image.tags << tag
     end
 
-    # save出来たらimageへの参照も追加
+    # Once it saves favored_image, add association to image
     if favored_image.save
       @image.favored_images << favored_image
     end
 
-    # format.jsの場合はpopoverをリロードするために'boards' templateを呼ぶ
+    # If request type is JS, call 'boards' template to reload the popover
     @clipped_board = board_name
     @board = ImageBoard.new
     @id = params[:html_id]
@@ -103,26 +104,21 @@ class ImagesController < ApplicationController
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")
       images = images.where.not(data_updated_at: nil)
+      images = filter_sort(images)
+
       @count = images.select('images.id').count.keys.count
+      @query = { q: { "tags_name_cont" => params[:q]['tags_name_cont'] }}
+
     # Single search
     else
       images = Image.search_images(params[:query])
+      images = filter_sort(images)
       @count = images.select('images.id').count
-    end
-
-    # Filter or sort images
-    images.reorder!('posted_at DESC') if params[:sort]
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
-      @count = images.select('images.id').count
+      @query = { query: params[:query] }
     end
 
     @disable_fotter = true
     @images = images.page(params[:page]).per(10)
-
-
-    render template: 'users/home'
   end
 
 
@@ -130,5 +126,17 @@ class ImagesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_image
       @image = Image.find(params[:id])
+    end
+
+    def filter_sort(images)
+      images.reorder!('posted_at DESC') if params[:sort]
+      if params[:date]
+        date = DateTime.parse(params[:date]).to_date
+        images = Image.filter_by_date(images, date)
+      end
+      if params[:site]
+        images = Image.filter_by_date(images, params[:site])
+      end
+      images
     end
 end

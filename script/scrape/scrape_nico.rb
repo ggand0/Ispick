@@ -86,7 +86,7 @@ module Scrape
           if image_id and (not user_id.nil?)
             #@logger.debug "scrape_nico: user=#{user_id}"
             @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
-            self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
+            self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false, user_id,
               target_word.class.name, target_word.id, @logger)
           end
 

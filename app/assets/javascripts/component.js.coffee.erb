@@ -1,6 +1,18 @@
 class @Component
   constructor: () ->
 
+  initCollapsables: () ->
+    console.log('test')
+    # Re-position images when collapse bar is torrigered
+    $('#filter-sort').on('hidden.bs.collapse', () ->
+      console.log('hidden')
+      window.scroll.changeDefHeights(false)
+    )
+    $('#filter-sort').on('shown.bs.collapse', () ->
+      console.log('shown')
+      window.scroll.changeDefHeights(true)
+    )
+
   # 'Clip'ボタンを押下した時にボタンを表示したままにする
   initButtons: () ->
     $(document).on('click', '.popover-board', () ->

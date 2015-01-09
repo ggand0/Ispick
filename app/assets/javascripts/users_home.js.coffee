@@ -27,6 +27,7 @@ $(document).on 'ready page:load', ->
   # Initialize infinite scroll
   window.scroll = new Scroll(logging)
   window.scroll.infiniteScroll()
+  window.component.initCollapsables()
 
   # Display the calender (Datepicker)
   window.component.initCalender()
@@ -35,5 +36,3 @@ $(document).on 'ready page:load', ->
   # Popovers: close popover on click wherever except popover windows
   window.component.initPopovers()
 
-#$(document).ready(ready)
-#$(document).on('page:load', ready)

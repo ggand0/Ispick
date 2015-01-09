@@ -3,6 +3,14 @@ require 'spec_helper'
 describe Image do
   let(:valid_attributes) { { "title" => "MyString" } }
 
+
+  describe "destroys image file and paperclip attachment before being destroyed" do
+    it "destroying" do
+      image = FactoryGirl.create(:image_file)
+    end
+  end
+
+
   describe "image_from_url" do
   	it "assigns argument as data" do
       image = Image.new valid_attributes
