@@ -13,7 +13,7 @@
 
 <%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
   <%= f.text_field :name, layout: :default, placeholder: 'Enter a board name', class: 'new_board_input' %>
-  <%= f.submit 'New board', class: "btn btn-primary" %>
+  <%= f.submit 'New board', class: "btn btn-info" %>
 <% end %>
 <br />
 
@@ -21,5 +21,5 @@
   <% boards = current_user.image_boards.map { |board| board.name } %>
 
   <%= f.select :board, boards, { label: "Choose a board:" }, { class: "selectpicker" } %>
-  <%= f.submit 'Clip this', class: "btn btn-primary" %>
+  <%= f.submit 'Clip this', class: "btn btn-info" %>
 <% end %>
