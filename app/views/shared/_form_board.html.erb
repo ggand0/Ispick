@@ -4,15 +4,16 @@
   - Using gem: https://github.com/bootstrap-ruby/rails-bootstrap-forms
 -->
 
-<div style="text-align: right; align:right;">
-  <!-- Putting this block directly inside the modal-content div seem to make the button unclickable -->
-  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-</div>
-<br />
-<div class="id"><%= image.id %></div>
+<!-- Putting this block directly inside the modal-content div seem to make the button unclickable -->
+<!--<div style="text-align: right; align:right;">
 
-<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board' do |f| %>
-  <%= f.text_field :name, layout: :default, placeholder: 'Enter a board name', class: 'new_board_input' %>
+  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+</div>-->
+
+<div class="id"><%= image.id %></div>
+<%= bootstrap_form_for image_board, remote: true, url: { controller: 'image_boards', action: 'create' , image: image.id, html_id: html }, class: 'new_board custom-search-form' do |f| %>
+
+  <%= f.text_field :name, layout: :default, placeholder: 'Create a new board', class: 'new_board_input', hide_label: :false %>
   <%= f.submit 'New board', class: "btn btn-info" %>
 <% end %>
 <br />
@@ -20,6 +21,11 @@
 <%= bootstrap_form_tag remote: true, url: { controller: 'images', action: 'favor', id: image.id, remote: true, html_id: html }, method: :put, class: 'new_board' do |f| %>
   <% boards = current_user.image_boards.map { |board| board.name } %>
 
-  <%= f.select :board, boards, { label: "Choose a board:" }, { class: "selectpicker" } %>
-  <%= f.submit 'Clip this', class: "btn btn-info" %>
+  <%= f.select :board, boards, { label: "Choose a board:", hide_label: :true  }, { class: "selectpicker" } %>
+  <%= f.submit 'Clip', class: "btn btn-info" %>
 <% end %>
+
+<br />
+
+
+

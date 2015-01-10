@@ -60,16 +60,23 @@ class ImagesController < ApplicationController
     # Once it saves favored_image, add association to image
     if favored_image.save
       @image.favored_images << favored_image
+
+      # If request type is JS, call 'boards' template to reload the popover
+      @clipped_board = board_name
+      @board = ImageBoard.new
+      @id = params[:html_id]
+      respond_to do |format|
+        format.html { redirect_to boards_users_path }
+        format.js { render partial: 'image_boards/after_clipped' }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to boards_users_path }
+        format.js { render partial: 'image_boards/clip_failed' }
+      end
     end
 
-    # If request type is JS, call 'boards' template to reload the popover
-    @clipped_board = board_name
-    @board = ImageBoard.new
-    @id = params[:html_id]
-    respond_to do |format|
-      format.html { redirect_to boards_users_path }
-      format.js { render partial: 'image_boards/after_clipped' }
-    end
+
   end
 
   # PUT hide
