@@ -12,7 +12,7 @@ module Scrape
     # Constructor.
     # @param logger [ActiveSupport::Logger]
     # @param limi [Integer] Maximum number of images to scrape
-    def initialize(logger=nil, limit=20)
+    def initialize(logger=nil, limit=200)
       self.limit = limit
       if logger.nil?
         self.logger = Logger.new('log/scrape_anipic_cron.log')
@@ -26,7 +26,7 @@ module Scrape
     # Scrape images from anipic RSS. The latter two params are used for testing.
     # @param [Integer] Given time for scraping[min]
     def scrape(interval=60)
-      @limit = 200
+      #@limit = 200
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
       result = scrape_RSS()
@@ -38,7 +38,7 @@ module Scrape
     # Scrape images using TargetWord records.
     # @param [Integer] Given time for scraping[min]
     def scrape_tag(interval=60)
-      @limit = 2000
+      #@limit = 2000
       @logger = Logger.new('log/scrape_anipic_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
       result = scrape_target_words('Scrape::Anipic', interval)
@@ -52,7 +52,7 @@ module Scrape
     def scrape_target_word(user_id, target_word, english=false)
       @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
 
-      result = scrape_using_api(target_word, user_id, true, false, english)
+      result = scrape_using_api(target_word, user_id, true, true, english)
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
     end
 
@@ -65,7 +65,7 @@ module Scrape
     # @param logging [Boolean] Whether it outputs logs or not
     # @param english [Boolean] Whether it's an English target_word or not
     # @return [Hash] Summary of scraping
-    def scrape_using_api(target_word, user_id=nil, validation=true, logging=false, english=false)
+    def scrape_using_api(target_word, user_id=nil, validation=true, logging=true, english=false)
       # Initialize query from target_word
       result_hash = Scrape.get_result_hash
       if english
@@ -77,6 +77,10 @@ module Scrape
         result_hash[:info] = 'query was nil or empty'
         return result_hash
       end
+      # =====================================================
+      #   Append 'single' keyword for creating better dataset
+      # =====================================================
+      query << ',single'
       @logger.info "query=#{query}"
 
       # Get search result page by Mechanize
@@ -137,7 +141,7 @@ module Scrape
 
         # Save the image to DB, getting info
         # image_data, tags, validation are essential for save
-        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+        options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
         tags = self.get_tags_original(xml)
         image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
@@ -146,7 +150,9 @@ module Scrape
         result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
         result_hash[:avg_time] += elapsed_time
-        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and res
+
+        # Writes a log line if successful
+        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
 
 
         # Finish if it's scraped @limit images
