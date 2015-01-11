@@ -45,7 +45,7 @@ class DownloadImage
         # ===================================
         unless user_id.nil?
           target = Object::const_get(target_type).find(target_id)
-          Deliver.deliver_image(user_id, target, image_id)
+          #Deliver.deliver_image(user_id, target, image_id)
         end
       end
     rescue => e
