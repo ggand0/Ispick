@@ -105,6 +105,12 @@ FactoryGirl.define do
     to_create do |instance|
       instance.save validate: false
     end
+
+    after(:create) do |image|
+      5.times do
+        image.tags << create(:tag)
+      end
+    end
   end
 
   factory :image_old, class: Image do

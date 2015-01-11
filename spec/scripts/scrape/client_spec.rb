@@ -4,8 +4,8 @@ require "#{Rails.root}/script/scrape/client"
 
 describe Scrape::Client do
   before do
-    #IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
+    #IO.any_instance.stub(:puts)
+    Resque.stub(:enqueue).and_return nil
     @client = Scrape::Client.new
     # Uncomment and edit this if you don't want to let it write logs
     #Rails.stub_chain(:logger, :debug).and_return(logger_mock)
@@ -97,6 +97,8 @@ describe Scrape::Client do
     end
   end
 
+
+=begin
   describe "check_photo method" do
     it "returns false if the image contains no irrelevant words" do
       image = FactoryGirl.create(:image_with_tags)
@@ -117,22 +119,6 @@ describe Scrape::Client do
   end
 
 
-  describe "is_banned method" do
-    it "returns true if the tags contain irrelevant words" do
-      image = FactoryGirl.create(:image_with_tags)
-      image.tags << Tag.new(name: 'R18')
-
-      expect(Scrape::Client.is_banned(image.tags)).to eq(true)
-    end
-
-    it "returns true if the tags contain irrelevant words" do
-      image = FactoryGirl.create(:image_with_tags)
-      image.tags << Tag.new(name: 'cosplay')
-
-      expect(Scrape::Client.is_banned(image.tags)).to eq(true)
-    end
-  end
-
   describe "is_photo method" do
     it "returns true if the tags contain irrelevant words" do
       puts Obscenity.config.inspect
@@ -151,6 +137,25 @@ describe Scrape::Client do
       expect(Scrape::Client.is_photo(image.tags)).to eq(false)
     end
   end
+=end
+
+  describe "is_banned method" do
+    it "returns true if the tags contain irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'R18')
+
+      expect(Scrape::Client.is_banned(image.tags)).to eq(true)
+    end
+
+    it "returns true if the tags contain irrelevant words" do
+      image = FactoryGirl.create(:image_with_tags)
+      image.tags << Tag.new(name: 'cosplay')
+
+      expect(Scrape::Client.is_banned(image.tags)).to eq(true)
+    end
+  end
+
+
 
 
   describe "save_image method" do
@@ -218,11 +223,11 @@ describe Scrape::Client do
       #expect(Scrape::Client).to receive(:generate_jobs)#.with(1, 'goo', false, 1, 'TargetWord', 1)
 
       #Resque.stub(:enqueue)
-      expect(Resque).to receive(:enqueue).with(DownloadImage, 1, 'goo', 1, 'TargetWord', 1)#.and_return nil
+      expect(Resque).to receive(:enqueue).with(DownloadImage, 1, 'Image', 'goo', 1, 'TargetWord', 1)#.and_return nil
       #expect(Resque).to receive(:enqueue)#.with(DownloadImage, 1, 'goo')
 
       puts 'test'
-      Scrape::Client.generate_jobs(1, 'goo', false, 1, 'TargetWord', 1)
+      Scrape::Client.generate_jobs(1, 'Image', 'goo', false, 1, 'TargetWord', 1)
     end
   end
 

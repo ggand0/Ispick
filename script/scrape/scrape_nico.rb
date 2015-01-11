@@ -159,10 +159,12 @@ module Scrape
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
     def self.get_client
       agent = Mechanize.new
-      agent.ssl_version = 'SSLv3'
+      #agent.ssl_version = 'SSLv3'
+      agent.ssl_version = :TLSv1
       agent.keep_alive = false
+      #agent.read_timeout = 180 # [sec]
       agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
-        'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
+        'mail' => CONFIG['nico_email'], 'password' => CONFIG['nico_password'])
       agent
     end
 

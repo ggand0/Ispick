@@ -51,26 +51,12 @@ describe UsersController do
     end
   end
 
-  describe "GET search" do
-    it "Search and render the right images" do
-      login_user
-      image1 = FactoryGirl.create(:image_with_tags)
-
-      get :search, { query: '鹿目まどか6', page: 1 }
-      response.should render_template('home')
-
-      # total count of images is 12, so at page 1, there must be six images
-      expect(assigns(:images).count).to eq(6)
-      #expect(assigns(:images).first).to eq(image1)
-    end
-  end
-
 
   describe "GET show_target_images" do
     it "renders show_target_images template when logged in" do
       login_user
       get :show_target_images, {}, valid_session
-      response.should render_template('debug/_show_target_images')
+      expect(response).to render_template('debug/_show_target_images')
     end
 
     it "renders not_signed_in template when NOT logged in" do
@@ -83,7 +69,7 @@ describe UsersController do
     it "renders 'preferences' template when logged in" do
       login_user
       get :preferences, {}, valid_session
-      response.should render_template('preferences')
+      expect(response).to render_template('preferences')
     end
 
     it "renders 'not_signed_in' template when NOT logged in" do
@@ -96,7 +82,7 @@ describe UsersController do
     it "renders show_target_images template when logged in" do
       login_user
       get :boards, {}, valid_session
-      response.should render_template('boards')
+      expect(response).to render_template('boards')
     end
 
     it "renders not_signed_in template when NOT logged in" do

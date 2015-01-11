@@ -14,7 +14,7 @@ describe DownloadImage do
       image = FactoryGirl.create(:image)
       Image.any_instance.should_receive(:save!)
 
-      DownloadImage.perform(image.id, @url)
+      DownloadImage.perform(image.id, 'Image', @url)
     end
 
     it "destroys the image when it has duplicate md5_checksum" do
@@ -24,10 +24,10 @@ describe DownloadImage do
       puts image1.inspect
       puts image2.inspect
       puts '================================='
-      DownloadImage.perform(image1.id, @url)
+      DownloadImage.perform(image1.id, 'Image', @url)
       puts image1.inspect
       Image.should_receive(:destroy)
-      DownloadImage.perform(image2.id, @url)
+      DownloadImage.perform(image2.id, 'Image', @url)
       puts image2.inspect
     end
 
@@ -39,7 +39,7 @@ describe DownloadImage do
       # error文と"Image download failed!"の２回
       expect(DownloadImage.logger).to receive(:error).exactly(1).times
 
-      DownloadImage.perform(image.id, @url)
+      DownloadImage.perform(image.id, 'Image', @url)
     end
   end
 
