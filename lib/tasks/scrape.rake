@@ -87,8 +87,8 @@ namespace :scrape do
     puts "Current image count: #{Image.count.to_s}"
   end
 
-  # @params limit [Integer] 最大保存数
   # 最大保存数を超えている場合、古いImageから順に画像ファイルだけを削除
+  # @param limit [Integer] Maximum save number
   desc "Delete images if its the count of all images exceeds the limit"
   task :delete_excess_image_files, [:limit] => :environment do |t, args|
     puts "Deleting excessed image's files..."
@@ -100,7 +100,7 @@ namespace :scrape do
     end
     puts "limit: #{limit.to_s}"
 
-    # 画像を持つレコードの数
+    # The number of records that have images
     before_count = Image.where.not(data_file_size:nil).count
     if before_count > limit
       delete_num = before_count - limit
@@ -114,7 +114,7 @@ namespace :scrape do
     puts "Number of images with not nil data: #{Image.where.not(data_file_size:nil).count}"
   end
 
-  desc "画像を対象webサイト全てから抽出する"
+  desc "Extract images from all target sites"
   task all: :environment do
     puts 'Scraping images from target websites...'
     Scrape.scrape_all
@@ -193,6 +193,27 @@ namespace :scrape do
     Scrape::Tags.scrape
   end
 
+  desc "Create TargetWord records for research"
+  task people0: :environment do
+    require 'csv'
+
+    csv_text = File.read "#{Rails.root}/db/seeds/people0.csv"
+    csv = CSV.parse(csv_text, :headers => true)
+    csv.each do |row|
+      Person.create!(row.to_hash)
+    end
+  end
+
+  desc "Create TargetWord records for research"
+  task hair_tags: :environment do
+    hair_styles = [
+      'side ponytail',
+      'twintails',
+    ]
+  end
+
+
+
 
   desc "ニコ静から画像抽出する"
   task :nico, [:interval] => :environment do |t, args|
@@ -236,11 +257,10 @@ namespace :scrape do
     Scrape::Anipic.new.scrape(interval.to_i)
   end
 
-  # Anime pictures and wallpapersから画像抽出する
-  desc "Scrape images from 'Anime pictures and wallpapers'"
+  desc "Scrape images from 'Anime pictures and wallpapers' using tags"
   task :anipic_tag, [:interval] => :environment do |t, args|
-    interval = args[:interval].nil? ? 240 : args[:interval]
-    Scrape::Anipic.new.scrape_tag(interval.to_i)
+    interval = args[:interval].nil? ? 120 : args[:interval]
+    Scrape::Anipic.new(nil, 2000).scrape_tag(interval.to_i)
   end
 
   # shushuから画像を抽出する
@@ -251,12 +271,16 @@ namespace :scrape do
   end
 
   # zerochanから画像を抽出する
-
   desc "Scrape images from 'zerochan'"
   task :zerochan, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Zerochan.new.scrape(interval.to_i)
   end
-=begin
-=end
+
+  desc "Scrape images from 'zerochan'"
+  task :zerochan_tag, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 120 : args[:interval]
+    Scrape::Zerochan.new(nil, 2000).scrape_tag(interval.to_i)
+  end
+
 end

@@ -8,7 +8,7 @@ module Scrape
   class Zerochan < Client
     ROOT_URL = 'http://www.zerochan.net/'
 
-    def initialize(logger=nil, limit=20)
+    def initialize(logger=nil, limit=100)
       self.limit = limit
       if logger.nil?
         self.logger = Logger.new('log/scrape_zerochan_cron.log')
@@ -18,18 +18,36 @@ module Scrape
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
     end
 
-    # 取得するPostの上限数。APIの仕様で20postsが限度
-    # Scrape images from zerochan. The latter two params are used for testing.
+
+    # Scrape images from zerochan by using RSS.
     # @param [Integer] min
-    # @param [Boolean] whether it's called for debug or not
-    # @param [Boolean] whether it's called for debug or not
     def scrape(interval=60)
-      @limit = 100
+      #@limit = 100
       @logger = Logger.new('log/scrape_zerochan_cron.log')
       @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-      #scrape_target_words('Scrape::Zerochan', interval)
       scrape_RSS()
     end
+
+    # Scrape images from zerochan by using the search form with TargetWord records.
+    # @param [Integer] min
+    def scrape_tag(interval=60)
+      #@limit = 2000
+      @logger = Logger.new('log/scrape_zerochan_cron.log')
+      @logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
+      scrape_target_words('Scrape::Zerochan', interval)
+    end
+
+    # Scrape images using TargetWord records.
+    # @param target_word [TargetWord]
+    def scrape_target_word(user_id, target_word, english=false)
+      @logger.info "Extracting #{@limit} images from: #{ROOT_URL}"
+
+      result = scrape_using_api(target_word, user_id, true, true, english)
+      @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, skipped: #{result[:skipped]}, avg_time: #{result[:avg_time]}"
+    end
+
+
+
 
     def self.get_agent
       agent = Mechanize.new
@@ -37,6 +55,119 @@ module Scrape
       agent.keep_alive = false
       agent
     end
+
+    # Get the result of search, using Mechanize.
+    # @param query [String] Query string
+    # @return [Mechanize] A Mechanize instance, initialized with a search result page
+    def get_search_result(query)
+      agent = Mechanize.new
+      agent.ssl_version = 'SSLv3'
+      agent.keep_alive = false
+      page = agent.get(ROOT_URL)
+
+      page.forms[0]['q'] = query
+      result = page.forms[0].submit
+
+      result
+    end
+
+
+    # Scrape images that have target tags.
+    # @param target_word [TargetWord] A TargetWord record.
+    # @param user_id [Integer] Not in use currently.
+    # @param validation [Boolean] Whether it validates values during saving
+    # @param logging [Boolean] Whether it outputs logs or not
+    # @param english [Boolean] Whether it's an English target_word or not
+    # @return [Hash] Summary of scraping
+    def scrape_using_api(target_word=nil, user_id=nil, validation=true, logging=true, english=false)
+      result_hash = Scrape.get_result_hash
+
+      # Get query string
+      if english
+        query = Scrape.get_query_en(target_word, 'english')
+      else
+        query = Scrape.get_query_en(target_word, '')
+      end
+      if query.nil? or query.empty?
+        result_hash[:info] = 'query was nil or empty'
+        return result_hash
+      end
+      # =====================================================
+      #   Append 'solo' keyword for creating better dataset
+      # =====================================================
+      query << ',solo'
+
+
+      # On zerochan 0th page and 1st page are the same.
+      page_num = 0
+      page = self.get_search_result(query)
+      url_base = page.uri.to_s
+
+
+      # Scrape images page by page
+      while page.search("div[id='content']").count != 0 && result_hash[:scraped] < @limit
+        page_num += 1
+        url = url_base + "?p=#{page_num}"  # Append a page num parameter to the base url
+        @logger.debug url
+        page = Nokogiri::HTML(open(url))    # Use Nokogiri from the second time
+
+        # Scrape images in a page and save them to the DB
+        result_hash = self.scrape_page(page, result_hash, target_word, user_id, validation, logging)
+      end
+    end
+
+
+    # Scrape images in a list page. Calls get_data method directly inside the method.
+    # @param page [Mechanize::Page]
+    # @param result_hash [Hash]
+    # @param user_id [Integer] Not in use currently.
+    # @param validation [Boolean] Whether it validates values during saving
+    # @param logging [Boolean] Whether it outputs logs or not
+    def scrape_page(page, result_hash, target_word, user_id, validation, logging)
+      page.search("div[id='content']").first.search("ul[id='thumbs2']").first.search("li").each do |item|
+        start = DateTime.now
+
+        id = item.search("a").first.attributes["href"].value.gsub("\/","")    # Get id of image
+        image_url = item.search("img").first.attribute("src").value         # Get URL of image
+        page_url = ROOT_URL + id.to_s                                       # Get URL of detail page
+        html = Nokogiri::HTML(open(page_url))#agent.get(page_url)                                          # Parse the detail page
+
+        # Get attributes of an image. If failed, move on to the next element.
+        tags = self.get_tags_original(html)
+        begin
+          image_data = self.get_data(html, id)
+        rescue => e
+          puts e.inspect
+          puts e.backtrace
+          @logger.error e.inspect
+          @logger.error e.backtrace
+          @logger.error "get_data method failed:"
+          @logger.error page_url
+          next
+        end
+        options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
+        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+
+        result_hash[:duplicates] += image_id ? 0 : 1
+        result_hash[:scraped] += 1 if image_id
+        elapsed_time = Time.now - start
+        result_hash[:avg_time] += elapsed_time
+        @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging
+
+        # Scrape images until it reaches @limit num
+        break if result_hash[:scraped] >= @limit
+
+        # ===================================================
+        #   Sleep 1 sec since we scrape a lot of images
+        # ===================================================
+        sleep(1)
+      end
+
+      result_hash
+    end
+
+
+
 
     def scrape_RSS(target_word=nil, user_id=nil, validation=true, logging=true, english=false)
       result_hash = Scrape.get_result_hash
@@ -118,16 +249,56 @@ module Scrape
       return result
     end
 
+    # Extract posted_at time string from a given html and convert it to a Time object.
+    # @param page [Nokogiri::HTML] The source page of an image
+    # @return [Time] The time when the image was posted at
+    def self.get_time(page)
+
+      begin
+        if page.search("div[id='content']").children[5].search('span').count == 1
+          # '1 week ago' or '5 days ago' style
+          # =========================================================
+          #<p>
+          #  Entry by <a href="/user/Sakuta+Baby">Sakuta Baby</a>
+          #  <span title="Mon Jan  5 08:36:12 2015">5 days ago</span>
+          #</p>
+          # =========================================================
+          time = Time.parse( page.search("div[id='content']").first.search("span")[0].attr('title') )
+        else
+          # Normal datetime style
+          # =========================================================
+          #<p>
+          #  Entry by <a href="/user/Artificial+Enemy">Artificial Enemy</a>
+          #    on Tue Aug 14 19:52:31 2012
+          #</p>
+          # =========================================================
+          tmp = page.search("div[id='content']").first.search('p')[0].content
+          time_string = tmp.match(/\son\s.*\d\d:\d\d:\d\d\s\d\d\d\d/).to_s.gsub(/\son\s/, '')
+          time = Time.parse(time_string)
+        end
+      rescue ArgumentError => e
+        # Rescue the case which the page doesn't have any time strings
+        # =========================================================
+        #<p>
+        #  Entry by <a href="/user/Hatsune_Miku_Lover">Hatsune_Miku_Lover</a>
+        #</p>
+        # =========================================================
+        time = nil
+      end
+
+      time
+    end
+
     # 画像１枚に関する情報をHashにして返す。
     # original_favorite_countの抽出にはVotesを利用
     # @param [Nokogiri::HTML]
     # @param [String]
     # @return [Hash]
     def get_data(page, id)
-      # titleの取得
       title = page.search("title").first.content
       caption = page.search("div[id='content']").first.search("h1").first.content
-      time = Time.parse( page.search("div[id='content']").first.search("span")[0].attr('title') )
+      #
+      time = self.class.get_time(page)
       src_url = page.search("div[id='large']").first.search("img").first.attr('src')
       original_url = page.search("div[id='large']").first.css("img").first.attr('src')
 
@@ -154,6 +325,9 @@ module Scrape
       return hash
     end
 
+
+
+=begin
     # Mechanizeにより検索結果を取得
     # @param [String]
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
@@ -169,6 +343,6 @@ module Scrape
 
       return result
     end
-
+=end
   end
 end

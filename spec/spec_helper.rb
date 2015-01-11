@@ -25,7 +25,7 @@ SimpleCov.command_name "RSpec"
 ENV["RAILS_ENV"] = 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
+
 require 'capybara'
 require 'capybara/rspec'
 require 'database_cleaner'
