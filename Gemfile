@@ -45,7 +45,7 @@ end
 gem 'puma'
 
 # Console
-gem 'rb-readline', require: false                   # rails consoleを起動するために必要
+gem 'rb-readline', require: false                   # Necessary to launch rails console
 
 
 # API clients
@@ -131,7 +131,7 @@ group :development, :test do
   # Utilities
   gem 'better_errors'                               # Improve error page
   gem 'binding_of_caller'
-  gem 'rails-erd'                                   # モデル関連図生成
+  gem 'rails-erd'                                   # Generates domain model diagram
   gem 'quiet_assets'                                # Turns off the Rails asset pipeline log
   gem 'diffy'
   gem 'spring'
@@ -146,13 +146,14 @@ group :development, :test do
 
 
   # RSpec
-  gem 'rspec-rails', '~> 3.0.0.beta1'#'~> 3.0'                    # Testing framework
+  gem 'rspec-rails', '~> 3.0.0.beta1'               # Testing framework
   #gem 'rspec-its'                                   # Provides the 'its' method
   gem 'rspec-activemodel-mocks'                     # Provides tools for testing ActiveModel classes
-  gem 'simplecov', :require => false                # カバレッジ測定
+  gem 'simplecov', :require => false                # Measure coverage
   gem 'simplecov-rcov', :require => false
-  gem 'fuubar'                                      # テスト進行状況可視化
+  gem 'fuubar'                                      # Visualise the process during running specs
   gem 'rake_shared_context'                         # Enable rake task testing
+  gem 'transpec'
 
   # Integration testing
   gem 'capybara'
@@ -172,7 +173,7 @@ group :development, :test do
   gem 'capistrano-rails'
   gem 'capistrano-rbenv', '~> 2.0'
   gem 'capistrano-bundler', '~> 1.1.2'
-  gem 'capistrano-ext'                              # 環境毎に設定を変更するためのgem
+  gem 'capistrano-ext'                              # A gem to change settings according to environments
   gem 'capistrano3-puma'
   gem 'capistrano-puma', require: false
 end
