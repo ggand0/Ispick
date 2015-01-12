@@ -1,5 +1,8 @@
+# ========================
+#  Not in use on 12/01/15
+# ========================
 class TargetFace
-  # Woeker起動時に指定するQUEUE名
+  # Set QUEUE name
   @queue = :target_face
 
   # @param [TargetImage] A record of TargetImage model which has already saved.
@@ -17,7 +20,7 @@ class TargetFace
       hash[tmp[1]] = tmp[0].to_f
     end
 
-    # 距離計算を速くするために、ラベルが無いkeyに0を設定
+    # To make it faster, set 0 to keys that have no labels
     (0..4095).each do |key|
       hash[key.to_s] = 0 if not hash.has_key?(key.to_s)
     end
@@ -30,7 +33,7 @@ class TargetFace
     target_image = TargetImage.find(target_id)
 
 =begin
-    # 顔の特徴量を抽出する
+    # Extract face features
     service = TargetImagesService.new
     face_feature = service.prefer(target_image)
     json_string = face_feature[:result].to_json
@@ -38,7 +41,7 @@ class TargetFace
     feature = Feature.new(face: json_string)
 =end
     puts json_string = self.get_categories(target_image).to_json
-    feature = Feature.new(categ_imagenet: json_string)
+    feature = Feature.new(convnet_feature: json_string)
     Feature.transaction do
       feature.save!
       TargetImage.transaction do
