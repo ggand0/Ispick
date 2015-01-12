@@ -5,15 +5,15 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:logger) { Logger.new('log/scrape_cron.log') }
   before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)
+    allow(Resque).to receive(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
   describe "scrape_all method" do
     it "runs all scraping script" do
       FactoryGirl.create(:target_word)
-      Scrape.stub(:scrape_keyword).and_return nil
-      Scrape.should_receive(:scrape_keyword).exactly(1).times
+      allow(Scrape).to receive(:scrape_keyword).and_return nil
+      expect(Scrape).to receive(:scrape_keyword).exactly(1).times
 
       Scrape.scrape_all
     end
@@ -22,11 +22,11 @@ describe Scrape do
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_min)
-      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i1').should eq(true)
+      expect(Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i1')).to eq(true)
     end
     it "should return false when arg url is NOT duplicate" do
       FactoryGirl.create(:image_min)
-      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
+      expect(Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i')).to eq(false)
     end
   end
 

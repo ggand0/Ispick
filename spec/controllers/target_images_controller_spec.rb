@@ -15,7 +15,7 @@ describe TargetImagesController do
 
   let(:user) { FactoryGirl.create(:user) }
   before do
-    Resque.stub(:enqueue).and_return nil
+    allow(Resque).to receive(:enqueue).and_return nil
     sign_in user
   end
 
@@ -94,14 +94,14 @@ describe TargetImagesController do
     describe "with invalid params" do
       it "assigns a newly created but unsaved target_image as @target_image" do
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         post :create, { target_image: { data: nil }}, valid_session
         expect(assigns(:target_image)).to be_a_new(TargetImage)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         post :create, { target_image: { data: nil }}, valid_session
         expect(response).to render_template("new")
       end
@@ -141,7 +141,7 @@ describe TargetImagesController do
       it "assigns the target_image as @target_image" do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
         expect(assigns(:target_image)).to eq(target_image)
       end
@@ -149,7 +149,7 @@ describe TargetImagesController do
       it "re-renders the 'edit' template" do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
         expect(response).to render_template("edit")
       end

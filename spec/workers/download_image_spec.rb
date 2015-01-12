@@ -12,7 +12,7 @@ describe DownloadImage do
   describe "perform method" do
     it "attaches image file to an image record" do
       image = FactoryGirl.create(:image)
-      Image.any_instance.should_receive(:save!)
+      expect_any_instance_of(Image).to receive(:save!)
 
       DownloadImage.perform(image.id, 'Image', @url)
     end
@@ -26,14 +26,14 @@ describe DownloadImage do
       puts '================================='
       DownloadImage.perform(image1.id, 'Image', @url)
       puts image1.inspect
-      Image.should_receive(:destroy)
+      expect(Image).to receive(:destroy)
       DownloadImage.perform(image2.id, 'Image', @url)
       puts image2.inspect
     end
 
     it "writes a line in the log when it crashes(but be rescued)" do
       image = FactoryGirl.create(:image)
-      Image.any_instance.stub(:image_from_url).and_raise
+      allow_any_instance_of(Image).to receive(:image_from_url).and_raise
 
       expect(DownloadImage.logger).to receive(:error).exactly(1).times
 

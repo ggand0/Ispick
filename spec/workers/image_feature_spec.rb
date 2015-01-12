@@ -39,8 +39,8 @@ describe ImageFace do
       count = Feature.count
       ImageFeature::perform(image.class.name, image.id)
 
-      Feature.count.should eq(count+1)
-      image.feature.should eq(Feature.first)
+      expect(Feature.count).to eq(count+1)
+      expect(image.feature).to eq(Feature.first)
     end
   end
 end

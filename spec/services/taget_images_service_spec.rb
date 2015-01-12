@@ -38,12 +38,12 @@ describe TargetImagesService do
 
       service = TargetImagesService.new
       result = service.get_preferred_images(target_image)
-      result.should be_a(Hash)
-      result[:images].should be_an(Array)
-      result[:target_colors].should be_a(Hash)
+      expect(result).to be_a(Hash)
+      expect(result[:images]).to be_an(Array)
+      expect(result[:target_colors]).to be_a(Hash)
 
       # check unique
-      result[:images].uniq.length.should eq(result[:images].length)
+      expect(result[:images].uniq.length).to eq(result[:images].length)
     end
 
     it "returns if target_image.feature is nil or '[]'" do
@@ -74,7 +74,7 @@ describe TargetImagesService do
         service = TargetImagesService.new
 
         result = service.get_preferred_images(target_image)
-        result[:images].length.should eq(1)
+        expect(result[:images].length).to eq(1)
       end
     end
 =begin
@@ -103,7 +103,7 @@ describe TargetImagesService do
 
         service = TargetImagesService.new
         result = service.get_preferred_images(target_image)
-        result[:images].length.should eq(1)
+        expect(result[:images].length).to eq(1)
       end
     end
   end

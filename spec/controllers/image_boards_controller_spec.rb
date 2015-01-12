@@ -123,7 +123,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
 
       it "re-renders the 'edit' template" do
         image_board = ImageBoard.create! valid_attributes
-        ImageBoard.any_instance.stub(:update).and_return nil
+        allow_any_instance_of(ImageBoard).to receive(:update).and_return nil
 
         put :update, {:id => image_board.to_param, :image_board => invalid_attributes}, valid_session
         expect(response).to render_template("edit")
