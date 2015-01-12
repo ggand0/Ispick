@@ -1,4 +1,4 @@
-# db/seeds/*.rb にマッチするファイルごとにタスクを定義する.
+# Define tasks per file that matchs db/seeds/*.rb.
 Dir.glob(File.join(Rails.root, 'db', 'seeds', '*.rb')).each do |file|
   desc "Load the seed data from db/seeds/#{File.basename(file)}."
   task "db:seed:#{File.basename(file).gsub(/\..+$/, '')}" => :environment do

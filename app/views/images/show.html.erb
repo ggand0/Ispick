@@ -1,11 +1,10 @@
-<!-- モーダル表示をせずに直接templateを描画する場合に使う。-->
 <%= javascript_include_tag 'users_home' %>
 <%= javascript_include_tag 'core' %>
 <%= stylesheet_link_tag 'users' %>
 <%= stylesheet_link_tag 'images_detail' %>
 <%= render 'shared/modal_board' %>
 
-<!-- モーダル表示で使用している。２つのpartial templateを描画する。 -->
+<!-- Render two partial templates -->
 <div class="detail-wrap">
   <%= render partial: 'shared/render_image', locals: { image: @image } %>
   <%= render partial: 'shared/show_image', locals: { image: @image } %>

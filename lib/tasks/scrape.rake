@@ -175,19 +175,19 @@ namespace :scrape do
   # =======================================
   #  Tasks to scrape on the specific sites
   # =======================================
-  desc "キャラクタに関する静的なDBを構築する"
+  desc "Constduct static DB related to characters"
   task wiki: :environment do
     puts 'Scraping character names...'
     Scrape::Wiki.scrape_all
   end
 
-  desc "キャラクタに関する静的なDBを構築する"
+  desc "Constduct static DB related to anime titles"
   task wiki_titles: :environment do
     puts 'Scraping anime titles...'
     Scrape::Wiki.scrape_titles
   end
 
-  desc "キャラクタ名をAnime-picturesから抽出する"
+  desc "Scrape characters name tags from Anime Pictures"
   task tags: :environment do
     puts 'Scraping character names from anime-pictures.net...'
     Scrape::Tags.scrape
@@ -213,44 +213,45 @@ namespace :scrape do
   end
 
 
-
-
-  desc "ニコ静から画像抽出する"
+  # =======================================
+  #   Tasks that scrape images from sites
+  # =======================================
+  desc "Scrape images from Nicoseiga"
   task :nico, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 120 : args[:interval]
     Scrape::Nico.new.scrape(interval.to_i)
   end
 
-  desc "ピアプロから画像抽出する"
+  desc "Scrape images from Piapro"
   task piapro: :environment do
     Scrape::Piapro.scrape
   end
 
-  desc "4chanから画像抽出する"
+  desc "Scrape images from 4chan"
   task fchan: :environment do
 
     Scrape::Fourchan.scrape
   end
 
-  desc "Tumblrから画像抽出する"
+  desc "Scrape images from Tumblr"
   task :tumblr, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Tumblr.new.scrape(interval.to_i)
   end
 
-  desc "deviantARTから画像抽出する"
+  desc "Scrape images from deviantART"
   task deviant: :environment do
     Scrape::Deviant.scrape
   end
 
-  # Giphyから画像抽出する
   desc "Scrape images from Giphy"
   task :giphy, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 720 : args[:interval]
     Scrape::Giphy.new.scrape(interval.to_i)
   end
 
-  # Anime pictures and wallpapersから画像抽出する
+
+  # Anime pictures and wallpapers
   desc "Scrape images from 'Anime pictures and wallpapers'"
   task :anipic, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
@@ -260,17 +261,17 @@ namespace :scrape do
   desc "Scrape images from 'Anime pictures and wallpapers' using tags"
   task :anipic_tag, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 120 : args[:interval]
-    Scrape::Anipic.new(nil, 2000).scrape_tag(interval.to_i)
+    Scrape::Anipic.new(nil, 1).scrape_tag(interval.to_i)
   end
 
-  # shushuから画像を抽出する
+  # E-shuushuu
   desc "Scrape images from 'Shushu'"
   task :shushu, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Shushu.new.scrape(interval.to_i)
   end
 
-  # zerochanから画像を抽出する
+  # Zerochan
   desc "Scrape images from 'zerochan'"
   task :zerochan, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]

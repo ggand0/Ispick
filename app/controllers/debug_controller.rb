@@ -1,15 +1,16 @@
+# ======================================================
+#   Debugging actions and routes. Full of dirty codes.
+# ======================================================
 class DebugController < ApplicationController
   include ApplicationHelper
   before_filter :set_search
   before_action :render_sign_in_page
   before_filter :authenticate
   before_action :set_image, only: [:favor_another, :show_debug]
-  #before_action :set_image_board, only: [:create_another]
-
-
 
   def index
   end
+
 
   # =======================
   #  Actions for debugging
@@ -43,7 +44,6 @@ class DebugController < ApplicationController
       images = Image.joins(:tags).
         where('tags.name' => queries).
         group("images.id").having("count(*)= #{queries.count}")
-      #images = images.where.not(data_updated_at: nil)
       @count = images.select('images.id').count.keys.count
     # Single search
     else
@@ -101,7 +101,6 @@ class DebugController < ApplicationController
 
   # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
-  # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     @images = current_user.image_boards.first.favored_images
     file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
@@ -266,13 +265,10 @@ class DebugController < ApplicationController
 
 
 
-  # ============================
+  # ========================
   #   Other debug methods
-  # ============================
-
-
+  # ========================
   # The page for debugging illust detection feature.
-  # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
     # Get images first
     if session[:all]
@@ -288,7 +284,7 @@ class DebugController < ApplicationController
     # Sort images if any requests exist.
     images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
     images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
-    @images = images.page(params[:page]).per(25)
+    @images = images
 
     render action: 'debug_illust_detection'
   end
@@ -403,7 +399,6 @@ class DebugController < ApplicationController
   end
 
   # Returns the session data for debugging.
-  # デバッグ用にsessionの情報を返す。
   # @return [Array] String array of session data
   def get_session_data
     [

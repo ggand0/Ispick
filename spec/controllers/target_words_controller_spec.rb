@@ -83,7 +83,6 @@ describe TargetWordsController do
         assigns(:target_word).should be_persisted
       end
 
-      # ユーザの登録ワード一覧ページへリダイレクトする事
       it "redirects to the list page of target_words" do
         person = FactoryGirl.create(:person)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session

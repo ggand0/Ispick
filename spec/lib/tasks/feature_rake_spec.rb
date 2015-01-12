@@ -10,7 +10,8 @@ describe "feature:reset_convnet" do
   it "calls valid methods" do
     FactoryGirl.create(:image)
 
-    expect(Resque).to receive(:enqueue)
+    puts Image.count
+    expect(Resque).to receive(:enqueue).at_least(:once)
     Rake::Task['feature:reset_convnet'].invoke
     #expect(Image.first.feature).not_to eq(nil)
   end

@@ -4,12 +4,11 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Deviant do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)
-    # resqueにenqueueしないように
-    Resque.stub(:enqueue).and_return nil
+    allow_any_instance_of(IO).to receive(:puts)             # Surpress console outputs
+    allow(Resque).to receive(:enqueue).and_return nil       # Prevent Resque.enqueue method from running
   end
 
-  # R18コンテンツを判定する関数について
+
   describe "is_adult method" do
     it "should return true with mature content" do
       url = 'http://ugly-ink.deviantart.com/art/HAPPY-HALLOWEEN-266750603'
@@ -49,7 +48,6 @@ describe Scrape::Deviant do
       Image.count.should eq(count)
     end
 
-    # 対象URLを開けなかったときログに書くこと
     it "should write a log when it fails to open the image page" do
       Rails.logger.should_receive(:info).with('Image model saving failed.')
       Scrape.should_not_receive(:save_image)
@@ -75,7 +73,7 @@ describe Scrape::Deviant do
       result = Scrape::Deviant.get_stats(page_url)
       expect(result).to be_a(Hash)
     end
-    # failしたらログに書く事
+
     it "writes a log when it fails to open the page" do
       Rails.logger.should_receive(:info).with('Could not open the page.')
 
