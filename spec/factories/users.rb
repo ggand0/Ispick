@@ -14,7 +14,9 @@ FactoryGirl.define do
 
       # Add all TargetSite
       Image::TARGET_SITES.each do |site|
-        user.target_sites << TargetSite.new(name: site)
+        target_site = (TargetSite.where(name: site).count == 0 ?
+          TargetSite.new(name: site) : TargetSite.where(name: site).first)
+        user.target_sites << target_site
       end
     end
   end
@@ -55,7 +57,9 @@ FactoryGirl.define do
 
         # Add all TargetSite
         Image::TARGET_SITES.each do |site|
-          user.target_sites << TargetSite.new(name: site)
+          target_site = (TargetSite.where(name: site).count == 0 ?
+            TargetSite.new(name: site) : TargetSite.where(name: site).first)
+          user.target_sites << target_site
         end
       end
     end
@@ -86,7 +90,7 @@ FactoryGirl.define do
       end
       after(:create) do |user, evaluator|
         5.times do
-          user.tags << create(:tag)
+          user.tags << create(:tag_with_image_file)
         end
       end
     end
@@ -96,7 +100,7 @@ FactoryGirl.define do
       uid '22345678'
       after(:create) do |user|
         1.times do
-          user.tags << create(:tag)
+          user.tags << create(:tag_with_images)
         end
       end
     end

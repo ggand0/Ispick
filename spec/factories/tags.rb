@@ -1,8 +1,10 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
+
+  # Creates a Tag that has sequenced name
   factory :tag do
-    sequence(:name) { |n| "鹿目まどか#{n}" } # 'Madoka Kaname'
+    sequence(:name) { |n| "鹿目まどか#{n}" } # 'Madoka Kaname' in Japanese
 
     # Creates a Tag object which is associated with images that don't have actual image files(only attributes).
     # The default images_count is 5.
@@ -30,7 +32,6 @@ FactoryGirl.define do
       end
     end
 
-
     factory :tag_with_image_dif_time do
       after(:create) do |tag|
         1.times do
@@ -47,7 +48,6 @@ FactoryGirl.define do
       end
     end
 
-
     # Creates a Tag object which is associated with a Person record
     factory :tag_with_person do
       ignore do
@@ -62,24 +62,16 @@ FactoryGirl.define do
 
 
 
-
+  # ======================================================
+  #  Factories for creating tags that have specific names
+  # ======================================================
   factory :tag_en, class: Tag do
     name 'Madoka Kaname'
   end
   factory :tag_title, class: Tag do
     name '魔法少女まどか☆マギカ'  # Puella Magi Madoka Magica
   end
-=begin
-  factory :tags, class: Tag do
-    sequence(:name) { |n| "鹿目まどか#{n}" } # Madoka Kaname
 
-    after(:create) do |tag|
-      5.times do
-        tag.images << create(:image)
-      end
-    end
-  end
-=end
 
   factory :tag_madoka, class: Tag do
     name 'Madoka Kaname'

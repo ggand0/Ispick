@@ -3,10 +3,10 @@
 FactoryGirl.define do
   factory :keyword_title, class: Keyword do
     is_alias false
-    name '魔法少女まどか☆マギカ'
+    name '魔法少女まどか☆マギカ'  # Puella Magi Madoka Magica in Japanese
   end
   factory :keyword_alias, class: Keyword do
     is_alias false
-    name 'かなめ まどか'
+    name 'かなめ まどか'  # Madoka Kaname in Japanese hiragana
   end
 end

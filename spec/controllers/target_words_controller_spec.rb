@@ -32,7 +32,7 @@ describe TargetWordsController do
   let(:user) { FactoryGirl.create(:user) }
   before do
     sign_in user
-    Resque.stub(:enqueue).and_return nil
+    allow(Resque).to receive(:enqueue).and_return nil       # Prevent Resque.enqueue method from running
   end
 
   describe "GET index" do

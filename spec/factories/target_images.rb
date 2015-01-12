@@ -6,17 +6,18 @@ FactoryGirl.define do
   factory :target_image, class: TargetImage do
     data { fixture_file_upload('spec/fixtures/files/madoka0.jpg', 'image/jpg') }
 
-    # save時にvalidationをスキップする
+    # Skip validation when saving
     to_create do |instance|
       instance.save validate: false
     end
 
-    factory :image_with_delivered_images do
-      ignore do
-        images_count 5
-      end
-      after(:create) do |target_image, evaluator|
-        create_list(:delivered_image_with_targetable, evaluator.images_count, targetable: target_image)
+
+    # =====================================
+    #  TargetImage factories with features
+    # =====================================
+    factory :target_image_f1, class: TargetImage do
+      after(:create) do |target_image|
+        target_image.feature = create(:feature_test1)
       end
     end
   end
