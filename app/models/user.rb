@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+  DEFAULT_DISPLAY_NUM = 10
+
+
   # Set this variabale true during testing to skip all callbacks.
   cattr_accessor :skip_callbacks
 
@@ -40,8 +43,6 @@ class User < ActiveRecord::Base
   # callbacks and validations
   after_create :create_default
   validates :name, presence: true
-
-
 
   # ==================
   #  Instance methods

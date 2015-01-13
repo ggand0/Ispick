@@ -38,7 +38,6 @@ describe TargetImagesController do
       it "assigns the face-feature json as @face_feature" do
         FactoryGirl.create(:feature_test1)
         target_image = TargetImage.first
-        #target_image = FactoryGirl.create(:target_image_f1)
 
         get :show, {id: target_image.to_param}, valid_session
         expect(assigns(:target_image).feature.face).to eq('[{"zero value": 0}]')

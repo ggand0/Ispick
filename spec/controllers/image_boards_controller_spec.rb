@@ -25,12 +25,10 @@ RSpec.describe ImageBoardsController, :type => :controller do
   # adjust the attributes here as well.
   let(:valid_attributes) {
     { name: 'valid attribute' }
-    #{ 'name'=>'valid attribute' }
   }
 
   let(:invalid_attributes) {
     { name: 'invalid attribute' }
-    #{ 'name'=>'invalid attribute' }
   }
 
   # This should return the minimal set of values that should be in the session
@@ -69,7 +67,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
     end
   end
 
-  # AJAX経由でのみ呼ばれると想定
+  # Assumes it's called only via AJAX
   describe "POST create" do
     before do
       login_user

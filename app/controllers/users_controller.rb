@@ -62,7 +62,7 @@ class UsersController < ApplicationController
 
     images = images.where("site_name IN (?)", convert_sites(current_user.target_sites))
 
-    @images = images.page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(current_user.display_num)
     @count = images.select('images.id').count
     @disable_fotter = true
   end
@@ -95,7 +95,7 @@ class UsersController < ApplicationController
     images.reorder!('original_favorite_count DESC') if params[:fav]
     images.uniq!
 
-    @images = images.page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(current_user.display_num)
     @count = images.select('images.id').count
     @disable_fotter = true
   end
@@ -250,7 +250,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :language, :language_preferences)
+    params.require(:user).permit(:name, :pagination, :display_num, :language, :language_preferences)
   end
 
   def validate_authorization_for_user
