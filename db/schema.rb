@@ -9,9 +9,9 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended that you check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system
 
-ActiveRecord::Schema.define(version: 20141214034129) do
+ActiveRecord::Schema.define(version: 20150103065355) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 20141214034129) do
 
   create_table "features", force: true do |t|
     t.text     "face"
-    t.text     "convnet_feature"
+    t.text     "convnet_feature", limit: 2147483647
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -152,6 +152,11 @@ ActiveRecord::Schema.define(version: 20141214034129) do
   add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
   add_index "images_tags", ["tag_id"], name: "index_images_tags_on_tag_id", using: :btree
 
+  create_table "images_target_images", force: true do |t|
+    t.integer "image_id",        null: false
+    t.integer "target_image_id", null: false
+  end
+
   create_table "images_target_words", force: true do |t|
     t.integer "image_id",       null: false
     t.integer "target_word_id", null: false
@@ -208,6 +213,39 @@ ActiveRecord::Schema.define(version: 20141214034129) do
 
   add_index "people_titles", ["person_id", "title_id"], name: "index_people_titles_on_person_id_and_title_id", using: :btree
 
+  create_table "photos", force: true do |t|
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.boolean  "is_illust"
+    t.float    "quality"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.string   "md5_checksum"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.string   "module_name"
+    t.integer  "views"
+    t.integer  "favorites"
+    t.datetime "posted_at"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "artist"
+    t.text     "original_url"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+  end
+
+  create_table "photos_tags", force: true do |t|
+    t.integer "photo_id", null: false
+    t.integer "tag_id",   null: false
+  end
+
   create_table "tags", force: true do |t|
     t.string   "name"
     t.integer  "image_id"
@@ -234,6 +272,20 @@ ActiveRecord::Schema.define(version: 20141214034129) do
     t.boolean  "enabled"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "images_count",      default: 0, null: false
+    t.integer  "width"
+    t.integer  "height"
+  end
+
+  create_table "target_sites", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "target_sites_users", force: true do |t|
+    t.integer "target_site_id", null: false
+    t.integer "user_id",        null: false
   end
 
   create_table "target_words", force: true do |t|

@@ -34,7 +34,7 @@ describe ImagesController do
     it "assigns all images as @images" do
       image = Image.create! valid_attributes
       get :index, {}, valid_session
-      assigns(:images).should eq([image])
+      expect(assigns(:images)).to eq([image])
     end
   end
 
@@ -42,7 +42,7 @@ describe ImagesController do
     it "assigns the requested image as @image" do
       image = Image.create! valid_attributes
       get :show, {id: image.to_param}, valid_session
-      assigns(:image).should eq(image)
+      expect(assigns(:image)).to eq(image)
     end
   end
 
@@ -57,12 +57,13 @@ describe ImagesController do
     it "redirects to the images list" do
       image = Image.create! valid_attributes
       delete :destroy, {:id => image.to_param}, valid_session
-      response.should redirect_to(images_url)
+      expect(response).to redirect_to(images_url)
     end
   end
 
 
 
+  # Adds images to ImageBoard objects
   describe "PUT favor" do
     before do
       login_user
@@ -96,6 +97,21 @@ describe ImagesController do
       }, valid_session
 
       expect(response).to redirect_to boards_users_path
+    end
+  end
+
+
+  describe "GET search" do
+    it "Search and render the right images" do
+      #image1 = FactoryGirl.create(:image_with_tags)
+      image1 = FactoryGirl.create(:image_file)
+
+      get :search, { query: '鹿目まどか1', page: 1 }
+      expect(response).to render_template('search')
+
+      # total count of images is 12, so at page 1, there must be six images
+      expect(assigns(:images).count).to eq(1)
+      expect(assigns(:images).first).to eq(image1)
     end
   end
 

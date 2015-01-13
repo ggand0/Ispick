@@ -1,23 +1,23 @@
 #-*- coding: utf-8 -*-
+# ========================
+#  Not in use on 12/01/15
+# ========================
 class DownloadImageLarge
-  # Woeker起動時に指定するQUEUE名
+  # Set QUEUE name
   @queue = :download_image_large
 
-  # 画像をDLする
+  # Download image from the web
   def self.perform(image_type, image_id, src_url)
     image = Object::const_get(image_type).find(image_id)
 
     begin
-      # 画像ダウンロード
+      # Download image
       image.image_from_url src_url
 
-      # DeliveredImageの場合はそのままイラスト判定へ
-      # Imageオブジェクトの場合、全く同一のファイルを持つレコードが既にDBに存在すれば削除する
       if image.kind_of? Image and Image.where(md5_checksum: image.md5_checksum).count > 0
         Image.destroy(image_id)
         puts "Destroyed duplicates : #{image_type}/#{image_id} (large)"
       else
-        # それ以外(含Image)はmd5_checksumを保存した後イラスト判定処理を行う
         image.save!
         Resque.enqueue(DetectIllust, image_type, image.id)
       end

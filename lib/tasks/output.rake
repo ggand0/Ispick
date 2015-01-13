@@ -1,9 +1,8 @@
 # encoding: utf-8
 require "#{Rails.root}/script/output_csv.rb"
 
-
 namespace :output do
-  # 指定したソースのImage情報及びFavoredImageのcsvデータを出力
+  # Export csv data of specified Image and FavoredImage
   desc "Output Image and Boards data"
   task :csv, [:src]=> :environment  do |t,args|
     puts 'output CSV...'

@@ -9,7 +9,7 @@ describe "images/show" do
       page_url: 'http://goo.gl/8icNI9',
       original_url: 'http://goo.gl/4b7UUc',
     ))
-    view.stub(:pinit_button).and_return image.page_url
+    allow(view).to receive(:pinit_button).and_return image.page_url
   end
 
   it "renders attributes in <p>" do

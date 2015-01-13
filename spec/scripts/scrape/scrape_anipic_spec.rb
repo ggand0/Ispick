@@ -3,20 +3,26 @@ require "#{Rails.root}/script/scrape/scrape"
 require "#{Rails.root}/script/scrape/scrape_anipic"
 
 describe Scrape::Anipic do
+  # TODO: Use fixture so to test codes without network connection
   let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'anipic_rss.html')) }
+
   before do
-    #IO.any_instance.stub(:puts)             # Surpress console outputs
-    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
+    #IO.any_instance.stub(:puts)                           # Surpress console outputs
+    allow(Resque).to receive(:enqueue).and_return nil     # Prevent Resque.enqueue method from running
     @client = Scrape::Anipic.new(nil, 5)
-    #@response = JSON.parse(response)['response']
     @logger = Logger.new('log/scrape_anipic_cron.log')
+    #@response = JSON.parse(response)['response']
   end
 
+
+  # =================
+  #    Main methods
+  # =================
   describe "scrape method" do
     it "calls scrape_target_words function" do
       FactoryGirl.create(:person_madoka)
-      @client.stub(:scrape_target_words).and_return nil
-      expect(@client).to receive(:scrape_target_words)
+      allow(@client).to receive(:scrape_RSS).and_return nil
+      expect(@client).to receive(:scrape_RSS)
 
       @client.scrape(60)
     end
@@ -26,18 +32,39 @@ describe Scrape::Anipic do
     it "calls valid methods" do
       target_word = FactoryGirl.create(:target_word)
       query = 'Kaname Madoka'
-      result = @client.get_search_result(query)
-      expect(@client).to receive(:get_search_result).exactly(1).times.
-        and_return(result)
-      expect(@client).to receive(:get_data).at_least(1).times.
-        and_return({})
-      expect(Scrape::Client).to receive(:save_image).at_least(1).times
+
+      #result = @client.get_search_result(query)
+      #expect(@client).to receive(:get_search_result).exactly(1).times.and_return(result)
+      #expect(@client).to receive(:get_data).at_least(1).times.and_return({})
+      #expect(Scrape::Client).to receive(:save_image).at_least(1).times
+      allow(@client).to receive(:scrape_page).and_return nil
 
       result_hash = @client.scrape_using_api(target_word)
       puts result_hash.inspect
     end
   end
 
+  describe "scrape_page method" do
+    it "sleep 1 sec after scraping" do
+      page = @client.get_search_result('Kaname Madoka')
+      url = page.uri.to_s
+      page = Nokogiri::HTML(open(url))
+      result_hash = Scrape.get_result_hash
+
+      allow(@client).to receive(:sleep).and_return 1
+      allow(@client).to receive(:get_data)
+      allow(Scrape::Client).to receive(:save_image).and_return(1)
+      expect(@client).to receive(:sleep)
+
+      result = @client.scrape_page(page, result_hash, nil, nil, nil, nil)
+    end
+  end
+
+
+
+  # =================
+  #   Utility methods
+  # =================
   describe "is_range method" do
     it "returns true when target's in range" do
       target =  Date.today

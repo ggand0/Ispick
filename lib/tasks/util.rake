@@ -109,6 +109,49 @@ namespace :util do
     end
   end
 
+  desc "Delete all Tumblr images"
+  task delete_tumblr: :environment do
+    Image.destroy_all(site_name: 'tumblr')
+
+    puts "DONE!"
+  end
+
+  desc "Delete tags that aren't associated with any images"
+  task delete_tags: :environment do
+    count = 0
+    Tag.all.each do |tag|
+      if tag.images.count == 0
+        tag.destroy
+        puts "Deleted: #{tag.id}"
+        count += 1
+      end
+    end
+
+    puts "Number of tags destroyed: #{count}"
+  end
+
+  desc "Reset counter cache of tags table"
+  task reset_tag_counter: :environment do
+    count = 0
+    Tag.all.each_with_index do |tag, count|
+      Tag.reset_counters(tag.id, :images)
+      puts "#{count} / #{Tag.count}" if count % 1000 == 0
+    end
+    puts "counter cache reset has been completed!"
+  end
+
+  desc "Reset counter cache of tags table"
+  task delete_tag_counter: :environment do
+    # =================================================================
+    #  Make sure you've already run the "util:reset_tag_counter" task!
+    # =================================================================
+    count = 0
+    Tag.destroy_all(images_count: 0)
+    puts "DONE!"
+  end
+
+
+
   task :test => :environment do
     puts "debugging something..."
     Person.all.each do |person|

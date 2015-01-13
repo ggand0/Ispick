@@ -21,7 +21,7 @@ describe AuthorizationsController do
     it "redirects to the authorizations list" do
       authorization = FactoryGirl.create(:authorization)
       delete :destroy, {:id => authorization.to_param}, valid_session
-      response.should redirect_to(settings_users_path)
+      expect(response).to redirect_to(settings_users_path)
     end
   end
 

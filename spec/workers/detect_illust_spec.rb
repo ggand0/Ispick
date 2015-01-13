@@ -5,7 +5,7 @@ describe DetectIllust do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image) }
 
   before do
-    IO.any_instance.stub(:puts)
+    allow_any_instance_of(IO).to receive(:puts)             # Suppress console outputs
   end
 
   describe "get_result method" do
@@ -13,8 +13,7 @@ describe DetectIllust do
       tool_path = CONFIG['illust_detection_path']
       image = Image.create! valid_attributes
 
-      DetectIllust.should_receive(:`).once.with("#{tool_path} #{image.data.path} #{DetectIllust::QUALITY_SIZE}")
-
+      expect(DetectIllust).to receive(:`).once.with("#{tool_path} #{image.data.path} #{DetectIllust::QUALITY_SIZE}")
       DetectIllust.get_result(tool_path, image)
     end
 
@@ -31,7 +30,7 @@ describe DetectIllust do
   describe "perform method" do
     it "updates 'is_illust' column with true when result is '1'" do
       image = Image.create! valid_attributes
-      DetectIllust.stub(:get_result).and_return('1')
+      allow(DetectIllust).to receive(:get_result).and_return('1')
 
       detect = DetectIllust.new
       DetectIllust::perform(image.id)
@@ -41,7 +40,7 @@ describe DetectIllust do
 
     it "updates 'is_illust' column with false when result is '0'" do
       image = Image.create! valid_attributes
-      DetectIllust.stub(:get_result).and_return('0')
+      allow(DetectIllust).to receive(:get_result).and_return('0')
 
       detect = DetectIllust.new
       DetectIllust::perform( image.id)
@@ -51,7 +50,7 @@ describe DetectIllust do
 
     it "updates 'is_illust' column with false when fails to get valid result" do
       image = Image.create! valid_attributes
-      DetectIllust.stub(:get_result).and_return('invalid return value')
+      allow(DetectIllust).to receive(:get_result).and_return('invalid return value')
 
       detect = DetectIllust.new
       DetectIllust::perform(image.id)
@@ -61,7 +60,7 @@ describe DetectIllust do
 
     it "writes a log when it crashes" do
       image = FactoryGirl.create(:image)
-      DetectIllust.stub(:get_result).and_raise
+      allow(DetectIllust).to receive(:get_result).and_raise
       expect(DetectIllust.logger).to receive(:error).exactly(1).times
 
       DetectIllust.perform(image.id)

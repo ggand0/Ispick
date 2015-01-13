@@ -7,7 +7,7 @@ include Scrape::Wiki::GameCharacter
 
 describe "Scrape::Wiki::GameCharacter" do
   before do
-    IO.any_instance.stub(:puts)
+    allow_any_instance_of(IO).to receive(:puts)
   end
 
   describe "get_game_character_name function" do

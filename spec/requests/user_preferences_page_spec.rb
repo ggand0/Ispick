@@ -3,13 +3,14 @@ require 'spec_helper'
 describe "Preferences page", :js => true do
   before do
     @user = FactoryGirl.create(:twitter_user)
+    @tag = '鹿目まどか1'#'Madoka Kaname1'
     FactoryGirl.create(:user_with_tags)
     visit root_path
     mock_auth_hash
     click_link 'Continue with Twitter'
     visit preferences_users_path
+
     #save_and_open_page
-    @tag = '鹿目まどか1'#'Madoka Kaname1'
   end
 
   it "sees popular tags" do
@@ -26,12 +27,7 @@ describe "Preferences page", :js => true do
     click_link @tag
     wait_for_ajax
 
-    #within '.followed-tags' do
-    #  find('a', text: @tag).click
-    #end
-
-    # TODO: Seed a tag with images
-    expect(page).to have_content('Found 0 images.')
+    expect(page).to have_xpath("//a/img[@alt='Madoka0']/..")
   end
 
   it "removes a followed tag" do
@@ -47,6 +43,5 @@ describe "Preferences page", :js => true do
   end
 
   it "searches a tag with a keyword" do
-
   end
 end

@@ -4,8 +4,8 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Pixiv do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return nil # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)
+    allow(Resque).to receive(:enqueue).and_return nil # resqueにenqueueしないように
   end
 
   describe "get_contents method" do
@@ -16,14 +16,14 @@ describe Scrape::Pixiv do
       lines = result.split("\n")
 
       Scrape::Pixiv.get_contents(lines[0])
-      Image.count.should eq(count+1)
+      expect(Image.count).to eq(count+1)
     end
   end
 
   describe "scrape method" do
     it "should call get_contents method at least 1 time" do
-      Scrape::Pixiv.stub(:get_contents).and_return nil
-      Scrape::Pixiv.should_receive(:get_contents).at_least(20).times
+      allow(Scrape::Pixiv).to receive(:get_contents).and_return nil
+      expect(Scrape::Pixiv).to receive(:get_contents).at_least(20).times
 
       Scrape::Pixiv.scrape
     end

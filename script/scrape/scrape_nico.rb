@@ -222,7 +222,7 @@ module Scrape
           if image_id and (not user_id.nil?)
             #@logger.debug "scrape_nico: user=#{user_id}"
             @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
-            self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
+            self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false, user_id,
               target_word.class.name, target_word.id, @logger)
           end
 
@@ -323,11 +323,14 @@ module Scrape
     # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
     def self.get_client
       agent = Mechanize.new
-      # ssl_versionを変えると上手くいかない？@2015/1/9
+      
       #agent.ssl_version = 'SSLv3'
+      agent.ssl_version = :TLSv1
+
       agent.keep_alive = false
+      #agent.read_timeout = 180 # [sec]
       agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
-        'mail' => CONFIG['nico_email'],'password' => CONFIG['nico_password'])
+        'mail' => CONFIG['nico_email'], 'password' => CONFIG['nico_password'])
       agent
     end
 

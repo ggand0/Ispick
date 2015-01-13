@@ -5,12 +5,9 @@
   <%= strip_tags(image.title) %>
 </div>
 
-
 <div class="image-buttons">
-
   <div class="image-share">
     <div class="share-button">
-      <%# tweet_button(count: 'none') %>
       <style type="text/css" media="screen">#custom-tweet-button a {display: block; padding: 32px 0px 0px 32px; background: url("<%= asset_path('icons/twitter_32.png') %>") no-repeat; border: 0px; }</style>
       <div id="custom-tweet-button">
         <a href="https://twitter.com/share?text=your text&url=<%= image.page_url %>" target="_blank"/>
@@ -27,14 +24,12 @@
       <script src="http://platform.tumblr.com/v1/share.js"></script>
       <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:32px; height:32px; background:url(<%= asset_path('icons/tumblr_32.png') %>) top left no-repeat transparent;"></a>
     </div>
-
     <div class="share-button">
       <%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
       class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" if current_user %>
     </div>
   </div>
 </div>
-<%# render_like_button(image, 'btn') %>
 <br />
 <hr>
 
@@ -60,15 +55,16 @@
 
     <dt>Created At:</dt>
     <dd><%= "#{image.created_at}" %></dd>
-  </dl>
 
+    <dt>Favorites: </dt>
+    <dd><%= image.original_favorite_count %></dd>
+  </dl>
 
   <%= tags_glyphicon %>
   <% image.tags.each do |tag| %>
     <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
   <% end %>
 </div>
-
 
 
 <!-- Insert space -->

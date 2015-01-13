@@ -15,7 +15,7 @@ describe TargetImagesController do
 
   let(:user) { FactoryGirl.create(:user) }
   before do
-    Resque.stub(:enqueue).and_return nil
+    allow(Resque).to receive(:enqueue).and_return nil
     sign_in user
   end
 
@@ -23,7 +23,7 @@ describe TargetImagesController do
     it "assigns all target_images as @target_images" do
       target_image = FactoryGirl.create(:target_image_nofile)
       get :index, {}, valid_session
-      assigns(:target_images).should eq([target_image])
+      expect(assigns(:target_images)).to eq([target_image])
     end
   end
 
@@ -31,16 +31,17 @@ describe TargetImagesController do
     it "assigns the requested target_image as @target_image" do
       target_image = FactoryGirl.create(:target_image_nofile)
       get :show, {id: target_image.to_param}, valid_session
-      assigns(:target_image).should eq(target_image)
+      expect(assigns(:target_image)).to eq(target_image)
     end
 
     describe "with an already extracted model" do
       it "assigns the face-feature json as @face_feature" do
         FactoryGirl.create(:feature_test1)
         target_image = TargetImage.first
+        #target_image = FactoryGirl.create(:target_image_f1)
 
         get :show, {id: target_image.to_param}, valid_session
-        assigns(:target_image).feature.face.should eq('[{"zero value": 0}]')
+        expect(assigns(:target_image).feature.face).to eq('[{"zero value": 0}]')
       end
     end
 
@@ -57,7 +58,7 @@ describe TargetImagesController do
   describe "GET new" do
     it "assigns a new target_image as @target_image" do
       get :new, {}, valid_session
-      assigns(:target_image).should be_a_new(TargetImage)
+      expect(assigns(:target_image)).to be_a_new(TargetImage)
     end
   end
 
@@ -65,7 +66,7 @@ describe TargetImagesController do
     it "assigns the requested target_image as @target_image" do
       target_image = TargetImage.create! valid_attributes
       get :edit, {id: target_image.to_param}, valid_session
-      assigns(:target_image).should eq(target_image)
+      expect(assigns(:target_image)).to eq(target_image)
     end
   end
 
@@ -80,29 +81,29 @@ describe TargetImagesController do
       it "assigns a newly created target_image as @target_image" do
         post :create, {target_image: valid_attributes}, valid_session
 
-        assigns(:target_image).should be_a(TargetImage)
-        assigns(:target_image).should be_persisted
+        expect(assigns(:target_image)).to be_a(TargetImage)
+        expect(assigns(:target_image)).to be_persisted
       end
 
       it "redirects to the created target_image" do
         post :create, {target_image: valid_attributes}, valid_session
-        response.should redirect_to('/users/show_target_images')
+        expect(response).to redirect_to('/users/show_target_images')
       end
     end
 
     describe "with invalid params" do
       it "assigns a newly created but unsaved target_image as @target_image" do
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         post :create, { target_image: { data: nil }}, valid_session
-        assigns(:target_image).should be_a_new(TargetImage)
+        expect(assigns(:target_image)).to be_a_new(TargetImage)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         post :create, { target_image: { data: nil }}, valid_session
-        response.should render_template("new")
+        expect(response).to render_template("new")
       end
     end
   end
@@ -116,8 +117,8 @@ describe TargetImagesController do
       it "updates the requested target_image" do
         target_image = TargetImage.create! valid_attributes
 
-        # mocha gemとrspecが競合してany_instanceが動かないため、
-        # TargetImage.any_instanceではなくexpect_any_instance_ofを使う
+        # mocha gem gets conflicted with rspec, and that makes any_instance keyword not working,
+        # Use expect_any_instance_of instead of TargetImage.any_instance
         expect_any_instance_of(TargetImage).to receive(:update).with(@updated_attributes)
         put :update, { id: target_image.id, target_image: @updated_attributes }, valid_session
       end
@@ -125,14 +126,14 @@ describe TargetImagesController do
       it "assigns the requested target_image as @target_image" do
         target_image = TargetImage.create! valid_attributes
         put :update, {:id => target_image.to_param, :target_image => valid_attributes}, valid_session
-        assigns(:target_image).should eq(target_image)
+        expect(assigns(:target_image)).to eq(target_image)
       end
 
       it "redirects to the target_image" do
         target_image = TargetImage.create! valid_attributes
         put :update, {:id => target_image.to_param, :target_image => valid_attributes}, valid_session
 
-        response.should redirect_to('/users/show_target_images')
+        expect(response).to redirect_to('/users/show_target_images')
       end
     end
 
@@ -140,17 +141,17 @@ describe TargetImagesController do
       it "assigns the target_image as @target_image" do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
-        assigns(:target_image).should eq(target_image)
+        expect(assigns(:target_image)).to eq(target_image)
       end
 
       it "re-renders the 'edit' template" do
         target_image = TargetImage.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetImage.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetImage).to receive(:save).and_return(false)
         put :update, {:id => target_image.to_param, :target_image => { data: nil }}, valid_session
-        response.should render_template("edit")
+        expect(response).to render_template("edit")
       end
     end
   end
@@ -166,12 +167,13 @@ describe TargetImagesController do
     it "redirects to the target_images list" do
       target_image = FactoryGirl.create(:target_image_nofile)
       delete :destroy, {:id => target_image.to_param}, valid_session
-      response.should redirect_to(show_target_images_users_path)
+      expect(response).to redirect_to(show_target_images_users_path)
     end
   end
 
 
-
+# Currently not in use
+=begin
   describe "GET prefer" do
     describe "with valid face feature" do
       it "returns preferred images array" do
@@ -180,62 +182,52 @@ describe TargetImagesController do
 
         target_image = TargetImage.first
         get :prefer, {id: target_image.id}, valid_session
-        assigns(:preferred).should be_an(Array)
+        expect(assigns(:preferred)).to be_an(Array)
       end
 
       it "renders the 'prefer' template" do
         face_feature = FactoryGirl.create(:feature_madoka)
 
         get :prefer, {id: face_feature.featurable_id}, valid_session
-        response.should render_template('prefer')
+        expect(response).to render_template('prefer')
       end
 
       describe "with resemble image" do
-        # 似てる画像を正しく判定する
+        # Detect similar images properly
         it "returns proper preferred images array" do
           face_feature = FactoryGirl.create(:feature_madoka)
-          FactoryGirl.create(:feature_madoka1)# 似てる
-          FactoryGirl.create(:feature_madoka2)# 似てない
-          FactoryGirl.create(:feature_test2)  # 抽出出来てない
-          FactoryGirl.create(:image)          # 抽出してない
+          FactoryGirl.create(:feature_madoka1)# Similar
+          FactoryGirl.create(:feature_madoka2)# Not similar
+          FactoryGirl.create(:feature_test2)  # Couldn't extract
+          FactoryGirl.create(:image)          # Not extracted
 
           get :prefer, {id: face_feature.featurable_id}, valid_session
-          assigns(:preferred).count.should eq(1)
+          expect(assigns(:preferred).count).to eq(1)
         end
       end
     end
 
 
     describe "with invalid face feature" do
-      # feature.face is []の時
+      # When feature.face is []
       it "should redirects index when face length is zero" do
         face_feature = FactoryGirl.create(:feature_test2)
 
-        # TargetImage.preferを呼ぶ
         get :prefer, {id: face_feature.featurable_id}, valid_session
-        assigns(:message).should eq('Could not get face feature from this image. 抽出できませんでした。')
+        expect(assigns(:message)).to eq('Could not get face feature from this image.')
       end
 
-      # feature is nilの時
+      # When feature is nil
       it "should redirects index when feature is nil" do
         target_image = FactoryGirl.create(:target_image_nofile)
 
         get :prefer, {id: target_image.id}, valid_session
-        assigns(:message).should eq('Not extracted yet. まだ抽出されていません。')
+        expect(assigns(:message)).to eq('Not extracted yet.')
       end
     end
 
   end
-
-
-  describe "show_delivered action" do
-    it "assigns delivered_images" do
-      #target_image = FactoryGirl.create(:image_with_delivered_images, images_count: 5)
-      #get :show_delivered, { id: target_image.to_param }, valid_session
-
-      #expect(assigns(:delivered_images).count).to eq(target_image.delivered_images.count)
-    end
-  end
+=end
 
   describe "switch action" do
     before(:each) do

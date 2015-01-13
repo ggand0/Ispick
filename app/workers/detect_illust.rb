@@ -3,25 +3,25 @@ class DetectIllust
   @queue = :detect_illust
   QUALITY_SIZE = 1
 
-  # イラスト判定ツールを実行し結果を得る
+  # Execute illust detection tool, and get the result
   def self.get_result(tool_path, image)
     %x(#{tool_path} #{image.data.path} #{QUALITY_SIZE})
   end
 
-  # イラストかどうか判定する
+  # Detect illustrations and artworks
   def self.perform(image_id)
     begin
-      # ツール実行
+      # Execute the tool
       image = Image.find(image_id)
       tool_path = CONFIG['illust_detection_path']
 
-      # 結果をtrue/falseにparse
+      # Parse the result
       result = self.get_result(tool_path, image).split(' ')
       illust = result.first.to_i
       quality = result.second.to_f
       is_illust = (illust == 1 ? true : false)
 
-      # 対象attributeをupdate
+      # Update the attributes
       image.update_attributes({ is_illust: is_illust, quality: quality })
     rescue => e
       logger.info e

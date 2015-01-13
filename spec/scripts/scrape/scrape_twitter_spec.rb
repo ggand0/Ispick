@@ -4,8 +4,8 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Twitter do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    IO.any_instance.stub(:puts)           # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)           # コンソールに出力しないようにしておく
+    allow(Resque).to receive(:enqueue).and_return nil  # resqueにenqueueしないように
 
     @client = Scrape::Twitter.new(nil, 10)
     @twitter_client = Scrape::Twitter.get_client
@@ -14,7 +14,7 @@ describe Scrape::Twitter do
   describe "scrape function" do
     it "calls scrape_using_api function when targetable is enabled" do
       FactoryGirl.create(:person_madoka)
-      @client.stub(:scrape_target_words).and_return nil
+      allow(@client).to receive(:scrape_target_words).and_return nil
       expect(@client).to receive(:scrape_target_words)
 
       @client.scrape(60)
@@ -26,8 +26,8 @@ describe Scrape::Twitter do
 
     it "calls scrape_using_api function" do
       target_word = FactoryGirl.create(:word_with_person)
-      @client.should_receive(:scrape_using_api)
-      @client.stub(:scrape_using_api).and_return(function_response)
+      expect(@client).to receive(:scrape_using_api)
+      allow(@client).to receive(:scrape_using_api).and_return(function_response)
 
       @client.scrape_target_word(1, target_word)
     end
@@ -39,29 +39,29 @@ describe Scrape::Twitter do
     end
 
     it "calls proper methods" do
-      Scrape::Twitter.stub(:get_contents).and_return nil
-      Scrape::Twitter.any_instance.should_receive(:get_contents).exactly(1).times
+      allow(Scrape::Twitter).to receive(:get_contents).and_return nil
+      expect_any_instance_of(Scrape::Twitter).to receive(:get_contents).exactly(1).times
 
       @client.scrape_using_api(@target_word)
     end
 
     it "rescues exceptions" do
-      Scrape::Twitter.stub(:get_contents).and_raise Twitter::Error::ClientError
+      allow(Scrape::Twitter).to receive(:get_contents).and_raise Twitter::Error::ClientError
 
       @client.scrape_using_api(@target_word)
     end
 
     it "rescues TooManyRequest exception" do
-      Twitter::RateLimit.any_instance.stub(:reset_in).and_return(300)
+      allow_any_instance_of(Twitter::RateLimit).to receive(:reset_in).and_return(300)
       #Scrape::Twitter.any_instance.stub(:get_contents) {
-      @client.stub(:get_contents) {
+      allow(@client).to receive(:get_contents) {
         #Scrape::Twitter.unstub(:get_contents); raise Twitter::Error::TooManyRequests
-        @client.unstub(:get_contents); raise Twitter::Error::TooManyRequests
+        allow(@client).to receive(:get_contents).and_call_original; raise Twitter::Error::TooManyRequests
       }
 
       #Scrape::Twitter.any_instance.should_receive(:get_contents).exactly(2).times
-      @client.should_receive(:get_contents).exactly(2).times
-      Scrape::Twitter.any_instance.should_receive(:sleep).with(300)
+      expect(@client).to receive(:get_contents).exactly(2).times
+      expect_any_instance_of(Scrape::Twitter).to receive(:sleep).with(300)
 
       @client.scrape_using_api(@target_word)
     end
@@ -72,8 +72,8 @@ describe Scrape::Twitter do
       target_word = FactoryGirl.create(:word_with_person)
       query = Scrape.get_query(target_word)
       result = @twitter_client.search("#{query} -rt", locale: 'ja', result_type: 'recent', include_entity: true)
-      Twitter::REST::Client.any_instance.stub(:search).and_return(result)
-      Twitter::REST::Client.any_instance.should_receive(:search)
+      allow_any_instance_of(Twitter::REST::Client).to receive(:search).and_return(result)
+      expect_any_instance_of(Twitter::REST::Client).to receive(:search)
 
       result_hash = @client.get_contents(target_word)
       expect(result_hash).to be_a(Hash)
@@ -98,18 +98,18 @@ describe Scrape::Twitter do
     it "returns image_data array" do
       # 仮のデータをstubを利用してreturnする
       # FactoryGirlを使用して書き換えても良い
-      Twitter::Tweet.any_instance.stub(:media?).and_return(true)
-      Twitter::Tweet.any_instance.stub(:text).and_return(
+      allow_any_instance_of(Twitter::Tweet).to receive(:media?).and_return(true)
+      allow_any_instance_of(Twitter::Tweet).to receive(:text).and_return(
         '大佐、会議室でよく使うハンドサイン発見しました☆パァ'
       )
-      Twitter::Tweet.any_instance.stub(:url).and_return(
+      allow_any_instance_of(Twitter::Tweet).to receive(:url).and_return(
         'https://twitter.com/wycejezevix/status/454783931636670464'
       )
-      Twitter::Tweet.any_instance.stub(:retweet_count).and_return(0)
-      Twitter::Tweet.any_instance.stub(:favorite_count).and_return(0)
-      Twitter::Tweet.any_instance.stub(:created_at).and_return(DateTime.now)
-      Twitter::Tweet.any_instance.stub(:media).and_return([Twitter::Media::Photo.new({id:1})])
-      Twitter::Media::Photo.any_instance.stub(:media_uri).and_return('src_url_of_media.png')
+      allow_any_instance_of(Twitter::Tweet).to receive(:retweet_count).and_return(0)
+      allow_any_instance_of(Twitter::Tweet).to receive(:favorite_count).and_return(0)
+      allow_any_instance_of(Twitter::Tweet).to receive(:created_at).and_return(DateTime.now)
+      allow_any_instance_of(Twitter::Tweet).to receive(:media).and_return([Twitter::Media::Photo.new({id:1})])
+      allow_any_instance_of(Twitter::Media::Photo).to receive(:media_uri).and_return('src_url_of_media.png')
       image_data = Scrape::Twitter.get_data(@tweet)
 
       expect(image_data).to be_an(Array)

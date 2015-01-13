@@ -8,8 +8,8 @@ describe Scrape::Giphy do
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
 
   before do
-    IO.any_instance.stub(:puts)             # コンソールに出力しないようにしておく
-    Resque.stub(:enqueue).and_return nil    # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)             # コンソールに出力しないようにしておく
+    allow(Resque).to receive(:enqueue).and_return nil    # resqueにenqueueしないように
     #@response = JSON.parse(response)['response']
 
     @giphy_client = Scrape::Giphy.get_client
@@ -19,7 +19,7 @@ describe Scrape::Giphy do
   describe "scrape method" do
     it "calls scrape_target_words function" do
       FactoryGirl.create(:person_madoka)
-      @client.stub(:scrape_target_words).and_return nil
+      allow(@client).to receive(:scrape_target_words).and_return nil
       expect(@client).to receive(:scrape_target_words)
 
       @client.scrape(60)
@@ -33,14 +33,14 @@ describe Scrape::Giphy do
       target_word = FactoryGirl.create(:word_with_person)
 
       expect(@client).to receive(:scrape_using_api).with(target_word, 1, true)
-      @client.stub(:scrape_using_api).and_return(function_response)
+      allow(@client).to receive(:scrape_using_api).and_return(function_response)
       @client.scrape_target_word(1, target_word)
     end
   end
 
   describe "scrape_using_api function" do
     it "calls proper functions" do
-      Giphy.stub(:search).and_return([])#::Client.any_instance
+      allow(Giphy).to receive(:search).and_return([])#::Client.any_instance
 
       # get_data functionをmockすると何故かcallされなくなるので、save_imageのみ見る
       #Scrape::Giphy.should_receive(:get_data).exactly(5).times
@@ -65,7 +65,7 @@ describe Scrape::Giphy do
   describe "get_client function" do
     it "returns Giphy client" do
       client = Scrape::Giphy.get_client
-      client.class.should eq(Class)
+      expect(client.class).to eq(Class)
     end
   end
 
