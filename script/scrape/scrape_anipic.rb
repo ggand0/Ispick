@@ -66,8 +66,11 @@ module Scrape
     # @param english [Boolean] Whether it's an English target_word or not
     # @return [Hash] Summary of scraping
     def scrape_using_api(target_word, user_id=nil, validation=true, logging=true, english=false)
+      @logger.debug "IN scrape_using_api"
       # Initialize query from target_word
       result_hash = Scrape.get_result_hash
+      @logger.info "target_word=#{target_word.name}"
+      @logger.info "limit=#{@limit}"
       if english
         query = Scrape.get_query_en(target_word, 'roman')
       else
@@ -81,6 +84,7 @@ module Scrape
       #   Append 'single' keyword for creating better dataset
       # =====================================================
       query << ',single'
+      @count = 0
       @logger.info "query=#{query}"
 
       # Get search result page by Mechanize
@@ -89,7 +93,7 @@ module Scrape
       url = page.uri.to_s
 
       # Actually scrape images page by page
-      while page.search("span[class='img_block_big']").count != 0 and result_hash[:scraped] < @limit
+      while page.search("span[class='img_block_big']").count != 0 and @count < @limit
         page_num += 1
 
         # Get URL of the next page
@@ -117,6 +121,8 @@ module Scrape
       # Based on the tag search result.
       # In case of anime-pictures, there are 80 images per page.
       page.search("span[class='img_block_big']").each_with_index do |image, count|
+        @count += 1
+
         # Skip R18 or advertisement images
         if image.children.search('img').first.nil?
           result_hash[:skipped] += 1
@@ -156,7 +162,8 @@ module Scrape
 
 
         # Finish if it's scraped @limit images
-        break if (count+1 - result_hash[:skipped]) >= @limit
+        #break if (count+1 - result_hash[:skipped]) >= @limit
+        break if @count >= @limit
 
         # ===================================================
         #   Sleep 1 sec since we scrape a lot of images
