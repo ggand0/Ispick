@@ -58,7 +58,7 @@ module Scrape
 
     # Get the result of search, using Mechanize.
     # @param query [String] Query string
-    # @return [Mechanize] A Mechanize instance, initialized with a search result page
+    # @return [Mechanize::Page] A Mechanize::Page instance, initialized with a search result page
     def get_search_result(query)
       agent = Mechanize.new
       agent.ssl_version = 'SSLv3'
@@ -100,12 +100,13 @@ module Scrape
 
       # On zerochan 0th page and 1st page are the same.
       page_num = 0
+      @count = 0
       page = self.get_search_result(query)
       url_base = page.uri.to_s
 
 
       # Scrape images page by page
-      while page.search("div[id='content']").count != 0 && result_hash[:scraped] < @limit
+      while page.search("div[id='content']").count != 0 and @count < @limit
         page_num += 1
         url = url_base + "?p=#{page_num}"  # Append a page num parameter to the base url
         @logger.debug url
@@ -114,6 +115,7 @@ module Scrape
         # Scrape images in a page and save them to the DB
         result_hash = self.scrape_page(page, result_hash, target_word, user_id, validation, logging)
       end
+      result_hash
     end
 
 
@@ -125,6 +127,7 @@ module Scrape
     # @param logging [Boolean] Whether it outputs logs or not
     def scrape_page(page, result_hash, target_word, user_id, validation, logging)
       page.search("div[id='content']").first.search("ul[id='thumbs2']").first.search("li").each do |item|
+        @count += 1
         start = DateTime.now
 
         id = item.search("a").first.attributes["href"].value.gsub("\/","")    # Get id of image
@@ -155,7 +158,7 @@ module Scrape
         @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging
 
         # Scrape images until it reaches @limit num
-        break if result_hash[:scraped] >= @limit
+        break if @count >= @limit
 
         # ===================================================
         #   Sleep 1 sec since we scrape a lot of images

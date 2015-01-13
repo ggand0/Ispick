@@ -18,8 +18,8 @@ describe DebugController do
   describe "GET download_recent_images" do
     it "downloads recent images" do
       login_user
-      controller.stub(:render).and_return nil
-      controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
+      allow(controller).to receive(:render).and_return nil
+      expect(controller).to receive(:send_file)
       get :download_images_n, {}
     end
 
@@ -32,19 +32,17 @@ describe DebugController do
   describe "GET download_tag" do
     it "downloads recent images" do
       login_user
-      controller.stub(:render).and_return nil
-      controller.should_receive(:send_file)
+      allow(controller).to receive(:render).and_return nil
+      expect(controller).to receive(:send_file)
       get :download_images_tag, {}
     end
   end
 
-
-  # An action for debug
   describe "GET debug_illust_detection" do
     it "renders valid template" do
       login_user
-      get :debug_illust_detection, {}, valid_session
-      response.should render_template('debug_illust_detection')
+      get :debug_illust_detection, {}
+      expect(response).to render_template('debug_illust_detection')
     end
   end
 

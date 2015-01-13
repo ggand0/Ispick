@@ -4,7 +4,7 @@ require 'rake'
 
 describe "util rake tasks" do
   before do
-    IO.any_instance.stub(:puts)
+    allow_any_instance_of(IO).to receive(:puts)
     Ispick::Application.load_tasks
   end
 
@@ -28,6 +28,6 @@ describe "util rake tasks" do
     image.save!
 
     Rake::Task['util:delete_banned'].invoke
-    Image.count.should eq(9)
+    expect(Image.count).to eq(9)
   end
 end

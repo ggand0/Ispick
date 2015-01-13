@@ -9,7 +9,6 @@ module Scrape
     ROOT_URL = ''
 
     # Initializes a new Client object
-    #
     # @param limit [Integer]
     # @param logger [Logger]
     # @return [Scrape::Client]
@@ -22,13 +21,6 @@ module Scrape
         self.logger = logger
       end
       self.logger.formatter = ActiveSupport::Logger::SimpleFormatter.new
-    end
-
-    # Print debugging info
-    def _print
-      require 'objspace'
-      @logger.debug "count_objects:#{ObjectSpace.count_objects}" #=> {:TOTAL=>55298, :FREE=>10289, :T_OBJECT=>3371, ...}
-      @logger.debug "memsize_of_all:#{ObjectSpace.memsize_of_all}" # Display all memory usage in bytes
     end
 
 
@@ -44,6 +36,7 @@ module Scrape
         raise Exception.new('the interval argument must be more than 10!')
         return
       end
+
       reserved_time = 10
       local_interval = (interval-reserved_time) / (TargetWord.count*1.0)
       @logger.info '--------------------------------------------------'
@@ -57,32 +50,28 @@ module Scrape
       # Scrape images tag by tag with text tag search API
       count = 0
       target_word = TargetWord.first
+
       while (count < TargetWord.count) do
         begin
-          crawl_target_word(module_type, target_word)
+          # Actually start crawling with target_word
+          crawl_target_word(target_word)
         rescue => e
+          # Writes logs and send an email manually
           @logger.info e.inspect
           @logger.info e.backtrace
           logger.error "Scraping from #{self.class::ROOT_URL} has failed!"
-
-          # Send an email manually
-          if Rails.env.production?
-            send_error_mail(e, module_type, target_word)
-          end
+          send_error_mail(e, module_type, target_word) if Rails.env.production?
         end
 
         begin
-          # nextメソッドを使用してtarget_wordの次にidの若いレコードを取得
           # Using next method, get the second youngest record next to target_word record
           target_word = target_word.next
           count+=1
-
 
           # Sleep for calculated time
           # Convert minutes to seconds
           sleep_time = local_interval*60
           logger.info "Sleeping #{local_interval} minutes."
-          #logger.debug "#{count},#{TargetWord.count}"
           if count == TargetWord.count
             logger.info "Reached the last TargetWord record. Exiting..."
             break
@@ -98,26 +87,20 @@ module Scrape
       @logger.info '--------------------------------------------------'
     end
 
-    def crawl_target_word(module_type, target_word)
+
+    # Crawl images with a TargetWord reccord.
+    # @param target_word [TargetWord] A TargetWord record to crawl with.
+    def crawl_target_word(target_word)
       # Do an API request based on paramters, and get the result
-      if (not target_word.name.nil?) and (not target_word.name.empty?)
-        @logger.debug "target_word_id: #{target_word.id}"
+      #if (not target_word.name.nil?) and (not target_word.name.empty?)
 
-        # Execute with default parameters
-        result = scrape_using_api(target_word)
-        puts result.inspect
-        @logger.info Scrape.get_result_string(result)
+      # Execute with default parameters
+      result = scrape_using_api(target_word)
+      @logger.info Scrape.get_result_string(result)
+      puts result.inspect
 
-        # If it's an English site, also search with English name
-        if module_type == 'Scrape::Tumblr' or module_type == 'Scrape::Anipic'
-          # Call with english=true
-          result = scrape_using_api(target_word, nil, true, false, true)
-          @logger.info Scrape.get_result_string(result)
-        end
-
-        target_word.crawl_count += 1
-        target_word.save!
-      end
+      target_word.crawl_count += 1
+      target_word.save!
     end
 
 
@@ -155,6 +138,13 @@ module Scrape
         @logger.debug p.pid
         @logger.debug p.pidpath
       end
+    end
+
+    # Print debugging info
+    def _print
+      require 'objspace'
+      @logger.debug "count_objects:#{ObjectSpace.count_objects}" #=> {:TOTAL=>55298, :FREE=>10289, :T_OBJECT=>3371, ...}
+      @logger.debug "memsize_of_all:#{ObjectSpace.memsize_of_all}" # Display all memory usage in bytes
     end
 
     # Returns true if the tags contain adult words

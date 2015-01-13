@@ -33,7 +33,7 @@ class TargetImagesController < ApplicationController
 
     respond_to do |format|
       if @target_image.save
-        # 特徴抽出処理をresqueで非同期的に行う
+        # Execute face feature extraction process asynchronously via Resque
         #Resque.enqueue(TargetFace, @target_image.id)
         Resque.enqueue(ImageFeature, 'TargetImage', @target_image.id)
 
@@ -91,14 +91,15 @@ class TargetImagesController < ApplicationController
   end
 
 
-  # 顔の特徴量をもとに、髪・目の色が似てる画像一覧を表示する
+  # Display images that have similar hair/eyes color based on face features
   # GET /target_images/1/prefer
   def prefer
     @preferred = []
     @message = ''
     target_image = TargetImage.find(params[:id])
 
-    # 正しい特徴値が無い場合はindexにredirectする。この後の処理は行いたくないのでreturn。
+    # If there are no correc features, redirect to index.
+    # Return explicitly to skip the latter process.
     if target_image.feature == nil
       return @message = 'Not extracted yet.'
     elsif target_image.feature.face == '[]'

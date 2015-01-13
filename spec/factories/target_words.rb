@@ -3,7 +3,7 @@
 FactoryGirl.define do
 
   factory :target_word do
-    sequence(:name) { |n| "鹿目まどか#{n}" }
+    sequence(:name) { |n| "鹿目まどか#{n}" } # Madoka Kaname
     sequence(:name_english) { |n| "Madoka Kaname#{n}" }
     after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     after(:create) do |target_word|
@@ -15,8 +15,6 @@ FactoryGirl.define do
       after(:create) { |user| user.send(:search_keyword) }
     end
 
-
-    # images(no file)を持つTargetWordオブジェクト
     # A TargetWord object with images that have no files
     factory :word_with_images do
       ignore do
@@ -30,7 +28,6 @@ FactoryGirl.define do
       after(:build) { |target_word| target_word.class.skip_callback(:create, :after, :search_keyword) }
     end
 
-    # image(with file)を持つTargetWord
     # A TargetWord object with images that have files
     factory :word_with_image_file do
       ignore do
@@ -75,11 +72,11 @@ FactoryGirl.define do
 
   # A TagetWord object which is associated with a Title record
   factory :target_word_title, class: TargetWord do
-    name '魔法少女まどか☆マギカ'
+    name '魔法少女まどか☆マギカ'  # Puella Magi Madoka Magica
   end
 
   factory :target_words, class: TargetWord do
-    sequence(:name) { |n| "鹿目 まどか#{n}" }
+    sequence(:name) { |n| "鹿目 まどか#{n}" }  # Madoka Kaname
     sequence(:name_english) { |n| "Madoka Kaname#{n}" }
     after(:create) do |target_word|
       5.times do

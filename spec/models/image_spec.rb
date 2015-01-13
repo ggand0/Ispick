@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Image do
   let(:valid_attributes) { { "title" => "MyString" } }
 
+  before do
+    allow_any_instance_of(IO).to receive(:puts)             # Suppress console outputs
+  end
+
 
   describe "destroys image file and paperclip attachment before being destroyed" do
     it "destroying" do
@@ -10,13 +14,12 @@ describe Image do
     end
   end
 
-
   describe "image_from_url" do
   	it "assigns argument as data" do
       image = Image.new valid_attributes
       url = 'http://goo.gl/4b7UUc'
       image.image_from_url(url)
-      image.data.should_not be_nil
+      expect(image.data).not_to be_nil
     end
 
     it "save an image with extension" do
@@ -48,7 +51,6 @@ describe Image do
     it "returns a valid string" do
       image = FactoryGirl.create(:image_file)
       result = image.get_title
-      puts result
 
       expect(result).to be_a(String)
       expect(result).to eq('madoka.jpg')
@@ -59,7 +61,6 @@ describe Image do
     it "writes image names to a file" do
       images = FactoryGirl.create_list(:image_file, 2)
       result = Image.create_list_file(images)
-      puts result.inspect
       expect(result).to be_a(Tempfile)
     end
   end
@@ -76,7 +77,6 @@ describe Image do
       ]
 
       result = Image.create_list_file_train_val(image_array)
-      puts result.inspect
       expect(result[0]).to be_a(Tempfile)
       expect(result[1]).to be_a(Tempfile)
 
@@ -92,8 +92,6 @@ describe Image do
 
   describe "search_images method" do
     it "returns a valid image relation" do
-      #FactoryGirl.create(:tag_with_images, images_count: 5)
-
       # Note that search_images exclude image records without actual file
       FactoryGirl.create(:tag_with_image_file, images_count: 5)
       #puts Image.first.tags.first.name
@@ -112,7 +110,6 @@ describe Image do
       FactoryGirl.create(:image_madoka_single)
 
       images = Image.search_images_tags(['Madoka Kaname', 'single'], 'and')
-      puts images.inspect
       expect(images.count).to eq(1)
     end
   end
@@ -128,7 +125,6 @@ describe Image do
       i2 = FactoryGirl.create(:image_sayaka_single)
 
       result = Image.search_images_custom
-      puts result
       expect(result.count).to eq(2)
     end
 
@@ -186,7 +182,6 @@ describe Image do
 
   describe "sort_by_quality method" do
     it "returns proper relation object" do
-
     end
   end
 

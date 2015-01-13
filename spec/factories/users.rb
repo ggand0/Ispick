@@ -11,6 +11,13 @@ FactoryGirl.define do
     after(:create) do |user|
       1.times { create(:favored_image_file, image_board: user.image_boards.first) }
       user.authorizations << create(:authorization)
+
+      # Add all TargetSite
+      Image::TARGET_SITES.each do |site|
+        target_site = (TargetSite.where(name: site).count == 0 ?
+          TargetSite.new(name: site) : TargetSite.where(name: site).first)
+        user.target_sites << target_site
+      end
     end
   end
 
@@ -47,6 +54,13 @@ FactoryGirl.define do
         user.image_boards << create(:image_board_min)
         user.authorizations << create(:authorization)
         user.authorizations << create(:authorization_tumblr)
+
+        # Add all TargetSite
+        Image::TARGET_SITES.each do |site|
+          target_site = (TargetSite.where(name: site).count == 0 ?
+            TargetSite.new(name: site) : TargetSite.where(name: site).first)
+          user.target_sites << target_site
+        end
       end
     end
 
@@ -64,9 +78,10 @@ FactoryGirl.define do
     end
 
 
-    # ==============================
-    #  Users with tags only
-    # ==============================
+    # ========================================================
+    #  Creates User objects which already followed some tags
+    #  (Associated with some Tag records).
+    # =======================================================
     factory :user_with_tags do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       uid '22345678'
@@ -75,7 +90,7 @@ FactoryGirl.define do
       end
       after(:create) do |user, evaluator|
         5.times do
-          user.tags << create(:tags)
+          user.tags << create(:tag_with_image_file)
         end
       end
     end
@@ -85,7 +100,7 @@ FactoryGirl.define do
       uid '22345678'
       after(:create) do |user|
         1.times do
-          user.tags << create(:tags)
+          user.tags << create(:tag_with_images)
         end
       end
     end
@@ -112,8 +127,10 @@ FactoryGirl.define do
         images_count 1
       end
       after(:create) do |user, evaluator|
-        1.times do
-          user.tags << create(:tag_with_image_file, images_count: evaluator.images_count)
+        evaluator.images_count.times do
+          #user.tags << create(:tag_with_image_file, images_count: evaluator.images_count)
+          image = create(:image_file)
+          user.tags << image.tags.first
         end
       end
     end

@@ -16,7 +16,7 @@ describe TargetImagesHelper do
 
   describe "paginate_zero method" do
     it "should return notice string if array size is zero" do
-      helper.paginate_zero([]).should eq('No matches.')
+      expect(helper.paginate_zero([])).to eq('No matches.')
     end
 
     # ref: https://github.com/amatsuda/kaminari/blob/master/spec/helpers/action_view_extension_spec.rb
@@ -26,17 +26,17 @@ describe TargetImagesHelper do
       TargetImage.create! valid_attributes
       target_image = TargetImage.all.page(1)
 
-      helper.paginate_zero(target_image).should be_a(String)
+      expect(helper.paginate_zero(target_image)).to be_a(String)
     end
   end
 
   describe "paginate_target_images method" do
     it "should return message argument if it is not empty" do
-      helper.paginate_target_images('Not extracted yet.', []).should eq('Not extracted yet.')
+      expect(helper.paginate_target_images('Not extracted yet.', [])).to eq('Not extracted yet.')
     end
 
     it "should return notice string if array size is zero" do
-      helper.paginate_target_images('', []).should eq('No matches.')
+      expect(helper.paginate_target_images('', [])).to eq('No matches.')
     end
 
     # ref: https://github.com/amatsuda/kaminari/blob/master/spec/helpers/action_view_extension_spec.rb
@@ -46,7 +46,7 @@ describe TargetImagesHelper do
       TargetImage.create! valid_attributes
       target_image = TargetImage.all.page(1)
 
-      helper.paginate_target_images('', target_image).should be_a(String)
+      expect(helper.paginate_target_images('', target_image)).to be_a(String)
     end
   end
 

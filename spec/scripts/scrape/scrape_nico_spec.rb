@@ -8,8 +8,8 @@ describe Scrape::Nico do
   let(:limit) { 10 }
 
   before do
-    IO.any_instance.stub(:puts)             # Surpress console outputs
-    Resque.stub(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
+    allow_any_instance_of(IO).to receive(:puts)             # Surpress console outputs
+    allow(Resque).to receive(:enqueue).and_return nil    # Prevent Resque.enqueue method from running
     @agent = Scrape::Nico.get_client        # Create a Mechanize agent
     @client = Scrape::Nico.new(nil, limit)
 
@@ -28,7 +28,7 @@ describe Scrape::Nico do
     it "calls scrape_using_api method" do
       FactoryGirl.create(:word_with_person)
 
-      @client.stub(:scrape_target_words).and_return nil
+      allow(@client).to receive(:scrape_target_words).and_return nil
       expect(@client).to receive(:scrape_target_words)
 
       @client.scrape(60)
@@ -39,7 +39,7 @@ describe Scrape::Nico do
     it "calls proper functions" do
       target_word = FactoryGirl.create(:word_with_person)
 
-      @client.stub(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
+      allow(@client).to receive(:scrape_using_api).and_return({ scraped: 0, duplicates: 0, avg_time: 0 })
       expect(@client).to receive(:scrape_using_api)
 
       @client.scrape_target_word(1, target_word)
@@ -68,8 +68,8 @@ describe Scrape::Nico do
     it "calls get_data function '@limit' times" do
       target_word = FactoryGirl.create(:word_with_person)
       #Scrape.stub(:get_query).and_return('Madoka Kaname')
-      Scrape::Nico.stub(:get_data).and_return({})
-      Scrape::Client.stub(:save_image).and_return(1)
+      allow(Scrape::Nico).to receive(:get_data).and_return({})
+      allow(Scrape::Client).to receive(:save_image).and_return(1)
 
       result = @client.scrape_using_api(target_word)
       expect(Scrape::Nico).to receive(:get_data).exactly(limit - result[:skipped]).times
@@ -80,8 +80,8 @@ describe Scrape::Nico do
 
     it "allows duplicates three times" do
       target_word = FactoryGirl.create(:word_with_person)
-      Scrape::Nico.stub(:get_data).and_return({})
-      Scrape::Client.stub(:save_image).and_return nil
+      allow(Scrape::Nico).to receive(:get_data).and_return({})
+      allow(Scrape::Client).to receive(:save_image).and_return nil
       expect(Scrape::Nico).to receive(:get_data).exactly(3).times
       expect(Scrape::Client).to receive(:save_image).exactly(3).times
 
@@ -107,8 +107,8 @@ describe Scrape::Nico do
       count = Image.count
       url = 'An invalid page url'
 
-      Rails.logger.should_receive(:info)
-      Scrape::Client.should_not_receive(:save_image)
+      expect(Rails.logger).to receive(:info)
+      expect(Scrape::Client).not_to receive(:save_image)
 
       Scrape::Nico.get_contents(url, @client, @title)
     end
@@ -116,7 +116,7 @@ describe Scrape::Nico do
     it "ignores adulut pages" do
       page_url = 'http://seiga.nicovideo.jp/seiga/im3833006'
 
-      Scrape.should_not_receive(:save_image)
+      expect(Scrape).not_to receive(:save_image)
       Scrape::Nico.get_contents(page_url, @client, @title)
     end
   end

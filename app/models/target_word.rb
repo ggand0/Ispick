@@ -1,5 +1,4 @@
 require "#{Rails.root}/script/scrape/scrape"
-require "#{Rails.root}/script/deliver/deliver"
 require "#{Rails.root}/app/workers/search_images"
 
 class TargetWord < ActiveRecord::Base

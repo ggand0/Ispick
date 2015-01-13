@@ -135,9 +135,9 @@ namespace :util do
     count = 0
     Tag.all.each_with_index do |tag, count|
       Tag.reset_counters(tag.id, :images)
-      puts "#{count} / Tag.count" if count % 1000 == 0
+      puts "#{count} / #{Tag.count}" if count % 1000 == 0
     end
-    puts "DONE!"
+    puts "counter cache reset has been completed!"
   end
 
   desc "Reset counter cache of tags table"

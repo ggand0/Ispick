@@ -14,28 +14,28 @@ describe Users::OmniauthCallbacksController do
 
   describe "twitter method" do
     it "should redirect back to sign_up page with an error when omniauth.auth is missing" do
-      @controller.stub(:env).and_return({"some_other_key" => "some_other_value"})
+      allow(@controller).to receive(:env).and_return({"some_other_key" => "some_other_value"})
       get :twitter
-      response.should redirect_to new_user_registration_url
+      expect(response).to redirect_to new_user_registration_url
     end
 
     it "should redirect back to sign_up page with an error when provider is missing" do
       stub_env_for_omniauth(nil)
       get :twitter
-      response.should redirect_to new_user_registration_url
+      expect(response).to redirect_to new_user_registration_url
     end
 
     it "should redirect to sign_up page when it can NOT find the user" do
       stub_env_for_omniauth
-      User.any_instance.stub(:persisted?).and_return(false)
+      allow_any_instance_of(User).to receive(:persisted?).and_return(false)
       get :twitter
-      response.should redirect_to new_user_registration_url
+      expect(response).to redirect_to new_user_registration_url
     end
 
     it "should redirect to user home page when it can find the user" do
       stub_env_for_omniauth
       get :twitter
-      response.should redirect_to home_path
+      expect(response).to redirect_to home_path
     end
   end
 end
