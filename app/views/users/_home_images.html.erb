@@ -1,3 +1,6 @@
+<%= content_tag :div, class: "temp_information", data: { scroll: (not current_user.pagination) } do %>
+<% end %>
+
 <div class="wrapper">
   <% images.each_with_index do |image, index| %>
 
@@ -30,9 +33,16 @@
 
   <% end %>
   <div id="loader">
-    <%= image_tag asset_path('round_loader_mini.gif')%>
+    <!-- Don't display loader icon if there's no images -->
+    <%= image_tag asset_path('round_loader_mini.gif') if images.count > 0 %>
   </div>
 
 </div>
 
 <%= paginate images %>
+
+
+<!-- Render pagination also at the bottom of the page if it's displayed with pagination -->
+<div class="pagination-footer">
+  <%= paginate images if current_user.pagination %>
+</div>

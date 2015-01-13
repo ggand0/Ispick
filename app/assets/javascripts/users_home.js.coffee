@@ -6,7 +6,7 @@
 
 $(document).on 'ready page:load', ->
   logging = false
-  align = $('.temp_information').data('align')
+  scroll = $('.temp_information').data('scroll')
 
   imgLoad = imagesLoaded($('.wrapper'))
   imgLoad.on( 'progress', ( instance, image ) ->
@@ -26,9 +26,12 @@ $(document).on 'ready page:load', ->
   window.component.initButtons()
 
 
-  # Initialize infinite scroll
+  # Initialize infinite scroll or pagination
   window.scroll = new Scroll(logging)
-  window.scroll.infiniteScroll() if !align
+  if scroll
+    window.scroll.infiniteScroll()
+  else
+    window.scroll.alignImages()
   window.component.initCollapsables()
 
   # Display the calender (Datepicker)

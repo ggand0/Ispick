@@ -1,8 +1,14 @@
+// Used for pagination.
+// Hide it by default since we need to position it dynamically with JavaScript
+.pagination-footer {
+  visibility: hidden;
+}
+
+// Used for image's detail view
 th {
   background-color: #7ACECE;
   color: #FFF;//#DDD;
 }
-
 .tag {
   text-decoration: underline;
 }
