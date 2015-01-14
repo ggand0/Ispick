@@ -15,7 +15,7 @@ class Image < ActiveRecord::Base
 
 	has_attached_file :data,
     styles: {
-      thumb: "300x",
+      thumb: "300x>",
       #thumb: { geometry: "300x300#", :processors => [:custom], :gif_first_frame_only => true },
       #thumb_gif: "300x300#",
       original: "600x800>"

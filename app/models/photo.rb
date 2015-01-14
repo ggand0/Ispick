@@ -8,7 +8,7 @@ class Photo < ActiveRecord::Base
 
   has_attached_file :data,
     styles: {
-      thumb: "300x",
+      thumb: "300x>",
       original: "600x800>"
     },
     default_url: lambda { |data| data.instance.set_default_url },
