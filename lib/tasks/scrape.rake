@@ -234,7 +234,7 @@ namespace :scrape do
 
   desc "Scrape images from deviantART"
   task deviant: :environment do
-    Scrape::Deviant.scrape
+    Scrape::Deviant.new.scrape
   end
 
   desc "Scrape images from Giphy"
