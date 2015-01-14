@@ -33,8 +33,8 @@ class Image < ActiveRecord::Base
   before_destroy :destroy_attachment
   validates_uniqueness_of :src_url
 
-  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga', 'shushu', 'zerochan']
-  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga', 'e-shuushuu', 'zerochan']
+  TARGET_SITES = ['tumblr', 'anipic', 'nicoseiga', 'shushu', 'zerochan', 'deviantart']
+  TARGET_SITES_DISPLAY = ['tumblr', 'anime-pictures', 'nicoseiga', 'e-shuushuu', 'zerochan', 'deviantart']
 
   # Set the default url of the paperclip attachment ('data' attribute)
   # @return [String]
