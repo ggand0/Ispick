@@ -26,14 +26,18 @@ module Scrape
     # Scrape images from nicoseiga, using all TargetWord records.
     # @param interval [Integer] The frequency of scraping images from NicoSeiga[min].
     def scrape(interval=60)
-      scrape_target_words('Scrape::Nico', interval)
+      #scrape_target_words('Scrape::Nico', interval)
+      @logger.info '--------------------------------------------------'
+      @logger.info "Start extracting from http://seiga.nicovideo.jp"
+      @logger.info "Scraping popular images..."
       scrape_popular_images()
-      scrape_ranking_images()
+      @logger.info "Scraping ranking images..."
+      #scrape_ranking_images()
+      @logger.info '--------------------------------------------------'
     end
 
 
     # Scrape images from nicoseiga, using single TargetWord object.
-    # キーワードによる検索・抽出を行う
     # @param user_id [Integer]
     # @param target_word [TargetWord]
     def scrape_target_word(user_id, target_word)
@@ -44,11 +48,11 @@ module Scrape
 
       @logger.info "scraped: #{result[:scraped]}, duplicates: #{result[:duplicates]}, avg_time: #{result[:avg_time]}"
     end
-    
-    # scrape images over 'threshold', from 'from_day' to 'to_day'.
+
+    # Scrape images over 'threshold', from 'from_day' to 'to_day'.
     def scrape_popular_images(target_word=nil,from_day=DateTime.now-1,to_day=DateTime.now, threshold=200,user_id=nil, validation=true, verbose=false)
       result_hash = Scrape.get_result_hash
-      
+
       # Get the xml file with api response
       agent = self.class.get_client
       flg = 0
@@ -57,14 +61,14 @@ module Scrape
         page_num = page_num+1
         url = NEW_IMAGES_URL + "?page=#{page_num}"
         xml = agent.get(url)
-        puts(page_num)
+        #puts(page_num)
         xml.search("div[class='illust_list']").search("a").each do |item|
           #compare popularity to threshold (popularity = 'view' or 'comment' or 'clip')
           if item.search("li[class='clip']").text.to_i >= threshold then
               page_url = ROOT_URL + item.attr("href")
               page = agent.get(page_url)
               start = Time.now
-              
+
               # skip adult illust
               begin
                 image_data = self.class.get_data2(page)
@@ -73,7 +77,7 @@ module Scrape
                 @logger.error "An error has occurred inside get_data method."
                 next
               end
-              
+
               #compare posted_at to from_day and to_day
               if image_data[:posted_at] >= from_day && image_data[:posted_at] <= to_day then
 
@@ -88,20 +92,11 @@ module Scrape
                 elapsed_time = Time.now - start
                 result_hash[:avg_time] += elapsed_time
 
-                # Resqueで非同期的に画像解析を行う
-                    # 始めに画像をダウンロードし、終わり次第ユーザに配信
-                if image_id and (not user_id.nil?)
-                  #@logger.debug "scrape_nico: user=#{user_id}"
-                  @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
-                  self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
-                  target_word.class.name, target_word.id, @logger)
-                end
-                  
-              # past than from_day
+              # older than from_day
               elsif image_data[:posted_at] < from_day then
                 flg = 1
-                break                
-              end              
+                break
+              end
 =begin
               # There is no api(using img_num) for extracting illust information???
               # by way of user information
@@ -117,32 +112,32 @@ module Scrape
                 end
               end
 =end
-          end          
-        
+          end
+
         end
-      
+
       end
-      
+
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
 
     end
-    
-    # scrape images from yesterday ranking
+
+    # Scrape images from yesterday's ranking
     def scrape_ranking_images(target_word=nil, user_id=nil, validation=true, verbose=false)
       result_hash = Scrape.get_result_hash
-      
+
       # Get the xml file with api response
       agent = self.class.get_client
       ranking_url = "http://ext.seiga.nicovideo.jp/api/illust/blogparts?mode=ranking&key=daily%2call"
       ranking = agent.get(ranking_url)
-      
+
       ranking.search("image").each do |image|
         page_url = ROOT_URL+"/seiga/im#{image.search("id").text}"
         start = Time.now
         page = agent.get(page_url)
- 
-        # skip adult illust
+
+        # skip adult illusts
         begin
           image_data = self.class.get_data2(page)
           @logger.debug "src_url: #{image_data[:src_url]}"
@@ -151,7 +146,7 @@ module Scrape
           next
         end
 
-         #save image_data
+        # save image_data
         options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
         # get tags information
         tags = page.search("meta[name='keywords']").attr("content").value.split(",")
@@ -161,24 +156,14 @@ module Scrape
         result_hash[:scraped] += 1 if image_id
         elapsed_time = Time.now - start
         result_hash[:avg_time] += elapsed_time
-
-        # Resqueで非同期的に画像解析を行う
-        # 始めに画像をダウンロードし、終わり次第ユーザに配信
-        if image_id and (not user_id.nil?)
-          #@logger.debug "scrape_nico: user=#{user_id}"
-          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
-          self.class.generate_jobs(image_id, image_data[:src_url], false, user_id,
-          target_word.class.name, target_word.id, @logger)
-        end
       end
-      
+
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
       result_hash
 
     end
 
     # Scrape images from nicoseiga, using its (probablly unofficial) API.
-    # キーワードからタグ検索してlimit分の画像を保存する
     # @param target_word [TargetWord] A TargetWord object to scrape.
     # @param user_id [Integer] An id value of certain user, if necessary.
     # @param validation [Boolean] Whether it needs to validate records or not.
@@ -217,18 +202,9 @@ module Scrape
           elapsed_time = Time.now - start
           result_hash[:avg_time] += elapsed_time
 
-          # Resqueで非同期的に画像解析を行う
-          # 始めに画像をダウンロードし、終わり次第ユーザに配信
-          if image_id and (not user_id.nil?)
-            #@logger.debug "scrape_nico: user=#{user_id}"
-            @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose and image_id
-            self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false, user_id,
-              target_word.class.name, target_word.id, @logger)
-          end
-
           break if result_hash[:duplicates] >= 3
         rescue => e
-          # 検索結果が0の場合など
+          # Like when the search result is 0.
           @logger.error e
           next
         end
@@ -261,7 +237,6 @@ module Scrape
         original_view_count: item.css('view_count').first.content,
         original_favorite_count: item.css('clip_count').first.content,
         # Parse JST posted_at datetime to utc
-        # JSTの投稿日時が返却されるのでUTCに変換する
         posted_at: DateTime.parse(item.css('created').first.content).in_time_zone('Asia/Tokyo').utc,
         site_name: 'nicoseiga',
         module_name: 'Scrape::Nico',
@@ -289,41 +264,18 @@ module Scrape
         original_view_count: page.search("li[class='view']").first.content.gsub("閲覧","").to_i,
         original_favorite_count: page.search("li[class='clip']").first.content.gsub("クリップ","").to_i,
         # Parse JST posted_at datetime to utc
-        # JSTの投稿日時が返却されるのでUTCに変換する
         posted_at: DateTime.strptime(page.search("li[class='date']").first.content, "%Y年%m月%d日 %H:%M").in_time_zone('Asia/Tokyo').utc,
         site_name: 'nicoseiga',
         module_name: 'Scrape::Nico',
       }
     end
 
-    # [OLD]Scrape contents with actual HTML page based on page_url value.
-    # @param page_url [String]
-    # @param agent [Mechanize]
-    # @param image_data [Hash]
-    # @param validation [Boolean]
-    def self.get_contents(page_url, agent, image_data, validation=true)
-      start = Time.now
-      begin
-        page = agent.get(page_url)  # 元ページを開く
-      rescue Exception => e         # ログイン求められて失敗した場合など
-        puts "Failed to open page_url: #{page_url}"
-        puts e
-        Rails.logger.info('Could not open a page.')
-        return
-      end
-
-      # タグ情報を取得
-      tag_string = page.at("meta[@name='keywords']").attr('content')
-      tags = Scrape.get_tags(tag_string.split(','))
-
-      puts "Updated in #{(Time.now - start).to_s} sec"
-    end
 
     # Login to the NicoSeiga with Mechanize.
-    # @return [Mechanize] Mechanizeのインスタンスを初期化して返す
+    # @return [Mechanize] A Mechanize instance initialized by login data
     def self.get_client
       agent = Mechanize.new
-      
+
       #agent.ssl_version = 'SSLv3'
       agent.ssl_version = :TLSv1
 
@@ -332,25 +284,6 @@ module Scrape
       agent.post('https://secure.nicovideo.jp/secure/login?site=seiga',
         'mail' => CONFIG['nico_email'], 'password' => CONFIG['nico_password'])
       agent
-    end
-
-
-    # delivered_images update用に、ログインしてstats情報だけ返す関数
-    # @param [Mechanize]
-    # @param [String]
-    # @return [Hash]
-    def self.get_stats(agent, page_url)
-      begin
-        page = agent.get(page_url)
-        info_elements = page.at("ul[@class='illust_count']")
-        original_view_count = info_elements.css("li[class='view']").css("span[class='count_value']").first.content
-        comments = info_elements.css("li[class='comment']").css("span[class='count_value']").first.content
-        clips = info_elements.css("li[class='clip']").css("span[class='count_value']").first.content
-      rescue => e
-        return false
-      end
-
-      { original_view_count: original_view_count, original_favorite_count: clips}
     end
 
   end
