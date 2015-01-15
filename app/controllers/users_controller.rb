@@ -194,10 +194,11 @@ class UsersController < ApplicationController
   def set_sites
     current_user.target_sites.clear
     @sites = []
-    Image::TARGET_SITES_DISPLAY.each do |site|
+
+    TargetSite.all.each do |site|
       # Convert string to symbol
-      if params[site.parameterize.underscore.to_sym].to_i == 1
-        @sites.push site
+      if params[site.name.parameterize.underscore.to_sym].to_i == 1
+        @sites.push site.name
       end
     end
 
