@@ -3,15 +3,16 @@
   - Using gem: https://github.com/Tretti/rails-bootstrap-helpers
 -->
 
-
 <!-- Edit form of name/language attribute -->
 <div class="container-fluid">
-  <div class="col-md-4">
-    <h3>Edit Account</h3>
+  <div class="col-md-5">
+    <%= render partial: "shared/flash_messages", flash: flash %>
+    <h3>Edit Your Account</h3>
     <%= render 'form' %>
 
 <!-- Display SNS accounts that are already linked -->
-    <h3>Connect Account</h3>
+
+    <h3>Connect Accounts</h3>
     <br />
     <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
 

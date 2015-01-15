@@ -6,6 +6,7 @@ class WelcomeController < ApplicationController
     @first = true
     @first = false if params[:page] and params[:page].to_i > 1
     @disable_fotter = true
+    @pagination = false
   end
 
   def signup
@@ -16,6 +17,7 @@ class WelcomeController < ApplicationController
     @first = true
     @first = false if params[:page] and params[:page].to_i > 1
     @disable_fotter = true
+    @pagination = false
   end
 
   def tags

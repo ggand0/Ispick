@@ -1,13 +1,31 @@
 module ApplicationHelper
-  # B→KBに換算する
+
+  # Convert a Rails flash type to Bootstrap one
+  # @return [String] Bootstrap flash type string
+  def bootstrap_class_for flash_type
+    case flash_type
+      when :success
+        "alert-success"
+      when :error
+        "alert-error"
+      when :alert
+        "alert-block"
+      when :notice
+        "alert-info"
+      else
+        flash_type.to_s
+    end
+  end
+
+  # Convert byte to kilobyte
   # @param [Integer] byte[B]
   # @return [Integer] kilobyte[KB]
   def bytes_to_kilobytes(byte)
-    return 0 unless byte      # nilの場合0を返す
+    return 0 unless byte      # Return 0 if it's nil
     (byte / 1024.0).round(3)
   end
 
-  # B→MBに換算する
+  # Convert byte to megabyte
   # @param [Integer] byte[B]
   # @return [Integer] megabyte[MB]
   def bytes_to_megabytes(byte)
@@ -15,6 +33,7 @@ module ApplicationHelper
     (byte / (1024.0*1024.0)).round(3)
   end
 
+  # Convert byte to kilobyte for mac
   # @param [Integer] byte[B]
   # @return [Integer] kilobyte[KB]
   def bytes_to_kilobytes_mac(byte)
@@ -22,6 +41,7 @@ module ApplicationHelper
     (byte / 1000.0).round(3)
   end
 
+  # Convert byte to megabyte for mac
   # @param [Integer] byte[B]
   # @return [Integer] megabyte[MB]
   def bytes_to_megabytes_mac(byte)
@@ -30,9 +50,9 @@ module ApplicationHelper
   end
 
 
-  # Image/DeliveredImageのrelationの画像サイズを合計して返す
-  # @param [ActiveRecord::Relation] Image/DeliveredImageのrelationオブジェクト
-  # @return [Integer] 容量の合計[byte]
+  # Calculate total size in the storage from given relation object or array.
+  # @param [ActiveRecord::Relation] A relation object of Image related model
+  # @return [Integer] Sum of file size in byte
   def get_total_size(images)
     return 0 if images.nil?
 

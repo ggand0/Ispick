@@ -22,7 +22,8 @@ class UsersController < ApplicationController
   # PUT /users/1
   def update
     if @user.update_attributes(user_params)
-      redirect_to settings_users_path(id: @user.id), notice: 'the settings was successfully updated.'
+      flash[:success] = 'The settings was successfully updated.'
+      redirect_to settings_users_path(id: @user.id)#, notice: 'The settings was successfully updated.'
     else
       render action: 'debug/edit'
     end
@@ -62,8 +63,9 @@ class UsersController < ApplicationController
 
     images = images.where("site_name IN (?)", convert_sites(current_user.target_sites))
 
-    @images = images.page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(current_user.display_num)
     @count = images.select('images.id').count
+    @pagination = current_user ? current_user.pagination : false
     @disable_fotter = true
   end
 
@@ -95,7 +97,9 @@ class UsersController < ApplicationController
     images.reorder!('original_favorite_count DESC') if params[:fav]
     images.uniq!
 
-    @images = images.page(params[:page]).per(10)
+    display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+    @pagination = current_user ? current_user.pagination : false
+    @images = images.page(params[:page]).per(display_num)
     @count = images.select('images.id').count
     @disable_fotter = true
   end
@@ -220,22 +224,6 @@ class UsersController < ApplicationController
     render partial: 'debug/show_target_images'
   end
 
-  # A temporary method. Will be fixed.
-  def share_tumblr
-    if current_user.provider == 'tumblr'
-      ::Tumblr.configure do |config|
-        config.oauth_token = session[:oauth_token]
-        config.oauth_token_secret = session[:oauth_token_secret]
-      end
-      client = ::Tumblr::Client.new
-      image = Image.find(params[:image_id])
-      #client.photo("http://anime-cute-girls.tumblr.com/", {:data => ['/path/to/pic.jpg', '/path/to/pic.jpg']})
-      client.photo("anime-cute-girls.tumblr.com", {:data => [image.data.path]})
-    end
-
-    redirect_to home_users_path
-  end
-
 
   private
 
@@ -250,7 +238,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :language, :language_preferences)
+    params.require(:user).permit(:name, :pagination, :display_num, :language, :language_preferences)
   end
 
   def validate_authorization_for_user

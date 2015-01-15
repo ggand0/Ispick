@@ -124,8 +124,10 @@ class ImagesController < ApplicationController
       @query = { query: params[:query] }
     end
 
+    display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+    @pagination = current_user ? current_user.pagination : false
     @disable_fotter = true
-    @images = images.page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(display_num)
   end
 
 

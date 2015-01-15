@@ -32,7 +32,7 @@ class @Scroll
     @scrollHeight = 200
     @defHeight = 0          # Starting height
 
-    # Get GET parameters(not used)
+    # Get GET parameters (not used)
     @GET = {}
     document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, =>
       decode = (s) =>
@@ -63,12 +63,13 @@ class @Scroll
 
 
   # Calculate window size and column size
-  setupBlocks: ()=>
+  setupBlocks: (pagination=false)=>
     @windowWidth = $(window).width()
     @colWidth = $('.block').outerWidth()
     @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     for i in [0..@colCount-1]
       @defHeight = $('.wrapper').offset().top
+      @defHeight += 60 if pagination
       window.blocks.push(@defHeight)
     console.log(window.blocks) if @logging
 
@@ -95,8 +96,12 @@ class @Scroll
   # Calculate initial images' positions
   initPositionBlocks: ()=>
     self = @
-    @colWidth = $('.block').outerWidth() if @colWidth is null
-    $('.block').each(()->
+    $blocks = $('.block')
+    count = 0
+    @colWidth = $blocks.outerWidth() if @colWidth is null
+
+    $blocks.each(()->
+      # Calculate and position a block div
       min = Array.min(window.blocks)
       index = $.inArray(min, window.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
@@ -113,8 +118,14 @@ class @Scroll
       # This data is rendered by Rails code, and read it on JS
       height = parseInt($(this).find('.height').text())
       height = 300 if height == 0
-      console.log(leftPos+','+height) if self.logging
       window.blocks[index] = min+height+self.margin
+
+      # Debug outputs
+      console.log(leftPos+','+height) if self.logging
+      console.log(height) if count == $blocks.length - 1
+
+      # Increment the counter
+      count += 1
     )
     console.log(window.blocks) if @logging
 
@@ -158,6 +169,7 @@ class @Scroll
       'top':max+'px'
       'left':(@colCount/2)*@colWidth+'px'
     })
+
 
 
   # Calculate images' position and add primary events
@@ -216,9 +228,40 @@ class @Scroll
         window.scrollReady = true
     })
 
+
+
+  # Align images for pagination
+  alignImages: ()=>
+    console.log('pagination with dynamic aligning') if @logging
+    $('#loader').hide()
+
+    # Initialize basic values
+    $('.block').hide()
+    @.setupBlocks(true)
+    @.updateSpinner()
+
+    # Position images after image files are loaded
+    $('.wrapper').imagesLoaded( =>
+      # Calculate positions of initial images
+      console.log('images loaded') if @logging
+      @initPositionBlocks()
+
+      max = Array.max(window.blocks)
+      console.log(max)
+      $('.pagination-footer').css({
+        'top': max + 'px',
+        'position': 'absolute',
+        'visibility': 'visible'
+      })
+      $('.pagination-footer').show()
+      console.log($('.pagination-footer').css('top'))
+    )
+
+
   # Infinite scrolling with Infinity.js
   fastInfiniteScroll: ()=>
     console.log('fast scrolling with infinity.js') if @logging
+
     # Initialize basic values
     $('.block').hide()
     @.setupBlocks()

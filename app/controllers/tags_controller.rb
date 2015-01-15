@@ -35,7 +35,7 @@ class TagsController < ApplicationController
       images = Image.filter_by_date(images, params[:site])
     end
 
-    @images = images.page(params[:page]).per(10)
+    @images = images.page(params[:page]).per(current_user.display_num)
     @count = images.select('images.id').count
     @disable_fotter = true
 
