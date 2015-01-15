@@ -70,11 +70,10 @@ class User < ActiveRecord::Base
       where.not(data_updated_at: nil).references(:tags)
   end
 
-  # Get an optional ImageBoard instance by board_id.
-  # そのUserオブジェクトに関連したImageBoardオブジェクトを取得する。
-  # board_idが指定されない場合はimage_boards内の一番最初のオブジェクトを返す。
+  # Get an optional ImageBoard instance associated with this User instance, by board_id.
+  # If board_id was not assigned, returns the first object of self.image_boards.
   # @param board_id [Integer] The image_board's id which you want to retrive
-  # @return [ImageBoard]
+  # @return [ImageBoard] An ImageBoard object
   def get_board(board_id=nil)
     if board_id.nil?
       board = image_boards.first
@@ -83,14 +82,13 @@ class User < ActiveRecord::Base
     end
   end
 
-
   # @return The path where default thumbnail file is.
   def set_default_url
     ActionController::Base.helpers.asset_path('default_user_thumb.png')
   end
 
-  # Create a default image board and attach it to self instance.
-  # 新しいレコードが作成された際に実行される。デフォルトのボード作成などを行う。
+  # Create default objects and attach them to a newly created user.
+  # E.g. Creating a default image board and attach it to self instance.
   def create_default
     # generate default image_board
     image_board = ImageBoard.create(name: 'Default')
@@ -99,6 +97,11 @@ class User < ActiveRecord::Base
     # generate default avatar
     self.avatar = File.open("#{Rails.root}/app/assets/images/icepick.png")
     self.save!
+
+    # Add all TargetSite records as default
+    TargetSite.all.each do |site|
+      self.target_sites << site
+    end
   end
 
 
