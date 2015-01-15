@@ -3,10 +3,10 @@
   - Using gem: https://github.com/Tretti/rails-bootstrap-helpers
 -->
 
-
 <!-- Edit form of name/language attribute -->
 <div class="container-fluid">
   <div class="col-md-5">
+    <%= render partial: "shared/flash_messages", flash: flash %>
     <h3>Edit Your Account</h3>
     <%= render 'form' %>
 
