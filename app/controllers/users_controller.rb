@@ -23,7 +23,7 @@ class UsersController < ApplicationController
   def update
     if @user.update_attributes(user_params)
       flash[:success] = 'The settings was successfully updated.'
-      redirect_to settings_users_path(id: @user.id)#, notice: 'The settings was successfully updated.'
+      redirect_to settings_users_path(id: @user.id)
     else
       render action: 'debug/edit'
     end
@@ -206,6 +206,7 @@ class UsersController < ApplicationController
       current_user.target_sites << TargetSite.where(name: site).first
     end
 
+    flash[:success] = 'The site settings was successfully updated.'
     respond_to do |format|
       format.html { redirect_to action: 'preferences' }
       format.js { render partial: 'layouts/reload_followed_tags' }
