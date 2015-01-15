@@ -284,7 +284,7 @@ class DebugController < ApplicationController
     # Sort images if any requests exist.
     images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
     images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
-    @images = images
+    @images = images.page(params[:page]).per(current_user.display_num)
 
     render action: 'debug_illust_detection'
   end
