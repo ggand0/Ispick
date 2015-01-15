@@ -171,13 +171,13 @@ namespace :scrape do
   # =======================================
   #  Tasks to scrape on the specific sites
   # =======================================
-  desc "Constduct static DB related to characters"
+  desc "Construct static DB related to characters"
   task wiki: :environment do
     puts 'Scraping character names...'
     Scrape::Wiki.scrape_all
   end
 
-  desc "Constduct static DB related to anime titles"
+  desc "Construct static DB related to anime titles"
   task wiki_titles: :environment do
     puts 'Scraping anime titles...'
     Scrape::Wiki.scrape_titles

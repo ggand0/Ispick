@@ -37,20 +37,18 @@ class UsersController < ApplicationController
   # GET /users/home
   # Render an user's home page.
   def home
-    # Get images: For a new user, display the newer images
     if current_user.tags.empty?
+      # Get images: For a new user, display the newer images
       images = Image.get_recent_images(500)
-
-    # Otherwise, display images from user.tags relation
     else
+      # Otherwise, display images from user.tags relation
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
       images.reorder!('original_favorite_count DESC') if params[:fav]
     end
     images.uniq!
 
-
-    # Filter images by date
+    # Filter images by date if neccesary
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
       images = Image.filter_by_date(images, date)
@@ -62,7 +60,6 @@ class UsersController < ApplicationController
     #end
 
     images = images.where("site_name IN (?)", convert_sites(current_user.target_sites))
-
     @images = images.page(params[:page]).per(current_user.display_num)
     @count = images.select('images.id').count
     @pagination = current_user ? current_user.pagination : false
