@@ -5,9 +5,11 @@
 
 
 <!-- Render images and the dropdown for filtering them -->
-<p>
-  <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.present? %>
-
+<div style="margin-left: 20px;">
+  <p>
+    <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.present? %>
+  </p>
+</div>
 
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <div class="dropdown">
@@ -43,8 +45,10 @@
     <%= "  #{get_debug_html(@count)}".html_safe if @count %>
   </div>
 
-</p>
-<br />
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
 
 <!-- image rendering starts from here -->
 <%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

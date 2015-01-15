@@ -1,5 +1,6 @@
 <%= content_tag :div, class: "temp_information", data: { scroll: (not pagination) } do %>
 <% end %>
+<%= paginate images %>
 
 <div class="wrapper">
   <% images.each_with_index do |image, index| %>
@@ -38,8 +39,6 @@
   </div>
 
 </div>
-
-<%= paginate images %>
 
 
 <!-- Render pagination also at the bottom of the page if it's displayed with pagination -->

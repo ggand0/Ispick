@@ -5,8 +5,7 @@
 
 
 <!-- Render images and the dropdown for selecting websites -->
-<p>
-
+<div style="margin-left: 0px;">
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <%= bs_dropdown_button_to list_glyphicon do %>
     <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
@@ -14,8 +13,11 @@
     <% end %>
   <% end %>
   <%= "#{@site}:  #{get_debug_html(@count)}".html_safe if @count %>
-</p>
-  <br />
+</div>
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
 
 <!-- image rendering starts from here -->
 <%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

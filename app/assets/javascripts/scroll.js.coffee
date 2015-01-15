@@ -69,7 +69,7 @@ class @Scroll
     @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     for i in [0..@colCount-1]
       @defHeight = $('.wrapper').offset().top
-      @defHeight += 60 if pagination
+      @defHeight += @margin # Add 20px margin so that it has correct gap
       window.blocks.push(@defHeight)
     console.log(window.blocks) if @logging
 
