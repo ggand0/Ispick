@@ -157,7 +157,9 @@ class UsersController < ApplicationController
     unless board.nil?
       session[:selected_board] = board.id
       @image_board = ImageBoard.find(board.id)
-      @favored_images = board.favored_images.page(params[:page]).per(25)
+      @pagination = current_user ? current_user.pagination : false
+      display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+      @favored_images = board.favored_images.page(params[:page]).per(display_num)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
       @disable_fotter = true
     else
