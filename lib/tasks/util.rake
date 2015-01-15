@@ -4,6 +4,14 @@ require "#{Rails.root}/script/anidb/anidb"
 require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
+  desc "Add a TargetSite record"
+  task :add_target_sites, :environment do
+    TargetSite.create!(name: 'pixiv')
+    TargetSite.create!(name: 'deviantart')
+    #TargetSite.create!(name: 'minitokyo')
+    #TargetSite.create!(name: '')
+  end
+
   desc "Redownload first n thumbnails"
   task :redownload_all, [:limit]=> :environment do |t, args|
     count=0
