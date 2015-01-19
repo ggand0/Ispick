@@ -11,6 +11,7 @@ require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
 require "#{Rails.root}/script/scrape/scrape_shushu.rb"
 require "#{Rails.root}/script/scrape/scrape_zerochan.rb"
+require "#{Rails.root}/script/scrape/scrape_pixiv.rb"
 
 require 'fileutils'
 require 'csv'
@@ -277,4 +278,11 @@ namespace :scrape do
     Scrape::Shushu.new.scrape(interval.to_i)
   end
 
+    # Pixiv
+  desc "Scrape images from 'Pixiv'"
+  task :pixiv, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Pixiv2.new.scrape(interval.to_i)
+  end
+  
 end
