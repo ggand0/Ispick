@@ -5,7 +5,7 @@ require "#{Rails.root}/script/scrape/client"
 
 
 module Scrape
-  class Pixiv2 < Client
+  class Pixiv < Client
     ROOT_URL = 'http://www.pixiv.net/'
 
 
@@ -76,6 +76,10 @@ module Scrape
         start = Time.now
         # get each images
         ranking_page.search("div[class='ranking-items adjust']").search("section").each do |image|
+          #puts image.attr("id")
+          # skip except new illust
+          next if  image.search("p").first.text != "初登場"
+          
           image_id = image.attr("data-id")
           #get image's URL
           page_url = ROOT_URL + "member_illust.php?mode=medium&illust_id=#{image_id}"
@@ -138,8 +142,12 @@ module Scrape
     # @param [String]
     # @return [Hash]
     def get_data(page,agent)
-      #複数枚投稿か確認
+      #複数枚投稿or複数枚投稿形式での1枚投稿か確認
+      #if page.search("ul[class='meta']").first.search("li")[1].text.split(" ")[0] == "複数枚投稿" then
+      #puts page.search("title").text
       if page.search("ul[class='meta']").first.search("li")[1].text.split(" ")[0] == "複数枚投稿" then
+        manga_flg = 2
+      elsif !page.search("title").text.match(/「.*」\/「.*」の漫画 \[pixiv\]/).nil? then
         manga_flg = 1
       else
         manga_flg = 0
@@ -181,10 +189,14 @@ module Scrape
       # ログイン時
       if manga_flg == 0 then
         original_url = page.search("img[class='original-image']").first.attr("src")
-      else
+      elsif manga_flg == 1 then
         images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
         images_page = agent.get(images_url)
-        original_url = images_page.search("div[class=item-container]").first.search("img").first.attr("data-src")
+        original_url = images_page.search("body").first.search("img").first.attr("src")
+      elsif manga_flg == 2 then
+        images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
+        images_page = agent.get(images_url)
+        original_url = images_page.search("div[class='item-container']").first.search("img").first.attr("data-src")
       end
 
       author = "none"

@@ -282,7 +282,7 @@ namespace :scrape do
   desc "Scrape images from 'Pixiv'"
   task :pixiv, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
-    Scrape::Pixiv2.new.scrape(interval.to_i)
+    Scrape::Pixiv.new.scrape(interval.to_i)
   end
   
 end
