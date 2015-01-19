@@ -14,7 +14,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/_legacy/scrape_futaba"
   require "#{Rails.root}/script/scrape/_legacy/scrape_matome"
   require "#{Rails.root}/script/scrape/_legacy/scrape_tinami"
-  require "#{Rails.root}/script/scrape/_legacy/scrape_pixiv"
+  require "#{Rails.root}/script/scrape/scrape_pixiv"
   require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
 
 
