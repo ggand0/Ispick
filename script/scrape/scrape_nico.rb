@@ -32,7 +32,7 @@ module Scrape
       @logger.info "Scraping popular images..."
       scrape_popular_images()
       @logger.info "Scraping ranking images..."
-      #scrape_ranking_images()
+      scrape_ranking_images()
       @logger.info '--------------------------------------------------'
     end
 
@@ -124,7 +124,7 @@ module Scrape
     end
 
     # Scrape images from yesterday's ranking
-    def scrape_ranking_images(target_word=nil, user_id=nil, validation=true, verbose=false)
+    def scrape_ranking_images(threshold=200, target_word=nil, user_id=nil, validation=true, verbose=false)
       result_hash = Scrape.get_result_hash
 
       # Get the xml file with api response
@@ -145,17 +145,20 @@ module Scrape
           @logger.error "An error has occurred inside get_data method."
           next
         end
+        
+        # absolute threshold (ranking may reffer to a rate of increase)
+        if image_data[:original_favorite_count] >= threshold then
+          # save image_data
+          options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
+          # get tags information
+          tags = page.search("meta[name='keywords']").attr("content").value.split(",")
+          image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
 
-        # save image_data
-        options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
-        # get tags information
-        tags = page.search("meta[name='keywords']").attr("content").value.split(",")
-        image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
-
-        result_hash[:duplicates] += image_id ? 0 : 1
-        result_hash[:scraped] += 1 if image_id
-        elapsed_time = Time.now - start
-        result_hash[:avg_time] += elapsed_time
+          result_hash[:duplicates] += image_id ? 0 : 1
+          result_hash[:scraped] += 1 if image_id
+          elapsed_time = Time.now - start
+          result_hash[:avg_time] += elapsed_time
+        end
       end
 
       result_hash[:avg_time] = result_hash[:avg_time] / ((result_hash[:scraped]+result_hash[:duplicates])*1.0)
