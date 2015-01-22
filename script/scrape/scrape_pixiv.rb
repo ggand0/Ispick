@@ -58,7 +58,7 @@ module Scrape
     # @param user_id [Integer] Not in use currently.
     # @param validation [Boolean] Whether it validates values during saving
     # @param logging [Boolean] Whether it outputs logs or not
-    def scrape_ranking(day='',target_word=nil, user_id=nil, validation=true, logging=true)
+    def scrape_ranking(day='',plural=1,target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
       agent = self.get_client()
       page_num = 0
@@ -89,18 +89,30 @@ module Scrape
           page = agent.get(page_url)
 
           # get image data hash
-          image_data = self.get_data(page, agent, illust_id)
+          image_data = self.get_data(page, agent, plural, illust_id)
           # get image's tags
           tags = self.get_tags_original(page)
-
           options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
-          image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
-
-          result_hash[:duplicates] += image_id ? 0 : 1
-          result_hash[:scraped] += 1 if image_id
-          elapsed_time = Time.now - start
-          result_hash[:avg_time] += elapsed_time
-          @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
+          
+          # if image_data havs plural images, then save all images
+          if image_data[:src_url].class != Array || plural==0 then
+            image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
+          else
+            src_url_tmp = Marshal.load(Marshal.dump(image_data[:src_url]))
+            original_url_tmp = Marshal.load(Marshal.dump(image_data[:original_url]))
+            
+            src_url_tmp.each_with_index do |su,i|
+              image_data[:src_url] = src_url_tmp[i]
+              image_data[:original_url] = original_url_tmp[i]             
+              image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options) 
+            end
+          end
+            
+            result_hash[:duplicates] += image_id ? 0 : 1
+            result_hash[:scraped] += 1 if image_id
+            elapsed_time = Time.now - start
+            result_hash[:avg_time] += elapsed_time
+            @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if logging and image_id
         end
       end
 
@@ -164,10 +176,11 @@ module Scrape
     # @param [Nokogiri::XML]
     # @param [String]
     # @return [Hash]
-    def get_data(page, agent, illust_id)
+    def get_data(page, agent, plural, illust_id)
       #複数枚投稿or複数枚投稿形式での1枚投稿か確認
-      #if page.search("ul[class='meta']").first.search("li")[1].text.split(" ")[0] == "複数枚投稿" then
-      #puts page.search("title").text
+      # 0: only 1 image,
+      # 1: only 1 image but special case,
+      # 2: plural images
       if page.search("ul[class='meta']").first.search("li")[1].text.split(" ")[0] == "複数枚投稿" then
         manga_flg = 2
       elsif !page.search("title").text.match(/「.*」\/「.*」の漫画 \[pixiv\]/).nil? then
@@ -203,24 +216,47 @@ module Scrape
       # 非ログイン時
       #src_url = page.search("div[class='img-container']").search("img").first.attr("src")
       # ログイン時
-      #src_url = page.search("div[class='works_display']").first.search("img").first.attr("src")
-      src_url = self.get_src_url(page_url, illust_id)
+      if manga_flg != 2 || plural==0 then
+        #src_url = page.search("div[class='works_display']").first.search("img").first.attr("src")
+        src_url = self.get_src_url(page_url, illust_id)
+      else
+        src_url = []
+        images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
+        images_page = agent.get(images_url)
+        images_page.search("img[class='image ui-scroll-view']").each_with_index do |image,c|
+          if c == 0
+            src_url.push(page.search("div[class='works_display']").first.search("img").first.attr("src"))
+          else
+            src_url.push(image.attr("data-src"))
+          end
+        end
+      end
 
 
       # original_urlの取得(need login)
       # 非ログイン時
       #original_url = page.search("div[class='img-container']").search("img").first.attr("src")
       # ログイン時
-      if manga_flg == 0 then
-        original_url = page.search("img[class='original-image']").first.attr("src")
+      if plural==0 then
+        if manga_flg == 0 then
+          original_url = page.search("img[class='original-image']").first.attr("data-src")
+        else
+          original_url = src_url
+        end
       elsif manga_flg == 1 then
         images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
         images_page = agent.get(images_url)
         original_url = images_page.search("body").first.search("img").first.attr("src")
       elsif manga_flg == 2 then
-        images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
-        images_page = agent.get(images_url)
-        original_url = images_page.search("div[class='item-container']").first.search("img").first.attr("data-src")
+        original_url = []
+        images_page.search("img[class='image ui-scroll-view']").each_with_index do |image,c|
+          if c == 0
+            original_url.push(image.attr("data-src"))
+          else
+            original_url.push(src_url[c])
+          end
+        end
+
       end
 
       author = "none"
@@ -234,15 +270,13 @@ module Scrape
       score = page.search("section[class='score']").first.search("dd[class='score-count']").first.text.to_i
 
       # Get size
-      size = FastImage.size(src_url)
-      if size.nil?
       # 非ログイン時
-      #size = []
-      #size[0] = 100
-      #size[1] = 100
+    #size = []
+    #size[0] = 100
+    #size[1] = 100
       # ログイン時
-        size = page.search("ul[class='meta']").first.search("li")[1].text.split("×")
-      end
+      size = page.search("ul[class='meta']").first.search("li")[1].text.split("×")
+
 
       hash = {
         title: title,
@@ -256,7 +290,7 @@ module Scrape
         original_height: size[1],
         original_favorite_count: score,
         site_name: 'pixiv',
-        module_name: 'Scrape::Pixiv2',
+        module_name: 'Scrape::Pixiv',
         artist: author,
       }
 
