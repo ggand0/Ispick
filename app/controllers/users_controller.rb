@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'zip'
-require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
