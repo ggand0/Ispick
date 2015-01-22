@@ -30,6 +30,38 @@ describe Scrape do
     end
   end
 
+  describe "get_tag method" do
+    it "creates tags properly" do
+      tag = Scrape.get_tag('abcd')
+      expect(tag.name).to eq('abcd')
+      expect(tag.language).to eq('english')
+
+      tag = Scrape.get_tag('NARUTO')
+      expect(tag.name).to eq('NARUTO')
+      expect(tag.language).to eq('english')
+
+      tag = Scrape.get_tag('鹿目まどか')
+      expect(tag.name).to eq('鹿目まどか')
+      expect(tag.language).to eq('japanese')
+
+      tag = Scrape.get_tag('NARUTO100users入り')
+      expect(tag.name).to eq('NARUTO100users入り')
+      expect(tag.language).to eq('japanese')
+    end
+  end
+
+  describe "get_tags method" do
+    it "create valid tags" do
+      tags = ['abcd', '鹿目まどか']
+      result = Scrape.get_tags(tags)
+      expect(result.first.name).to eq('abcd')
+      expect(result.first.language).to eq('english')
+      expect(result[1].name).to eq('鹿目まどか')
+      expect(result[1].language).to eq('japanese')
+    end
+  end
+
+
   describe "get_query function" do
     it "returns proper string when target_word has a person model" do
       target_word = FactoryGirl.create(:word_with_person)
@@ -91,6 +123,16 @@ describe Scrape do
       string = '👍'
       result = Scrape.remove_4bytes(string)
       expect(result).to eq('')
+    end
+  end
+
+  describe "is_ascii method" do
+    it "returns valid result" do
+      expect(Scrape.is_ascii('abcd')).to eq(true)
+      expect(Scrape.is_ascii('NARUTO')).to eq(true)
+      expect(Scrape.is_ascii('NARUTO100users入り')).to eq(false)
+      expect(Scrape.is_ascii('策士ハナビ')).to eq(false)
+      expect(Scrape.is_ascii('👍')).to eq(false)
     end
   end
 

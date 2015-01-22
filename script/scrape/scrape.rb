@@ -127,7 +127,22 @@ module Scrape
   # @param [String]
   def self.get_tag(tag)
     t = Tag.where(name: tag)
-    t.empty? ? Tag.new(name: tag) : t.first
+
+    if t.empty?
+      # Detect non-ascii characters, and assume it's Japanese
+      ascii = Scrape.is_ascii(tag)
+      if ascii
+        lang = 'english'
+      else
+        lang = 'japanese'
+      end
+
+      # Create one newly
+      t = Tag.new(name: tag, language: lang)
+    else
+      # There's already a tag record
+      t.first
+    end
   end
 
   # Tagインスタンスの配列を作成する
@@ -135,14 +150,20 @@ module Scrape
   # @return [Array] Tagオブジェクトの配列
   def self.get_tags(tags)
     tags.map do |tag|
-      t = Tag.where(name: tag)
-      t.empty? ? Tag.new(name: tag) : t.first
+      #t = Tag.where(name: tag)
+      #t.empty? ? Tag.new(name: tag) : t.first
+      Scrape.get_tag(tag)
     end
   end
 
   def self.remove_4bytes(string)
     return nil if string.nil?
     string.each_char.select{ |c| c.bytes.count < 4 }.join('')
+  end
+
+  def self.is_ascii(string)
+    return nil if string.nil?
+    string.match(/\P{ASCII}/) ? false : true
   end
 
   def self.remove_nonascii(string)
