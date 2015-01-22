@@ -4,9 +4,10 @@ require "#{Rails.root}/script/scrape/scrape"
 describe Scrape::Pixiv do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    allow_any_instance_of(IO).to receive(:puts)
+    #allow_any_instance_of(IO).to receive(:puts)
     allow(Resque).to receive(:enqueue).and_return nil
     @client = Scrape::Pixiv.new
+    @agent = @client.get_client
   end
 
   describe "get_contents method" do
@@ -27,6 +28,19 @@ describe Scrape::Pixiv do
       expect(Scrape::Pixiv).to receive(:get_contents).at_least(20).times
 
       Scrape::Pixiv.scrape
+    end
+  end
+
+  describe "get_tags_original method" do
+    it "Get user oriented tags" do
+      page_url = 'http://www.pixiv.net/member_illust.php?mode=medium&illust_id=48295800'
+      page = @agent.get(page_url)
+
+      tags = @client.get_tags_original(page)
+      correct = ['ナルヒナ','日向ハナビ','サイいの','どんな下着だったのかkwsk','NARUTO100users入り','NARUTO','策士ハナビ','NARUTO1000users入り']
+      puts tags
+
+      expect(tags).to eq(correct)
     end
   end
 

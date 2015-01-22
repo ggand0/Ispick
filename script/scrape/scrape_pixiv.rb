@@ -64,7 +64,7 @@ module Scrape
       page_num = 0
       @logger.info "Starting scraping from #{ROOT_URL}..."
 
-      while (page_num<10)
+      while (page_num < 10)
         @logger.debug page_num
         page_num = page_num+1
         # get ranking page URL
@@ -136,8 +136,16 @@ module Scrape
     # @param [Nokogiri::XML]
     # @return [Array::String]
     def get_tags_original(page)
-      result = page.search("meta[name='keywords']").attr("content").value.split(",")
-      return result
+      # Get meta tags
+      #tags = page.search("meta[name='keywords']").attr("content").value.split(",")
+
+      # Get user edited tags
+      tags = []
+      page.search("li[class='tag']").each do |element|
+        tags.push(element.css('a')[1].content)
+      end
+
+      return tags
     end
 
     # Get src_url by getting a thumbnail url from iphone API
