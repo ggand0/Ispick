@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113021657) do
+ActiveRecord::Schema.define(version: 20150122080514) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -251,8 +251,9 @@ ActiveRecord::Schema.define(version: 20150113021657) do
     t.integer  "image_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "images_count", default: 0, null: false
-    t.integer  "users_count",  default: 0, null: false
+    t.integer  "images_count", default: 0,         null: false
+    t.integer  "users_count",  default: 0,         null: false
+    t.string   "language",     default: "english", null: false
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
