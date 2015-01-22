@@ -2,7 +2,7 @@
 <%= render 'shared/modal_image' %>
 <%= render 'shared/modal_board' %>
 
-
+<div class="controlls">
 <!-- Render UIs to add/edit/delete boards -->
 <%= button_group do %>
   <%= bs_dropdown_button_to list_glyphicon do %>
@@ -15,9 +15,10 @@
   <%= bs_button_to pencil_glyphicon, edit_image_board_path(id: @image_board.id), remote: true, class: 'btn btn-default' %>
   <%= bs_button_to remove_glyphicon, @image_board, method: :delete, data: { confirm: 'Are you sure to delete this board? This operation cannot be undone.' }, class: 'btn btn-default' %>
 <% end %>
-<br /><br />
+</div>
 
 <!-- Display the images of the selected board. Same as home.html.erb -->
+<%= paginate @favored_images %>
 
 <div class="wrapper">
   <% @favored_images.each_with_index do |favored_image, index| %>
@@ -43,6 +44,9 @@
   <div id="loader">
     <%= image_tag asset_path('round_loader_mini.gif')%>
   </div>
-
 </div>
-<%= paginate @favored_images %>
+
+<!-- Render pagination also at the bottom of the page if it's displayed with pagination -->
+<div class="pagination-footer">
+  <%= paginate @favored_images if @pagination %>
+</div>

@@ -23,7 +23,7 @@ class UsersController < ApplicationController
   def update
     if @user.update_attributes(user_params)
       flash[:success] = 'The settings was successfully updated.'
-      redirect_to settings_users_path(id: @user.id)#, notice: 'The settings was successfully updated.'
+      redirect_to settings_users_path(id: @user.id)
     else
       render action: 'debug/edit'
     end
@@ -157,7 +157,9 @@ class UsersController < ApplicationController
     unless board.nil?
       session[:selected_board] = board.id
       @image_board = ImageBoard.find(board.id)
-      @favored_images = board.favored_images.page(params[:page]).per(25)
+      @pagination = current_user ? current_user.pagination : false
+      display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+      @favored_images = board.favored_images.page(params[:page]).per(display_num)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
       @disable_fotter = true
     else
@@ -194,10 +196,11 @@ class UsersController < ApplicationController
   def set_sites
     current_user.target_sites.clear
     @sites = []
-    Image::TARGET_SITES_DISPLAY.each do |site|
+
+    TargetSite.all.each do |site|
       # Convert string to symbol
-      if params[site.parameterize.underscore.to_sym].to_i == 1
-        @sites.push site
+      if params[site.name.parameterize.underscore.to_sym].to_i == 1
+        @sites.push site.name
       end
     end
 
@@ -205,6 +208,7 @@ class UsersController < ApplicationController
       current_user.target_sites << TargetSite.where(name: site).first
     end
 
+    flash[:success] = 'The site settings was successfully updated.'
     respond_to do |format|
       format.html { redirect_to action: 'preferences' }
       format.js { render partial: 'layouts/reload_followed_tags' }

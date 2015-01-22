@@ -1,7 +1,16 @@
 <%= stylesheet_link_tag 'users' %>
 
 
-<div class="container-fluid">
+<div class="container-fluid controlls">
+    <!-- Render flash notices -->
+    <% if flash.present? %>
+      <div class="search-tags col-md-5 col-lg-5">
+        <%= render partial: "shared/flash_messages", flash: flash %>
+      </div>
+      <div class="clearfix visible-lg-block"></div>
+      <div class="clearfix visible-md-block"></div>
+      <div class="clearfix visible-sm-block"></div>
+    <% end %>
 
     <!-- Render the search form -->
     <%= search_form_for @search_tags, url: preferences_users_path, html: { method: :post },
@@ -54,12 +63,12 @@
 <div class="search-tags col-md-10 col-lg-10 col-sm-10">
   Set default sites for filtering:
   <%= bootstrap_form_tag url: set_sites_users_path, class: "col-md-5 col-lg-5 col-sm-5" do |f| %>
-    <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+    <% TargetSite.all.each_with_index do |site, count| %>
       <label class="checkbox-inline">
-      <% if current_user.target_sites.where(name: site).count > 0 %>
-        <%= f.check_box site.parameterize.underscore.to_sym, label: Image::TARGET_SITES_DISPLAY[count], label_class: "checkbox-inline", checked: true %>
+      <% if current_user.target_sites.where(name: site.name).count > 0 %>
+        <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline", checked: true %>
       <% else %>
-        <%= f.check_box site.parameterize.underscore.to_sym, label: Image::TARGET_SITES_DISPLAY[count], label_class: "checkbox-inline" %>
+        <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline" %>
       <% end %>
     </label>
     <% end %>

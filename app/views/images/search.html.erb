@@ -5,8 +5,7 @@
 
 
 <!-- Render images and the dropdown for filtering them -->
-<p>
-
+<div class="controlls">
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <div class="dropdown">
     <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-default" data-target="#" href="/page.html">
@@ -29,9 +28,11 @@
     </ul>
     <%= "  #{get_debug_html(@count)}".html_safe if @count %>
   </div>
+</div>
 
-</p>
-  <br />
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
 
 <!-- image rendering starts from here -->
 <%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>
