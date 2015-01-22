@@ -58,7 +58,7 @@ module Scrape
     # @param user_id [Integer] Not in use currently.
     # @param validation [Boolean] Whether it validates values during saving
     # @param logging [Boolean] Whether it outputs logs or not
-    def scrape_ranking(day='',target_word=nil, user_id=nil, validation=true, logging=true)
+    def scrape_ranking(day='',plural=1,target_word=nil, user_id=nil, validation=true, logging=true)
       result_hash = Scrape.get_result_hash
       agent = self.get_client()
       
@@ -87,13 +87,13 @@ module Scrape
           page = agent.get(page_url)
           
           # get image data hash
-          image_data = self.get_data(page,agent)
+          image_data = self.get_data(page,agent,plural)
           # get image's tags
           tags = self.get_tags_original(page)
           options = Scrape.get_option_hash(validation, false, true, (not user_id.nil?))
           
           # if image_data havs plural images, then save all images
-          if image_data[:src_url].class != Array then
+          if image_data[:src_url].class != Array || plural==0 then
             image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options)
           else
             src_url_tmp = Marshal.load(Marshal.dump(image_data[:src_url]))
@@ -101,9 +101,7 @@ module Scrape
             
             src_url_tmp.each_with_index do |su,i|
               image_data[:src_url] = src_url_tmp[i]
-              image_data[:original_url] = original_url_tmp[i]
-              #puts "original_url : #{image_data[:original_url]}"
-              #puts "src_url : #{image_data[:src_url]}"              
+              image_data[:original_url] = original_url_tmp[i]             
               image_id = self.class.save_image(image_data, @logger, target_word, Scrape.get_tags(tags), options) 
             end
           end
@@ -154,7 +152,7 @@ module Scrape
     # @param [Nokogiri::XML]
     # @param [String]
     # @return [Hash]
-    def get_data(page,agent)
+    def get_data(page,agent,plural)
       #複数枚投稿or複数枚投稿形式での1枚投稿か確認
       # 0: only 1 image,
       # 1: only 1 image but special case,
@@ -194,7 +192,7 @@ module Scrape
       # 非ログイン時
       #src_url = page.search("div[class='img-container']").search("img").first.attr("src")
       # ログイン時
-      if manga_flg != 2 then
+      if manga_flg != 2 || plural==0 then
         src_url = page.search("div[class='works_display']").first.search("img").first.attr("src")
       else
         src_url = []
@@ -215,8 +213,12 @@ module Scrape
       # 非ログイン時
       #original_url = page.search("div[class='img-container']").search("img").first.attr("src")
       # ログイン時
-      if manga_flg == 0 then
-        original_url = page.search("img[class='original-image']").first.attr("data-src")
+      if plural==0 then
+        if manga_flg == 0 then
+          original_url = page.search("img[class='original-image']").first.attr("data-src")
+        else
+          original_url = src_url
+        end
       elsif manga_flg == 1 then
         images_url = ROOT_URL + page.search("div[class='works_display']").first.search("a").first.attr("href")
         images_page = agent.get(images_url)
