@@ -5,7 +5,8 @@ describe Scrape::Pixiv do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
     allow_any_instance_of(IO).to receive(:puts)
-    allow(Resque).to receive(:enqueue).and_return nil # resqueにenqueueしないように
+    allow(Resque).to receive(:enqueue).and_return nil
+    @client = Scrape::Pixiv.new
   end
 
   describe "get_contents method" do
@@ -26,6 +27,16 @@ describe Scrape::Pixiv do
       expect(Scrape::Pixiv).to receive(:get_contents).at_least(20).times
 
       Scrape::Pixiv.scrape
+    end
+  end
+
+  describe "get_src_url method" do
+    it "returns valid src_url" do
+      page_url = 'http://www.pixiv.net/member_illust.php?mode=medium&illust_id=48287081'
+      illust_id = '48287081'
+
+      result = @client.get_src_url(page_url, illust_id)
+      expect(result).to eq('http://i2.pixiv.net/c/480x960/img-master/img/2015/01/21/01/16/33/48287081_480mw.jpg')
     end
   end
 end

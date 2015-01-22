@@ -34,8 +34,7 @@ class DownloadImage
         # Image analysis
         #Resque.enqueue(DetectIllust, image.id)
         #Resque.enqueue(ImageFace, image.id)  # Stopped since 14/07/05
-        Resque.enqueue(ImageFeature, 'Image', image.id)
-
+        #Resque.enqueue(ImageFeature, 'Image', image.id)  # Still testing 15/01/22
       end
     rescue => e
       logger.error e

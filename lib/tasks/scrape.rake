@@ -278,11 +278,11 @@ namespace :scrape do
     Scrape::Shushu.new.scrape(interval.to_i)
   end
 
-    # Pixiv
+  # Pixiv
   desc "Scrape images from 'Pixiv'"
   task :pixiv, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Pixiv.new.scrape(interval.to_i)
   end
-  
+
 end
