@@ -5,7 +5,7 @@
 
 
 <!-- Render images and the dropdown for selecting websites -->
-<div style="margin-left: 0px;">
+<div class="controlls">
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <%= bs_dropdown_button_to list_glyphicon do %>
     <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>

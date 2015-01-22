@@ -5,8 +5,8 @@
 
 
 <!-- Render images and the dropdown for filtering them -->
-<div style="margin-left: 20px;">
-  <p>
+<div class="controlls">
+  <p style="margin-left: 20px;">
     <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.present? %>
   </p>
 </div>
