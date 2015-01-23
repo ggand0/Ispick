@@ -23,8 +23,13 @@ form .line {
 
 
 .top-description {
-  text-align: center;
-  background-color : #E4F5F5;//#7ACECE;
+  padding: 20px;
+  h1 {
+    text-align: center;
+    margin-top: 0px;
+  }
+  background-color: $ice-soft;
+  color: $white;
 }
 .top-wrap {
   background-color : #E4F5F5;
