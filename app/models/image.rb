@@ -8,6 +8,8 @@ class Image < ActiveRecord::Base
   has_many :images_target_words, dependent: :destroy
   has_many :target_words, :through => :images_target_words
 
+  is_impressionable :counter_cache => true
+
 
   # Aboid error by explicitly setting table name
   default_scope { order("#{table_name}.created_at DESC") }
@@ -87,6 +89,8 @@ class Image < ActiveRecord::Base
     generate_md5_checksum(file)
 	end
 
+
+
   # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
   # Get images that is recently created.
   # @param limit [Integer] The number of images
@@ -97,6 +101,19 @@ class Image < ActiveRecord::Base
     else
       Image.reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
     end
+  end
+
+  # Get most viewed images counting impressions from a day ago to DateTime.now in UTC.
+  # @param limit [Integer] The maximum number of ranking images
+  # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
+  def self.get_ranking_images(limit)
+    impressions =
+      Impression.where('created_at > (?)', DateTime.now.utc.to_date).
+      group_by(&:impressionable_id).
+      sort_by{|k,v| v.count}.
+      reverse[0..limit-1].
+      map {|k,v| k}
+    Image.where(id: impressions)
   end
 
   def self.get_popular_recent_images(limit)
