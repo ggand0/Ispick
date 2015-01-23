@@ -6,6 +6,11 @@ FactoryGirl.define do
     sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
   end
 
+  factory :image_today, class: Image do
+    sequence(:src_url) { |n| "http://lohas.nicoseiga.jp/thumb/3804029i#{n}" }
+    created_at DateTime.now.utc
+  end
+
   # The main factory. This generates Image objects with various attributes.
   factory :image, class: Image do
     title 'test'

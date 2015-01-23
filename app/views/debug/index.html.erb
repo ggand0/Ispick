@@ -15,6 +15,8 @@ and this page would be used as the alternative in production.<br />
 <%= button_group class: 'btn-group-vertical' do %>
   <%= bs_button_to 'View all images', images_path, class: 'btn-default' %>
   <%= bs_button_to 'Target images', target_images_path, class: 'btn-default' %>
+  <%= bs_button_to 'Ranking', '/ranking', class: 'btn-default' %>
+  <%= bs_button_to 'RSS of ranking(1st image only)', '/daily_images/rss.rss', class: 'btn-default' %>
   <%= bs_button_to 'Debug design', home_debug_path, class: 'btn-default' %>
   <%= bs_button_to 'Debug illust_detection', illust_detection_debug_path, class: 'btn-default' %>
   <%= bs_button_to 'Debug crawling', crawling_debug_path, class: 'btn-default' %>

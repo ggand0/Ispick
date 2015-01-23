@@ -6,6 +6,7 @@ Ispick::Application.routes.draw do
   root 'welcome#index'
 
   match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
+  match '/ranking' => 'welcome#ranking', :as => 'ranking_welcome', :via => :get
   match '/tags' => 'welcome#tags', :as => 'tags_welcome', :via => [:get,:post]
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
@@ -77,6 +78,9 @@ Ispick::Application.routes.draw do
     end
   end
 
+  namespace :daily_images do
+    get 'rss'
+  end
   resources :favored_images, only: [:show, :destroy]
   resources :image_boards do
     collection do

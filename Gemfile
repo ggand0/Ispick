@@ -91,6 +91,8 @@ gem 'obscenity', git: 'git@github.com:pentiumx/obscenity.git'
 gem 'fastimage'
 gem 'google-analytics-rails'
 gem 'turnout'
+gem 'impressionist'                                   # For the rakning page
+
 
 # Twitter Bootstrap gems
 gem 'bootstrap-sass', '~> 3.2.0'

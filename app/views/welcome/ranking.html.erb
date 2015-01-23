@@ -1,0 +1,20 @@
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render images and the dropdown for filtering them -->
+<div class="controlls">
+  <h3 style="margin-left: 20px;">
+    Today's ranking
+  </h3>
+</div>
+
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

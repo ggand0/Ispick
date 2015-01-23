@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150122080514) do
+ActiveRecord::Schema.define(version: 20150123031130) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -55,6 +55,31 @@ ActiveRecord::Schema.define(version: 20150122080514) do
     t.string   "token"
     t.string   "secret"
     t.string   "user_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "daily_images", force: true do |t|
+    t.integer  "image_id"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
+    t.datetime "posted_at"
+    t.text     "original_url"
+    t.text     "artist"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -139,6 +164,7 @@ ActiveRecord::Schema.define(version: 20150122080514) do
     t.integer  "share_count",             default: 0, null: false
     t.integer  "width",                   default: 0, null: false
     t.integer  "height",                  default: 0, null: false
+    t.integer  "impressions_count",       default: 0, null: false
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
@@ -161,6 +187,31 @@ ActiveRecord::Schema.define(version: 20150122080514) do
     t.integer "image_id",       null: false
     t.integer "target_word_id", null: false
   end
+
+  create_table "impressions", force: true do |t|
+    t.string   "impressionable_type"
+    t.integer  "impressionable_id"
+    t.integer  "user_id"
+    t.string   "controller_name"
+    t.string   "action_name"
+    t.string   "view_name"
+    t.string   "request_hash"
+    t.string   "ip_address"
+    t.string   "session_hash"
+    t.text     "message"
+    t.text     "referrer"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "impressions", ["controller_name", "action_name", "ip_address"], name: "controlleraction_ip_index", using: :btree
+  add_index "impressions", ["controller_name", "action_name", "request_hash"], name: "controlleraction_request_index", using: :btree
+  add_index "impressions", ["controller_name", "action_name", "session_hash"], name: "controlleraction_session_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "ip_address"], name: "poly_ip_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "request_hash"], name: "poly_request_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "session_hash"], name: "poly_session_index", using: :btree
+  add_index "impressions", ["impressionable_type", "message", "impressionable_id"], name: "impressionable_type_message_index", length: {"impressionable_type"=>nil, "message"=>255, "impressionable_id"=>nil}, using: :btree
+  add_index "impressions", ["user_id"], name: "index_impressions_on_user_id", using: :btree
 
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
@@ -244,6 +295,12 @@ ActiveRecord::Schema.define(version: 20150122080514) do
   create_table "photos_tags", force: true do |t|
     t.integer "photo_id", null: false
     t.integer "tag_id",   null: false
+  end
+
+  create_table "ranking_images", force: true do |t|
+    t.integer  "image_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "tags", force: true do |t|
