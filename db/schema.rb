@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150122151350) do
+ActiveRecord::Schema.define(version: 20150123031130) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -55,6 +55,31 @@ ActiveRecord::Schema.define(version: 20150122151350) do
     t.string   "token"
     t.string   "secret"
     t.string   "user_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "daily_images", force: true do |t|
+    t.integer  "image_id"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
+    t.datetime "posted_at"
+    t.text     "original_url"
+    t.text     "artist"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -270,6 +295,12 @@ ActiveRecord::Schema.define(version: 20150122151350) do
   create_table "photos_tags", force: true do |t|
     t.integer "photo_id", null: false
     t.integer "tag_id",   null: false
+  end
+
+  create_table "ranking_images", force: true do |t|
+    t.integer  "image_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "tags", force: true do |t|
