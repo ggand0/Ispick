@@ -60,6 +60,11 @@
   &:link, &:visited, &:hover, &:active {
     color: $white;
   }
+  i {
+    width: 2em;
+    margin-right: 10px;
+    text-align: center;
+  }
 }
 
 .btn-facebook {
