@@ -5,6 +5,9 @@ namespace :system do
   task :update_ranking, :environment do
     limit = 100
 
+    # First, erase all RankingImage records
+    RankingImage.destroy_all
+
     # Collect most viewed images and save them to ranking records.
     # Sort them in decending order
     tmp =

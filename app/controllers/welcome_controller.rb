@@ -29,6 +29,13 @@ class WelcomeController < ApplicationController
   end
 
   def ranking
+    @images = RankingImage.get_images.page(params[:page]).per(10)
+    @count = @images.count
+    @disable_fotter = true
+    @pagination = false
+  end
+
+  def ranking_realtime
     @images = Image.get_ranking_images(100).page(params[:page]).per(10)
     @count = @images.count
     @disable_fotter = true
