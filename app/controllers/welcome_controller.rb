@@ -22,12 +22,16 @@ class WelcomeController < ApplicationController
 
   def tags
     @tags = Tag.get_tags_with_images(1000)
-
-    #@search = Image.search(params[:q])
     @search_tags = Tag.search(params[:q])
     if params[:q]
       @tags_result = @search_tags.result(distinct: true).page(params[:page]).per(1000)
     end
+  end
 
+  def ranking
+    @images = Image.get_ranking_images(100).page(params[:page]).per(10)
+    @count = @images.count
+    @disable_fotter = true
+    @pagination = false
   end
 end
