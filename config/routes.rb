@@ -78,6 +78,9 @@ Ispick::Application.routes.draw do
     end
   end
 
+  namespace :daily_images do
+    get 'rss'
+  end
   resources :favored_images, only: [:show, :destroy]
   resources :image_boards do
     collection do
