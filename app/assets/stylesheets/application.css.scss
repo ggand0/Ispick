@@ -28,10 +28,24 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 @import "_colors";
-.container-fluid,
-.controlls {
+
+html,
+body { // For sticky footer
+  height: 100%;
+}
+
+body:before { // For sticky footer
+  content: "";
+  height: 100%;
+  float: left;
+  width: 0;
+  margin-top: -32767px;
+}
+#wrapper { // For sticky footer
+  min-height: 100%;
   background-color: $base-light;
 }
+
 // Override button color
 $color: #E4F5F5;
 $background: #5B9B9B;//#79CECE;
@@ -41,12 +55,25 @@ $border: #5B9B9B;//#79CECE;
 }
 
 #footer {
-  clear:  left;
-  bottom: 0;
+  background-color: $base-pale;
+  clear: both;
+  text-align: center;
+  padding: 20px;
   width:  100%;
+  position: relative; // For sticky footer
+  margin-top: -100px;
   height: 100px;
+  ul {
+    border-left: 1px solid $white;
+    display: inline-block;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    padding: 2px 20px;
+    border-right: 1px solid $white;
+  }
 }
-
 
 // Header's logo related styles
 .navbar-inverse {
