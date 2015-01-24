@@ -98,6 +98,11 @@ class UsersController < ApplicationController
     @images = images.page(params[:page]).per(display_num)
     @count = images.select('images.id').count
     @disable_fotter = true
+
+    respond_to do |format|
+      format.html {}
+      format.js { render action: 'home' }
+    end
   end
 
 
