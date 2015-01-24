@@ -23,19 +23,19 @@
 # ==================
 #   Scraping tasks
 # ==================
-every 12.hours do
+every 1.day, :at => '2:30 am' do
   rake 'scrape:anipic', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
-every 6.hours do
+every 1.day, :at => '3:30 am' do
   rake 'scrape:pixiv', output: { error: 'log/scrape_pixiv_error.log', standard: 'log/scrape_pixiv_cron.log' }
 end
 
-every 3.hours do
+every 1.day, :at => '4:30 am' do
   rake 'scrape:nico', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
 end
 
-every 3.hours do
+every 1.day, :at => '5:30 am' do
   rake 'scrape:shushu', output: { error: 'log/scrape_shushu_error.log', standard: 'log/scrape_shushu_cron.log' }
 end
 
