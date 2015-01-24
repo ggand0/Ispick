@@ -52,9 +52,9 @@ gem 'rb-readline', require: false                   # Necessary to launch rails 
 gem 'natto'
 gem 'x2ch'
 gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
-gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
+#gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
 gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
-gem 'giphy'
+#gem 'giphy'
 gem 'tinami'
 
 
@@ -68,6 +68,7 @@ gem 'omniauth-tumblr'
 
 # Manages sharing on social networks
 gem 'shareable'
+gem "social-buttons", git: 'git@github.com:pentiumx/social-buttons.git'
 
 # System related gems
 gem 'nokogiri'                                        # For scraping

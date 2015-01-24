@@ -7,7 +7,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_deviant"
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
-  require "#{Rails.root}/script/scrape/scrape_giphy"
+  #require "#{Rails.root}/script/scrape/scrape_giphy"
   require "#{Rails.root}/script/scrape/scrape_anipic"
 
   require "#{Rails.root}/script/scrape/_legacy/scrape_2ch"
@@ -15,7 +15,7 @@ module Scrape
   require "#{Rails.root}/script/scrape/_legacy/scrape_matome"
   require "#{Rails.root}/script/scrape/_legacy/scrape_tinami"
   require "#{Rails.root}/script/scrape/scrape_pixiv"
-  require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
+  #require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
 
 
   # 全てのTargetWordに基づき画像抽出する
