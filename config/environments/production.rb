@@ -59,7 +59,7 @@ Ispick::Application.configure do
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-  config.assets.precompile += %w( *.js bootstrap-social.css table_custom.css images.css scaffolds.css welcome.css users.css images-detail.css core.css )
+  config.assets.precompile += %w( *.js table_custom.css images.css scaffolds.css welcome.css users.css images-detail.css core.css )
   # https://github.com/activeadmin/activeadmin/issues/3072
   #config.assets.precompile << /\A(?!active_admin).*\.(css)\z/
 
