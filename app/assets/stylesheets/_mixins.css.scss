@@ -1,0 +1,10 @@
+@mixin social-button($color) {
+  &:link, &:visited {
+    background-color: $color;
+    border-bottom: 3px solid darken($color, 15%);
+  }
+  &:hover, &:active {
+    background-color: darken($color, 5%);
+    border-bottom: 3px solid darken($color, 20%);
+  }
+}

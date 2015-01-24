@@ -1,6 +1,8 @@
 // Use and customize this file if you need to customize entire navbar style.
 // For now, it is partly overrided in the application.css.scss file, and these styles are not in use.
 
+@import "_colors";
+
 /* navbar */
 .navbar-ispick {
     background-color: #79CECE;//#3F3F3F;//#939393;//#F8F8F8;
@@ -70,10 +72,10 @@
 }
 @media (max-width: 767px) {
     .navbar-ispick .navbar-nav .open .dropdown-menu > li > a {
-        color: #777;
+      color: $base-dark;
     }
     .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:hover,
     .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:focus {
-        color: #333;
+      color: darken($base-dark, 15%);
     }
 }

@@ -19,7 +19,6 @@
  *= require welcome
  *= require bootstrap-datepicker3
  *= require rails_bootstrap_forms
- *= require bootstrap-social
  *= require font-awesome
  *= require navbar_custom
  *= require button_custom
@@ -28,6 +27,11 @@
 
 @import "bootstrap-sprockets";
 @import "bootstrap";
+@import "_colors";
+.container-fluid,
+.controlls {
+  background-color: $base-light;
+}
 // Override button color
 $color: #E4F5F5;
 $background: #5B9B9B;//#79CECE;

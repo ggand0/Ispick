@@ -1,3 +1,10 @@
+@import "_colors";
+@import "_mixins";
+
+.btn-default {
+  color: darken($base-dark, 15%);
+}
+
 .btn-custom-darken.active {
   color: rgba(255, 255, 255, 0.75);
 }
@@ -32,4 +39,46 @@
 .btn-custom-darken:active,
 .btn-custom-darken.active {
   background-color: #3ca5a5 ;
+}
+
+.dropdown-menu {
+  li {
+    a {
+      color: $base-dark;
+    }
+    a:hover,
+    a:focus {
+      color: darken($base-dark, 15%);
+    }
+  }
+}
+
+.btn-social {
+  text-align: left;
+  border: none;
+  border-radius: 4px;
+  &:link, &:visited, &:hover, &:active {
+    color: $white;
+  }
+  i {
+    width: 2em;
+    margin-right: 10px;
+    text-align: center;
+  }
+}
+
+.btn-facebook {
+  @include social-button($facebook);
+}
+
+.btn-twitter {
+  @include social-button($twitter);
+}
+
+.btn-tumblr {
+  @include social-button($tumblr);
+}
+
+.btn-email {
+  @include social-button($ice-soft);
 }

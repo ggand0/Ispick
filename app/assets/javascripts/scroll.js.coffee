@@ -1,38 +1,33 @@
+# Get the min value of an array
 Array.min = (array) ->
   return Math.min.apply(Math, array)
+
+# Get the max value of an array
 Array.max = (array) ->
   return Math.max.apply(Math, array)
 
-getNatural = ($mainImage) ->
-  mainImage = $mainImage[0]
-  d = {}
-  if mainImage.naturalWidth is undefined
-    i = new Image()
-    i.src = mainImage.src
-    d.oWidth = i.width
-    d.oHeight = i.height
-  else
-    d.oWidth = mainImage.naturalWidth
-    d.oHeight = mainImage.naturalHeight
-  return d
 
 
-
-
+# A class which have the public instance methods that align/scroll images on the screen
 class @Scroll
+  DEF_DESC_CLASS_NAME: 'desc-box' # The class name of description box divs
+  DEF_COLUMN_WIDTH: 300
+  DEF_IMAGE_HEIGHT: 300
+  DEF_MARGIN: 20
+
   constructor: (logging) ->
-    @logging = logging
+    @logging = logging        # Whether it writes logs or not
     @colCount=0
     @colWidth=0
-    @margin=20
+    @margin=@DEF_MARGIN       # Margin width between two blocks
     @windowWidth=0
     window.blocks=[]
     window.promisesArray=[]
     @counter = 0
-    @scrollHeight = 200
-    @defHeight = 0          # Starting height
+    @scrollHeight = 200       # The position it starts to load next images from the bottom of the screen
+    @defHeight = 0            # The starting height where it starts to put image blocks
 
-    # Get GET parameters (not used)
+    # [Not Used]Get GET parameters
     @GET = {}
     document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, =>
       decode = (s) =>
@@ -41,19 +36,20 @@ class @Scroll
     )
 
 
-  # Initialize masonry lib
+  # [Not Used]Initialize masonry lib
   # Not necessary when using fastInfiniteScroll method
-  masonry: () ->
+  masonry: () =>
     $container = $('.wrapper')
     $container.masonry({
        itemSelector: '.block',
-       gutter: 20,
-       gutterWidth: 20,
+       gutter: @DEF_MARGIN,
+       gutterWidth: @DEF_MARGIN,
        animate: true,
-       columnWidth: 300;
+       columnWidth: @DEF_COLUMN_WIDTH;
     })
-    $('.block').css('margin-bottom', 20+'px')
+    $('.block').css('margin-bottom', @DEF_MARGIN + 'px')
     $('.wrapper').hide()
+
     # call the layout method after all elements have been loaded
     $container.imagesLoaded( ->
       $('.wrapper').show()
@@ -73,12 +69,11 @@ class @Scroll
       window.blocks.push(@defHeight)
     console.log(window.blocks) if @logging
 
+
+  # [WIP][Not Used]
   changeDefHeights: (collapsed)=>
     newHeight = $('.wrapper').offset().top
-    #gap = if collapsed then 74 else -74;
     gap = if collapsed then 36 else -36;
-    console.log(gap)
-    console.log(100 + gap)
 
     window.listView.top += gap
     for item in window.listView.pages[0].items
@@ -86,7 +81,6 @@ class @Scroll
         t = $(div).css('top')
         top = parseInt(t.substring(0, t.length-2))
         newTop = top + gap
-        #console.log(t + ',' + newTop)
         $(div).css({
           'top': @defHeight + newTop + 'px'
         })
@@ -100,29 +94,43 @@ class @Scroll
     count = 0
     @colWidth = $blocks.outerWidth() if @colWidth is null
 
+    # Position images one by one
     $blocks.each(()->
       # Calculate and position a block div
       min = Array.min(window.blocks)
       index = $.inArray(min, window.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
-      if @logging
+      if self.logging
         console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
         console.log(index+','+min)
+
+      # Change css styles to position the div
       $(this).css({
         'left':leftPos+'px',
         'top':min+'px'
       })
       $(this).show()
 
-      # Get thumbnail's height from html
-      # This data is rendered by Rails code, and read it on JS
-      height = parseInt($(this).find('.height').text())
-      height = 300 if height == 0
-      window.blocks[index] = min+height+self.margin
+
+      # Get the box's height
+      if $(this).hasClass(self.DEF_DESC_CLASS_NAME)
+        # Since this code handles the placement of initial images,
+        # it may contain description boxes, which have specific heights.
+        # As the heights of those boxes change by the amount of texts,
+        # get their div heights directly at here.
+
+        # Get the height including the margin
+        height = $(this).outerHeight()
+      else
+        # Get the thumbnail's height from html
+        # This data is rendered by Rails code, and read it on JS
+        height = parseInt($(this).find('.height').text())
+        height = self.DEF_IMAGE_HEIGHT if height == 0
+
+      window.blocks[index] = min + height + self.margin
 
       # Debug outputs
       console.log(leftPos+','+height) if self.logging
-      console.log(height) if count == $blocks.length - 1
 
       # Increment the counter
       count += 1
@@ -137,24 +145,26 @@ class @Scroll
     # colWidth variable gets null. Re-initialize it if it detects null.
     @colWidth = $('.block').outerWidth() if @colWidth is null
     $container = $('.block')
-    #console.log(window.listView.pages[0].items[0])
-    #$container = window.listView.pages[0].items[window.listView.pages[0].items.length-1].$el
 
+    # Position images one by one.
     # Get newly added elements only
     $container.slice(Math.max($container.length - newElemsCount, 1)).each (()->
       min = Array.min(window.blocks)
       index = $.inArray(min, window.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
-      if @logging
+      if self.logging
         console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
         console.log(index+','+min)
-      $(this).show()
+
+      # Change css styles to position the div
       $(this).css({
         'left':leftPos+'px',
         'top':min+'px'
       })
+      $(this).show()
+
       height = parseInt($(this).find('.height').text())
-      height = 300 if height == 0
+      height = self.DEF_IMAGE_HEIGHT if height == 0
       console.log(leftPos+','+height) if self.logging
       window.blocks[index] = min+height+self.margin
     )
@@ -164,7 +174,6 @@ class @Scroll
   # Update loading icon's position
   updateSpinner: ()=>
     max = Array.max(window.blocks)
-    #max = Array.max(window.blocks) - 100
     $('#loader').css({
       'top':max+'px'
       'left':(@colCount/2)*@colWidth+'px'
@@ -182,6 +191,7 @@ class @Scroll
   # Load next images to display
   loadImages: (url) =>
     console.log('Fetching...') if @logging
+
     # Prevent loading next images until current loading is done
     window.scrollReady = false
 
@@ -313,7 +323,7 @@ class @Scroll
 
 
 
-  # Infinite scrolling using Masonry.js
+  # [Not Used]Infinite scrolling using Masonry.js
   normalInfiniteScroll: ()=>
     @.masonry()
     console.log('normal scrolling with infinite-scroll lib')

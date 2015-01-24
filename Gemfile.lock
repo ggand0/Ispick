@@ -46,13 +46,6 @@ GIT
     obscenity (1.0.2)
 
 GIT
-  remote: git@github.com:pentiumx/social-buttons.git
-  revision: 6877a94cf8c4bbc2e35dda3fc02eec1d485c4c31
-  specs:
-    social-buttons (0.3.9)
-      rails (>= 3.0.0)
-
-GIT
   remote: git@github.com:pentiumx/twitter.git
   revision: 1fed387104cb0c84bf7d058559f83c393ed5eb8b
   specs:
@@ -701,7 +694,6 @@ DEPENDENCIES
   shareable
   simplecov
   simplecov-rcov
-  social-buttons!
   spring
   spring-commands-rspec
   teaspoon

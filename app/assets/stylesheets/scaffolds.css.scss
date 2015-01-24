@@ -1,6 +1,8 @@
+@import "_colors";
+
 body {
-  background-color: #FDFCFB;//#F3F0EC;//#fff;
-  color: #333;
+  background-color: $base-pale;
+  color: $base-dark;
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 13px;
   line-height: 18px;
@@ -21,13 +23,13 @@ pre {
 }
 
 a {
-  color: #000;
+  color: darken($base-dark, 15%);
   text-decoration: none;
   /*&:visited {
     color: #666;
   }*/
   &:hover {
-    color: #000;
+    color: darken($base-dark, 15%);
     text-decoration: underline;
   }
 }

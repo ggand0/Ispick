@@ -6,21 +6,14 @@
 <!-- Render description box and login form box only at the first time -->
 <div class="wrapper">
   <% if @first %>
-    <div class="block has-gutters">
-      <div class="height">260</div>
+    <div class="block has-gutters desc-box">
       <div class="top-description">
-        <br />
         <%= render partial: 'shared/top_description' %>
-        <br />
       </div>
     </div>
-    <div class="block has-gutters">
-      <div class="height">250</div>
+    <div class="block has-gutters desc-box">
       <div class="wrapper-oauth">
-        <br />
         <%= render partial: 'shared/top/wrapper_sign_up' %>
-        <br />
-        <br />
       </div>
     </div>
   <% end %>
