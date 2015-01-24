@@ -32,7 +32,7 @@ module Scrape
       @logger.info "Scraping popular images..."
       scrape_popular_images()
       @logger.info "Scraping ranking images..."
-      scrape_ranking_images()
+      #scrape_ranking_images()
       @logger.info '--------------------------------------------------'
     end
 
@@ -145,7 +145,7 @@ module Scrape
           @logger.error "An error has occurred inside get_data method."
           next
         end
-        
+
         # absolute threshold (ranking may reffer to a rate of increase)
         if image_data[:original_favorite_count] >= threshold then
           # save image_data
