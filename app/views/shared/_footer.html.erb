@@ -1,9 +1,10 @@
 <div id='footer'>
-  <p>2014-2020 <%= link_to 'Ispick', '/' %>.
-    <%= link_to 'Privacy Policy', page_path('privacy_policy') %> /
-    <%= link_to 'Term of Service', page_path('term_of_service') %> /
-    <%= link_to 'About us', new_contact_path %>
+  <p id="copyright">2014-2020 <%= link_to 'Ispick', '/' %></p>
+  <ul>
+    <li><%= link_to 'Privacy Policy', page_path('privacy_policy') %></li>
+    <li><%= link_to 'Term of Service', page_path('term_of_service') %></li>
+    <li><%= link_to 'About us', new_contact_path %></li>
     <%# link_to 'FAQ', page_path('faq') %>
     <%# link_to 'Blog', 'http://ispick.tumblr.com/'.html_safe %>
-  </p>
+  </ul>
 </div>
