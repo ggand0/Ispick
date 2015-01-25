@@ -36,7 +36,7 @@ FactoryGirl.define do
 
     # Creates an image that has sequenced tags
     factory :image_with_tags do
-      ignore do
+      transient do
         tags_count 5
       end
       after(:create) do |image, evaluator|

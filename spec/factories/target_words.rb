@@ -17,7 +17,7 @@ FactoryGirl.define do
 
     # A TargetWord object with images that have no files
     factory :word_with_images do
-      ignore do
+      transient do
         images_count 5
       end
       after(:create) do |target_word, evaluator|
@@ -30,7 +30,7 @@ FactoryGirl.define do
 
     # A TargetWord object with images that have files
     factory :word_with_image_file do
-      ignore do
+      transient do
         images_count 1
       end
       after(:create) do |target_word, evaluator|
@@ -59,7 +59,7 @@ FactoryGirl.define do
 
     # A TagetWord object which is associated with a Person record
     factory :word_with_person do
-      ignore do
+      transient do
         words_count 1
       end
       after(:build) do |target_word, evaluator|

@@ -69,7 +69,7 @@ FactoryGirl.define do
     # ==========================
     factory :user_with_target_images do
       sequence(:name) { |n| "ispick_twitter_i#{n}" }
-      ignore do
+      transient do
         images_count 5
       end
       after(:create) do |user, evaluator|
@@ -85,7 +85,7 @@ FactoryGirl.define do
     factory :user_with_tags do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
       uid '22345678'
-      ignore do
+      transient do
         tags_count 5
       end
       after(:create) do |user, evaluator|
@@ -111,7 +111,7 @@ FactoryGirl.define do
     # ==========================================
     factory :user_with_tag_images do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
-      ignore do
+      transient do
         images_count 1
       end
       after(:create) do |user, evaluator|
@@ -123,7 +123,7 @@ FactoryGirl.define do
 
     factory :user_with_tag_images_file do
       sequence(:name) { |n| "ispick_twitter_w#{n}" }
-      ignore do
+      transient do
         images_count 1
       end
       after(:create) do |user, evaluator|
