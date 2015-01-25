@@ -2,7 +2,7 @@
 
 namespace :system do
   desc "Update the daily ranking"
-  task :update_ranking, :environment do
+  task update_ranking: :environment do
     limit = 100
 
     # First, erase all RankingImage records
