@@ -1,11 +1,13 @@
+# [Not Used] on 25/01/15
 require 'spec_helper'
 require "#{Rails.root}/script/scrape/scrape"
 
-describe Scrape::Twitter do
+=begin
+describe Scrape::Twitter, :broken => true do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   before do
-    allow_any_instance_of(IO).to receive(:puts)           # コンソールに出力しないようにしておく
-    allow(Resque).to receive(:enqueue).and_return nil  # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)
+    allow(Resque).to receive(:enqueue).and_return nil
 
     @client = Scrape::Twitter.new(nil, 10)
     @twitter_client = Scrape::Twitter.get_client
@@ -146,3 +148,4 @@ describe Scrape::Twitter do
   end
 
 end
+=end

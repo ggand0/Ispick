@@ -1,15 +1,17 @@
+# [Not Used] on 25/01/15
+
 require 'spec_helper'
 require "#{Rails.root}/script/scrape/scrape"
-require "#{Rails.root}/script/scrape/scrape_giphy"
 
-describe Scrape::Giphy do
+=begin
+describe Scrape::Giphy, :broken => true do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:logger) { Logger.new('log/scrape_giphy.log') }
   #let(:response) { IO.read(Rails.root.join('spec', 'fixtures', 'giphy_api_response')) }
 
   before do
-    allow_any_instance_of(IO).to receive(:puts)             # コンソールに出力しないようにしておく
-    allow(Resque).to receive(:enqueue).and_return nil    # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)
+    allow(Resque).to receive(:enqueue).and_return nil
     #@response = JSON.parse(response)['response']
 
     @giphy_client = Scrape::Giphy.get_client
@@ -70,3 +72,4 @@ describe Scrape::Giphy do
   end
 
 end
+=end
