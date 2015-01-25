@@ -129,6 +129,11 @@ class ImagesController < ApplicationController
     @pagination = current_user ? current_user.pagination : false
     @disable_fotter = true
     @images = images.page(params[:page]).per(display_num)
+
+    respond_to do |format|
+      format.html {}
+      format.js { render template: 'users/home' }
+    end
   end
 
 
