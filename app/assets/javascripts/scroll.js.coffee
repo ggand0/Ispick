@@ -27,12 +27,18 @@ class @Scroll
     @scrollHeight = 200       # The position it starts to load next images from the bottom of the screen
     @defHeight = 0            # The starting height where it starts to put image blocks
 
-    # [Not Used]Get GET parameters
-    @GET = {}
-    document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, =>
-      decode = (s) =>
-        return decodeURIComponent(s.split("+").join(" "))
-      @GET[decode(arguments[1])] = decode(arguments[2])
+    # Set resize event
+    $(window).resize(() =>
+      if (timer != false)
+        clearTimeout(timer)
+
+      # Execute the function after it elapses 200ms
+      timer = setTimeout(() =>
+        console.log('resized')
+
+        @recalculatePositions()
+        window.resizing = false
+      , 500)
     )
 
 
@@ -70,6 +76,77 @@ class @Scroll
     console.log(window.blocks) if @logging
 
 
+  # Re-calculate the positions of displayed images
+  # on window resized event, or when some other items are re-rendered.
+  recalculatePositions: () =>
+    if window.resizing
+      return
+    window.resizing = true
+
+    #for page in window.listView.pages
+      #console.log(page)
+      #for item in page.items
+      #  console.log(item)
+
+    # Reset values
+    window.blocks = []
+    @windowWidth = $(window).width()
+
+    @colWidth = $('.block').outerWidth()
+    console.log(@colWidth)
+    @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
+    for i in [0..@colCount-1]
+      @defHeight = $('.wrapper').offset().top
+      @defHeight += @margin # Add 20px margin so that it has correct gap
+      window.blocks.push(@defHeight)
+
+    # Re-calculate positions, loading past html elements from listView obj
+    self = @
+    count = 0
+    #console.log(window.listView.pages[0])
+    for item in window.listView.pages[0].items
+      console.log(item)
+      item.$el.each(()->
+        # Calculate and position a block div
+        console.log($(this))
+        min = Array.min(window.blocks)
+        index = $.inArray(min, window.blocks)
+        leftPos = self.margin+(index*(self.colWidth+self.margin))
+        if self.logging
+          console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
+          console.log(index+','+min)
+        # Change css styles to position the div
+        $(this).css({
+          'left':leftPos+'px',
+          'top':min+'px'
+        })
+        # Get the box's height
+        if $(this).hasClass(self.DEF_DESC_CLASS_NAME)
+          # Since this code handles the placement of initial images,
+          # it may contain description boxes, which have specific heights.
+          # As the heights of those boxes change by the amount of texts,
+          # get their div heights directly at here.
+
+          # Get the height including the margin
+          height = $(this).outerHeight()
+        else
+          # Get the thumbnail's height from html
+          # This data is rendered by Rails code, and read it on JS
+          height = parseInt($(this).find('.height').text())
+          height = self.DEF_IMAGE_HEIGHT if height == 0
+
+        window.blocks[index] = min + height + self.margin
+
+        # Debug outputs
+        console.log(leftPos+','+height) if self.logging
+
+        # Increment the counter
+        count += 1
+      )
+
+
+
+
   # [WIP][Not Used]
   changeDefHeights: (collapsed)=>
     newHeight = $('.wrapper').offset().top
@@ -93,6 +170,7 @@ class @Scroll
     $blocks = $('.block')
     count = 0
     @colWidth = $blocks.outerWidth() if @colWidth is null
+
 
     # Position images one by one
     $blocks.each(()->

@@ -1,19 +1,21 @@
 class @Component
   constructor: () ->
 
-  # [WIP]
+  # Re-position images when collapse bar is trrigered
   initCollapsables: () ->
-    # Re-position images when collapse bar is torrigered
-    $('#filter-sort').on('hidden.bs.collapse', () ->
+    $('#menu').on('hidden.bs.collapse', () ->
       console.log('hidden')
-      window.scroll.changeDefHeights(false)
+      window.resizing = false # Set flag to false since the method returns when the flag is true
+      window.scroll.recalculatePositions()
     )
-    $('#filter-sort').on('shown.bs.collapse', () ->
+    $('#menu').on('shown.bs.collapse', () ->
       console.log('shown')
-      window.scroll.changeDefHeights(true)
+      window.resizing = false
+      window.scroll.recalculatePositions()
     )
 
-  # 'Clip'ボタンを押下した時にボタンを表示したままにする
+
+  # Keep the 'Clip' button visible when clicked
   initButtons: () ->
     $(document).on('click', '.popover-board', () ->
       $(this).parents('.boxInner').addClass('hovered')
