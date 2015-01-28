@@ -14,12 +14,10 @@
 
 // Style the format of time inside a titleBox div
 .time-string {
-  font-size: 8px;
-  line-height: 8px;
+  font-size: 10px;
+  line-height: 1.2;
   text-align: right;
-  align: right;
-  float: right;
-  width: 200px;
+  margin-top: 3px;
 }
 // for home_debug action
 .time-string-debug {
