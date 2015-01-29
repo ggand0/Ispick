@@ -1,22 +1,27 @@
 <%# stylesheet_link_tag 'scaffolds' %>
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="col-md-10 col-lg-10 about-us">
-      <br />
-      <h2>FAQ</h2>
-      <strong>What is this site?</strong><br />
-        Ispick is a website that gathers anime artworks automatically. You can browse images with the pinterest-like layout, based on RSS streams, or simply on tag search results. Also, you can create your own image feed by registering to our site.<br />
-        If you're an original author and want to delete your works on the site, please feel free to contact us.<br /><br />
-      <strong>Why does it fail to load images with infinite scroll when I browse on Chrome?</strong><br />
-         This is a broser side bug and is fixed in version 40, as following stackoverflow page describes:
-        <%= link_to '<u>http://stackoverflow.com/questions/26408931/bizarre-error-in-chrome-developer-console-failed-to-load-resource-neterr-ca</u>'.html_safe, 'http://stackoverflow.com/questions/26408931/bizarre-error-in-chrome-developer-console-failed-to-load-resource-neterr-ca' %> <br /><br />
-         To address this problem, you can use other browsers like Firefox, or you can try <%= link_to '<u>Chrome 40 beta</u>'.html_safe, 'http://googlechromereleases.blogspot.jp/'.html_safe %>.<br />
-      <br />
-      <strong>How can I turn on pagination?</strong><br />
-        After logging in, go to the settings page. You can enable it by checking "Display images with pagination" and hitting "Update Settings" button.<br /><br />
-      <strong>Are you going to increase the number of sites?</strong><br />
-        Yes, currently we're planning to add deviantART, Pixiv, Nicoseiga, and other image board style websites.<br /><br />
+  <div class="row">
+    <div class="col-md-12">
+      <h1>FAQ</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-10 col-lg-10">
+      <div class="content-box">
+        <strong>What is this site?</strong><br />
+          Ispick is a website that gathers anime artworks automatically. You can browse images with the pinterest-like layout, based on RSS streams, or simply on tag search results. Also, you can create your own image feed by registering to our site.<br />
+          If you're an original author and want to delete your works on the site, please feel free to contact us.<br /><br />
+        <strong>Why does it fail to load images with infinite scroll when I browse on Chrome?</strong><br />
+           This is a broser side bug and is fixed in version 40, as following stackoverflow page describes:
+          <%= link_to '<u>http://stackoverflow.com/questions/26408931/bizarre-error-in-chrome-developer-console-failed-to-load-resource-neterr-ca</u>'.html_safe, 'http://stackoverflow.com/questions/26408931/bizarre-error-in-chrome-developer-console-failed-to-load-resource-neterr-ca' %> <br /><br />
+           To address this problem, you can use other browsers like Firefox, or you can try <%= link_to '<u>Chrome 40 beta</u>'.html_safe, 'http://googlechromereleases.blogspot.jp/'.html_safe %>.<br />
+        <br />
+        <strong>How can I turn on pagination?</strong><br />
+          After logging in, go to the settings page. You can enable it by checking "Display images with pagination" and hitting "Update Settings" button.<br /><br />
+        <strong>Are you going to increase the number of sites?</strong><br />
+          Yes, currently we're planning to add deviantART, Pixiv, Nicoseiga, and other image board style websites.
+      </div>
     </div>
   </div>
 </div>

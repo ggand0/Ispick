@@ -1,29 +1,34 @@
 <%= stylesheet_link_tag 'users' %>
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Preferences</h1>
+    </div>
+  </div>
 
-<div class="container-fluid controlls">
-    <!-- Render flash notices -->
-    <% if flash.present? %>
-      <div class="search-tags col-md-5 col-lg-5">
-        <%= render partial: "shared/flash_messages", flash: flash %>
-      </div>
-      <div class="clearfix visible-lg-block"></div>
-      <div class="clearfix visible-md-block"></div>
-      <div class="clearfix visible-sm-block"></div>
-    <% end %>
-
-    <!-- Render the search form -->
-    <%= search_form_for @search_tags, url: preferences_users_path, html: { method: :post },
-      remote: true, class: "search-tags col-md-5 col-lg-5 col-sm-5" do |f| %>
-        Search a tag to follow!
-        <div class="input-group">
-        <%= f.text_field :name_cont, class: "form-control",  placeholder: 'Search tags' %>
-
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-        </span>
+  <div class="row">
+    <div class="col-md-5">
+      <!-- Render flash notices -->
+      <% if flash.present? %>
+        <div class="search-tags">
+          <%= render partial: "shared/flash_messages", flash: flash %>
         </div>
-    <% end %>
+      <% end %>
+
+      <!-- Render the search form -->
+      <%= search_form_for @search_tags, url: preferences_users_path, html: { method: :post },
+        remote: true, class: "search-tags" do |f| %>
+          <h2>Search a tag to follow!</h2>
+          <div class="input-group">
+          <%= f.text_field :name_cont, class: "form-control",  placeholder: 'Search tags' %>
+
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+          </span>
+          </div>
+      <% end %>
+    </div>
 
     <!-- Render a dropdown to switch popular tags source
     <%= bs_dropdown_button_to list_glyphicon do %>
@@ -32,51 +37,44 @@
     <% end %>
     <br />
     <br />-->
-
-
-  <div class="clearfix visible-lg-block"></div>
-  <div class="clearfix visible-md-block"></div>
-  <div class="clearfix visible-sm-block"></div>
-
-<div class="row vertical-align">
-  <!-- Render popular tags or search result in the partial -->
-  <div class="wrapper-popular-tags col-md-5 col-lg-5">
-    <%= render partial: 'users/popular_tags', locals: { tags_result: @tags_result, popular_tags: @popular_tags } %>
   </div>
 
-  <div class="arrow col-md-1 col-lg-1">
-    <%= image_tag asset_path('arrow_aqua_green_sm.png') %>
+  <div class="row">
+    <!-- Render popular tags or search result in the partial -->
+    <div class="col-md-5 col-lg-5">
+      <%= render partial: 'users/popular_tags', locals: { tags_result: @tags_result, popular_tags: @popular_tags } %>
+    </div>
+
+    <div class="arrow col-md-1 col-lg-1">
+      <%= image_tag asset_path('arrow_aqua_green_sm.png') %>
+    </div>
+
+    <!-- Render followed tags in the partial -->
+    <div class="col-md-5 col-lg-5">
+      <%= render partial: 'users/followed_tags', locals: { tags: @tags, test: 'test0' } %>
+    </div>
   </div>
 
-  <div class="clearfix visible-sm-block"></div>
-
-  <!-- Render followed tags in the partial -->
-  <div class="wrapper-followed-tags col-md-5 col-lg-5">
-    <%= render partial: 'users/followed_tags', locals: { tags: @tags, test: 'test0' } %>
+  <div class="row">
+    <div class="col-md-12">
+      <hr>
+      <div class="search-tags">
+        <h2>Set default sites for filtering:</h2>
+        <%= bootstrap_form_tag url: set_sites_users_path, class: "col-md-5 col-lg-5 col-sm-5" do |f| %>
+          <% TargetSite.all.each_with_index do |site, count| %>
+            <label class="checkbox-inline">
+            <% if current_user.target_sites.where(name: site.name).count > 0 %>
+              <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline", checked: true %>
+            <% else %>
+              <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline" %>
+            <% end %>
+          </label>
+          <% end %>
+          <%= f.submit %>
+        <% end %>
+      </div>
+    </div>
   </div>
-</div>
-<br />
-<br />
-
-<div class="clearfix visible-md-block"></div>
-<div class="clearfix visible-sm-block"></div>
-<div class="search-tags col-md-10 col-lg-10 col-sm-10">
-  Set default sites for filtering:
-  <%= bootstrap_form_tag url: set_sites_users_path, class: "col-md-5 col-lg-5 col-sm-5" do |f| %>
-    <% TargetSite.all.each_with_index do |site, count| %>
-      <label class="checkbox-inline">
-      <% if current_user.target_sites.where(name: site.name).count > 0 %>
-        <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline", checked: true %>
-      <% else %>
-        <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline" %>
-      <% end %>
-    </label>
-    <% end %>
-    <%= f.submit %>
-  <% end %>
-</div>
-
-
 
   <!-- Insert space -->
   <div style="clear: both;">
