@@ -4,11 +4,13 @@
 
 @import "_colors";
 
-.about-us {
+
+.content-box {
   background-color: #F8F8F8;
-  border: 2px solid #F8F8F8;
-  border-radius: 15px;
-  margin: 10px;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
 }
 .col-centered{
   float: none;

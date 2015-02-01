@@ -71,47 +71,24 @@ span.glyphicon {
 
 .after-header { padding: -500px 0px; }
 
-
-// Classes in the 'Tags' page
-.search-tags {
-  padding-left: 0px;
-}
 .arrow {
-  position: relative;
-  padding-left: 0px;
-  width: 100px;
-  font-size: 50pt;
-}
-.vertical-align {
-  display: flex;
-  align-items: center;
-  //justify-content: center;
-  flex-direction: row;
-  flex-wrap: wrap;
+  line-height: 300px + 20px + 10px + 24px * 1.1;
+  text-align: center;
+  img {
+    width: 40px;
+    height: 57px;
+  }
 }
 
-.wrapper-popular-tags {
-  width: 450px;
-}
-.wrapper-followed-tags {
-  width: 450px;
-}
-.popular-tags {
-  width: 400px;
-  height: 300px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #C3C3C3;
-  overflow-y: scroll;
-}
+.popular-tags,
 .followed-tags {
-  width: 400px;
   height: 300px;
   border-style: solid;
   border-width: 1px;
   border-color: #C3C3C3;
   overflow-y: scroll;
 }
+
 .tag-button {
   color: #5B9B9B;//#F8F8F8;
   background-color: #E4F5F5;//#7ACECE;
