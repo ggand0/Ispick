@@ -57,14 +57,23 @@
 }
 /* mobile version */
 .navbar-ispick .navbar-toggle {
-    border-color: #DDD;
+  border-color: $ice-light;
+  width: 40px;
+  height: 40px;
+  margin: 10px;
+  padding: 0;
 }
 .navbar-ispick .navbar-toggle:hover,
 .navbar-ispick .navbar-toggle:focus {
-    background-color: #DDD;
+  background-color: $ice-light;
+  .icon-bar {
+    background-color: $ice-soft;
+  }
 }
 .navbar-ispick .navbar-toggle .icon-bar {
-    background-color: #CCC;
+  background-color: $ice-light;
+  margin-right: auto;
+  margin-left: auto;
 }
 #image_search {
     padding-top: 5px;
