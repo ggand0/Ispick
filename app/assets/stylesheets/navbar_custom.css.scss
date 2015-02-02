@@ -9,6 +9,7 @@
     border-bottom-color: #FFFFFF;
     border: none;
     border-radius: 0px;
+    margin-bottom: 20px;
 }
 /* title */
 .navbar-ispick .navbar-brand {
@@ -79,11 +80,76 @@
     padding-top: 5px;
 }
 @media (max-width: 767px) {
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a {
-      color: $base-dark;
+  .navbar-collapse {
+    background-color: lighten($ice-light, 3%);
+    position: relative;
+    z-index: 100;
+  }
+  .navbar-ispick .navbar-nav {
+    margin: 0 -15px;
+    li {
+      padding: 0;
+      a {
+        color: $ice-soft;
+        line-height: 40px;
+        padding: 0 15px;;
+        margin: 0;
+      }
+      a:hover,
+      a:focus {
+        background-color: $ice-dull;
+        color: $ice-light;
+        border-radius: 0;
+      }
     }
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:hover,
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:focus {
-      color: darken($base-dark, 15%);
+    & > .active {
+      a,
+      a:hover,
+      a:focus {
+        color: $ice-light;
+        background-color: $ice-soft;
+        border-radius: 0;
+      }
     }
+    & > .dropdown {
+      a {
+        .caret {
+          border-top-color: $ice-soft;
+        }
+      }
+      a:hover,
+      a:focus {
+        .caret {
+          border-bottom-color: $ice-light;
+        }
+      }
+    }
+    & > .open {
+      a,
+      a:hover,
+      a:focus {
+        border-radius: 0;
+      }
+    }
+    .dropdown-menu {
+      padding: 0;
+      li {
+        a {
+          color: $ice-soft;
+        }
+        a:hover,
+        a:focus {
+          color: $ice-light;
+        }
+      }
+      .active {
+        a,
+        a:hover,
+        a:focus {
+          color: $ice-light;
+          background-color: $ice-soft;
+        }
+      }
+    }
+  }
 }
