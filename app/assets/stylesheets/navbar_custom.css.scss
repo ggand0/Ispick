@@ -115,11 +115,13 @@
       a {
         .caret {
           border-top-color: $ice-soft;
+          border-bottom-color: $ice-soft;
         }
       }
       a:hover,
       a:focus {
         .caret {
+          border-top-color: $ice-light;
           border-bottom-color: $ice-light;
         }
       }
