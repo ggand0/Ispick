@@ -2,6 +2,10 @@
 <%= render 'shared/modal_image' %>
 <%= render 'shared/modal_board' %>
 
+<!-- Tell JavaScript infinite scroll or pagination -->
+<%= content_tag :div, class: "temp_information", data: { scroll: (not @pagination) } do %>
+<% end %>
+
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
