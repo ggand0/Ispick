@@ -9,6 +9,7 @@
     border-bottom-color: #FFFFFF;
     border: none;
     border-radius: 0px;
+    margin-bottom: 20px;
 }
 /* title */
 .navbar-ispick .navbar-brand {
@@ -25,59 +26,132 @@
     font-weight: 700;
 }
 .navbar-ispick .navbar-nav > li > a:hover,
-.navbar-ispick .navbar-nav > li > a:focus {
-    color: #5B9B9B;//#333;
+.navbar-ispick .navbar-nav > li > a:focus,
+.navbar-ispick .navbar-nav > .open > a,
+.navbar-ispick .navbar-nav > .open > a:hover,
+.navbar-ispick .navbar-nav > .open > a:focus {
     border-radius: 4px 4px 0 0;
+    background-color: $ice-dull;
 }
 .navbar-ispick .navbar-nav > .active > a,
 .navbar-ispick .navbar-nav > .active > a:hover,
 .navbar-ispick .navbar-nav > .active > a:focus {
-    color: #E4F5F5;//#555;
-    background-color: #5B9B9B;//#E7E7E7;
+    color: $ice-dull;
+    background-color: $base-light;
     border-radius: 4px 4px 0 0;
 }
-.navbar-ispick .navbar-nav > .open > a,
-.navbar-ispick .navbar-nav > .open > a:hover,
-.navbar-ispick .navbar-nav > .open > a:focus {
-    color: #E4F5F5;//#555;
-    background-color: #5B9B9B;//#D5D5D5;
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+    color: $ice-light;
+    background-color: $ice-soft;
 }
 /* caret */
-.navbar-ispick .navbar-nav > .dropdown > a .caret {
-    border-top-color: #E4F5F5;//#777;
-    border-bottom-color: #E4F5F5;//#777;
-}
+.navbar-ispick .navbar-nav > .dropdown > a .caret,
 .navbar-ispick .navbar-nav > .dropdown > a:hover .caret,
-.navbar-ispick .navbar-nav > .dropdown > a:focus .caret {
-    border-top-color: #5B9B9B;//#333;
-    border-bottom-color: #5B9B9B;//#333;
-}
+.navbar-ispick .navbar-nav > .dropdown > a:focus .caret,
 .navbar-ispick .navbar-nav > .open > a .caret,
 .navbar-ispick .navbar-nav > .open > a:hover .caret,
 .navbar-ispick .navbar-nav > .open > a:focus .caret {
-    border-top-color: #5B9B9B;//#555;
-    border-bottom-color: #5B9B9B;//#555;
+    border-top-color: $ice-light;
+    border-bottom-color: $ice-light;
 }
 /* mobile version */
 .navbar-ispick .navbar-toggle {
-    border-color: #DDD;
+  border-color: $ice-light;
+  width: 40px;
+  height: 40px;
+  margin: 10px;
+  padding: 0;
 }
 .navbar-ispick .navbar-toggle:hover,
 .navbar-ispick .navbar-toggle:focus {
-    background-color: #DDD;
+  background-color: $ice-light;
+  .icon-bar {
+    background-color: $ice-soft;
+  }
 }
 .navbar-ispick .navbar-toggle .icon-bar {
-    background-color: #CCC;
+  background-color: $ice-light;
+  margin-right: auto;
+  margin-left: auto;
 }
 #image_search {
     padding-top: 5px;
 }
 @media (max-width: 767px) {
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a {
-      color: $base-dark;
+  .navbar-collapse {
+    background-color: lighten($ice-light, 3%);
+    position: relative;
+    z-index: 100;
+  }
+  .navbar-ispick .navbar-nav {
+    margin: 0 -15px;
+    li {
+      padding: 0;
+      a {
+        color: $ice-soft;
+        line-height: 40px;
+        padding: 0 15px;;
+        margin: 0;
+      }
+      a:hover,
+      a:focus {
+        background-color: $ice-dull;
+        color: $ice-light;
+        border-radius: 0;
+      }
     }
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:hover,
-    .navbar-ispick .navbar-nav .open .dropdown-menu > li > a:focus {
-      color: darken($base-dark, 15%);
+    & > .active {
+      a,
+      a:hover,
+      a:focus {
+        color: $ice-light;
+        background-color: $ice-soft;
+        border-radius: 0;
+      }
     }
+    & > .dropdown {
+      a {
+        .caret {
+          border-top-color: $ice-soft;
+          border-bottom-color: $ice-soft;
+        }
+      }
+      a:hover,
+      a:focus {
+        .caret {
+          border-top-color: $ice-light;
+          border-bottom-color: $ice-light;
+        }
+      }
+    }
+    & > .open {
+      a,
+      a:hover,
+      a:focus {
+        border-radius: 0;
+      }
+    }
+    .dropdown-menu {
+      padding: 0;
+      li {
+        a {
+          color: $ice-soft;
+        }
+        a:hover,
+        a:focus {
+          color: $ice-light;
+        }
+      }
+      .active {
+        a,
+        a:hover,
+        a:focus {
+          color: $ice-light;
+          background-color: $ice-soft;
+        }
+      }
+    }
+  }
 }

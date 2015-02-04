@@ -34,8 +34,6 @@ class @Scroll
 
       # Execute the function after it elapses 200ms
       timer = setTimeout(() =>
-        console.log('resized')
-
         @recalculatePositions()
         window.resizing = false
       , 500)
@@ -83,17 +81,11 @@ class @Scroll
       return
     window.resizing = true
 
-    #for page in window.listView.pages
-      #console.log(page)
-      #for item in page.items
-      #  console.log(item)
-
     # Reset values
     window.blocks = []
     @windowWidth = $(window).width()
 
     @colWidth = $('.block').outerWidth()
-    console.log(@colWidth)
     @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     for i in [0..@colCount-1]
       @defHeight = $('.wrapper').offset().top
@@ -103,18 +95,16 @@ class @Scroll
     # Re-calculate positions, loading past html elements from listView obj
     self = @
     count = 0
-    #console.log(window.listView.pages[0])
     for item in window.listView.pages[0].items
-      console.log(item)
       item.$el.each(()->
         # Calculate and position a block div
-        console.log($(this))
         min = Array.min(window.blocks)
         index = $.inArray(min, window.blocks)
         leftPos = self.margin+(index*(self.colWidth+self.margin))
         if self.logging
           console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
           console.log(index+','+min)
+
         # Change css styles to position the div
         $(this).css({
           'left':leftPos+'px',

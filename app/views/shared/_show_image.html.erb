@@ -1,73 +1,92 @@
 <%= stylesheet_link_tag 'images_detail' %>
 
-<br />
-<div class="image-title">
-  <%= strip_tags(image.title) %>
-</div>
+<div class="container-fluid">
+  <br />
 
-<div class="image-buttons">
-  <div class="image-share">
-    <div class="share-button">
-      <style type="text/css" media="screen">#custom-tweet-button a {display: block; padding: 32px 0px 0px 32px; background: url("<%= asset_path('icons/twitter_32.png') %>") no-repeat; border: 0px; }</style>
-      <div id="custom-tweet-button">
-        <a href="https://twitter.com/share?text=your text&url=<%= image.page_url %>" target="_blank"/>
+  <!-- Render image's title -->
+  <div class="image-title">
+    <%= strip_tags(image.title) %>
+  </div>
+
+  <!-- Render social sharing buttons -->
+  <div class="image-buttons" style="padding: 0px;">
+    <div class="image-share">
+
+      <!-- Render Twitter share button -->
+      <div class="share-button">
+        <style type="text/css" media="screen">#custom-tweet-button a {display: block; padding: 32px 0px 0px 32px; background: url("<%= asset_path('icons/twitter_32.png') %>") no-repeat; border: 0px; }</style>
+        <div id="custom-tweet-button">
+          <a href="https://twitter.com/share?text=your text&url=<%= image.page_url %>" target="_blank"/>
+        </div>
+      </div>
+
+      <!-- Render Facebook share button -->
+      <div class="share-button">
+        <!-- We need to set the app public to use this like button -->
+        <%= like_button(CONFIG['facebook_app_id'].to_i) %>
+      </div>
+
+      <!-- Render Pinit button -->
+      <div class="share-button">
+        <%= pinit_button(url: image.page_url, media: image.original_url, description: "#{strip_tags(image.caption)} via ispicks.com", icon: asset_path('icons/pinterest_32.png')) %>
+      </div>
+
+      <!-- Render Tumblr share button -->
+      <div class="share-button">
+        <script src="http://platform.tumblr.com/v1/share.js"></script>
+        <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:32px; height:32px; background:url(<%= asset_path('icons/tumblr_32.png') %>) top left no-repeat transparent;"></a>
+      </div>
+
+      <!-- Render clip button -->
+      <div class="share-button">
+        <%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
+        class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" if current_user %>
       </div>
     </div>
-    <div class="share-button">
-      <!-- We need to set the app public to use this like button -->
-      <%# like_button(CONFIG['facebook_app_id'].to_i) %>
-    </div>
-    <div class="share-button">
-      <%= pinit_button(url: image.page_url, media: image.original_url, description: "#{strip_tags(image.caption)} via ispicks.com", icon: asset_path('icons/pinterest_32.png')) %>
-    </div>
-    <div class="share-button">
-      <script src="http://platform.tumblr.com/v1/share.js"></script>
-      <a href="http://www.tumblr.com/share/photo?source=<%=u image.original_url %>&caption=<%=u strip_tags(image.caption) %>&clickthru=<%=u image.page_url %>" title="Share on Tumblr" style="display:inline-block; text-indent:-9999px; overflow:hidden; width:32px; height:32px; background:url(<%= asset_path('icons/tumblr_32.png') %>) top left no-repeat transparent;"></a>
-    </div>
-    <div class="share-button">
-      <%= bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
-      class: "popover-board btn-info btn btn-share" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}" if current_user %>
-    </div>
+
   </div>
-</div>
-<br />
-<hr>
 
-<div class="image-detail">
-  <dl>
-    <dt>Artist: </dt>
-    <dd><%= image.artist ? image.artist : 'Unknown artist' %></dd>
-
-    <dt>Title: </dt>
-    <dd><%= strip_tags(image.title) if image.title %></dd>
-
-    <dt>Caption: </dt>
-    <dd><%= strip_tags(image.caption) if image.caption %></dd>
-
-    <dt>Page Url: </dt>
-    <dd><%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %></dd>
-
-    <dt>Sharable Size:</dt>
-    <dd><%= "#{image.original_width}, #{image.original_height}" %></dd>
-
-    <dt>Posted At:</dt>
-    <dd><%= "#{image.posted_at}" %></dd>
-
-    <dt>Created At:</dt>
-    <dd><%= "#{image.created_at}" %></dd>
-
-    <dt>Favorites: </dt>
-    <dd><%= image.original_favorite_count %></dd>
-  </dl>
-
-  <%= tags_glyphicon %>
-  <% image.tags.each do |tag| %>
-    <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
-  <% end %>
-</div>
-
-
-<!-- Insert space -->
-<div style="clear: both;">
+  <div class="clearfix visible-lg-block"></div>
+  <div class="clearfix visible-md-block"></div>
+  <div class="clearfix visible-sm-block"></div>
   <br />
+  <hr>
+
+  <!-- Render additional image information -->
+  <div class="col-md-5">
+    <dl>
+      <dt>Artist: </dt>
+      <dd><%= image.artist ? image.artist : 'Unknown artist' %></dd>
+
+      <dt>Title: </dt>
+      <dd><%= strip_tags(image.title) if image.title %></dd>
+
+      <dt>Caption: </dt>
+      <dd><%= strip_tags(image.caption) if image.caption %></dd>
+
+      <dt>Page Url: </dt>
+      <dd><%= link_to "#{image.page_url}", image.page_url.html_safe, :target => "_blank" if image.page_url %></dd>
+
+      <dt>Sharable Size:</dt>
+      <dd><%= "#{image.original_width}, #{image.original_height}" %></dd>
+
+      <dt>Posted At:</dt>
+      <dd><%= "#{image.posted_at}" %></dd>
+
+      <dt>Created At:</dt>
+      <dd><%= "#{image.created_at}" %></dd>
+
+      <dt>Favorites: </dt>
+      <dd><%= image.original_favorite_count %></dd>
+    </dl>
+  </div>
+
+
+  <!-- Render tags associated with the image -->
+  <div class="col-md-5">
+    <%= tags_glyphicon %>
+    <% image.tags.each do |tag| %>
+      <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
+    <% end %>
+  </div>
 </div>

@@ -1,13 +1,11 @@
 // Used on image detail modals
 .image-title {
   font-size: 20pt;
-  width: 600px;
   height: 32px;
   float: left;
 }
 .image-detail {
-  width: 500px;
-  float: left;
+  height: 400px;
 }
 .image-buttons {
   align: right;
@@ -22,43 +20,10 @@
 .image-time {
   text-align: left;
 }
-.image-buttons {
-}
 .share-button {
   float: right;
-  //width: auto;
   text-align: right;
   align: right;
-}
-
-
-dl {
-  overflow: hidden;
-  width: 700px;
-}
-
-dt {
-  float: left;
-  clear: right;
-  width: 190px;
-  color: white;
-  background-color: #7ACECE;
-}
-
-dd {
-  float: right;
-  width: 510px;
-  margin-left: 0;
-  margin-bottom: 5px;
-  color: #444;
-  //border: 1px #cccccc solid;
-  border-left: none;
-}
-
-dt, dd {
-  //height: 56px;
-  //line-height: 56px;
-  padding-left: 14px;
 }
 
 
