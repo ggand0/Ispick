@@ -27,6 +27,30 @@
 }
 
 
+
+dt {
+  clear: right;
+  width: 150px;
+  color: white;
+  background-color: #7ACECE;
+}
+
+dd {
+  //margin-left: 0;
+  //margin-bottom: 5px;
+  color: #444;
+  word-break: break-word;
+}
+
+dt, dd {
+  padding-left: 14px;
+}
+
+.modal-body {
+  word-break: break-word;
+}
+
+
 // Used on html view of modals
 .detail-wrap {
   width: 800px;
