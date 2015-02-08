@@ -10,6 +10,11 @@ Array.max = (array) ->
 
 # A class which have the public instance methods that align/scroll images on the screen
 class @Scroll
+  #instance = null
+  #@get: (logging) ->
+  #  instance ?= new ScrollPrivate(logging)
+
+  #class ScrollPrivate
   DEF_DESC_CLASS_NAME: 'desc-box' # The class name of description box divs
   DEF_COLUMN_WIDTH: 300
   DEF_IMAGE_HEIGHT: 300
@@ -21,11 +26,15 @@ class @Scroll
     @colWidth=0
     @margin=@DEF_MARGIN       # Margin width between two blocks
     @windowWidth=0
-    window.blocks=[]
-    window.promisesArray=[]
+    @url = document.URL#window.location.pathname
+    @blocks = []
     @counter = 0
     @scrollHeight = 200       # The position it starts to load next images from the bottom of the screen
     @defHeight = 0            # The starting height where it starts to put image blocks
+
+    @$el = $('.wrapper')
+    @listView = new infinity.ListView(@$el)
+    @scrollReady = true
 
     # Set resize event
     $(window).resize(() =>
@@ -70,8 +79,8 @@ class @Scroll
     for i in [0..@colCount-1]
       @defHeight = $('.wrapper').offset().top
       @defHeight += @margin # Add 20px margin so that it has correct gap
-      window.blocks.push(@defHeight)
-    console.log(window.blocks) if @logging
+      @blocks.push(@defHeight)
+    console.log(@blocks) if @logging
 
 
   # Re-calculate the positions of displayed images
@@ -82,7 +91,7 @@ class @Scroll
     window.resizing = true
 
     # Reset values
-    window.blocks = []
+    @blocks = []
     @windowWidth = $(window).width()
 
     @colWidth = $('.block').outerWidth()
@@ -90,16 +99,16 @@ class @Scroll
     for i in [0..@colCount-1]
       @defHeight = $('.wrapper').offset().top
       @defHeight += @margin # Add 20px margin so that it has correct gap
-      window.blocks.push(@defHeight)
+      @blocks.push(@defHeight)
 
     # Re-calculate positions, loading past html elements from listView obj
     self = @
     count = 0
-    for item in window.listView.pages[0].items
+    for item in @listView.pages[0].items
       item.$el.each(()->
         # Calculate and position a block div
-        min = Array.min(window.blocks)
-        index = $.inArray(min, window.blocks)
+        min = Array.min(self.blocks)
+        index = $.inArray(min, self.blocks)
         leftPos = self.margin+(index*(self.colWidth+self.margin))
         if self.logging
           console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
@@ -125,7 +134,7 @@ class @Scroll
           height = parseInt($(this).find('.height').text())
           height = self.DEF_IMAGE_HEIGHT if height == 0
 
-        window.blocks[index] = min + height + self.margin
+        self.blocks[index] = min + height + self.margin
 
         # Debug outputs
         console.log(leftPos+','+height) if self.logging
@@ -142,8 +151,8 @@ class @Scroll
     newHeight = $('.wrapper').offset().top
     gap = if collapsed then 36 else -36;
 
-    window.listView.top += gap
-    for item in window.listView.pages[0].items
+    @listView.top += gap
+    for item in @listView.pages[0].items
       for div in item.$el
         t = $(div).css('top')
         top = parseInt(t.substring(0, t.length-2))
@@ -165,8 +174,8 @@ class @Scroll
     # Position images one by one
     $blocks.each(()->
       # Calculate and position a block div
-      min = Array.min(window.blocks)
-      index = $.inArray(min, window.blocks)
+      min = Array.min(self.blocks)
+      index = $.inArray(min, self.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
       if self.logging
         console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
@@ -195,7 +204,7 @@ class @Scroll
         height = parseInt($(this).find('.height').text())
         height = self.DEF_IMAGE_HEIGHT if height == 0
 
-      window.blocks[index] = min + height + self.margin
+      self.blocks[index] = min + height + self.margin
 
       # Debug outputs
       console.log(leftPos+','+height) if self.logging
@@ -203,7 +212,7 @@ class @Scroll
       # Increment the counter
       count += 1
     )
-    console.log(window.blocks) if @logging
+    console.log(@blocks) if @logging
 
 
   # Calculate and position newly loaded images
@@ -217,8 +226,8 @@ class @Scroll
     # Position images one by one.
     # Get newly added elements only
     $container.slice(Math.max($container.length - newElemsCount, 1)).each (()->
-      min = Array.min(window.blocks)
-      index = $.inArray(min, window.blocks)
+      min = Array.min(self.blocks)
+      index = $.inArray(min, self.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
       if self.logging
         console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
@@ -234,14 +243,14 @@ class @Scroll
       height = parseInt($(this).find('.height').text())
       height = self.DEF_IMAGE_HEIGHT if height == 0
       console.log(leftPos+','+height) if self.logging
-      window.blocks[index] = min+height+self.margin
+      self.blocks[index] = min+height+self.margin
     )
-    console.log(window.blocks) if @logging
+    console.log(@blocks) if @logging
 
 
   # Update loading icon's position
   updateSpinner: ()=>
-    max = Array.max(window.blocks)
+    max = Array.max(@blocks)
     $('#loader').css({
       'top':max+'px'
       'left':(@colCount/2)*@colWidth+'px'
@@ -261,7 +270,7 @@ class @Scroll
     console.log('Fetching...') if @logging
 
     # Prevent loading next images until current loading is done
-    window.scrollReady = false
+    @scrollReady = false
 
     # Get and execute javascript template of the current page
     $.getScript(url)
@@ -274,25 +283,23 @@ class @Scroll
       dataType: 'html',
 
       success: (data) =>
+        console.log('loaded')
         # Get image divs
         $newElements = $(data).find('.block')
         $newElements.hide()
-
-        # Append them to the listView array
-        #window.listView.append($newElements)
-        #count = window.listView.pages[0].items.length
-        #console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
 
         # Display loading gif icon
         @.updateSpinner()
         $('#loader').show()
 
         # Add event to position newly loaded images
-        $('.wrapper').imagesLoaded( =>
+        #$('.wrapper').imagesLoaded( =>
+        imgLoad = imagesLoaded( $('.wrapper') )
+        imgLoad.on('always', (instance) =>
           # Append them to the listView array
-          window.listView.append($newElements)
-          count = window.listView.pages[0].items.length
-          console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
+          @listView.append($newElements)
+          count = @listView.pages[0].items.length
+          console.log(count+': '+@listView.pages[0].items[count-1]) if @logging
 
           console.log('images loaded') if @logging
           $('#loader').hide()
@@ -300,10 +307,10 @@ class @Scroll
         )
 
         # Now we can load next images
-        window.scrollReady = true
+        @scrollReady = true
       failure: (data) ->
         console.log('failed') if @logging
-        window.scrollReady = true
+        @scrollReady = true
     })
 
 
@@ -319,12 +326,14 @@ class @Scroll
     @.updateSpinner()
 
     # Position images after image files are loaded
-    $('.wrapper').imagesLoaded( =>
+    #$('.wrapper').imagesLoaded( =>
+    imgLoad = imagesLoaded( $('.wrapper') )
+    imgLoad.on('always', (instance) =>
       # Calculate positions of initial images
       console.log('images loaded') if @logging
       @initPositionBlocks()
 
-      max = Array.max(window.blocks)
+      max = Array.max(@blocks)
       console.log(max)
       $('.pagination-footer').css({
         'top': max + 'px',
@@ -346,16 +355,18 @@ class @Scroll
     @.updateSpinner()
 
     # Initialize window Infinity.js variables
-    window.$el = $('.wrapper')
-    window.listView = new infinity.ListView(window.$el)
-    window.scrollReady = true
+    #@$el = $('.wrapper')
+    #@listView = new infinity.ListView(@$el)
+    #@scrollReady = true
 
     # Position images after image files are loaded
-    $('.wrapper').imagesLoaded( =>
+    #$('.wrapper').imagesLoaded( =>
+    imgLoad = imagesLoaded( $('.wrapper') )
+    imgLoad.on('always', (instance) =>
       # Append initial images to the listView array
-      window.listView.append($('.block'))
-      count = window.listView.pages[0].items.length
-      console.log(count+': '+window.listView.pages[0].items[count-1]) if @logging
+      @listView.append($('.block'))
+      count = @listView.pages[0].items.length
+      console.log(count+': '+@listView.pages[0].items[count-1]) if @logging
 
       # Calculate positions of initial images
       console.log('images loaded') if @logging
@@ -368,7 +379,7 @@ class @Scroll
     # Add event to load images when there's no scroll bars
     $(window).on('mousewheel', (e) =>
       # Do nothing when it's not ready
-      return if window.scrollReady == false
+      return if @scrollReady == false
 
       # Load new images if there's no scroll bars
       hasScrollBar = $(document).height() > $(window).height()
@@ -379,15 +390,23 @@ class @Scroll
     )
 
     # Add event to load images when it's scrolled to the bottom
-    $(window).scroll =>
-      #console.log(window.scrollReady) if @logging
-      return if window.scrollReady == false
+    $(window).scroll( =>
+    #$('window').on('scroll', =>
+      #console.log(@scrollReady) if @logging
+      current_url = document.URL
+      console.log(@url)
+      return if current_url != @url
+      #console.log(@blocks)
+      return if @scrollReady == false
 
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - @scrollHeight
         console.log('with scrollbar') if @logging
+        console.log(@blocks)
         @.loadImages(url)
+    )
+
 
 
 
