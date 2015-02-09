@@ -381,6 +381,10 @@ class @Scroll
       # Do nothing when it's not ready
       return if @scrollReady == false
 
+      # Return if the instance wasn't created on the current page
+      current_url = document.URL
+      return if current_url != @url
+
       # Load new images if there's no scroll bars
       hasScrollBar = $(document).height() > $(window).height()
       url = $('nav.pagination a[rel=next]').attr('href')
@@ -391,13 +395,13 @@ class @Scroll
 
     # Add event to load images when it's scrolled to the bottom
     $(window).scroll( =>
-    #$('window').on('scroll', =>
-      #console.log(@scrollReady) if @logging
-      current_url = document.URL
-      console.log(@url)
-      return if current_url != @url
-      #console.log(@blocks)
+      # Do nothing when it's not ready
       return if @scrollReady == false
+
+      # Return if the instance wasn't created on the current page
+      current_url = document.URL
+      return if current_url != @url
+
 
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
