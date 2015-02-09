@@ -21,7 +21,8 @@ class WelcomeController < ApplicationController
   end
 
   def tags
-    @tags = Tag.get_tags_with_images(1000)
+    #@tags = Tag.get_tags_with_images(1000)
+    @tags = Tag.get_popular_tags(1000)
     @search_tags = Tag.search(params[:q])
     if params[:q]
       @tags_result = @search_tags.result(distinct: true).page(params[:page]).per(1000)
