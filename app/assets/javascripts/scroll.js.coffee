@@ -213,6 +213,8 @@ class @Scroll
       count += 1
     )
     console.log(@blocks) if @logging
+    #console.log(@blocks)
+    @scrollReady = true
 
 
   # Calculate and position newly loaded images
@@ -283,7 +285,6 @@ class @Scroll
       dataType: 'html',
 
       success: (data) =>
-        console.log('loaded')
         # Get image divs
         $newElements = $(data).find('.block')
         $newElements.hide()
@@ -358,6 +359,7 @@ class @Scroll
     #@$el = $('.wrapper')
     #@listView = new infinity.ListView(@$el)
     #@scrollReady = true
+    @scrollReady = false
 
     # Position images after image files are loaded
     #$('.wrapper').imagesLoaded( =>
@@ -378,6 +380,8 @@ class @Scroll
 
     # Add event to load images when there's no scroll bars
     $(window).on('mousewheel', (e) =>
+      #console.log(@scrollReady)
+
       # Do nothing when it's not ready
       return if @scrollReady == false
 
@@ -395,6 +399,7 @@ class @Scroll
 
     # Add event to load images when it's scrolled to the bottom
     $(window).scroll( =>
+      console.log(@scrollReady)
       # Do nothing when it's not ready
       return if @scrollReady == false
 
@@ -407,7 +412,6 @@ class @Scroll
       console.log(url) if @logging
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - @scrollHeight
         console.log('with scrollbar') if @logging
-        console.log(@blocks)
         @.loadImages(url)
     )
 
