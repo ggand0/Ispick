@@ -21,10 +21,11 @@ $(document).on 'ready page:load', ->
     console.log($('.block').length)
   return if $('.wrapper').length==0
 
-  window.component = new Component()
+
 
   # Initialize buttons related to clipping
-  window.component.initButtons()
+  component = new Component()
+  component.initButtons()
 
   sc = new Scroll(logging)
 
@@ -34,12 +35,12 @@ $(document).on 'ready page:load', ->
   else
     sc.alignImages()
 
-  window.component.initCollapsables()
+  component.initCollapsables(sc)
 
   # Display the calender (Datepicker)
-  window.component.initCalender()
+  component.initCalender()
 
 
   # Popovers: close popover on click wherever except popover windows
-  window.component.initPopovers()
+  component.initPopovers()
 

@@ -2,16 +2,16 @@ class @Component
   constructor: () ->
 
   # Re-position images when collapse bar is trrigered
-  initCollapsables: () ->
+  initCollapsables: (scroll) ->
     $('.navbar-collapse').on('hidden.bs.collapse', () ->
       console.log('hidden')
       window.resizing = false # Set flag to false since the method returns when the flag is true
-      window.scroll.recalculatePositions()
+      scroll.recalculatePositions()
     )
     $('.navbar-collapse').on('shown.bs.collapse', () ->
       console.log('shown')
       window.resizing = false
-      window.scroll.recalculatePositions()
+      scroll.recalculatePositions()
     )
 
 
