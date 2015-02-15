@@ -6,9 +6,28 @@
 
 .block {
   position: absolute;
-  width: 300px;
+  //width: 300px;
   height: auto;
 }
+
+/*@media only screen and (max-width: 500px) {
+  .block {
+    width: 55%;
+  }
+
+  .desc-box {
+    width: 95% !important;
+  }
+}*/
+@media only screen and (min-width: 500px) {
+  .block {
+    width: 300px;
+  }
+  .desc-box {
+    width: 300px;
+  }
+}
+
 #loader {
   position: absolute;
   text-align: center;
@@ -69,7 +88,7 @@ body {
    padding: 10px;
 }
 .title {
-  width: 300px;
+  //width: 300px;
   line-height: 1.2;
   font-size: 14px;
   position: absolute;

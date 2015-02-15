@@ -9,8 +9,11 @@ module UsersHelper
   # @params image [Image] An object of Image which is included in the image.
   # @return []
   def render_image(image, size='btn-sm')
-    link_to image_tag(image.data.url(:thumb)), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
-      class: 'image'
+    if mobile_device?
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+    else
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+    end
   end
 
   def render_favored_image(image, size='btn-sm')
