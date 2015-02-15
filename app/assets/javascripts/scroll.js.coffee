@@ -6,11 +6,19 @@ Array.min = (array) ->
 Array.max = (array) ->
   return Math.max.apply(Math, array)
 
+# Measure true height of desc-box
+DESC_BOX_HEIGHT = 0
+$(window).load( ->
+  DESC_BOX_HEIGHT = $('.desc-box').eq(1).outerHeight()
+  console.log('test'+DESC_BOX_HEIGHT)
+)
 
 
 # A class which have the public instance methods that align/scroll images on the screen
 class @Scroll
   DEF_DESC_CLASS_NAME: 'desc-box' # The class name of description box divs
+  DESC_BOX0_HEIGHT: 255
+  DESC_BOX1_HEIGHT: 317
   DEF_COLUMN_WIDTH: 300
   DEF_IMAGE_HEIGHT: 300
   DEF_MARGIN: 20
@@ -19,7 +27,6 @@ class @Scroll
     @mobile = false
     if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
       console.log('from a mobile device')
-      #@DEF_COLUMN_WIDTH = 80
       @DEF_MARGIN = 10
       @mobile = true
 
@@ -80,34 +87,38 @@ class @Scroll
     @windowWidth = $(window).width()
     @colWidth = $('.block').outerWidth()
     @defHeight = $('.wrapper').offset().top
-    @defHeight += @margin # Add 20px margin so that it has correct gap
+    #@defHeight += @margin # Add 20px margin so that it has correct gap
+
     if !@mobile
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     else
       @colCount = 2
-      @colWidth = @windowWidth / 2.0
+      @colWidth = @windowWidth / 2.0 - @margin*2#@windowWidth / 2.0
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
 
 
     if @mobile
       # Resize images
       image_width = @windowWidth / 2.0 - @margin*2
-      console.log(image_width)
-      $('.image').css({width: @colWidth})
-      $('.block').css({width: @colWidth})
+      $('.image').css({width: image_width})
+      $('.block').css({width: image_width})
+      $('.desc-box').css({width: @windowWidth - @margin*2})
 
+      # Position desc boxes
       $blocks = $('.block')
-      console.log($blocks.eq(0).hasClass(self.DEF_DESC_CLASS_NAME))
       $blocks.eq(0).css({
         'left':@margin+'px',
         'top':@defHeight+'px'
       })
       $blocks.eq(1).css({
         'left':@margin+'px',
-        'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+        #'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+
+        # Since outerHeight method gives wrong values, use constants to get the height
+        'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
       })
-      @defHeight = @defHeight + $blocks.eq(0).outerHeight() +
-        $blocks.eq(1).outerHeight() + @margin*2
+      @defHeight = @defHeight + @DESC_BOX0_HEIGHT +
+        @DESC_BOX1_HEIGHT + @margin*2
       $blocks.eq(0).show()
       $blocks.eq(1).show()
 
@@ -137,9 +148,9 @@ class @Scroll
     if @mobile
       # Resize images
       image_width = @windowWidth / 2.0 - @margin*2
-      console.log(image_width)
       $('.image').css({width: @colWidth})
       $('.block').css({width: @colWidth})
+      $('.desc-box').css({width: @windowWidth - @margin*2})
 
       $blocks = $('.block')
       console.log($blocks.eq(0).hasClass(@DEF_DESC_CLASS_NAME))
@@ -149,21 +160,28 @@ class @Scroll
       })
       $blocks.eq(1).css({
         'left':@margin+'px',
-        'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+        #'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+
+        # Since outerHeight method gives wrong values, use constants to get the height
+        'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
       })
-      @defHeight = @defHeight + $blocks.eq(0).outerHeight() +
-        $blocks.eq(1).outerHeight() + @margin*2
+      @defHeight = @defHeight + @DESC_BOX0_HEIGHT +
+        @DESC_BOX1_HEIGHT + @margin*2
       $blocks.eq(0).show()
       $blocks.eq(1).show()
 
     for i in [0..@colCount-1]
       @blocks.push(@defHeight)
 
+
     # Re-calculate positions, loading past html elements from listView obj
     self = @
     count = 0
     for item in @listView.pages[0].items
       item.$el.each(()->
+        # Skip description boxes since they're already positioned
+        return if self.mobile and $(this).hasClass(self.DEF_DESC_CLASS_NAME)
+
         # Calculate and position a block div
         min = Array.min(self.blocks)
         index = $.inArray(min, self.blocks)
@@ -247,8 +265,6 @@ class @Scroll
         # This data is rendered by Rails code, and read it on JS
         height = parseInt($(this).find('.height').text())
         height = height * self.resize_rate if self.mobile
-        console.log(@resize_rate)
-        console.log(height)
         height = self.DEF_IMAGE_HEIGHT if height == 0
 
       self.blocks[index] = min + height + self.margin
@@ -292,6 +308,7 @@ class @Scroll
       height = parseInt($(this).find('.height').text())
       height = height * self.resize_rate if self.mobile
       height = self.DEF_IMAGE_HEIGHT if height == 0
+
       console.log(leftPos+','+height) if self.logging
       self.blocks[index] = min+height+self.margin
     )
@@ -356,7 +373,7 @@ class @Scroll
           # Resize elements if mobile devices
           if @mobile
             $('.image').css({width: @colWidth})
-            $('.block').css({width: @colWidth})
+            $('.block').filter(':not(.desc-box)').css({width: @colWidth})
           @.positionBlocks($newElements.length)
         )
 
