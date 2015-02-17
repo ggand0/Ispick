@@ -5,7 +5,7 @@
 $(document).on 'ready page:load', ->
   console.log('Starting streaming')
 
-  limit = 100
+  limit = 100000
   source = new EventSource("/debug/stream_csv?limit=" + limit)
   count = 0
   source.addEventListener('update', (e) ->
