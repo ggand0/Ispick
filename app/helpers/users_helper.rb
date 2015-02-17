@@ -10,7 +10,7 @@ module UsersHelper
   # @return []
   def render_image(image, size='btn-sm')
     if mobile_device?
-      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s }
     else
       link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
     end
