@@ -3,6 +3,7 @@
 # ======================================================
 class DebugController < ApplicationController
   include ApplicationHelper
+  include ActionController::Live
   before_filter :set_search
   before_action :render_sign_in_page
   before_filter :authenticate
@@ -57,12 +58,15 @@ class DebugController < ApplicationController
     render template: 'images/index'
   end
 
+  def view_csv
+    render :layout => 'streaming'
+  end
+
 
   def stream_csv
-    include ActionController::Live
-    limit = params[:limit].to_i
-    puts limit.class.name
-    # .. store current accessing user
+    # Default image num is 10,000
+    limit = params[:limit] ? params[:limit].to_i : 100
+    puts limit
 
     # Set the response header to keep client open
     response.headers['Content-Type'] = 'text/event-stream'
@@ -70,21 +74,23 @@ class DebugController < ApplicationController
     # .. list of users who are current streaming the list
     #list_of_current_streamers = Users.streamers
 
+    #render stream: true
+
     # loop infinitely, users can just close the browser
     begin
       images = Image.select('id, page_url, original_width, original_height, artist').order(:created_at).limit(limit)
-      puts images.class.name
-      puts images.count
 
       # Includes joining table
-      #images.includes(:tags).find_each do |image|
-      images.includes(:tags).each do |image|
+      images.includes(:tags).each_with_index do |image, count|
+        puts count
         tag_string = ""
         image.tags.each do |tag|
           tag_string += "#{tag.name};"
         end
 
-        response.stream.write "#{image.id},#{image.page_url.inspect},#{image.original_width.inspect},#{image.original_height.inspect},#{image.artist.inspect},#{tag_string}\n"
+        response.stream.write "id: 0\n"
+        response.stream.write "event: update\n"
+        response.stream.write("data: #{image.id},#{image.page_url.inspect},#{image.original_width.inspect},#{image.original_height.inspect},#{image.artist.inspect},#{tag_string}\n\n")
         sleep 0.1
       end
      rescue IOError
@@ -95,7 +101,8 @@ class DebugController < ApplicationController
         response.stream.close
      end
 
-     render stream: true
+     #render stream: true
+
   end
 
 
