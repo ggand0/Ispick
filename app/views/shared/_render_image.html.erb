@@ -1,7 +1,8 @@
-<div align="center">
-  <% if image.src_url %>
-    <%= link_to image_tag(image.data.url), image.src_url.html_safe, :target => "_blank" %>
+<div class="image">
+  <% if mobile_device? %>
+    <%= link_to image_tag(image.data.url, class: 'image'), image.src_url.html_safe, :target => "_blank" %>
+    <%= javascript_include_tag 'resize_image' %>
   <% else %>
-    <%= image_tag image.data.url :target => "_blank" %>
+    <%= link_to image_tag(image.data.url, class: 'image'), image.src_url.html_safe, :target => "_blank" %>
   <% end %>
 </div>

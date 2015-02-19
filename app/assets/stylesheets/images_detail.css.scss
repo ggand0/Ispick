@@ -1,7 +1,12 @@
 // Used on image detail modals
+.image {
+  text-align: center;
+  align: center;
+}
+
+
 .image-title {
   font-size: 20pt;
-  height: 32px;
   float: left;
 }
 .image-detail {
@@ -52,6 +57,8 @@ dt, dd {
 
 
 // Used on html view of modals
-.detail-wrap {
-  width: 800px;
+@media only screen and (min-width: 500px) {
+  .detail-wrap {
+    //width: 800px;
+  }
 }
