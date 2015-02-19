@@ -36,8 +36,8 @@ class @Scroll
     @colWidth=0
     @margin=@DEF_MARGIN       # Margin width between two blocks
     @windowWidth=0
-    @url = document.URL#window.location.pathname
-    @blocks = []
+    @url = document.URL       # Get current URL for supporting browser back button
+    @blocks = []              # Stores maximum heights from the top of each column
     @counter = 0
     @scrollHeight = 200       # The position it starts to load next images from the bottom of the screen
     @defHeight = 0            # The starting height where it starts to put image blocks
@@ -81,6 +81,12 @@ class @Scroll
     )
     $container.masonry()
 
+  isTop: ()=>
+    topPages = ['/', '/signup', 'signin_with_password']
+    for page in topPages
+      return true if window.location.pathname == page
+    return false
+
 
   # Calculate window size and column size
   setupBlocks: (pagination=false)=>
@@ -93,34 +99,37 @@ class @Scroll
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     else
       @colCount = 2
-      @colWidth = @windowWidth / 2.0 - @margin*2#@windowWidth / 2.0
+      @colWidth = @windowWidth / 2.0 - @margin*2.5
+      console.log(@colWidth)
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
 
 
+    console.log('isTop()='+@.isTop())
     if @mobile
       # Resize images
-      image_width = @windowWidth / 2.0 - @margin*2
-      $('.image').css({width: image_width})
-      $('.block').css({width: image_width})
+      # -@margin*3 since there's two rows
+      $('.image').css({width: @colWidth})
+      $('.block').css({width: @colWidth})
       $('.desc-box').css({width: @windowWidth - @margin*2})
 
       # Position desc boxes
-      $blocks = $('.block')
-      $blocks.eq(0).css({
-        'left':@margin+'px',
-        'top':@defHeight+'px'
-      })
-      $blocks.eq(1).css({
-        'left':@margin+'px',
-        #'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+      if @.isTop()
+        $blocks = $('.block')
+        $blocks.eq(0).css({
+          'left':@margin+'px',
+          'top':@defHeight+'px'
+        })
+        $blocks.eq(1).css({
+          'left':@margin+'px',
+          'top':@defHeight+$blocks.eq(0).outerHeight()+@margin+'px'
 
-        # Since outerHeight method gives wrong values, use constants to get the height
-        'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
-      })
-      @defHeight = @defHeight + @DESC_BOX0_HEIGHT +
-        @DESC_BOX1_HEIGHT + @margin*2
-      $blocks.eq(0).show()
-      $blocks.eq(1).show()
+          # Since outerHeight method gives wrong values, use constants to get the height
+          #'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
+        })
+        #@defHeight = @defHeight + @DESC_BOX0_HEIGHT + @DESC_BOX1_HEIGHT + @margin*2
+        @defHeight = @defHeight + $blocks.eq(0).outerHeight() + $blocks.eq(1).outerHeight() + @margin*2
+        $blocks.eq(0).show()
+        $blocks.eq(1).show()
 
     for i in [0..@colCount-1]
       @blocks.push(@defHeight)
@@ -142,33 +151,33 @@ class @Scroll
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     else
       @colCount = 2
-      @colWidth = @windowWidth / 2.0
+      @colWidth = @windowWidth / 2.0 - @margin*2
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
 
     if @mobile
       # Resize images
-      image_width = @windowWidth / 2.0 - @margin*2
       $('.image').css({width: @colWidth})
       $('.block').css({width: @colWidth})
       $('.desc-box').css({width: @windowWidth - @margin*2})
 
-      $blocks = $('.block')
-      console.log($blocks.eq(0).hasClass(@DEF_DESC_CLASS_NAME))
-      $blocks.eq(0).css({
-        'left':@margin+'px',
-        'top':@defHeight+'px'
-      })
-      $blocks.eq(1).css({
-        'left':@margin+'px',
-        #'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
+      if @.isTop()
+        $blocks = $('.block')
+        console.log($blocks.eq(0).hasClass(@DEF_DESC_CLASS_NAME))
+        $blocks.eq(0).css({
+          'left':@margin+'px',
+          'top':@defHeight+'px'
+        })
+        $blocks.eq(1).css({
+          'left':@margin+'px',
+          #'top':@defHeight+$blocks.eq(0).outerHeight()+'px'
 
-        # Since outerHeight method gives wrong values, use constants to get the height
-        'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
-      })
-      @defHeight = @defHeight + @DESC_BOX0_HEIGHT +
-        @DESC_BOX1_HEIGHT + @margin*2
-      $blocks.eq(0).show()
-      $blocks.eq(1).show()
+          # Since outerHeight method gives wrong values, use constants to get the height
+          'top':@defHeight+@DESC_BOX0_HEIGHT+@margin+'px'
+        })
+        @defHeight = @defHeight + @DESC_BOX0_HEIGHT +
+          @DESC_BOX1_HEIGHT + @margin*2
+        $blocks.eq(0).show()
+        $blocks.eq(1).show()
 
     for i in [0..@colCount-1]
       @blocks.push(@defHeight)
