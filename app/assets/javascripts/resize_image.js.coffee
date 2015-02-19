@@ -3,4 +3,5 @@ $(document).on 'ready page:load', ->
   width = $(window).width() - margin*2
   console.log($('.image'))
   console.log(width)
-  $('image[class=image]').css({'left': margin+'px',  'width': width+'px'})
+  #$('image[class=image]').css({'left': margin+'px',  'width': width+'px'})
+  #$('.image').css({'left': margin+'px',  'width': width+'px'})

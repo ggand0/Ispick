@@ -21,7 +21,7 @@
       </div>
       <% end %>
 
-      <!-- Add another anchor to the modal as it gets unclickable when thumbnail's height is to short -->
+      <!-- Add another anchor to the modal as it gets unclickable when thumbnail's height is too short -->
       <%= link_to ({ controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) do %>
         <div class="title">
           <%= image.title.to_s %>
