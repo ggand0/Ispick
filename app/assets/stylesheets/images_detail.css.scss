@@ -5,12 +5,16 @@
     align: center;
   }
 }
-@media only screen and (max-width: 500px) {
-  .image {
-    width: 100%;
-  }
-}
 
+// Debug
+/*.image {
+  visibility: hidden;
+}
+.block {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #000;
+}*/
 
 .image-title {
   font-size: 20pt;

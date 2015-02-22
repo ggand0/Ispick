@@ -6,6 +6,7 @@
   <% images.each_with_index do |image, index| %>
 
     <div class="block has-gutters">
+      <div class="width"><%= image.width %></div>
       <div class="height"><%= image.height %></div>
       <%= render_image(image) %>
 

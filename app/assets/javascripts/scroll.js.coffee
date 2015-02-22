@@ -99,7 +99,10 @@ class @Scroll
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
     else
       @colCount = 2
-      @colWidth = @windowWidth / 2.0 - @margin*2.5
+      @colWidth = @windowWidth / 2.0 - @margin*1.5
+      console.log(@windowWidth)
+      console.log(@windowWidth/2.0)
+      console.log(@margin)
       console.log(@colWidth)
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
 
@@ -216,8 +219,9 @@ class @Scroll
         else
           # Get the thumbnail's height from html
           # This data is rendered by Rails code, and read it on JS
+          width = parseInt($(this).find('.width').text())
           height = parseInt($(this).find('.height').text())
-          height = height * self.resize_rate if self.mobile
+          height = height * self.resize_rate if self.mobile and width >= self.colWidth
           height = self.DEF_IMAGE_HEIGHT if height == 0
 
         self.blocks[index] = min + height + self.margin
@@ -272,9 +276,11 @@ class @Scroll
       else
         # Get the thumbnail's height from html
         # This data is rendered by Rails code, and read it on JS
+        width = parseInt($(this).find('.width').text())
         height = parseInt($(this).find('.height').text())
-        height = height * self.resize_rate if self.mobile
+        height = height * self.resize_rate if self.mobile and width >= self.colWidth
         height = self.DEF_IMAGE_HEIGHT if height == 0
+
 
       self.blocks[index] = min + height + self.margin
 
@@ -285,7 +291,6 @@ class @Scroll
       count += 1
     )
     console.log(@blocks) if @logging
-    #console.log(@blocks)
     @scrollReady = true
 
 
@@ -303,6 +308,7 @@ class @Scroll
       min = Array.min(self.blocks)
       index = $.inArray(min, self.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
+
       if self.logging
         console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
         console.log(index+','+min)
@@ -314,8 +320,9 @@ class @Scroll
       })
       $(this).show()
 
+      width = parseInt($(this).find('.width').text())
       height = parseInt($(this).find('.height').text())
-      height = height * self.resize_rate if self.mobile
+      height = height * self.resize_rate if self.mobile and width >= self.colWidth
       height = self.DEF_IMAGE_HEIGHT if height == 0
 
       console.log(leftPos+','+height) if self.logging
@@ -381,8 +388,14 @@ class @Scroll
 
           # Resize elements if mobile devices
           if @mobile
-            $('.image').css({width: @colWidth})
-            $('.block').filter(':not(.desc-box)').css({width: @colWidth})
+            self = @
+            $('.block').filter(':not(.desc-box)').each( ->
+              # Resize thick images only
+              width = parseInt($(this).find('.width').text())
+
+
+              $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
+            )
           @.positionBlocks($newElements.length)
         )
 
@@ -429,16 +442,11 @@ class @Scroll
   fastInfiniteScroll: ()=>
     console.log('fast scrolling with infinity.js') if @logging
 
-    # Initialize basic values
+    # Initialization
+    @scrollReady = false
     $('.block').hide()
     @.setupBlocks()
     @.updateSpinner()
-
-    # Initialize window Infinity.js variables
-    #@$el = $('.wrapper')
-    #@listView = new infinity.ListView(@$el)
-    #@scrollReady = true
-    @scrollReady = false
 
     # Position images after image files are loaded
     #$('.wrapper').imagesLoaded( =>
@@ -450,18 +458,19 @@ class @Scroll
       console.log(count+': '+@listView.pages[0].items[count-1]) if @logging
 
       # Calculate positions of initial images
-      console.log('images loaded') if @logging
+      console.log('images\' been loaded') if @logging
       $('#loader').hide()
       @initPositionBlocks()
     )
 
 
-
+    # =================================
+    #            SCROLL EVENTS
+    # =================================
     # Add event to load images when there's no scroll bars
     $(window).on('mousewheel', (e) =>
-      #console.log(@scrollReady)
-
       # Do nothing when it's not ready
+      #console.log(@scrollReady)
       return if @scrollReady == false
 
       # Return if the instance wasn't created on the current page
@@ -478,14 +487,13 @@ class @Scroll
 
     # Add event to load images when it's scrolled to the bottom
     $(window).scroll( =>
-      console.log(@scrollReady)
       # Do nothing when it's not ready
+      console.log(@scrollReady)
       return if @scrollReady == false
 
       # Return if the instance wasn't created on the current page
       current_url = document.URL
       return if current_url != @url
-
 
       url = $('nav.pagination a[rel=next]').attr('href')
       console.log(url) if @logging
