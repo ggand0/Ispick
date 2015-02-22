@@ -54,8 +54,10 @@ class @Scroll
 
       # Execute the function after it elapses 200ms
       timer = setTimeout(() =>
+        @scrollReady = false
         @recalculatePositions()
         window.resizing = false
+        @scrollReady = true
       , 500)
     )
 
@@ -100,19 +102,20 @@ class @Scroll
     else
       @colCount = 2
       @colWidth = @windowWidth / 2.0 - @margin*1.5
-      console.log(@windowWidth)
-      console.log(@windowWidth/2.0)
-      console.log(@margin)
-      console.log(@colWidth)
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
 
-
-    console.log('isTop()='+@.isTop())
     if @mobile
       # Resize images
       # -@margin*3 since there's two rows
-      $('.image').css({width: @colWidth})
-      $('.block').css({width: @colWidth})
+      #$('.image').css({width: @colWidth})
+      #$('.block').css({width: @colWidth})
+      self = @
+      $('.block').filter(':not(.desc-box)').each( ->
+        # Resize thick images only
+        width = parseInt($(this).find('.width').text())
+        $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
+      )
+      $('.desc-box').css({width: @windowWidth - @margin*2})
       $('.desc-box').css({width: @windowWidth - @margin*2})
 
       # Position desc boxes
@@ -159,8 +162,14 @@ class @Scroll
 
     if @mobile
       # Resize images
-      $('.image').css({width: @colWidth})
-      $('.block').css({width: @colWidth})
+      #$('.image').css({width: @colWidth})
+      #$('.block').css({width: @colWidth})
+      self = @
+      $('.block').filter(':not(.desc-box)').each( ->
+        # Resize thick images only
+        width = parseInt($(this).find('.width').text())
+        $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
+      )
       $('.desc-box').css({width: @windowWidth - @margin*2})
 
       if @.isTop()
@@ -181,7 +190,6 @@ class @Scroll
           @DESC_BOX1_HEIGHT + @margin*2
         $blocks.eq(0).show()
         $blocks.eq(1).show()
-
     for i in [0..@colCount-1]
       @blocks.push(@defHeight)
 
@@ -392,15 +400,15 @@ class @Scroll
             $('.block').filter(':not(.desc-box)').each( ->
               # Resize thick images only
               width = parseInt($(this).find('.width').text())
-
-
               $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
             )
-          @.positionBlocks($newElements.length)
-        )
+            @.positionBlocks($newElements.length)
+          else
+            @.positionBlocks($newElements.length)
 
-        # Now we can load next images
-        @scrollReady = true
+          # Now we can load the next set of images
+          @scrollReady = true
+        )
       failure: (data) ->
         console.log('failed') if @logging
         @scrollReady = true
@@ -488,7 +496,8 @@ class @Scroll
     # Add event to load images when it's scrolled to the bottom
     $(window).scroll( =>
       # Do nothing when it's not ready
-      console.log(@scrollReady)
+      console.log('@scrollReady:'+@scrollReady)
+      #console.log('@scrollReady==false:'+(@scrollReady == false))
       return if @scrollReady == false
 
       # Return if the instance wasn't created on the current page
