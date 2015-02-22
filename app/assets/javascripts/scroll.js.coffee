@@ -45,21 +45,24 @@ class @Scroll
 
     @$el = $('.wrapper')
     @listView = new infinity.ListView(@$el)
-    @scrollReady = true
+    @scrollReady = false
 
     # Set resize event
-    $(window).resize(() =>
-      if (timer != false)
-        clearTimeout(timer)
+    unless @mobile
+      $(window).resize(() =>
+        return if @scrollReady == false
+        if (timer != false)
+          clearTimeout(timer)
 
-      # Execute the function after it elapses 200ms
-      timer = setTimeout(() =>
-        @scrollReady = false
-        @recalculatePositions()
-        window.resizing = false
-        @scrollReady = true
-      , 500)
-    )
+        # Execute the function after it elapses 200ms
+        timer = setTimeout(() =>
+          #@scrollReady = false
+          return if @scrollReady == false
+          @recalculatePositions()
+          window.resizing = false
+          #@scrollReady = true
+        , 500)
+      )
 
 
   # [Not Used]Initialize masonry lib
@@ -146,7 +149,9 @@ class @Scroll
   # on window resized event, or when some other items are re-rendered.
   recalculatePositions: () =>
     return if window.resizing
+    return if @scrollReady == false
     window.resizing = true
+    console.log('resizing')
 
     # Reset values
     @blocks = []
@@ -299,12 +304,16 @@ class @Scroll
       count += 1
     )
     console.log(@blocks) if @logging
+
+    # Ready to load the second set of images
     @scrollReady = true
 
 
   # Calculate and position newly loaded images
   positionBlocks: (newElemsCount) =>
     self = @
+    console.log(@blocks)
+    console.log(newElemsCount)
     # Sometimes, especially after using the datepicker,
     # colWidth variable gets null. Re-initialize it if it detects null.
     @colWidth = $('.block').outerWidth() if @colWidth is null
@@ -312,7 +321,7 @@ class @Scroll
 
     # Position images one by one.
     # Get newly added elements only
-    $container.slice(Math.max($container.length - newElemsCount, 1)).each (()->
+    $container.slice(Math.max($container.length - newElemsCount, 1)).each ((i, e)->
       min = Array.min(self.blocks)
       index = $.inArray(min, self.blocks)
       leftPos = self.margin+(index*(self.colWidth+self.margin))
@@ -333,10 +342,26 @@ class @Scroll
       height = height * self.resize_rate if self.mobile and width >= self.colWidth
       height = self.DEF_IMAGE_HEIGHT if height == 0
 
+
+
       console.log(leftPos+','+height) if self.logging
       self.blocks[index] = min+height+self.margin
+      console.log(i+','+min+','+height)
+      #console.log(self.blocks)
+      #console.log(self.blocks[0])
+
+      # ===========================================================================
+      #   When it finished loading all images, we can load the next set of images
+      # ===========================================================================
+      if i == newElemsCount-1
+        #self.scrollReady = true
+        setTimeout( =>
+          self.scrollReady = true
+          console.log('finished positioning')
+          console.log(self.blocks)
+        , 250)
     )
-    console.log(@blocks) if @logging
+    console.log(@blocks)# if @logging
 
 
   # Update loading icon's position
@@ -391,7 +416,7 @@ class @Scroll
           count = @listView.pages[0].items.length
           console.log(count+': '+@listView.pages[0].items[count-1]) if @logging
 
-          console.log('images loaded') if @logging
+          #console.log('images\' been loaded')# if @logging
           $('#loader').hide()
 
           # Resize elements if mobile devices
@@ -402,12 +427,15 @@ class @Scroll
               width = parseInt($(this).find('.width').text())
               $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
             )
+
+            # @scrollRready flag will be reset inside the positionBlocks function
             @.positionBlocks($newElements.length)
           else
             @.positionBlocks($newElements.length)
 
           # Now we can load the next set of images
-          @scrollReady = true
+          #console.log('images\' been positioned')
+          #@scrollReady = true
         )
       failure: (data) ->
         console.log('failed') if @logging
