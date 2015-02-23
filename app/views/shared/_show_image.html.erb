@@ -20,7 +20,14 @@
 
     <%= tags_glyphicon %>
     <% image.tags.each do |tag| %>
-      <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-xs' %>
+      <% if current_user %>
+        <%= button_group do %>
+          <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-sm tag-button' %>
+          <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default btn-sm tag-button' %>
+        <% end %>
+      <% else %>
+        <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-sm tag-button' %>
+      <% end %>
     <% end %>
     </div>
 

@@ -1,3 +1,5 @@
+@import "_colors";
+
 .navbar{
   margin-bottom: 0px;
 }
@@ -71,6 +73,13 @@ th {
   //background-image: url('assets/icons/pinterest_32.png');
 }
 
+
+.modal-dialog {
+  background-color: $base-light;
+}
+.modal-body, .modal-content {
+  background-color: $base-light;
+}
 
 // Set the background color of image detail modals.
 .modal-backdrop {

@@ -1,3 +1,7 @@
+.modal-body {
+  word-break: break-word;
+}
+
 // Used on image detail modals
 @media only screen and (min-width: 500px) {
   .image {
@@ -6,28 +10,12 @@
   }
 }
 
-// Debug
-/*.image {
-  visibility: hidden;
-}
-.block {
-  border-style: solid;
-  border-width: 1px;
-  border-color: #000;
-}*/
-
 .image-title {
   font-size: 20pt;
   float: left;
 }
-.image-detail {
-  height: 400px;
-}
 .image-buttons {
   align: right;
-}
-.image-info {
-  align: left;
 }
 .image-share {
   text-align: right;
@@ -50,26 +38,10 @@ dt {
   color: white;
   background-color: #7ACECE;
 }
-
 dd {
-  //margin-left: 0;
-  //margin-bottom: 5px;
   color: #444;
   word-break: break-word;
 }
-
 dt, dd {
   padding-left: 14px;
-}
-
-.modal-body {
-  word-break: break-word;
-}
-
-
-// Used on html view of modals
-@media only screen and (min-width: 500px) {
-  .detail-wrap {
-    //width: 800px;
-  }
 }
