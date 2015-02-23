@@ -97,11 +97,14 @@ class @Scroll
   setupBlocks: (pagination=false)=>
     @windowWidth = $(window).width()
     @colWidth = $('.block').outerWidth()
+    if @colWidth == 0
+      @colWidth = @DEF_COLUMN_WIDTH
     @defHeight = $('.wrapper').offset().top
     #@defHeight += @margin # Add 20px margin so that it has correct gap
 
-    if !@mobile
+    unless @mobile
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
+
     else
       @colCount = 2
       @colWidth = @windowWidth / 2.0 - @margin*1.5
