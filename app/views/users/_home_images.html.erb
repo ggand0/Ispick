@@ -15,7 +15,7 @@
         <div class="id"><%= image.id %></div>
         <%= button_group class: 'pull-right blocks' do %>
           <%= render_clip_button(image) %>
-          <%= render_show_button(image) %>
+          <%= render_show_button(image) unless mobile_device? %>
           <%= render_show_debug_button(image) if Rails.env.development? %>
         <% end %>
         <br />
