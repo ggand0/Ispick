@@ -87,7 +87,7 @@ class @Scroll
     $container.masonry()
 
   isTop: ()=>
-    topPages = ['/', '/signup', 'signin_with_password']
+    topPages = ['/', '/signup', '/signin_with_password']
     for page in topPages
       return true if window.location.pathname == page
     return false
@@ -115,12 +115,14 @@ class @Scroll
       self = @
       $('.block').filter(':not(.desc-box)').each( ->
         # Resize thick images only
+        console.log($(this))
         width = parseInt($(this).find('.width').text())
+        console.log('initial width:'+width)
         $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
       )
       $('.desc-box').css({width: @windowWidth - @margin*2})
-      $('.desc-box').css({width: @windowWidth - @margin*2})
 
+      console.log(@.isTop())
       # Position desc boxes
       if @.isTop()
         $blocks = $('.block')
@@ -354,7 +356,6 @@ class @Scroll
       #   When it finished loading all images, we can load the next set of images
       # ===========================================================================
       if i == newElemsCount-1
-        #self.scrollReady = true
         setTimeout( =>
           self.scrollReady = true
           console.log('finished positioning')
