@@ -8,6 +8,11 @@ describe "util rake tasks" do
     Ispick::Application.load_tasks
   end
 
+  it "add TargetSite records" do
+    Rake::Task['util:add_target_sites'].invoke
+    expect(TargetSite.count).to eq(2)
+  end
+
   it "delete valid tags" do
     # Create an image that has 'tumblr' as the site_name attribute
     FactoryGirl.create(:image_with_tags)

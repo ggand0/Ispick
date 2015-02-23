@@ -106,6 +106,7 @@ class @Scroll
       @colCount = 2
       @colWidth = @windowWidth / 2.0 - @margin*1.5
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
+      console.log(@colWidth+','+@resize_rate)
 
     if @mobile
       # Resize images

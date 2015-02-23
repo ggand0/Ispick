@@ -49,31 +49,28 @@ class Image < ActiveRecord::Base
     '/assets/default_image_thumb.png'
   end
 
-  # attachmentを削除し、ストレージにある画像ファイルも削除する
-  # Destroys paperclip attachment, also destroys actual image file in the storage
+  # Destroys paperclip attachment, also destroys the ACTUAL IMAGE FILE in the storage
   def destroy_attachment
-    # data.destroyは画像を削除するだけ、すなわちパスの指定は変更されない（デフォルトパスが指定されない）
+    # data.destroy method only destroys image file, which means it doesn't change the path to the file
+    # (it doesn't set the default path)
     self.data.destroy
   end
 
   # Delete the image from the storage and set the default path instead.
-  # ストレージから画像を削除し、デフォルトパスを指定する。
   def destroy_image_files
     tmp = self
     tmp.data = nil
     tmp.save
   end
 
-  # Generate MD5 checksum value from the file.
-  # 与えられたFileオブジェクトからMD5チェックサムを生成する
+  # Generate MD5 checksum value from a given file.
   # @param file [File] A file object that we need to get MD5 hash
   # @return [String] MD5 checksum value
   def generate_md5_checksum(file)
     self.md5_checksum = Digest::MD5.hexdigest(file.read)
   end
 
-  # 与えられたsource urlから画像をダウンロードし、paperclip attachmentに保存する
-  # Downloads image data from url and stores it as a paperclip attachment
+  # Downloads image data from url and stores it as a paperclip attachment.
   # @param url [String] The source url of an image
   # @return [String] A MD5 checksum string.
 	def image_from_url(url)
@@ -91,8 +88,7 @@ class Image < ActiveRecord::Base
 
 
 
-  # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
-  # Get images that is recently created.
+  # Get exactly [limit] images that is recently created, and returns a relation object.
   # @param limit [Integer] The number of images
   # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
   def self.get_recent_images(limit, site=nil)
@@ -129,7 +125,7 @@ class Image < ActiveRecord::Base
     end
   end
 
-  # 最近作成されたImageオブジェクトをlimit個取得してrelationオブジェクトを返す
+  # Get exactly [limit] images that is recently created, and returns a relation object.
   # Get images that is recently created.
   # @param limit [Integer] The number of images
   # @return [ActiveRecord::Relation::ActiveRecord_Relation_Image]
@@ -347,7 +343,6 @@ class Image < ActiveRecord::Base
 
   # Return images which is filtered by is_illust data.
   # How the filter is applied depends on the session[:illust] value.
-  # イラストと判定されてるかどうかでフィルタをかけるメソッド。
   # @param images [ActiveRecord::Association::CollectionProxy]
   # @return [ActiveRecord::AssociationRelation] An association relation of DeliveredImage class.
   def self.filter_by_illust(images, illust)
@@ -371,8 +366,5 @@ class Image < ActiveRecord::Base
   # @return [ActiveRecord::AssociationRelation]
   def self.sort_by_quality(images, page)
     images.reorder('quality desc')
-  end
-
-  def self.sort_by_posted_at(images)
   end
 end
