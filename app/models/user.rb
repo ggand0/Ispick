@@ -58,7 +58,7 @@ class User < ActiveRecord::Base
   def get_images
     words = tags.map{ |tag| tag.name }
     #Image.joins(:tags).where("tags.name IN (?)", words).limit(10000).
-    Image.select('images.id,posted_at,height,title,caption,data_file_name').joins(:tags).where("tags.name IN (?)", words).limit(10000).
+    Image.select('images.id,posted_at,width,height,title,caption,data_file_name').joins(:tags).where("tags.name IN (?)", words).limit(10000).
       where.not(data_updated_at: nil).references(:tags)
   end
 
