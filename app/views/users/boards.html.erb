@@ -33,13 +33,14 @@
 <div class="wrapper">
   <% @favored_images.each_with_index do |favored_image, index| %>
     <div class="block has-gutters">
+      <div class="width"><%= favored_image.width %></div>
       <div class="height"><%= favored_image.height %></div>
       <%= render_favored_image(favored_image) %>
 
       <div class="titleBox">
         <%= button_group class: 'pull-right blocks' do %>
           <%= render_unclip_button(favored_image) %>
-          <%= render_show_favored_button(favored_image) %>
+          <%= render_show_favored_button(favored_image) unless mobile_device? %>
         <% end %>
         <br />
       </div>

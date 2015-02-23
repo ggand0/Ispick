@@ -4,6 +4,7 @@
 
 @import "_colors";
 
+
 .block {
   position: absolute;
   //width: 300px;
@@ -12,7 +13,7 @@
 
 @media only screen and (max-width: 500px) {
   .block {
-    width: 300px;
+    //width: 300px;
   }
 
   .desc-box {
