@@ -33,6 +33,7 @@
 <div class="wrapper">
   <% @favored_images.each_with_index do |favored_image, index| %>
     <div class="block has-gutters">
+      <div class="width"><%= favored_image.width %></div>
       <div class="height"><%= favored_image.height %></div>
       <%= render_favored_image(favored_image) %>
 
