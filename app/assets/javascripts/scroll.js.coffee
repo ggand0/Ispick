@@ -25,7 +25,9 @@ class @Scroll
 
   constructor: (logging) ->
     @mobile = false
-    if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    #if ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    # Exclude iPad since three rows are more beautiful on it
+    if ( /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
       console.log('from a mobile device')
       @DEF_MARGIN = 10
       @mobile = true
@@ -114,8 +116,6 @@ class @Scroll
     if @mobile
       # Resize images
       # -@margin*3 since there's two rows
-      #$('.image').css({width: @colWidth})
-      #$('.block').css({width: @colWidth})
       self = @
       $('.block').filter(':not(.desc-box)').each( ->
         # Resize thick images only
@@ -185,7 +185,6 @@ class @Scroll
 
       if @.isTop()
         $blocks = $('.block')
-        console.log($blocks.eq(0).hasClass(@DEF_DESC_CLASS_NAME))
         $blocks.eq(0).css({
           'left':@margin+'px',
           'top':@defHeight+'px'
