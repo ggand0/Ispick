@@ -65,6 +65,7 @@ Ispick::Application.routes.draw do
       get 'preferences'
       post 'preferences'
       get 'boards'
+      put 'update_display_settings'
 
       delete 'delete_target_word'
       delete 'delete_tag'

@@ -1,0 +1,2 @@
+$(".target-sites-fields").html('<%= escape_javascript(render :partial => "users/target_sites_fields", locals: { user: @user }) %>');
+$(".notice-target-sites").html('<%= escape_javascript(render :partial => "shared/flash_messages", locals: { flash: flash }) %>');
