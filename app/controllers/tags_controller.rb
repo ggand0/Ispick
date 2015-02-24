@@ -1,5 +1,5 @@
 class TagsController < ApplicationController
-  before_action :set_tag, only: [:images, :attach]
+  before_action :set_tag, only: [:images, :attach, :follow_remote]
 
   # POST
   # This action only get the existing TargetWord record,
@@ -9,7 +9,23 @@ class TagsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to controller: 'users', action: 'preferences' }
-      format.js { @tags = current_user.tags; render partial: 'layouts/reload_followed_tags' }
+      format.js do
+        @tags = current_user.tags
+        render partial: 'shared/reload_notice'
+      end
+    end
+  end
+  # POST
+  # Same as the above one, but this is called from the detail view.
+  def follow_remote
+    current_user.tags << @tag
+    flash[:success] = 'You\'ve followed a new tag!'
+
+    respond_to do |format|
+      format.js do
+        @tags = current_user.tags
+        render partial: 'shared/reload_notice'
+      end
     end
   end
 

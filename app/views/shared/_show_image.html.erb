@@ -4,37 +4,38 @@
   <div class="row"></div>
 
   <!-- Render image's title without html tags -->
-  <div class="row"></div>
-    <div class="image-title col-md-8 col-sm-4">
+  <div class="row">
+    <div class="image-title col-md-12 col-sm-12">
     <%= strip_tags(image.title) %>
     </div>
+  </div>
 
-
-  <div class="clearfix visible-lg-block"></div>
-  <div class="clearfix visible-md-block"></div>
-  <div class="clearfix visible-sm-block"></div>
 
   <!-- Render text tags associated with the image -->
-  <div class="row"></div>
-    <div class="col-md-6 col-sm-6">
+  <div class="row">
+    <div class="col-md-12 col-sm-12">
+      <div class="notice search-tags">
+      </div>
 
     <%= tags_glyphicon %>
     <% image.tags.each do |tag| %>
       <% if current_user %>
         <%= button_group do %>
           <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-sm tag-button' %>
-          <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default btn-sm tag-button' %>
+          <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'follow_remote', id: tag.id }, method: :post, remote: true, class: 'btn btn-default btn-sm tag-button' %>
         <% end %>
       <% else %>
         <%= bs_button_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: 'btn-default btn-sm tag-button' %>
       <% end %>
     <% end %>
     </div>
+  </div>
 
 
 
   <!-- Render social sharing buttons -->
-  <div class="image-buttons col-md-2">
+  <div class="row">
+  <div class="image-buttons col-md-12" align='right'>
     <div class="image-share">
 
       <!-- Render Twitter share button -->
@@ -102,7 +103,7 @@
       <dt>Favorites: </dt>
       <dd><%= image.original_favorite_count %></dd>
     </dl>
-  </div>
+  </div></div>
 
 
   </div>

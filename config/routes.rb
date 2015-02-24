@@ -124,6 +124,7 @@ Ispick::Application.routes.draw do
     collection do
       match 'search' => 'tags#search', via: [:get, :post], as: :search
       post 'attach'
+      post 'follow_remote'
       get 'autocomplete'
     end
     member do
