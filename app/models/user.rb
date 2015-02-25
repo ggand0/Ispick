@@ -22,6 +22,10 @@ class User < ActiveRecord::Base
   has_many :tags_users, dependent: :destroy
   has_many :tags, :through => :tags_users
 
+  # has_many recommended_tags for making image feeds
+  has_many :recommended_tags_users, dependent: :destroy
+  has_many :recommended_tags, :through => :recommended_tags_users
+
   # has_many target_sites for filtering image feeds by default
   has_many :target_sites_users, dependent: :destroy
   has_many :target_sites, :through => :target_sites_users

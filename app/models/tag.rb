@@ -1,4 +1,6 @@
 class Tag < ActiveRecord::Base
+  belongs_to :recommended_tag
+
   has_many :tags_users, dependent: :destroy
   has_many :users, :through => :tags_users
 
