@@ -57,7 +57,7 @@ class User < ActiveRecord::Base
     Resque.enqueue(SearchImages, self.id, target_word.id)
   end
 
-  # Get images which is shown at user's home page.
+  # Get images which are shown at user's home page.
   # @return [ActiveRecord::AssociationRelation]
   def get_images
     words = tags.map{ |tag| tag.name }
@@ -66,7 +66,7 @@ class User < ActiveRecord::Base
       where.not(data_updated_at: nil).references(:tags)
   end
 
-  # For now, it's same as get_images method
+  # For now, it's the same as get_images method
   # @return [ActiveRecord::AssociationRelation]
   def get_images_all
     words = tags.map{ |tag| tag.name }
@@ -175,11 +175,10 @@ class User < ActiveRecord::Base
   end
 
 
-  # ====================
-  #   Recommendation
-  # ====================
+  # ==========================
+  #   Recommendation methods
+  # ==========================
   def get_coocurrence_tags
-    #images = Image.get_popular_recent_images(10000)
     _tags = {}
 
     tags.each do |tag|
@@ -198,6 +197,7 @@ class User < ActiveRecord::Base
       end
     end
 
+
     # Eliminate the existing tags
     _tags.reject!{ |k, v| v.to_i<=1 or self.tags.where(name: k).count > 0 or self.recommended_tags.where(name: k).count > 0 }
 
@@ -208,10 +208,13 @@ class User < ActiveRecord::Base
 
     _tags.each do |name, value|
       recommended_tag = RecommendedTag.where(name: name).first
+      tag = Tag.where(name: name).first
+
       if recommended_tag.nil?
-        recommended_tag = RecommendedTag.new(name: name)
+        recommended_tag = RecommendedTag.new(name: name, cooccurrence_count: value)
       end
 
+      recommended_tag.tag = tag
       self.recommended_tags << recommended_tag
       #RecommendedTag.reset_counters(recommended_tag.id, :images)
     end

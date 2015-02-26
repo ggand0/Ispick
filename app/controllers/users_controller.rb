@@ -216,6 +216,9 @@ class UsersController < ApplicationController
   # Show recommended_tags, mainly for debugging
   def recommended_tags
     @tags = current_user.recommended_tags
+    @tags = @tags.order('cooccurrence_count desc')
+    # Get images_count from an associated Tag object since RecommendedTag doesn't have any counter caches
+    #@counts = current_user.recommended_tags.map { |t| t.tag.images_count }
   end
 
   # POST
