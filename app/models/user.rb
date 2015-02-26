@@ -162,16 +162,59 @@ class User < ActiveRecord::Base
     auth.provider == 'twitter' ? User.create_unique_email : auth.info.email
   end
 
+  # Create uuid string for general signup use or dummy email string when Twitter OAuth
   # @return A string that provides an uuid.
-  # 通常サインアップ時のuid用、Twitter OAuth認証時のemail用にuuidな文字列を生成
   def self.create_unique_string
     SecureRandom.uuid
   end
 
+  # Since twitter API doesn't provide email fetch, create a dummy unique string and assign it.
   # @return A random email address.
-  # twitterではemailを取得できないので、適当に一意のemailを生成
   def self.create_unique_email
     User.create_unique_string + '@example.com'
+  end
+
+
+  # ====================
+  #   Recommendation
+  # ====================
+  def get_coocurrence_tags
+    #images = Image.get_popular_recent_images(10000)
+    _tags = {}
+
+    tags.each do |tag|
+      images = tag.get_images
+      images = images.limit(100)
+
+      # Check for co-occurrence word by word
+      images.each do |image|
+        image.tags.each do |_tag|
+          if _tags.has_key?(_tag.name)
+            _tags[_tag.name] += 1
+          else
+            _tags[_tag.name] = 1
+          end
+        end
+      end
+    end
+
+    # Eliminate the existing tags
+    _tags.reject!{ |k, v| v.to_i<=1 or self.tags.where(name: k).count > 0 or self.recommended_tags.where(name: k).count > 0 }
+
+    #puts "User: #{self.id}"
+    #puts "Tags: #{self.tags.inspect}"
+    #puts "Co-occurred  tags:"
+    #puts _tags.delete_if{|t| t.to_i<=1}.inspect
+
+    _tags.each do |name, value|
+      recommended_tag = RecommendedTag.where(name: name).first
+      if recommended_tag.nil?
+        recommended_tag = RecommendedTag.new(name: name)
+      end
+
+      self.recommended_tags << recommended_tag
+      #RecommendedTag.reset_counters(recommended_tag.id, :images)
+    end
   end
 
 end

@@ -212,6 +212,12 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET
+  # Show recommended_tags, mainly for debugging
+  def recommended_tags
+    @tags = current_user.recommended_tags
+  end
+
   # POST
   # Set User.sites after clearing it
   def set_sites

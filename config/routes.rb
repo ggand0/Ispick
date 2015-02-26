@@ -69,6 +69,7 @@ Ispick::Application.routes.draw do
 
       delete 'delete_target_word'
       delete 'delete_tag'
+      get 'recommended_tags'
       post 'set_sites'
 
       get "/home/:year/:month/:day" => "users#home",

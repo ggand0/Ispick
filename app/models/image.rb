@@ -112,8 +112,7 @@ class Image < ActiveRecord::Base
     Image.where(id: impressions)
   end
 
-  def self.get_popular_recent_images(limit)
-    sites = ['anipic', 'shushu', 'zerochan']
+  def self.get_popular_recent_images(limit, sites=['anipic', 'shushu', 'zerochan'])
     Image.where("site_name IN (?)", sites).where("original_favorite_count > (?)", 2).reorder("created_at DESC").where.not(data_updated_at: nil).limit(limit)
   end
 

@@ -1,0 +1,47 @@
+<%= stylesheet_link_tag 'table_custom' %>
+
+<div class="container-fluid controlls">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Tags</h1>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <%# bs_table_tag do %>
+      <table class="table table-striped">
+      <thead>
+        <tr>
+          <th align="left" class="col-md-1">Name</th>
+          <th align="left" class="col-md-1">Image Count</th>
+          <th align="left" class="col-md-1">Order</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% unless @tags_result %>
+          <% @tags.each_with_index do |tag, count| %>
+          <tr>
+            <td><%= link_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: "tag" %></td>
+            <td><%= tag.images_count %></td>
+            <td><%= count %></td>
+          </tr>
+          <% end %>
+        <% else %>
+          <% @tags_result.each_with_index do |tag, count| %>
+          <tr>
+            <td><%= link_to tag.name, { controller: 'images', action: 'search', query: "#{tag.name}" }, class: "tag" %></td>
+            <td><%= tag.images_count %></td>
+            <td><%= count %></td>
+          </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+      </table>
+      <%# end %>
+
+    </div>
+  </div>
+</div>
