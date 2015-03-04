@@ -33,6 +33,13 @@ class @Scroll
       @mobile = true
 
 
+    # ================================
+    #   Reset previous scroll events
+    # ================================
+    $(window).off("scroll")
+    console.log($._data($(window)[0], "events"))
+    console.log('binded events:' + $(window).data('events'))
+
     @logging = logging        # Whether it writes logs or not
     @colCount=0
     @colWidth=0
@@ -60,6 +67,8 @@ class @Scroll
         timer = setTimeout(() =>
           #@scrollReady = false
           return if @scrollReady == false
+
+          console.log('resizing...')
           @recalculatePositions()
           window.resizing = false
           #@scrollReady = true
@@ -102,7 +111,6 @@ class @Scroll
     if @colWidth == 0
       @colWidth = @DEF_COLUMN_WIDTH
     @defHeight = $('.wrapper').offset().top
-    #@defHeight += @margin # Add 20px margin so that it has correct gap
 
     unless @mobile
       @colCount = Math.floor(@windowWidth/(@colWidth+@margin))
@@ -111,7 +119,6 @@ class @Scroll
       @colCount = 2
       @colWidth = @windowWidth / 2.0 - @margin*1.5
       @resize_rate = @colWidth / (@DEF_COLUMN_WIDTH*1.0)
-      console.log(@colWidth+','+@resize_rate)
 
     if @mobile
       # Resize images
@@ -119,14 +126,12 @@ class @Scroll
       self = @
       $('.block').filter(':not(.desc-box)').each( ->
         # Resize thick images only
-        console.log($(this))
         width = parseInt($(this).find('.width').text())
         console.log('initial width:'+width)
         $(this).find('img.image').css({ width: self.colWidth }) if width > self.colWidth
       )
       $('.desc-box').css({width: @windowWidth - @margin*2})
 
-      console.log(@.isTop())
       # Position desc boxes
       if @.isTop()
         $blocks = $('.block')
@@ -157,7 +162,7 @@ class @Scroll
     return if window.resizing
     return if @scrollReady == false
     window.resizing = true
-    console.log('resizing')
+    console.log('recalculating positions...')
 
     # Reset values
     @blocks = []
@@ -216,6 +221,7 @@ class @Scroll
         min = Array.min(self.blocks)
         index = $.inArray(min, self.blocks)
         leftPos = self.margin+(index*(self.colWidth+self.margin))
+
         if self.logging
           console.log(self.windowWidth+','+self.margin+','+self.colWidth+','+self.colCount)
           console.log(index+','+min)
@@ -317,8 +323,8 @@ class @Scroll
   # Calculate and position newly loaded images
   positionBlocks: (newElemsCount) =>
     self = @
-    console.log(@blocks)
-    console.log(newElemsCount)
+    #console.log(@blocks)
+
     # Sometimes, especially after using the datepicker,
     # colWidth variable gets null. Re-initialize it if it detects null.
     @colWidth = $('.block').outerWidth() if @colWidth is null
@@ -348,12 +354,10 @@ class @Scroll
       height = self.DEF_IMAGE_HEIGHT if height == 0
 
 
-
       console.log(leftPos+','+height) if self.logging
       self.blocks[index] = min+height+self.margin
-      console.log(i+','+min+','+height)
-      #console.log(self.blocks)
-      #console.log(self.blocks[0])
+      #console.log(i+','+min+','+height)
+
 
       # ===========================================================================
       #   When it finished loading all images, we can load the next set of images
@@ -365,7 +369,7 @@ class @Scroll
           console.log(self.blocks)
         , 250)
     )
-    console.log(@blocks)# if @logging
+    console.log(@blocks) if @logging
 
 
   # Update loading icon's position
@@ -510,7 +514,6 @@ class @Scroll
     # Add event to load images when there's no scroll bars
     $(window).on('mousewheel', (e) =>
       # Do nothing when it's not ready
-      #console.log(@scrollReady)
       return if @scrollReady == false
 
       # Return if the instance wasn't created on the current page
@@ -521,25 +524,24 @@ class @Scroll
       hasScrollBar = $(document).height() > $(window).height()
       url = $('nav.pagination a[rel=next]').attr('href')
       if e.originalEvent.deltaY > 0 and !hasScrollBar
-        console.log('without scrollbar') if @logging
+        #console.log('without scrollbar') if @logging
         @.loadImages(url)
     )
 
     # Add event to load images when it's scrolled to the bottom
     $(window).scroll( =>
       # Do nothing when it's not ready
-      console.log('@scrollReady:'+@scrollReady)
-      #console.log('@scrollReady==false:'+(@scrollReady == false))
       return if @scrollReady == false
+
 
       # Return if the instance wasn't created on the current page
       current_url = document.URL
+      #console.log(current_url + ',' + @url)
       return if current_url != @url
 
       url = $('nav.pagination a[rel=next]').attr('href')
-      console.log(url) if @logging
       if url and $(window).scrollTop() > $(document).height() - $(window).height() - @scrollHeight
-        console.log('with scrollbar') if @logging
+        #console.log('with scrollbar') if @logging
         @.loadImages(url)
     )
 
