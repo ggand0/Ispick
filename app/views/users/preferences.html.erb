@@ -9,12 +9,7 @@
 
   <div class="row">
     <div class="col-md-5">
-      <!-- Render flash notices -->
-      <% if flash.present? %>
-        <div class="search-tags">
-          <%= render partial: "shared/flash_messages", flash: flash %>
-        </div>
-      <% end %>
+
 
       <!-- Render the search form -->
       <%= search_form_for @search_tags, url: preferences_users_path, html: { method: :post },
@@ -29,13 +24,6 @@
           </div>
       <% end %>
     </div>
-
-    <!-- Render a dropdown to switch popular tags source
-    <%= bs_dropdown_button_to list_glyphicon do %>
-      <li><%= link_to 'Tags used for crawling', { controller: 'users', action: 'preferences', target_words: true }, class: 'btn-default' %></li>
-      <li><%= link_to 'All tags', { controller: 'users', action: 'preferences' }, class: 'btn-default' %></li>
-    <% end %>
-    -->
   </div>
 
   <div class="row">
@@ -55,23 +43,29 @@
   </div>
 
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-5">
       <hr>
-      <div class="search-tags">
-        <h2>Set default sites for filtering:</h2>
-        <%= bootstrap_form_tag url: set_sites_users_path, class: "col-md-5 col-lg-5 col-sm-5" do |f| %>
-          <% TargetSite.all.each_with_index do |site, count| %>
-            <label class="checkbox-inline">
-            <% if current_user.target_sites.where(name: site.name).count > 0 %>
-              <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline", checked: true %>
-            <% else %>
-              <%= f.check_box site.name.parameterize.underscore.to_sym, label: site.name, label_class: "checkbox-inline" %>
-            <% end %>
-          </label>
-          <% end %>
-          <%= f.submit %>
-        <% end %>
-      </div>
+      <!-- Render flash notices -->
+      <% puts flash %>
+      <% if flash.present? %>
+        <div class="notice-target-sites search-tags">
+          <%# render partial: "shared/flash_messages", flash: flash %>
+        </div>
+      <% end %>
+      <%= render partial: 'users/target_sites_fields' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+      <hr>
+      <!-- Render flash notices -->
+      <% if flash.present? %>
+        <div class="notice-displaying search-tags">
+          <%# render partial: "shared/flash_messages", flash: flash %>
+        </div>
+      <% end %>
+      <%= render partial: 'users/displaying_fields', locals: { user: @user } %>
     </div>
   </div>
 

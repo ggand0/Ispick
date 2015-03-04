@@ -1,0 +1,23 @@
+<div class="displaying-fields search-tags">
+  <h2>Infinite scroll options:</h2>
+  <%= bootstrap_form_for(user, url: update_display_settings_users_path, remote: true, method: :put, control_col: "col-sm-10") do |f| %>
+    <% if user.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
+        <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <%= f.text_field :display_num, label: 'Image display num per page or per fetch (Default value is 10).', :required => true, :autofocus => true, value: current_user.display_num, inline: true %>
+    <br />
+    <%= f.check_box :pagination, label: 'Display images with pagination', checked: current_user.pagination, inline: true %>
+    <br />
+    <br />
+    <div class="actions">
+      <%= f.submit 'Save' %>
+    </div>
+  <% end %>
+</div>

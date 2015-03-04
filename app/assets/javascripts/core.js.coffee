@@ -1,6 +1,21 @@
 #= require 'component'
+window.onload = () ->
+  #alert('first visit or from the back button?')
+window.onunload = () ->
 
 ready = ->
+  console.log('document.ready called')
+  Turbolinks.pagesCached(0)
+
+  ###if $("#refresh").length > 0
+    console.log('#refresh exists')
+    if ($("#refresh").val() == 'yes')
+      console.log('reloading!')
+      location.reload(true)
+    else
+      console.log('first visit')
+      $('#refresh').val('yes')###
+
   # Dropdown: Close the dialog when clicked
   window.component = new Component()
   window.component.initDropdowns()

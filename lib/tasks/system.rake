@@ -1,6 +1,19 @@
 # encoding: utf-8
 
 namespace :system do
+  desc "Recommend new tags to a user"
+  task recommend_tags: :environment do
+    #tags_limit = 100
+    #scan_range = 10000  # The number of image that is used for a recommendation
+    #images = Image.get_popular_recent_images(scan_range)
+
+    User.all.each do |user|
+      next if user.tags.blank?
+
+      user.get_coocurrence_tags()
+    end
+  end
+
   desc "Update the daily ranking"
   task update_ranking: :environment do
     limit = 100

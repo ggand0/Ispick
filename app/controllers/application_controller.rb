@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   #before_filter :authenticate
+  before_filter :set_cache_headers
   before_filter :set_search
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
@@ -36,7 +37,7 @@ class ApplicationController < ActionController::Base
     @search = Image.search(params[:q])
   end
 
-  # production環境のみBASIC認証する
+  # Set BASIC auth only in production env
   def authenticate
     if CONFIG['perform_authentication']
       authenticate_or_request_with_http_basic do |username, password|
@@ -45,12 +46,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # ログアウト後のリダイレクト先を指定する
+  # Specify the redirect location after logout
   def after_sign_out_path_for(resource)
     root_path
   end
 
-  # ログイン後のリダイレクト先を指定する
+  # Specify the redirect location after login
   def after_sign_in_path_for(resource)
     stored_location_for(resource) ||
       if resource.is_a?(Admin)
@@ -60,7 +61,7 @@ class ApplicationController < ActionController::Base
       end
   end
 
-  # Sign up時にname attributeを関連づける
+  # Associate name attribute when signup
   def configure_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) << :name
   end
@@ -77,7 +78,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_cache_headers
-    response.headers["Cache-Control"] = "private, no-cache, no-store, max-age=0, must-revalidate, post-check=0, pre-check=0"
+    response.headers["Cache-Control"] = "private, no-cache, no-store, max-age=0, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end

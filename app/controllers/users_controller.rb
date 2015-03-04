@@ -4,7 +4,7 @@ require 'zip'
 class UsersController < ApplicationController
   include ApplicationHelper
   before_filter :set_search
-  before_filter :set_user, only: [:edit, :update, :settings]
+  before_filter :set_user, only: [:edit, :update, :settings, :preferences, :update_display_settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
   before_filter :authenticate, only: [:show_target_images]
 
@@ -21,12 +21,26 @@ class UsersController < ApplicationController
   # PUT /users/1
   def update
     if @user.update_attributes(user_params)
-      flash[:success] = 'The settings was successfully updated.'
+      flash[:success] = 'The user setting was successfully updated.'
       redirect_to settings_users_path(id: @user.id)
     else
       render action: 'debug/edit'
     end
   end
+
+  # PUT /users/1
+  def update_display_settings
+    if @user.update_attributes(user_params)
+      flash[:success] = 'The display setting was successfully updated.'
+      respond_to do |format|
+        format.html { redirect_to preferences_users_path(id: @user.id) }
+        format.js { render partial: 'users/reload_displaying_fields' }
+      end
+    else
+      redirect_to preferences_users_path(id: @user.id)
+    end
+  end
+
 
   # GET /users/1/settings
   def settings
@@ -131,6 +145,9 @@ class UsersController < ApplicationController
 
   # Render the index page of tags.
   def preferences
+    flash = nil
+    puts flash.present?
+
     if params[:target_words]
       @popular_tags = TargetWord.get_tags_with_images(100).
         map { |target_word| Tag.where(name: target_word.name_english).first }
@@ -195,6 +212,15 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET
+  # Show recommended_tags, mainly for debugging
+  def recommended_tags
+    @tags = current_user.recommended_tags
+    @tags = @tags.order('cooccurrence_count desc')
+    # Get images_count from an associated Tag object since RecommendedTag doesn't have any counter caches
+    #@counts = current_user.recommended_tags.map { |t| t.tag.images_count }
+  end
+
   # POST
   # Set User.sites after clearing it
   def set_sites
@@ -215,7 +241,7 @@ class UsersController < ApplicationController
     flash[:success] = 'The site settings was successfully updated.'
     respond_to do |format|
       format.html { redirect_to action: 'preferences' }
-      format.js { render partial: 'layouts/reload_followed_tags' }
+      format.js { render partial: 'users/reload_target_sites_fields' }
     end
   end
 

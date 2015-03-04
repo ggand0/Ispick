@@ -27,13 +27,15 @@ $(document).on 'ready page:load', ->
   component = new Component()
   component.initButtons()
 
-  sc = new Scroll(logging)
+
 
   # Initiate infinite scrolling or just aligning images for pagination
-  if scroll
-    sc.infiniteScroll()
-  else
-    sc.alignImages()
+  if $('.block').length > 0
+    sc = new Scroll(logging)
+    if scroll
+      sc.infiniteScroll()
+    else
+      sc.alignImages()
 
   component.initCollapsables(sc)
 

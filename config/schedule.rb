@@ -56,11 +56,9 @@ end
 #    System tasks
 # ==================
 every 6.hours do
-  # 指定枚数を越えたらその分Imagesから画像ファイルを削除
   # If the number of records exceeds the limit, delete the image files of excess records
   rake 'scrape:delete_excess_image_files[500000]', output: 'log/system.log'
 
-  # 指定枚数を超えたらその分Imagesから削除
   # If the number of records exceeds the limit, delete the records themselves
   rake 'scrape:delete_excess[1000000]', output: 'log/system.log'
 end
@@ -68,6 +66,11 @@ end
 # Update ranking records and create a 'daily image' record
 every 1.day, :at => '6:00 pm' do
   rake 'system:update_ranking'
+end
+
+# Recommend tags for users
+every 1.day do
+  rake 'system:recommend_tags', output: 'log/system.log'
 end
 
 

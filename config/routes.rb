@@ -65,9 +65,11 @@ Ispick::Application.routes.draw do
       get 'preferences'
       post 'preferences'
       get 'boards'
+      put 'update_display_settings'
 
       delete 'delete_target_word'
       delete 'delete_tag'
+      get 'recommended_tags'
       post 'set_sites'
 
       get "/home/:year/:month/:day" => "users#home",
@@ -123,6 +125,7 @@ Ispick::Application.routes.draw do
     collection do
       match 'search' => 'tags#search', via: [:get, :post], as: :search
       post 'attach'
+      post 'follow_remote'
       get 'autocomplete'
     end
     member do

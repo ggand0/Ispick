@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'users_home' %>
-<%= javascript_include_tag 'core' %>
 <%= stylesheet_link_tag 'users' %>
 <%= stylesheet_link_tag 'images_debug' %>
 <%= stylesheet_link_tag 'images_detail' %>
@@ -7,7 +5,11 @@
 <%= render 'shared/modal_board' %>
 
 
-<!-- 表示する画像数とフィルタに関するdropdownを描画 -->
+<!-- Reload in pages that have dynamic contents -->
+<input type="hidden" id="refresh" value="no"></input>
+
+
+<!-- Render images and the dropdown for filtering them -->
 <p>
   <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.target_words.count == 0 %>
   <%= bs_dropdown_button_to 'Filters' do %>
@@ -21,7 +23,8 @@
   <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
 </p>
 
-<!-- ここから画像表示 -->
+
+<!-- Render image from here -->
 <%= paginate @images unless @images.nil? %>
 
 <div class="wrap">

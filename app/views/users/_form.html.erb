@@ -17,10 +17,6 @@
 
   <%= f.text_field :name, :required => true, :autofocus => true, inline: true %>
   <br />
-  <%= f.text_field :display_num, label: 'Image display num per page or per fetch (Default value is 10).', :required => true, :autofocus => true, value: current_user.display_num, inline: true %>
-  <br />
-  <%= f.check_box :pagination, label: 'Display images with pagination', checked: current_user.pagination, inline: true %>
-  <br />
   <br />
   <%# f.select :language_preferences, ['ja', 'en'], { label: "Choose a language:" }, { class: "selectpicker" } %>
 
