@@ -186,7 +186,7 @@ module Scrape
       escaped = URI.escape(url)
       xml = agent.get(escaped)
 
-      # 画像情報を取得してlimit枚DBヘ保存する
+      # Get images and save them to the database by 'limit' num
       xml.search('image').take(@limit).each_with_index do |item, count|
         begin
           # Skip adult images and ones that have 0 clip count
@@ -196,7 +196,7 @@ module Scrape
           end
 
           start = Time.now
-          image_data = self.class.get_data(item)             # APIの結果から画像情報取得
+          image_data = self.class.get_data(item)             # Get image data from the API result
           options = Scrape.get_option_hash(validation, false, false, (not user_id.nil?))
           image_id = self.class.save_image(image_data, @logger, target_word, [ Scrape.get_tag(query) ], options)
 
