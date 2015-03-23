@@ -41,10 +41,10 @@ class @Scroll
     console.log('binded events:' + $(window).data('events'))
 
     @logging = logging        # Whether it writes logs or not
-    @colCount=0
-    @colWidth=0
-    @margin=@DEF_MARGIN       # Margin width between two blocks
-    @windowWidth=0
+    @colCount = 0
+    @colWidth = 0
+    @margin = @DEF_MARGIN       # Margin width between two blocks
+    @windowWidth = $(window).width()
     @url = document.URL       # Get current URL for supporting browser back button
     @blocks = []              # Stores maximum heights from the top of each column
     @counter = 0
@@ -57,23 +57,23 @@ class @Scroll
     @scrollReady = false
 
     # Set resize event
-    unless @mobile
-      $(window).resize(() =>
+    $(window).resize(() =>
+
+      # Avoid firing resize events when scrolling on Safari by checking if the window size has actually changed
+      if $(window).width() != @windowWidth
         return if @scrollReady == false
         if (timer != false)
           clearTimeout(timer)
 
         # Execute the function after it elapses 200ms
         timer = setTimeout(() =>
-          #@scrollReady = false
           return if @scrollReady == false
 
           console.log('resizing...')
           @recalculatePositions()
           window.resizing = false
-          #@scrollReady = true
         , 500)
-      )
+    )
 
 
   # [Not Used]Initialize masonry lib
