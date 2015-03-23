@@ -1,7 +1,21 @@
 class @Component
   constructor: () ->
 
-  # 'Clip'ボタンを押下した時にボタンを表示したままにする
+  # Re-position images when collapse bar is trrigered
+  initCollapsables: (scroll) ->
+    $('.navbar-collapse').on('hidden.bs.collapse', () ->
+      console.log('hidden')
+      window.resizing = false # Set flag to false since the method returns when the flag is true
+      scroll.recalculatePositions()
+    )
+    $('.navbar-collapse').on('shown.bs.collapse', () ->
+      console.log('shown')
+      window.resizing = false
+      scroll.recalculatePositions()
+    )
+
+
+  # Keep the 'Clip' button visible when clicked
   initButtons: () ->
     $(document).on('click', '.popover-board', () ->
       $(this).parents('.boxInner').addClass('hovered')

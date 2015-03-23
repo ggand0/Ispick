@@ -1,7 +1,7 @@
 class CreateImages < ActiveRecord::Migration
   def change
     create_table :images do |t|
-      # 基本的な情報
+      # Basic data
       t.text :title
       t.text :caption
       t.text :src_url
@@ -10,7 +10,7 @@ class CreateImages < ActiveRecord::Migration
       t.attachment :data
       t.string :md5_checksum
 
-      # 付加的な情報
+      # Additional data
       t.text :page_url
       t.text :site_name
       t.string :module_name

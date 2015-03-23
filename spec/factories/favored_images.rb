@@ -17,7 +17,7 @@ FactoryGirl.define do
     sequence(:created_at) { |n| Time.mktime(2014, 1, n, 0, 0, 0) }
     data { fixture_file_upload('spec/files/test_images/madoka0.jpg') }
 
-    # save時にvalidationをスキップする
+    # Skip validation when saving
     to_create do |instance|
       instance.save validate: false
     end

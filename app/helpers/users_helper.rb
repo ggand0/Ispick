@@ -9,17 +9,26 @@ module UsersHelper
   # @params image [Image] An object of Image which is included in the image.
   # @return []
   def render_image(image, size='btn-sm')
-    link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
-      class: 'image'
+    if mobile_device?
+      # class: 'image' needed for resizing from JavaScript for mobiles
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s }
+    else
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+    end
   end
 
   def render_favored_image(image, size='btn-sm')
-    link_to image_tag(image.data.url(:thumb)), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+    if mobile_device?
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: 'favored_images', action: 'show', id: image.id.to_s }
+    else
+      link_to image_tag(image.data.url(:thumb), class: 'image'), { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }
+    end
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_clip_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to paperclip_glyphicon, { controller: 'image_boards', action: 'boards', remote: true, image: image.id, id: "popover-board#{image.id}",
       class: "popover-board btn-info #{size}" }, 'data-toggle' => "popover", 'data-placement'=>'bottom', 'data-container'=> 'body', id: "popover-board#{image.id}"
   end
@@ -27,23 +36,27 @@ module UsersHelper
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_unclip_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to 'Unclip', { controller: 'favored_images', action: 'destroy', id: image.id, board: @image_board.id }, method: :delete,
       class: "popover-board btn-info #{size}"
   end
 
   def render_like_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to thumbs_up_glyphicon, hide_image_path(image), method: :put, class: "btn-default #{size}"
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_hide_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to 'Hide', hide_image_path(image), method: :put, class: "btn-default #{size}"
   end
 
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_show_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to resize_full_glyphicon, { controller: 'images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
      class: "btn-default #{size}"
   end
@@ -51,6 +64,7 @@ module UsersHelper
   # Renders a bootstrap button with the link.
   # @params image [Image] An object of Image.
   def render_show_favored_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to resize_full_glyphicon, { controller: 'favored_images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
      class: "btn-default #{size}"
   end
@@ -108,6 +122,9 @@ module UsersHelper
   def file_glyphicon
     '<span class="glyphicon glyphicon-file" style="vertical-align:middle"></span>'.html_safe
   end
+  def search_glyphicon
+    '<span class="glyphicon glyphicon-search" style="vertical-align:middle"></span>'.html_safe
+  end
 
 
 
@@ -116,6 +133,7 @@ module UsersHelper
   #  will be deleted
   # =================
   def render_show_debug_button(image, size='btn-sm')
+    size = 'btn-xs' if mobile_device?
     bs_button_to wrench_glyphicon, { controller: 'debug', action: 'show_debug', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' },
       class: "btn-default #{size}"
   end
@@ -153,7 +171,7 @@ module UsersHelper
   # Returns html code for debugging.
   # @params image [ActiveRecord::AssociationRelation] A relation object of Image class.
   # @return [String] html code with the count of input relation.
-  def get_debug_html(images)
-    "<strong>Found #{images.count} images.</strong>".html_safe
+  def get_debug_html(count)
+    "<strong>Found #{count} images.</strong>".html_safe
   end
 end

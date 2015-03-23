@@ -32,14 +32,14 @@ describe TargetWordsController do
   let(:user) { FactoryGirl.create(:user) }
   before do
     sign_in user
-    Resque.stub(:enqueue).and_return nil
+    allow(Resque).to receive(:enqueue).and_return nil       # Prevent Resque.enqueue method from running
   end
 
   describe "GET index" do
     it "assigns all target_words as @target_words" do
       target_word = TargetWord.create! valid_attributes
       get :index, {}, valid_session
-      assigns(:target_words).should eq([target_word])
+      expect(assigns(:target_words)).to eq([target_word])
     end
   end
 
@@ -47,14 +47,14 @@ describe TargetWordsController do
     it "assigns the requested target_word as @target_word" do
       target_word = TargetWord.create! valid_attributes
       get :show, {:id => target_word.to_param}, valid_session
-      assigns(:target_word).should eq(target_word)
+      expect(assigns(:target_word)).to eq(target_word)
     end
   end
 
   describe "GET new" do
     it "assigns a new target_word as @target_word" do
       get :new, {}, valid_session
-      assigns(:target_word).should be_a_new(TargetWord)
+      expect(assigns(:target_word)).to be_a_new(TargetWord)
     end
   end
 
@@ -62,7 +62,7 @@ describe TargetWordsController do
     it "assigns the requested target_word as @target_word" do
       target_word = TargetWord.create! valid_attributes
       get :edit, {:id => target_word.to_param}, valid_session
-      assigns(:target_word).should eq(target_word)
+      expect(assigns(:target_word)).to eq(target_word)
     end
   end
 
@@ -83,7 +83,6 @@ describe TargetWordsController do
         assigns(:target_word).should be_persisted
       end
 
-      # ユーザの登録ワード一覧ページへリダイレクトする事
       it "redirects to the list page of target_words" do
         person = FactoryGirl.create(:person)
         post :create, { target_word: valid_attributes, id: person.id }, valid_session
@@ -135,20 +134,20 @@ describe TargetWordsController do
         # specifies that the TargetWord created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        TargetWord.any_instance.should_receive(:update).with({ "name" => "MyString" })
+        expect_any_instance_of(TargetWord).to receive(:update).with({ "name" => "MyString" })
         put :update, {:id => target_word.to_param, :target_word => { "name" => "MyString" }}, valid_session
       end
 
       it "assigns the requested target_word as @target_word" do
         target_word = TargetWord.create! valid_attributes
         put :update, {:id => target_word.to_param, :target_word => valid_attributes}, valid_session
-        assigns(:target_word).should eq(target_word)
+        expect(assigns(:target_word)).to eq(target_word)
       end
 
       it "redirects to the target_word" do
         target_word = TargetWord.create! valid_attributes
         put :update, {:id => target_word.to_param, :target_word => valid_attributes}, valid_session
-        response.should redirect_to(target_word)
+        expect(response).to redirect_to(target_word)
       end
     end
 
@@ -156,17 +155,17 @@ describe TargetWordsController do
       it "assigns the target_word as @target_word" do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetWord.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetWord).to receive(:save).and_return(false)
         put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
-        assigns(:target_word).should eq(target_word)
+        expect(assigns(:target_word)).to eq(target_word)
       end
 
       it "re-renders the 'edit' template" do
         target_word = TargetWord.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        TargetWord.any_instance.stub(:save).and_return(false)
+        allow_any_instance_of(TargetWord).to receive(:save).and_return(false)
         put :update, {:id => target_word.to_param, :target_word => { "name" => "invalid value" }}, valid_session
-        response.should render_template("edit")
+        expect(response).to render_template("edit")
       end
     end
   end
@@ -182,7 +181,7 @@ describe TargetWordsController do
     it "redirects to the target_words list" do
       target_word = TargetWord.create! valid_attributes
       delete :destroy, {:id => target_word.to_param}, valid_session
-      response.should redirect_to(preferences_users_path)
+      expect(response).to redirect_to(preferences_users_path)
     end
   end
 

@@ -20,34 +20,57 @@
 # Learn more: http://github.com/javan/whenever
 
 
-# Scraping processes
-every 12.hours do
-  rake 'scrape:anipic[720]', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
+# ==================
+#   Scraping tasks
+# ==================
+every 1.day, :at => '2:30 am' do
+  rake 'scrape:anipic', output: { error: 'log/scrape_anipic_error.log', standard: 'log/scrape_anipic_cron.log' }
 end
 
+every 1.day, :at => '3:30 am' do
+  rake 'scrape:pixiv', output: { error: 'log/scrape_pixiv_error.log', standard: 'log/scrape_pixiv_cron.log' }
+end
+
+every 1.day, :at => '4:30 am' do
+  rake 'scrape:nico', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+end
+
+every 1.day, :at => '5:30 am' do
+  rake 'scrape:shushu', output: { error: 'log/scrape_shushu_error.log', standard: 'log/scrape_shushu_cron.log' }
+end
+
+every 3.hours do
+  rake 'scrape:zerochan', output: { error: 'log/scrape_zerochan_error.log', standard: 'log/scrape_zerochan_cron.log' }
+end
+
+every 2.hours do
+  rake 'scrape:deviant', output: { error: 'log/scrape_deviant_error.log', standard: 'log/scrape_deviant_cron.log' }
+end
+
+#every 6.hours do
+#  rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+#end
+
+
+# ==================
+#    System tasks
+# ==================
 every 6.hours do
-  rake 'scrape:nico[360]', output: { error: 'log/scrape_nico_error.log', standard: 'log/scrape_nico_cron.log' }
+  # If the number of records exceeds the limit, delete the image files of excess records
+  rake 'scrape:delete_excess_image_files[500000]', output: 'log/system.log'
+
+  # If the number of records exceeds the limit, delete the records themselves
+  rake 'scrape:delete_excess[1000000]', output: 'log/system.log'
 end
 
-every 6.hours do
-  rake 'scrape:tumblr[360]', output: { error: 'log/scrape_tumblr_error.log', standard: 'log/scrape_tumblr_cron.log' }
+# Update ranking records and create a 'daily image' record
+every 1.day, :at => '6:00 pm' do
+  rake 'system:update_ranking'
 end
 
-every 6.hours do
-  #rake 'scrape:fchan'
+# Recommend tags for users
+every 1.day do
+  rake 'system:recommend_tags', output: 'log/system.log'
 end
 
 
-# Delivery and deletion processes
-every 6.hours do
-  # TargetWordと同名のTagを持つImageをTargetWordと関連づける処理
-  #rake 'deliver:associate', output: 'log/deliver.log'
-  
-  # 指定枚数を越えたらその分Imagesから画像ファイルを削除
-  rake 'scrape:delete_excess_image_files[500000]', output: 'log/deliver.log'
-
-  # 指定枚数を超えたらその分Imagesから削除
-  rake 'scrape:delete_excess[1000000]', output: 'log/deliver.log'
-  
-
-end

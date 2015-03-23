@@ -1,19 +1,20 @@
 // Place all the styles related to the welcome controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-.about-us {
+
+@import "_colors";
+
+
+.content-box {
   background-color: #F8F8F8;
-  border: 2px solid #F8F8F8;
-  border-radius: 15px;
-  margin: 10px;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
 }
 .col-centered{
   float: none;
   margin: 0 auto;
-}
-.btn-group-oauth {
-  width     : 90%;
-  line-height: 5px;
 }
 form .line {
   margin-bottom: 5px; //adjust to your liking
@@ -24,8 +25,13 @@ form .line {
 
 
 .top-description {
-  text-align: center;
-  background-color : #E4F5F5;//#7ACECE;
+  padding: 20px;
+  h1 {
+    text-align: center;
+    margin-top: 0px;
+  }
+  background-color: $ice-soft;
+  color: $white;
 }
 .top-wrap {
   background-color : #E4F5F5;
@@ -40,9 +46,10 @@ form .line {
   z-index   : 9999;
 }
 .wrapper-oauth {
+  padding: 20px;
   text-align: center;
   line-height: 10px;
-  background-color : #7ACECE;
+  background-color : $ice-light;
   z-index   : 9999;
 }
 .wrapper-sign-in {
@@ -51,24 +58,19 @@ form .line {
   overflow  : hidden;
   z-index   : 2;
 }
-.link-sign-in a {
-  color: #000;
-  text-decoration: none;
-  &:visited {
-    color: #000;
-  }
-  &:hover {
-    color: #000;
-    text-decoration: underline;
-  }
+.link-sign-in {
+  margin-top: 20px;
 }
-
+.btn-group-oauth {
+  margin-bottom: 10px;
+}
 
 
 // styles for "Creating an account means you've accepted Term of Service and..."
 .warning{
   font-size: 10px;
   line-height: 10px;
+  margin-bottom: 10px;
 }
 .warning a {
   &:hover {

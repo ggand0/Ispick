@@ -1,10 +1,8 @@
-<div class="btn-group-vertical btn-group-oauth">
-  <%= button_group do %>
+<div class="btn-group-oauth">
     <%= bs_button_to '<i class="fa fa-facebook"></i>Continue with Facebook'.html_safe, user_omniauth_authorize_path(:facebook), class: "btn-block btn-social btn-facebook" %><br />
     <%= bs_button_to '<i class="fa fa-twitter"></i>Continue with Twitter'.html_safe, user_omniauth_authorize_path(:twitter), class: "btn-default btn-block btn-social btn-twitter" %><br />
     <%= bs_button_to '<i class="fa fa-tumblr"></i>Continue with Tumblr'.html_safe,  user_omniauth_authorize_path(:tumblr), class: "btn-default btn-block btn-social btn-tumblr" %><br />
-    <%= bs_button_to '<i class="fa fa-envelope"></i>Continue with Email'.html_safe, '/sign_up', class: "btn-default btn-block  btn-social btn-email" %><br />
-  <% end %>
+    <%= bs_button_to '<i class="fa fa-envelope"></i>Continue with Email'.html_safe, '/sign_up', class: "btn-default btn-block  btn-social btn-email" %>
 </div>
 <%= render partial: 'shared/top/warning' %>
 <div align="center">

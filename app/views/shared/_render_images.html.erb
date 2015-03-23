@@ -1,21 +1,42 @@
+<!-- Disable pagination -->
+<%= content_tag :div, class: "temp_information", data: { scroll: true } do %>
+<% end %>
+
 <!-- Render images as usual -->
 <% images.each_with_index do |image, index| %>
-  <div class="block has-gutters">
-    <div class="height"><%= image.height %></div>
-    <% if image.page_url %>
-      <%= link_to image_tag(image.data.url(:thumb)), image.page_url.html_safe, :target => "_blank" %>
-    <% else %>
-      <%= link_to image_tag(image.data.url(:thumb)), image.src_url.html_safe, :target => "_blank" %>
-    <% end %>
 
-    <div class="title">
-        <%= image.title.to_s %><br />
-        <div class="time-string">
-          <br /><%= "PA: #{get_jst_string(image.posted_at)}" %>
-        </div>
+    <div class="block has-gutters">
+      <div class="width"><%= image.width %></div>
+      <div class="height"><%= image.height %></div>
+      <%= render_image(image) %>
+
+      <% if current_user %>
+      <div class="titleBox">
+        <div class="id"><%= image.id %></div>
+        <%= button_group class: 'pull-right blocks' do %>
+          <%= render_clip_button(image) %>
+          <%= render_show_button(image) %>
+          <%= render_show_debug_button(image) if Rails.env.development? %>
+        <% end %>
+        <br />
       </div>
+      <% end %>
+
+      <!-- Add another anchor to the modal as it gets unclickable when thumbnail's height is to short -->
+      <% unless mobile_device? %>
+        <%= link_to ({ controller: '/images', action: 'show', id: image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' }) do %>
+          <div class="title">
+            <%= image.title.to_s %>
+            <div class="time-string">
+              <%= "Posted at: #{get_jst_string(image.posted_at)}" %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+  <% end %>
+  <div id="loader">
+    <%= image_tag asset_path('round_loader_mini.gif')%>
   </div>
-<% end %>
-<div id="loader">
-  <%= image_tag asset_path('round_loader_mini.gif')%>
-</div>
+

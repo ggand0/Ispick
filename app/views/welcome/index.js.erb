@@ -1,3 +1,5 @@
+// Called from JavaScript;
+// The code loads the next set of images and replaces current divs with new ones.
 <% if @images.next_page %>
   $('.pagination').replaceWith('<%= j paginate @images %>');
   $('.pagination').hide();

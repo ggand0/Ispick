@@ -7,6 +7,8 @@ module Scrape
   class Tumblr < Client
     ROOT_URL = 'https://tumblr.com'
 
+    # @params logger [ActiveSupport::Logger] A logger object which is used during the process
+    # @params limit [Integer] Max number of images to scrape
     def initialize(logger=nil, limit=20)
       self.limit = limit
       if logger.nil?
@@ -18,7 +20,6 @@ module Scrape
     end
 
 
-    # 取得するPostの上限数。APIの仕様で20postsまでに制限されている
     # Scrape images from tumblr. The latter two params are used for testing.
     # @param [Integer] min
     def scrape(interval=60)
@@ -26,7 +27,7 @@ module Scrape
     end
 
 
-    # キーワードによる抽出処理を行う
+    # Scrape images by target_words
     # @param user_id [Integer]
     # @param target_word [TargetWord]
     # @param english [Boolean]
@@ -39,8 +40,7 @@ module Scrape
     end
 
 
-    # Scrape images that posess target_word
-    # 対象のタグを持つPostの画像を抽出する
+    # Scrape images of posts that have target_word string as a tag
     # @param [String]
     # @param [Integer]
     # @param [Boolean]
@@ -60,7 +60,8 @@ module Scrape
       @logger.info "query=#{query}"
       client = self.class.get_client
 
-      # タグ検索：limitで指定された数だけ画像を取得
+
+      # Get images as many as the number it's assigned
       client.tagged(query).each_with_index do |image, count|
         # Scrape images only
         if image['type'] != 'photo'
@@ -87,7 +88,7 @@ module Scrape
         # 始めに画像をダウンロードし、終わり次第ユーザに配信
         if image_id and (not user_id.nil?)
           @logger.info "Scraped from #{image_data[:src_url]} in #{elapsed_time} sec" if verbose
-          self.class.generate_jobs(image_id, image_data[:src_url], false,
+          self.class.generate_jobs(image_id, 'Image', image_data[:src_url], false,
             user_id, target_word.class.name, target_word.id, @logger)
         end
 
@@ -101,25 +102,11 @@ module Scrape
 
 
 
-    # ==============
-    #  OLD METHODS
-    # ==============
-    # [OLD]直接HTMLを開いてlikes数を取得する。パフォーマンスに問題あり
-    # @param [String] likes_countを取得するページのurl
-    def get_original_favorite_count(page_url)
-      begin
-        # show:likesを設定しているページのみ取得
-        html = Nokogiri::HTML(open(page_url))
-        likes = html.css("ol[class='notes']").first.content.to_s.scan(/ likes this/)
-        suki = html.css("ol[class='notes']").first.content.to_s.scan(/「スキ!」/)
-        return likes.count + suki.count
-      rescue => e
-        @logger.info e
-      end
-    end
+    # ========================
+    #     Utility methods
+    # ========================
 
-
-    # @return [Tumblr::Client] APIキーを設定したClientオブジェクト
+    # @return [Tumblr::Client] A Client objects which is set the API keys
     def self.get_client
       ::Tumblr.configure do |config|
         config.consumer_key = CONFIG['tumblr_consumer_key']
@@ -128,13 +115,14 @@ module Scrape
       ::Tumblr::Client.new
     end
 
+    # Gets artist's information from the post's caption
     def self.get_artist_information(caption)
-        # タグの除去
+      # Remove tags
       caption = caption.gsub(/<.*?>/,"")
 
       #Hatsune… Madoka? | hitsu [pixiv]
-        #「まどかさん」/「かきあげ」のイラスト [pixiv]
-        #「ハサハ」/「ローラ」の作品 [TINAMI] #illustail
+      #「まどかさん」/「かきあげ」のイラスト [pixiv]
+      #「ハサハ」/「ローラ」の作品 [TINAMI] #illustail
       if /\[pixiv\]|\[TINAMI\]/ =~ caption
         /「.+」 *[\/|\|] *「(.+)」.+/ =~ caption
         if $1.nil?
@@ -183,22 +171,6 @@ module Scrape
       }
     end
 
-
-    # [OLD]likes_countを更新する
-    # @param [String]
-    # @return [Hash]
-    def self.get_stats(page_url)
-      puts 'DEBUG'
-      client = self.get_client
-      #client = self.class.get_client
-
-      blog_name = page_url.match(/http:\/\/.*.tumblr.com/).to_s.gsub(/http:\/\//, '').gsub(/.tumblr.com/,'')
-      id = page_url.match(/post\/.*\//).to_s.gsub(/post\//,'').gsub(/\//,'')
-      posts = client.posts(blog_name)
-      post = posts['posts'].find { |h| h['id'] == id.to_i } if posts['posts']
-
-      { original_view_count: nil, original_favorite_count: post ? post['note_count'] : nil }
-    end
 
   end
 end

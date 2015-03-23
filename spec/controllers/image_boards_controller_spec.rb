@@ -25,12 +25,10 @@ RSpec.describe ImageBoardsController, :type => :controller do
   # adjust the attributes here as well.
   let(:valid_attributes) {
     { name: 'valid attribute' }
-    #{ 'name'=>'valid attribute' }
   }
 
   let(:invalid_attributes) {
     { name: 'invalid attribute' }
-    #{ 'name'=>'invalid attribute' }
   }
 
   # This should return the minimal set of values that should be in the session
@@ -69,7 +67,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
     end
   end
 
-  # AJAX経由でのみ呼ばれると想定
+  # Assumes it's called only via AJAX
   describe "POST create" do
     before do
       login_user
@@ -123,7 +121,7 @@ RSpec.describe ImageBoardsController, :type => :controller do
 
       it "re-renders the 'edit' template" do
         image_board = ImageBoard.create! valid_attributes
-        ImageBoard.any_instance.stub(:update).and_return nil
+        allow_any_instance_of(ImageBoard).to receive(:update).and_return nil
 
         put :update, {:id => image_board.to_param, :image_board => invalid_attributes}, valid_session
         expect(response).to render_template("edit")

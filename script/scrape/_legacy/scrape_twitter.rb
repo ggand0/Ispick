@@ -144,8 +144,8 @@ module Scrape
             page_url: tweet.url.to_s,
             site_name: 'twitter',
             module_name: 'Scrape::Twitter',
-            views: tweet.retweet_count,
-            favorites: tweet.favorite_count,
+            original_view_count: tweet.retweet_count,
+            original_favorite_count: tweet.favorite_count,
             posted_at: tweet.created_at
           })
         end

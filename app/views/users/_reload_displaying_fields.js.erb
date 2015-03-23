@@ -1,0 +1,2 @@
+$(".displaying-fields").html('<%= escape_javascript(render :partial => "users/displaying_fields", locals: {user: @user}) %>');
+$(".notice-displaying").html('<%= escape_javascript(render :partial => "shared/flash_messages", locals: { flash: flash }) %>');

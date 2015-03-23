@@ -2,22 +2,25 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-// Image.idをhtmlに埋め込むために使用
+// Used for embedding Image.id in a html
 .id {
   display: none;
 }
+// Used for embedding thumbnails' heights in a html
 .height {
   display: none;
 }
+.width {
+  display: none;
+}
 
-// titleBox内の時間表記用
+
+// Style the format of time inside a titleBox div
 .time-string {
-  font-size: 8px;
-  line-height: 8px;
+  font-size: 10px;
+  line-height: 1.2;
   text-align: right;
-  align: right;
-  float: right;
-  width: 150px;
+  margin-top: 3px;
 }
 // for home_debug action
 .time-string-debug {
@@ -34,7 +37,8 @@
   width: 10px;
 }
 
-// クリップする際に表示させるモーダル内で使用
+
+// Used in clipping modals
 .favored_board {
   background-color: #5B9B9B;
 }
@@ -42,7 +46,8 @@
   text-align: right;
 }
 
-// Bootstrapのbutton関連
+
+// Tweak Bootstrap buttons
 .blocks .btn-default {
   margin: 0 5px;
   border-radius: 0;
@@ -52,56 +57,55 @@
   border-radius: 0;
 }
 
-// glyphiconがbutton上で微妙にずれる問題への対策
+
+
+// Address the problem that bootstrap glyphicons aren't positioned correctly
 // from: http://stackoverflow.com/questions/14082826/bootstrap-icons-glyphicons-are-positioned-slightly-up-when-using-google-fonts
 span.glyphicon {
   vertical-align: middle;
   margin-top: -5px;
 }
 
+// To get rid of gaps at the search form
+.custom-search-form {
+  padding-right: 0;
+  margin-right: 0;
+}
+
 .after-header { padding: -500px 0px; }
 
-// タグ登録ページで使用
 .arrow {
-  position: relative;
-  top: 175px;
-  left: 10px;
-  float: left;
-  width: 80px;
-  font-size: 50pt;
+  line-height: 300px + 20px + 10px + 24px * 1.1;
+  text-align: center;
+  img {
+    width: 40px;
+    height: 57px;
+  }
 }
-.wrapper-popular-tags {
-  float: left;
-  width: 400px;
-}
-.wrapper-followed-tags {
-  float: left;
-  width: 400px;
-}
-.popular-tags {
-  width: 400px;
-  height: 300px;
-  border-style: solid;
-  border-color: #C3C3C3;
-  overflow-y: scroll;
-}
+
+.popular-tags,
 .followed-tags {
-  width: 400px;
   height: 300px;
   border-style: solid;
+  border-width: 1px;
   border-color: #C3C3C3;
   overflow-y: scroll;
 }
+
 .tag-button {
-  color: #FFF;
-  background-color: #7ACECE;
+  color: #5B9B9B;//#F8F8F8;
+  background-color: #E4F5F5;//#7ACECE;
 }
-.tag-button a:visited {
-  color: #FFF;
+.tag-button:hover {
+  color: #5B9B9B;
+  background-color: #DDD;
 }
 
 
-// Dropdowns related styles
+
+
+// Nested dropdowns styles
+// Used at image displaying pages
 .dropdown-submenu {
     position:relative;
 }

@@ -1,10 +1,10 @@
 require 'rubygems'
 require 'zip'
-require "#{Rails.root}/script/scrape/scrape_tumblr"
 
 class UsersController < ApplicationController
   include ApplicationHelper
-  before_filter :set_user, only: [:edit, :update, :settings]
+  before_filter :set_search
+  before_filter :set_user, only: [:edit, :update, :settings, :preferences, :update_display_settings]
   before_filter :validate_authorization_for_user, only: [:edit, :update, :settings]
   before_filter :authenticate, only: [:show_target_images]
 
@@ -21,11 +21,26 @@ class UsersController < ApplicationController
   # PUT /users/1
   def update
     if @user.update_attributes(user_params)
-      redirect_to settings_users_path(id: @user.id), notice: 'the settings was successfully updated.'
+      flash[:success] = 'The user setting was successfully updated.'
+      redirect_to settings_users_path(id: @user.id)
     else
       render action: 'debug/edit'
     end
   end
+
+  # PUT /users/1
+  def update_display_settings
+    if @user.update_attributes(user_params)
+      flash[:success] = 'The display setting was successfully updated.'
+      respond_to do |format|
+        format.html { redirect_to preferences_users_path(id: @user.id) }
+        format.js { render partial: 'users/reload_displaying_fields' }
+      end
+    else
+      redirect_to preferences_users_path(id: @user.id)
+    end
+  end
+
 
   # GET /users/1/settings
   def settings
@@ -34,54 +49,76 @@ class UsersController < ApplicationController
 
   # GET /users/home
   # Render an user's home page.
-  # ユーザ個別のホームページを表示する。
   def home
-    # Get images: For a new user, display the newer images
     if current_user.tags.empty?
+      # Get images: For a new user, display the newer images
       images = Image.get_recent_images(500)
-
-    # Otherwise, display images from user.tags relation
     else
+      # Otherwise, display images from user.tags relation
       images = current_user.get_images
       images.reorder!('posted_at DESC') if params[:sort]
       images.reorder!('original_favorite_count DESC') if params[:fav]
     end
+    images.uniq!
 
-    # Filter images by date
+    # Filter images by date if neccesary
     if params[:date]
       date = DateTime.parse(params[:date]).to_date
       images = Image.filter_by_date(images, date)
     end
 
     # Filter images by sites
+    #if params[:site]
+    #  images = Image.filter_by_date(images, params[:site])
+    #end
+
+    images = images.where("site_name IN (?)", convert_sites(current_user.target_sites))
+    @images = images.page(params[:page]).per(current_user.display_num)
+    @count = images.select('images.id').count
+    @pagination = current_user ? current_user.pagination : false
+    @disable_fotter = true
+  end
+
+  def convert_sites(sites)
+    result = []
+    sites = sites.map{ |site| site.name }
+    Image::TARGET_SITES_DISPLAY.each_with_index do |site, count|
+      if sites.include? site
+        result.push Image::TARGET_SITES[count]
+      end
+    end
+    result
+  end
+
+
+  # GET /users/rss
+  # Render streams of crawled websites.
+  def rss
+    # Filter images by sites
     if params[:site]
-      images = Image.filter_by_date(images, params[:site])
+      images = Image.where(site_name: params[:site])
+      @site = params[:site_name]
+    else
+      images = Image.where(site_name: 'anipic')
+      @site = 'anime-pictures'
     end
-
-    # TMP FEATURE
-    images = images.where.not(site_name: 'nicoseiga') if params[:nico]
-
-    @images = images.page(params[:page]).per(10)
-    @images_all = images
-    @disable_fotter = true
-  end
-
-  # GET
-  def search
-    images = Image.search_images(params[:query])
+    images = images.where.not(data_updated_at: nil).limit(1000)
     images.reorder!('posted_at DESC') if params[:sort]
+    images.reorder!('original_favorite_count DESC') if params[:fav]
+    images.uniq!
 
-    # Filter images by date
-    if params[:date]
-      date = DateTime.parse(params[:date]).to_date
-      images = Image.filter_by_date(images, date)
-    end
-
-    @images = images.page(params[:page]).per(10)
-    @images_all = images
+    display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+    @pagination = current_user ? current_user.pagination : false
+    @images = images.page(params[:page]).per(display_num)
+    @count = images.select('images.id').count
     @disable_fotter = true
-    render action: 'home'
+
+    respond_to do |format|
+      format.html {}
+      format.js { render action: 'home' }
+    end
   end
+
 
   # GET
   def new_avatar
@@ -106,9 +143,11 @@ class UsersController < ApplicationController
   end
 
 
-  # タグ登録画面を表示する
   # Render the index page of tags.
   def preferences
+    flash = nil
+    puts flash.present?
+
     if params[:target_words]
       @popular_tags = TargetWord.get_tags_with_images(100).
         map { |target_word| Tag.where(name: target_word.name_english).first }
@@ -119,9 +158,9 @@ class UsersController < ApplicationController
     @tags = current_user.tags
     @tag = Tag.new
 
-    @search = Tag.search(params[:q])
+    @search_tags = Tag.search(params[:q])
     if params[:q]
-      @tags_result = @search.result(distinct: true).page(params[:page]).per(50)
+      @tags_result = @search_tags.result(distinct: true).page(params[:page]).per(50)
     end
 
     respond_to do |format|
@@ -130,7 +169,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # お気に入り画像一覧ページを表示する
+
   # Render the list of clipped images.
   def boards
     board_id = params[:board]
@@ -139,7 +178,9 @@ class UsersController < ApplicationController
     unless board.nil?
       session[:selected_board] = board.id
       @image_board = ImageBoard.find(board.id)
-      @favored_images = board.favored_images.page(params[:page]).per(25)
+      @pagination = current_user ? current_user.pagination : false
+      display_num = current_user ? current_user.display_num : User::DEFAULT_DISPLAY_NUM
+      @favored_images = board.favored_images.page(params[:page]).per(display_num)
       @total_size = bytes_to_megabytes(@image_board.get_total_size)
       @disable_fotter = true
     else
@@ -147,8 +188,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # 登録タグの削除：関連のみ削除する
   # Remove a registered text tag from user.tags.
+  # Only remove an association.
   def delete_target_word
     current_user.tags.delete(TargetWord.find(params[:id]))
     @tags = current_user.tags
@@ -159,8 +200,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # 登録タグの削除：関連のみ削除する
   # Remove a registered text tag from user.tags.
+  # Only remove an association.
   def delete_tag
     current_user.tags.delete(Tag.find(params[:id]))
     @tags = current_user.tags
@@ -171,33 +212,47 @@ class UsersController < ApplicationController
     end
   end
 
+  # GET
+  # Show recommended_tags, mainly for debugging
+  def recommended_tags
+    @tags = current_user.recommended_tags
+    @tags = @tags.order('cooccurrence_count desc')
+    # Get images_count from an associated Tag object since RecommendedTag doesn't have any counter caches
+    #@counts = current_user.recommended_tags.map { |t| t.tag.images_count }
+  end
+
+  # POST
+  # Set User.sites after clearing it
+  def set_sites
+    current_user.target_sites.clear
+    @sites = []
+
+    TargetSite.all.each do |site|
+      # Convert string to symbol
+      if params[site.name.parameterize.underscore.to_sym].to_i == 1
+        @sites.push site.name
+      end
+    end
+
+    @sites.each do |site|
+      current_user.target_sites << TargetSite.where(name: site).first
+    end
+
+    flash[:success] = 'The site settings was successfully updated.'
+    respond_to do |format|
+      format.html { redirect_to action: 'preferences' }
+      format.js { render partial: 'users/reload_target_sites_fields' }
+    end
+  end
 
 
   # ===============================
   #  Debugging / temporary actions
   # ===============================
-
-  # [Unused]画像登録画面を表示する
-  # Render the index page of target_images.
+  # [Unused] Render the index page of target_images.
   def show_target_images
     @target_images = current_user.target_images
     render partial: 'debug/show_target_images'
-  end
-
-  # A temporary method. Will be fixed.
-  def share_tumblr
-    if current_user.provider == 'tumblr'
-      ::Tumblr.configure do |config|
-        config.oauth_token = session[:oauth_token]
-        config.oauth_token_secret = session[:oauth_token_secret]
-      end
-      client = ::Tumblr::Client.new
-      image = Image.find(params[:image_id])
-      #client.photo("http://anime-cute-girls.tumblr.com/", {:data => ['/path/to/pic.jpg', '/path/to/pic.jpg']})
-      client.photo("anime-cute-girls.tumblr.com", {:data => [image.data.path]})
-    end
-
-    redirect_to home_users_path
   end
 
 
@@ -208,8 +263,13 @@ class UsersController < ApplicationController
     @user = User.find(current_user.id)
   end
 
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
+  end
+
   def user_params
-    params.require(:user).permit(:name, :language, :language_preferences)
+    params.require(:user).permit(:name, :pagination, :display_num, :language, :language_preferences)
   end
 
   def validate_authorization_for_user

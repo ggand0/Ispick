@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   #before_filter :authenticate
+  before_filter :set_cache_headers
+  before_filter :set_search
   before_filter :configure_permitted_parameters, if: :devise_controller?
   before_filter :miniprofiler
   before_filter :your_function
@@ -13,9 +15,29 @@ class ApplicationController < ActionController::Base
     redirect_to new_user_session_path  unless current_admin
   end
 
+  def check_for_mobile
+    session[:mobile_override] = params[:mobile] if params[:mobile]
+  end
+
+  def mobile_device?
+    if session[:mobile_override]
+      session[:mobile_override] == "1"
+    else
+      # Season this regexp to taste. I prefer to treat iPad as non-mobile.
+      (request.user_agent =~ /Mobile|webOS/) && (request.user_agent !~ /iPad/)
+    end
+  end
+
+  helper_method :mobile_device?
+
   protected
 
-  # production環境のみBASIC認証する
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
+  end
+
+  # Set BASIC auth only in production env
   def authenticate
     if CONFIG['perform_authentication']
       authenticate_or_request_with_http_basic do |username, password|
@@ -24,12 +46,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # ログアウト後のリダイレクト先を指定する
+  # Specify the redirect location after logout
   def after_sign_out_path_for(resource)
     root_path
   end
 
-  # ログイン後のリダイレクト先を指定する
+  # Specify the redirect location after login
   def after_sign_in_path_for(resource)
     stored_location_for(resource) ||
       if resource.is_a?(Admin)
@@ -39,7 +61,7 @@ class ApplicationController < ActionController::Base
       end
   end
 
-  # Sign up時にname attributeを関連づける
+  # Associate name attribute when signup
   def configure_permitted_parameters
     devise_parameter_sanitizer.for(:sign_up) << :name
   end
@@ -51,12 +73,12 @@ class ApplicationController < ActionController::Base
   end
 
   def your_function
-    @controller = controller_name
-    @action = action_name
+    @controller_name = controller_name
+    @action_name = action_name
   end
 
   def set_cache_headers
-    response.headers["Cache-Control"] = "private, no-cache, no-store, max-age=0, must-revalidate, post-check=0, pre-check=0"
+    response.headers["Cache-Control"] = "private, no-cache, no-store, max-age=0, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end

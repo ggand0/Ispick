@@ -3,38 +3,44 @@
 <%= javascript_include_tag 'core' %>
 <%= render 'shared/modal_image' %>
 
-<%= button_group do %>
-  <%= bs_button_to '全画像/Twitter由来のみ', { controller: 'users', action: 'debug_illust_detection', toggle_site: true } %>
-  <%= bs_button_to 'Favorites順にする', { controller: 'users', action: 'debug_illust_detection', sort: 'favorites' } %>
-  <%= bs_button_to '書き込み度順にする', { controller: 'users', action: 'debug_illust_detection', sort: 'quality' } %>
-<% end %>
-<%= bs_dropdown_button_to '判定結果で絞り込む' do %>
-  <li><%= link_to '全て', { controller: 'users', action: 'debug_illust_detection', illust: 'all' } %></li>
-  <li><%= link_to 'イラストのみ', { controller: 'users', action: 'debug_illust_detection', illust: 'illust' } %></li>
-  <li><%= link_to '実写のみ', { controller: 'users', action: 'debug_illust_detection', illust: 'photo' } %></li>
+
+
+<%= bs_dropdown_button_to 'Filter by illust detection attributes' do %>
+  <li><%= link_to 'all', { controller: 'debug', action: 'debug_illust_detection', illust: 'all' } %></li>
+  <li><%= link_to 'illusts', { controller: 'debug', action: 'debug_illust_detection', illust: 'illust' } %></li>
+  <li><%= link_to 'photos', { controller: 'debug', action: 'debug_illust_detection', illust: 'photo' } %></li>
 <% end %>
 
-<%= paginate @images %>
-<div class="wrap">
-  <% @images.each do |delivered_image| %>
-    <% image = delivered_image %>
-    <% next if delivered_image.avoided %>
-    <div class="box">
-      <div class="boxInner">
-        <%= get_jst_string(delivered_image.created_at) + '配信' %>
-        <br>
-        <%= link_to 'Hide', avoid_delivered_image_path(delivered_image), method: :put %>
-        <%= link_to 'Destroy', image, method: :delete, data: { confirm: 'Are you sure?' } %>
-        <%= get_illust_html image if image %>
-        <%= get_quality_html image if image %>
-        <br>
-        <%= "Favorites: #{image.favorites.to_s}" if image %>
+<!-- Render images and the dropdown for filtering them -->
+<p>
+  <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.count == 0 %>
 
-        <%= link_to image_tag(image.data.url(:thumb)), { controller: 'images', action: 'show', id: delivered_image.id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
-        <div class="titleBox"><%= image.title.to_s %></div>
-      </div>
-    </div>
-  <% end %>
-</div>
 
-<%= paginate @images %>
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <div class="dropdown">
+    <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-default" data-target="#" href="/page.html">
+        Filter/Sort <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+      <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
+      <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
+      <li class="divider"></li>
+      <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Filter by source</a>
+
+        <ul class="dropdown-menu">
+          <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+            <li><%= link_to "#{site}", home_users_path(site: Image::TARGET_SITES[count]) %></li>
+          <% end %>
+        </ul>
+      </li>
+    </ul>
+    <%= "  #{get_debug_html(@count)}".html_safe if @count %>
+  </div>
+
+</p>
+<br />
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images } %>

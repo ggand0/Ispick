@@ -1,18 +1,18 @@
-<h3>Popular tags / Search result</h3>
+<h3>Search result</h3>
 <div class="popular-tags">
   <% if tags_result.nil? %>
 
     <% popular_tags.each do |tag| %>
       <%= button_group do %>
-        <%= bs_button_to tag.name, images_tag_path(tag), class: 'btn-default' %>
-        <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn-default' %>
+        <%= bs_button_to tag.name, images_tag_path(tag), class: 'btn-default tag-button' %>
+        <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn-default tag-button' %>
       <% end %>
     <% end %>
   <% else %>
     <% tags_result.each do |tag| %>
       <%= button_group do %>
-        <%= bs_button_to tag.name, images_tag_path(tag), class: 'btn-default' %>
-        <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default' %>
+        <%= bs_button_to tag.name, images_tag_path(tag), class: 'btn-default tag-button' %>
+        <%= bs_button_to plus_glyphicon, { controller: 'tags', action: 'attach', id: tag.id }, method: :post, remote: true, class: 'btn btn-default tag-button' %>
       <% end %>
       <%= ' ' %>
     <% end %>

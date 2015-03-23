@@ -7,13 +7,13 @@ SimpleCov.start do
   add_filter '/script/scrape/_legacy'
   add_filter '/script/deliver'
   add_filter '/lib/tasks'
-  #add_filter 'config/initializers/reload_lib'
-  #add_filter 'config/initializers/teaspoon'
   add_filter 'config'
   add_filter '/spec/factories'
   add_filter '/spec/support'
   add_filter '/app/admin'
   add_filter '/spec/teaspoon_env.rb'
+  #add_filter 'config/initializers/reload_lib'
+  #add_filter 'config/initializers/teaspoon'
 
   add_group 'Models', 'app/models'
 end
@@ -21,11 +21,9 @@ SimpleCov.command_name "rspec"
 SimpleCov.command_name "RSpec"
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-#ENV["RAILS_ENV"] ||= 'test'
 ENV["RAILS_ENV"] = 'test'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
 require 'capybara'
 require 'capybara/rspec'
 require 'database_cleaner'
@@ -82,14 +80,18 @@ RSpec.configure do |config|
   end
 
   # Devise configuration
+  # Don't set 'type: controller' to pass view specs
   config.include Devise::TestHelpers, :type => :controller
-  config.include ControllerMacros, :type => :controller
-  config.include WaitForAjax#, type: :feature
+  config.include Devise::TestHelpers, :type => :view
 
+  config.include ControllerMacros, :type => :controller
   #config.include WaitForAjax, type: :feature
+  config.include WaitForAjax
+
 
   # Capybara
   config.include Capybara::DSL
+
   # Integration Test helper
   config.include OmniauthMacros
 
@@ -100,7 +102,7 @@ RSpec.configure do |config|
   config.after(:all, callbacks: true) do
     ActiveRecord::Base.skip_callbacks = true
   end
+
   # Skip callbacks as default
   ActiveRecord::Base.skip_callbacks = true
-
 end

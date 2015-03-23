@@ -9,26 +9,30 @@ require "#{Rails.root}/script/scrape/scrape_giphy.rb"
 require "#{Rails.root}/script/scrape/scrape_wiki.rb"
 require "#{Rails.root}/script/scrape/scrape_tags.rb"
 require "#{Rails.root}/script/scrape/scrape_anipic.rb"
+require "#{Rails.root}/script/scrape/scrape_shushu.rb"
+require "#{Rails.root}/script/scrape/scrape_zerochan.rb"
+require "#{Rails.root}/script/scrape/scrape_pixiv.rb"
+
+require 'fileutils'
+require 'csv'
+
 
 namespace :scrape do
-  @DEFAULT_MN = 10000
-  @DEFAULT_MO = 7
+  @DEFAULT_MN = 10000 # 10,000 images
+  @DEFAULT_MO = 7     # 7 days
 
   # ==================================
   #           General tasks
   # ==================================
-
-  # 指定された時期より古いImageを削除
+  # Delete images which have older created_at time than specified time
   desc "Delete images older than a certain date"
   task :delete_old, [:limit] => :environment do |t, args|
     puts 'Deleting old images...'
-
     if args[:limit]
       limit = args[:limit].to_i
     else
       limit = @DEFAULT_MO
     end
-
     before_count = Image.count
 
     # ref: http://stackoverflow.com/questions/755669/how-do-i-convert-datetime-now-to-utc-in-ruby
@@ -39,12 +43,12 @@ namespace :scrape do
     puts "Current image count: #{Image.count.to_s}"
   end
 
-  # @params limit [Integer] 最大保存数
-  # 最大保存数を超えている場合古いImageから順に削除、削除したレコード情報はold_record.txtにエクスポートする
+  # @params limit [Integer] Maximum limit to save images
+  # If it exceeds the max limit, delete images from the oldest one,
+  # and export deleted records attributes to old_record.txt
   desc "Delete images if its the count of all images exceeds the limit"
   task :delete_excess, [:limit] => :environment do |t, args|
     puts 'Deleting excessed images...'
-
     if args[:limit]
       limit = args[:limit].to_i
     else
@@ -56,7 +60,7 @@ namespace :scrape do
     if Image.count > limit
       delete_num = Image.count - limit
 
-      # recordを削除する前にtxtファイルにエクスポートする
+    # Export images' attributes before it deletes them
 =begin
       io = File.open("#{Rails.root}/log/old_record.txt","a")
       Image.reorder(:created_at).limit(delete_num).each do |image|
@@ -85,12 +89,11 @@ namespace :scrape do
     puts "Current image count: #{Image.count.to_s}"
   end
 
-  # @params limit [Integer] 最大保存数
-  # 最大保存数を超えている場合、古いImageから順に画像ファイルだけを削除
+  # If it exceeds the max limit, delete images from the oldest one, only actual image filess
+  # @param limit [Integer] Maximum limit to save images
   desc "Delete images if its the count of all images exceeds the limit"
   task :delete_excess_image_files, [:limit] => :environment do |t, args|
     puts "Deleting excessed image's files..."
-
     if args[:limit]
       limit = args[:limit].to_i
     else
@@ -98,7 +101,7 @@ namespace :scrape do
     end
     puts "limit: #{limit.to_s}"
 
-    # 画像を持つレコードの数
+    # The number of records that have images
     before_count = Image.where.not(data_file_size:nil).count
     if before_count > limit
       delete_num = before_count - limit
@@ -112,33 +115,31 @@ namespace :scrape do
     puts "Number of images with not nil data: #{Image.where.not(data_file_size:nil).count}"
   end
 
-  desc "画像を対象webサイト全てから抽出する"
+  desc "Extract images from all target sites"
   task all: :environment do
     puts 'Scraping images from target websites...'
     Scrape.scrape_all
   end
 
-  desc "画像を対象webサイト全てから抽出する"
+  desc "Scrape images from all target webistes"
   task users: :environment do
     puts 'Scraping images from target websites...'
     Scrape.scrape_users
   end
 
-  desc "タグ検索による抽出を行う"
+  desc "Scrape images based on tag-search APIs, or search forms"
   task keyword: :environment do
     puts 'Scraping images from target websites...'
     Scrape.scrape_keyword(TargetWord.last)
   end
 
-  # dataがnilのレコードにsrc_urlから再DLさせる
   desc "Redownload an image data which has nil src_url attribute"
   task redownload: :environment do
     puts 'Downloading for images with nil data...'
     Scrape.redownload
   end
 
-  # people関連テーブルを完全に抹消する（デバッグ時に使用）
-  desc "Delete all people related tables completely"
+  desc "Delete all people related tables COMPLETELY"
   task delete_people: :environment do
     puts 'Deleting all people related tables...'
     Person.delete_all
@@ -148,14 +149,12 @@ namespace :scrape do
     PeopleTitle.delete_all
   end
 
-  # images, tags, target_wordsのレコード、画像ファイルを完全に消す
-  desc "Delete images and target_words related tables completely"
+  desc "Delete images and target_words related tables COMPLETELY"
   task delete_all: :environment do
     puts 'Deleting all images / target_words related tables and image files...'
 
     # First, delete images and its files
     Image.delete_all
-    require 'fileutils'
     begin
       FileUtils.rm_rf("#{Rails.root}/public/system/images")
     rescue => e
@@ -173,64 +172,117 @@ namespace :scrape do
   # =======================================
   #  Tasks to scrape on the specific sites
   # =======================================
-  desc "キャラクタに関する静的なDBを構築する"
+  desc "Construct static DB related to characters"
   task wiki: :environment do
     puts 'Scraping character names...'
     Scrape::Wiki.scrape_all
   end
 
-  desc "キャラクタに関する静的なDBを構築する"
+  desc "Construct static DB related to anime titles"
   task wiki_titles: :environment do
     puts 'Scraping anime titles...'
     Scrape::Wiki.scrape_titles
   end
 
-  desc "キャラクタ名をAnime-picturesから抽出する"
+  desc "Scrape characters name tags from Anime Pictures"
   task tags: :environment do
     puts 'Scraping character names from anime-pictures.net...'
     Scrape::Tags.scrape
   end
 
+  desc "Create TargetWord records for research"
+  task people0: :environment do
+    csv_text = File.read "#{Rails.root}/db/seeds/people0.csv"
+    csv = CSV.parse(csv_text, :headers => true)
+    csv.each do |row|
+      Person.create!(row.to_hash)
+    end
+  end
 
-  desc "ニコ静から画像抽出する"
+  desc "Create TargetWord records for research"
+  task hair_tags: :environment do
+    hair_styles = [
+      'side ponytail',
+      'twintails',
+    ]
+  end
+
+
+  # =======================================
+  #   Tasks that scrape images from sites
+  # =======================================
+  desc "Scrape images from Nicoseiga"
   task :nico, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 120 : args[:interval]
     Scrape::Nico.new.scrape(interval.to_i)
   end
 
-  desc "ピアプロから画像抽出する"
+  desc "Scrape images from Piapro"
   task piapro: :environment do
     Scrape::Piapro.scrape
   end
 
-  desc "4chanから画像抽出する"
+  desc "Scrape images from 4chan"
   task fchan: :environment do
-
     Scrape::Fourchan.scrape
   end
 
-  desc "Tumblrから画像抽出する"
+  desc "Scrape images from Tumblr"
   task :tumblr, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Tumblr.new.scrape(interval.to_i)
   end
 
-  desc "deviantARTから画像抽出する"
+  desc "Scrape images from deviantART"
   task deviant: :environment do
-    Scrape::Deviant.scrape
+    Scrape::Deviant.new.scrape
   end
 
-  # Giphyから画像抽出する
   desc "Scrape images from Giphy"
   task :giphy, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 720 : args[:interval]
     Scrape::Giphy.new.scrape(interval.to_i)
   end
 
-  # Anime pictures and wallpapersから画像抽出する
+
+  # Anime pictures and wallpapers
   desc "Scrape images from 'Anime pictures and wallpapers'"
   task :anipic, [:interval] => :environment do |t, args|
     interval = args[:interval].nil? ? 240 : args[:interval]
     Scrape::Anipic.new.scrape(interval.to_i)
   end
+
+  desc "Scrape images from 'Anime pictures and wallpapers' using tags"
+  task :anipic_tag, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 120 : args[:interval]
+    Scrape::Anipic.new(nil, 1000).scrape_tag(interval.to_i)
+  end
+
+  # Zerochan
+  desc "Scrape images from 'zerochan'"
+  task :zerochan, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Zerochan.new.scrape(interval.to_i)
+  end
+
+  desc "Scrape images from 'zerochan'"
+  task :zerochan_tag, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 120 : args[:interval]
+    Scrape::Zerochan.new(nil, 1000).scrape_tag(interval.to_i)
+  end
+
+  # E-shuushuu
+  desc "Scrape images from 'Shushu'"
+  task :shushu, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Shushu.new.scrape(interval.to_i)
+  end
+
+  # Pixiv
+  desc "Scrape images from 'Pixiv'"
+  task :pixiv, [:interval] => :environment do |t, args|
+    interval = args[:interval].nil? ? 240 : args[:interval]
+    Scrape::Pixiv.new.scrape(interval.to_i)
+  end
+
 end

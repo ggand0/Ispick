@@ -6,7 +6,7 @@ describe TargetFace do
   let(:valid_attributes) { FactoryGirl.attributes_for(:target_image) }
 
   before do
-    IO.any_instance.stub(:puts)
+    allow_any_instance_of(IO).to receive(:puts)
   end
 
   describe "get_categories function" do
@@ -15,23 +15,22 @@ describe TargetFace do
       hash = TargetFace.get_categories target_image
 
       expect(hash).to be_a(Hash)
-      #expect(hash['butcher shop']).to eq(0.141260)
       expect(hash.keys.count).to eq(4096)
       expect(hash.values.count).to eq(4096)
     end
   end
 
   describe "perform method" do
-    it "should create a new Feature model" do
+    it "creates a new Feature model" do
       target_image = TargetImage.create! valid_attributes
       face = TargetFace.new
-      TargetImagesService.any_instance.stub(:prefer).and_return({ time: 0, result: '[]' })
+      allow_any_instance_of(TargetImagesService).to receive(:prefer).and_return({ time: 0, result: '[]' })
 
       count = Feature.count
       TargetFace::perform(target_image.id)
 
-      Feature.count.should eq(count+1)
-      target_image.feature.should eq(Feature.first)
+      expect(Feature.count).to eq(count+1)
+      expect(target_image.feature).to eq(Feature.first)
     end
   end
 end

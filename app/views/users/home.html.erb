@@ -5,9 +5,11 @@
 
 
 <!-- Render images and the dropdown for filtering them -->
-<p>
-  <%= "You don't seem to follow any tags yet. Let\'s follow them at the Preferences page! <br /><i>Showing recently created images:</i>".html_safe if current_user.tags.count == 0 %>
-
+<div class="controlls">
+  <p style="margin-left: 20px;">
+    <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.blank? %>
+  </p>
+</div>
 
   <!-- Render the dropdown to provide filtering and sorting functionality-->
   <div class="dropdown">
@@ -16,10 +18,10 @@
     </a>
 
     <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-      Filter by date
+      <!--Filter by date
       <div class="input-group date" style="width: 200px;" align="right">
         <input type="text" class="form-control" disabled><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
-      </div>
+      </div>-->
       <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
       <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
       <li class="divider"></li>
@@ -40,11 +42,13 @@
         </ul>
       </li>
     </ul>
-    <%= "  #{get_debug_html(@images_all)}".html_safe if @images_all %>
+    <%= "  #{get_debug_html(@count)}".html_safe if @count %>
   </div>
 
-</p>
-  <br />
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
 
 <!-- image rendering starts from here -->
-<%= render partial: 'users/home_images', locals: { images: @images } %>
+<%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

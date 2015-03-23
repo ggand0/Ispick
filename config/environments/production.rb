@@ -37,7 +37,7 @@ Ispick::Application.configure do
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
+  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
@@ -59,7 +59,9 @@ Ispick::Application.configure do
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-  config.assets.precompile += %w( *.js users.css images-detail.css )
+  config.assets.precompile += %w( *.js table_custom.css images.css scaffolds.css welcome.css users.css images_detail.css core.css )
+  # https://github.com/activeadmin/activeadmin/issues/3072
+  #config.assets.precompile << /\A(?!active_admin).*\.(css)\z/
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

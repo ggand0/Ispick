@@ -10,7 +10,7 @@ describe User do
   let(:auth_facebook) { OmniAuth::AuthHash.new({
     provider: 'facebook',
     uid: '12345678',
-    #extra: { raw_info: {name:'John'}},
+    #extra: { raw_info: { name:'John' }},
     info: { email:'test@example.com', last_name: 'Smith', first_name: 'John' },
     credentials: OmniAuth::AuthHash.new({})
   })}
@@ -20,7 +20,8 @@ describe User do
       user = FactoryGirl.create(:user_with_tags)
       user.destroy
       expect(TagsUser.count).to eq(0)
-      expect(Tag.count).to eq(5)
+      # 5 tags followed by the user + 25 tags which are associated with images
+      expect(Tag.count).to eq(30)
     end
   end
 

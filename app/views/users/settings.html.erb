@@ -3,31 +3,40 @@
   - Using gem: https://github.com/Tretti/rails-bootstrap-helpers
 -->
 
-
 <!-- Edit form of name/language attribute -->
 <div class="container-fluid">
-  <div class="col-md-4">
-    <h3>Edit Account</h3>
-    <%= render 'form' %>
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Settings</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      <%= render partial: "shared/flash_messages", flash: flash %>
+      <h2>Edit Your Account</h2>
+      <%= render 'form' %>
 
 <!-- Display SNS accounts that are already linked -->
-    <h3>Connect Account</h3>
-    <br />
-    <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
 
-      <% providers = current_user.authorizations.pluck(:provider) %>
-      <% if providers.include?(provider.to_s) %>
-        <% auth = current_user.authorizations.where(provider: provider).first %>
-        <%= button_group do %>
-          <%= bs_button_to "#{provider.to_s.titleize} Connected / #{auth.user_name}", class: 'btn-default disabled btn-block' %>
-          <%= bs_button_to "Disconnect this account", auth, method: :delete, class: 'btn-default btn-block' %>
+      <hr>
+      <h2>Connect Accounts</h2>
+      <br />
+      <% ['facebook', 'twitter', 'tumblr'].each do |provider| %>
+
+        <% providers = current_user.authorizations.pluck(:provider) %>
+        <% if providers.include?(provider.to_s) %>
+          <% auth = current_user.authorizations.where(provider: provider).first %>
+          <%= button_group do %>
+            <%= bs_button_to "#{provider.to_s.titleize} Connected / #{auth.user_name}", class: 'btn-default disabled btn-block' %>
+            <%= bs_button_to "Disconnect this account", auth, method: :delete, class: 'btn-default btn-block' %>
+          <% end %>
+        <% else %>
+          <%= bs_button_to "Sign in with #{provider.to_s.titleize}",
+            omniauth_authorize_path('user', provider), class: 'btn-default btn-block' %>
         <% end %>
-      <% else %>
-        <%= bs_button_to "Sign in with #{provider.to_s.titleize}",
-          omniauth_authorize_path('user', provider), class: 'btn-default btn-block' %>
+      <br />
+      <br />
       <% end %>
-    <br />
-    <br />
-    <% end %>
+    </div>
   </div>
 </div>

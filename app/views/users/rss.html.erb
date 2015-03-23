@@ -1,0 +1,23 @@
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render images and the dropdown for selecting websites -->
+<div class="controlls">
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <%= bs_dropdown_button_to list_glyphicon do %>
+    <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+      <li><%= link_to "#{site}", rss_users_path({ site: Image::TARGET_SITES[count], site_name: Image::TARGET_SITES_DISPLAY[count]}) %></li>
+    <% end %>
+  <% end %>
+  <%= "#{@site}:  #{get_debug_html(@count)}".html_safe if @count %>
+</div>
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

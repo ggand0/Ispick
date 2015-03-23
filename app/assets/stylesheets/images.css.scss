@@ -2,11 +2,33 @@
 //  Classes for image alignment
 // =============================
 
+@import "_colors";
+
+
 .block {
   position: absolute;
-  width: 300px;
+  //width: 300px;
   height: auto;
 }
+
+@media only screen and (max-width: 500px) {
+  .block {
+    //width: 300px;
+  }
+
+  .desc-box {
+    width: 300px;
+  }
+}/**/
+@media only screen and (min-width: 500px) {
+  .block {
+    width: 300px;
+  }
+  .desc-box {
+    width: 300px;
+  }
+}
+
 #loader {
   position: absolute;
   text-align: center;
@@ -14,7 +36,7 @@
   height: auto;
 }
 
-// デバッグ用の画像一覧ページで使用。
+
 // Classes used at 'View all images' page (for debugging)
 // from: http://goo.gl/zsi5mT
 ul.boxline {
@@ -38,24 +60,23 @@ ul.boxline li {
 ul.boxline li img {
     display: block!important;
     border: 1px solid #d0a600!important;
-    height: 55px!important;
-    width: 72px!important;
+    //height: 55px!important;
+    //width: 72px!important;
+    height: 200px!important;
+    width: 200px!important;
     margin: 2px!important;
     padding: 2px!important;
 }
 
 
 
-// Home画面の画像整列で使用している
+
 // Classes used at 'User's home' page
 // from: http://www.dwuser.com/education/content/creating-responsive-tiled-layout-with-pure-css/
 body {
    margin: 0;
    padding: 0;
-   background: #EEE;
 }
-
-// new version
 .block .titleBox {
    position: absolute;
    visibility: hidden;
@@ -68,17 +89,17 @@ body {
    padding: 10px;
 }
 .title {
-  width: 300px;
-  text-align: center;
+  //width: 300px;
+  line-height: 1.2;
+  font-size: 14px;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   margin-bottom: 0px;
-  background: #000;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba($base-dark, 0.5);
   color: #FFF;
-  padding: 10px;
+  padding: 5px 7px;
 }
 body.no-touch .block:hover .titleBox, body.touch .block.touchFocus .titleBox {
    margin-bottom: 0;

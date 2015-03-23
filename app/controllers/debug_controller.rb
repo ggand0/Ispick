@@ -1,11 +1,17 @@
+# ======================================================
+#   Debugging actions and routes. Full of dirty codes.
+# ======================================================
 class DebugController < ApplicationController
+  include ApplicationHelper
+  include ActionController::Live
+  before_filter :set_search
   before_action :render_sign_in_page
   before_filter :authenticate
   before_action :set_image, only: [:favor_another, :show_debug]
-  #before_action :set_image_board, only: [:create_another]
 
   def index
   end
+
 
   # =======================
   #  Actions for debugging
@@ -31,9 +37,77 @@ class DebugController < ApplicationController
     @images_all = images
   end
 
+  # GET search
+  def search
+    # Ransack search
+    if params[:q] and params[:q]['tags_name_cont']
+      queries = params[:q]['tags_name_cont'].split(',')
+      images = Image.joins(:tags).
+        where('tags.name' => queries).
+        group("images.id").having("count(*)= #{queries.count}")
+      @count = images.select('images.id').count.keys.count
+    # Single search
+    else
+      images = Image.search_images(params[:query])
+      @count = images.select('images.id').count
+    end
+
+    @disable_fotter = true
+    @images = images.page(params[:page]).per(100)
+
+    render template: 'images/index'
+  end
+
+  def view_csv
+    render :layout => 'streaming'
+  end
+
+
+  def stream_csv
+    # Default image num is 10,000
+    limit = params[:limit] ? params[:limit].to_i : 100
+    puts limit
+
+    # Set the response header to keep client open
+    response.headers['Content-Type'] = 'text/event-stream'
+
+    # .. list of users who are current streaming the list
+    #list_of_current_streamers = Users.streamers
+
+    #render stream: true
+
+    # loop infinitely, users can just close the browser
+    begin
+      images = Image.select('id, page_url, original_width, original_height, artist').order(:created_at).limit(limit)
+
+      # Includes joining table
+      images.includes(:tags).each_with_index do |image, count|
+        puts count
+        tag_string = ""
+        image.tags.each do |tag|
+          tag_string += "#{tag.name};"
+        end
+
+        response.stream.write "id: 0\n"
+        response.stream.write "event: update\n"
+        response.stream.write("data: #{image.id},#{image.page_url.inspect},#{image.original_width.inspect},#{image.original_height.inspect},#{image.artist.inspect},#{tag_string}\n\n")
+        sleep 0.1
+      end
+     rescue IOError
+        # client disconnected.
+        # .. update database streamers to remove disconnected client
+     ensure
+        # clean up the stream by closing it.
+        response.stream.close
+     end
+
+     #render stream: true
+
+  end
+
+
   # [DEBUG]Download images of the default image_board.
   # This feature will be deleted in future.
-  # 画像のダウンロード：releaseする時にこの機能は削除する。
   def download_favored_images
     @images = current_user.image_boards.first.favored_images
     file_name  = "user#{current_user.id}-#{DateTime.now}.zip"
@@ -51,10 +125,159 @@ class DebugController < ApplicationController
     temp_file.close
   end
 
+  # [DEBUG] Download images that have a specific tag from an optional site.
+  def download_images_tag
+    limit = params[:limit]
+    site = params[:site]
+    tag = params[:tag]
+    @images = Image.search_images(tag)
+    @images = @images.where(site_name: site) if site
+    @images = @images.limit(limit) if limit
+    file_name = "#{site}_#{tag}#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file(@images))
+      @images.each do |image|
+        # To avoid creating nested directory, remove slashes
+        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+        title = image.get_title
+        zos.put_next_entry(title)
+        zos.print IO.read(image.data.path)
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
+  # [DEBUG] Download images that have a specific tag from an optional site.
+  def download_images_tags
+    limit = params[:limit]
+    site = params[:site]
+    tag = params[:tag]
+    @image_array = []
+    tags = tag.split(':')#
+
+    tags.each do |tag|
+      t = tag.split(',')#
+      ims = Image.search_images_tags(t, 'and')#
+      ims.uniq!
+      ims = ims.where(site_name: site) if site
+      ims = ims.limit(limit) if limit
+      @image_array.push({images: ims, label: t[0]})
+    end
+
+    file_name = "#{site}_#{tag}#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file_labels(@image_array))
+
+      @image_array.each_with_index do |images, i|
+        images[:images].each do |image|
+          # To avoid creating nested directory, remove slashes
+          # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+          title = image.get_title
+
+          zos.put_next_entry(title)
+          zos.print IO.read(image.data.path)
+        end
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
+
+  # [DEBUG] Download last 1000 images.
+  def download_images_n
+    limit = params[:limit]
+    @images = Image.get_recent_n(limit)
+    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      zos.put_next_entry 'imagelist'
+      zos.print IO.read(Image.create_list_file(@images))
+      @images.each do |image|
+        #title = "#{image.title}#{File.extname(image.data.path)}"
+        # To avoid creating nested directory, remove slashes
+        # E.g. 'NARUTO/xxx_zerochan.jpg' will create 'NARUTO' dir above the file in the zip
+        #puts title = title.gsub!(/\//, '_') if title.include?("/")
+        title = image.get_title
+        puts title
+        zos.put_next_entry(title)
+
+        #puts image.data.path if image.site_name == 'zerochan'
+        zos.print IO.read(image.data.path)
+      end
+    end
+    send_file temp_file.path, type: 'application/zip',
+      disposition: 'attachment', filename: file_name
+    temp_file.close
+  end
+
+  def download_images_custom
+    limit = params[:limit].to_i
+    start = params[:start].to_i
+    limit_per_tag = params[:l].to_i
+
+    @image_array = Image.search_images_custom(limit, start)
+    file_name = "user#{current_user.id}-#{DateTime.now}.zip"
+    temp_file = Tempfile.new("#{file_name}-#{current_user.id}")
+    temp_file = File.new("/tmp/#{file_name}-#{current_user.id}", "w")
+
+
+    # Write image files and list file to temp_file
+    Zip::OutputStream.open(temp_file.path) do |zos|
+      train_val = Image.create_list_file_train_val(@image_array, start)
+      zos.put_next_entry('train')
+      zos.print IO.read(train_val[0])
+      zos.put_next_entry('val')
+      zos.print IO.read(train_val[1])
+
+      titles = []
+      @image_array.each_with_index do |hash, i|
+        break if limit_per_tag and i > limit_per_tag  # for debug
+
+        title = hash[:image].get_title
+        titles.push title
+
+        # Detect duplication and rename the latest title for making extracting zip file be successful
+        if titles.uniq.length != titles.length
+          title += Random.rand(100000).to_s
+          Rails.logger "Duplicated record during download_images_custom!"
+          puts "Duplicated record during download_images_custom!"
+        end
+
+        zos.put_next_entry(title)
+        zos.print IO.read(hash[:image].data.path)
+        Rails.logger.debug "zipping #{i}/#{@image_array.count} is done!" if i % 500 == 0
+      end
+    end
+
+    # Send file
+    temp_file.flush
+    Rails.logger.debug bytes_to_megabytes(temp_file.size)
+    send_file temp_file.path, type: 'application/zip', disposition: 'attachment', filename: file_name, x_sendfile: true
+    temp_file.close
+    temp_file.unlink
+  end
+
+
+
+
+  # ========================
+  #   Other debug methods
+  # ========================
   # The page for debugging illust detection feature.
-  # イラスト判定ツールのデバッグ用ページを表示する。
   def debug_illust_detection
-    # Get images
+    # Get images first
     if session[:all]
       images = current_user.get_images_all
     else
@@ -68,7 +291,7 @@ class DebugController < ApplicationController
     # Sort images if any requests exist.
     images = Image.sort_images(images, params[:page]) if session[:sort] == 'favorites'
     images = Image.sort_by_quality(images, params[:page]) if session[:sort] == 'quality'
-    @images = images.page(params[:page]).per(25)
+    @images = images.page(params[:page]).per(current_user.display_num)
 
     render action: 'debug_illust_detection'
   end
@@ -159,6 +382,11 @@ class DebugController < ApplicationController
     @image = Image.find(params[:id])
   end
 
+  # Set @search variable to make ransack's search form work
+  def set_search
+    @search = Image.search(params[:q])
+  end
+
   # Never trust parameters from the scary internet, only allow the white list through.
   def image_board_params
     params.require(:image_board).permit(:name)
@@ -178,7 +406,6 @@ class DebugController < ApplicationController
   end
 
   # Returns the session data for debugging.
-  # デバッグ用にsessionの情報を返す。
   # @return [Array] String array of session data
   def get_session_data
     [

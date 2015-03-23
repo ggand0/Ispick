@@ -5,15 +5,15 @@ describe Scrape do
   let(:valid_attributes) { FactoryGirl.attributes_for(:image_url) }
   let(:logger) { Logger.new('log/scrape_cron.log') }
   before do
-    IO.any_instance.stub(:puts)
-    Resque.stub(:enqueue).and_return nil  # resqueにenqueueしないように
+    allow_any_instance_of(IO).to receive(:puts)
+    allow(Resque).to receive(:enqueue).and_return nil  # resqueにenqueueしないように
   end
 
   describe "scrape_all method" do
     it "runs all scraping script" do
       FactoryGirl.create(:target_word)
-      Scrape.stub(:scrape_keyword).and_return nil
-      Scrape.should_receive(:scrape_keyword).exactly(1).times
+      allow(Scrape).to receive(:scrape_keyword).and_return nil
+      expect(Scrape).to receive(:scrape_keyword).exactly(1).times
 
       Scrape.scrape_all
     end
@@ -22,13 +22,45 @@ describe Scrape do
   describe "is_duplicate method" do
     it "should return true when arg url is duplicate" do
       FactoryGirl.create(:image_min)
-      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i1').should eq(true)
+      expect(Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804029i1')).to eq(true)
     end
     it "should return false when arg url is NOT duplicate" do
       FactoryGirl.create(:image_min)
-      Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i').should eq(false)
+      expect(Scrape.is_duplicate('http://lohas.nicoseiga.jp/thumb/3804020i')).to eq(false)
     end
   end
+
+  describe "get_tag method" do
+    it "creates tags properly" do
+      tag = Scrape.get_tag('abcd')
+      expect(tag.name).to eq('abcd')
+      expect(tag.language).to eq('english')
+
+      tag = Scrape.get_tag('NARUTO')
+      expect(tag.name).to eq('NARUTO')
+      expect(tag.language).to eq('english')
+
+      tag = Scrape.get_tag('鹿目まどか')
+      expect(tag.name).to eq('鹿目まどか')
+      expect(tag.language).to eq('japanese')
+
+      tag = Scrape.get_tag('NARUTO100users入り')
+      expect(tag.name).to eq('NARUTO100users入り')
+      expect(tag.language).to eq('japanese')
+    end
+  end
+
+  describe "get_tags method" do
+    it "create valid tags" do
+      tags = ['abcd', '鹿目まどか']
+      result = Scrape.get_tags(tags)
+      expect(result.first.name).to eq('abcd')
+      expect(result.first.language).to eq('english')
+      expect(result[1].name).to eq('鹿目まどか')
+      expect(result[1].language).to eq('japanese')
+    end
+  end
+
 
   describe "get_query function" do
     it "returns proper string when target_word has a person model" do
@@ -70,7 +102,7 @@ describe Scrape do
     it "return the valid string based on a result hash" do
       result = Scrape.get_result_hash
       string = Scrape.get_result_string(result)
-      valid_string = 'scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: '
+      valid_string = 'scraped: 0, duplicates: 0, skipped: 0, avg_time: 0, info: none'
       expect(string).to eq(valid_string)
     end
   end
@@ -91,6 +123,30 @@ describe Scrape do
       string = '👍'
       result = Scrape.remove_4bytes(string)
       expect(result).to eq('')
+    end
+  end
+
+  describe "is_ascii method" do
+    it "returns valid result" do
+      expect(Scrape.is_ascii('abcd')).to eq(true)
+      expect(Scrape.is_ascii('NARUTO')).to eq(true)
+      expect(Scrape.is_ascii('NARUTO100users入り')).to eq(false)
+      expect(Scrape.is_ascii('策士ハナビ')).to eq(false)
+      expect(Scrape.is_ascii('👍')).to eq(false)
+    end
+  end
+
+  describe "remove_nonascii method" do
+    it "replaces non-ascii characters to empty strings" do
+      string = '№'
+      result = Scrape.remove_nonascii(string)
+      expect(result).to eq('')
+    end
+
+    it "keep other characters" do
+      string = 'this is ascii characters1234'
+      result = Scrape.remove_nonascii(string)
+      expect(result).to eq(string)
     end
   end
 

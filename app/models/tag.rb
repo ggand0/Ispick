@@ -1,4 +1,6 @@
 class Tag < ActiveRecord::Base
+  belongs_to :recommended_tag
+
   has_many :tags_users, dependent: :destroy
   has_many :users, :through => :tags_users
 
@@ -22,11 +24,14 @@ class Tag < ActiveRecord::Base
   # Get popular tags in the order of images_count
   # @param size [Integer]
   def self.get_tags_with_images(size)
-    Tag.where.not(images_count: 0).order('images_count DESC').limit(size)
+    Tag.where.not(images_count: 0).
+      order('images_count DESC').
+      where(language: 'english').
+      limit(size)
   end
 
   # Get images which refers this record.
-  def get_images
+  def get_images()
     images.where.not(data_updated_at: nil).reorder('created_at DESC')
   end
 end

@@ -1,5 +1,4 @@
 require "#{Rails.root}/script/scrape/scrape"
-require "#{Rails.root}/script/deliver/deliver"
 require "#{Rails.root}/app/workers/search_images"
 
 class TargetWord < ActiveRecord::Base
@@ -11,7 +10,7 @@ class TargetWord < ActiveRecord::Base
   validates_uniqueness_of :name
 
   # 自分の次にidが小さいレコードを返す。クロール時に使用
-  # Return the record that has the smalledst id value next to self.
+  # Return the record that has the smallest id value next to this instance.
   def next
     TargetWord.where("id > ?", id).first
   end

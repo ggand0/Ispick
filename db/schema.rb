@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141016181815) do
+ActiveRecord::Schema.define(version: 20150226075736) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -59,6 +59,31 @@ ActiveRecord::Schema.define(version: 20141016181815) do
     t.datetime "updated_at"
   end
 
+  create_table "daily_images", force: true do |t|
+    t.integer  "image_id"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
+    t.datetime "posted_at"
+    t.text     "original_url"
+    t.text     "artist"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+    t.integer  "width",                   default: 0, null: false
+    t.integer  "height",                  default: 0, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "favored_images", force: true do |t|
     t.text     "title"
     t.text     "caption"
@@ -92,7 +117,7 @@ ActiveRecord::Schema.define(version: 20141016181815) do
 
   create_table "features", force: true do |t|
     t.text     "face"
-    t.text     "categ_imagenet"
+    t.text     "convnet_feature", limit: 2147483647
     t.integer  "featurable_id"
     t.string   "featurable_type"
     t.datetime "created_at"
@@ -139,6 +164,7 @@ ActiveRecord::Schema.define(version: 20141016181815) do
     t.integer  "share_count",             default: 0, null: false
     t.integer  "width",                   default: 0, null: false
     t.integer  "height",                  default: 0, null: false
+    t.integer  "impressions_count",       default: 0, null: false
   end
 
   add_index "images", ["md5_checksum", "created_at"], name: "index_images_on_md5_checksum_and_created_at", using: :btree
@@ -150,11 +176,42 @@ ActiveRecord::Schema.define(version: 20141016181815) do
   end
 
   add_index "images_tags", ["image_id"], name: "index_images_tags_on_image_id", using: :btree
+  add_index "images_tags", ["tag_id"], name: "index_images_tags_on_tag_id", using: :btree
+
+  create_table "images_target_images", force: true do |t|
+    t.integer "image_id",        null: false
+    t.integer "target_image_id", null: false
+  end
 
   create_table "images_target_words", force: true do |t|
     t.integer "image_id",       null: false
     t.integer "target_word_id", null: false
   end
+
+  create_table "impressions", force: true do |t|
+    t.string   "impressionable_type"
+    t.integer  "impressionable_id"
+    t.integer  "user_id"
+    t.string   "controller_name"
+    t.string   "action_name"
+    t.string   "view_name"
+    t.string   "request_hash"
+    t.string   "ip_address"
+    t.string   "session_hash"
+    t.text     "message"
+    t.text     "referrer"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "impressions", ["controller_name", "action_name", "ip_address"], name: "controlleraction_ip_index", using: :btree
+  add_index "impressions", ["controller_name", "action_name", "request_hash"], name: "controlleraction_request_index", using: :btree
+  add_index "impressions", ["controller_name", "action_name", "session_hash"], name: "controlleraction_session_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "ip_address"], name: "poly_ip_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "request_hash"], name: "poly_request_index", using: :btree
+  add_index "impressions", ["impressionable_type", "impressionable_id", "session_hash"], name: "poly_session_index", using: :btree
+  add_index "impressions", ["impressionable_type", "message", "impressionable_id"], name: "impressionable_type_message_index", length: {"impressionable_type"=>nil, "message"=>255, "impressionable_id"=>nil}, using: :btree
+  add_index "impressions", ["user_id"], name: "index_impressions_on_user_id", using: :btree
 
   create_table "keywords", force: true do |t|
     t.boolean  "is_alias"
@@ -207,13 +264,68 @@ ActiveRecord::Schema.define(version: 20141016181815) do
 
   add_index "people_titles", ["person_id", "title_id"], name: "index_people_titles_on_person_id_and_title_id", using: :btree
 
+  create_table "photos", force: true do |t|
+    t.text     "title"
+    t.text     "caption"
+    t.text     "src_url"
+    t.boolean  "is_illust"
+    t.float    "quality"
+    t.string   "data_file_name"
+    t.string   "data_content_type"
+    t.integer  "data_file_size"
+    t.datetime "data_updated_at"
+    t.string   "md5_checksum"
+    t.text     "page_url"
+    t.text     "site_name"
+    t.string   "module_name"
+    t.integer  "views"
+    t.integer  "favorites"
+    t.datetime "posted_at"
+    t.integer  "original_view_count"
+    t.integer  "original_favorite_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "artist"
+    t.text     "original_url"
+    t.text     "poster"
+    t.integer  "original_width"
+    t.integer  "original_height"
+  end
+
+  create_table "photos_tags", force: true do |t|
+    t.integer "photo_id", null: false
+    t.integer "tag_id",   null: false
+  end
+
+  create_table "ranking_images", force: true do |t|
+    t.integer  "image_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "recommended_tags", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "cooccurrence_count"
+  end
+
+  create_table "recommended_tags_users", force: true do |t|
+    t.integer  "recommended_tag_id", null: false
+    t.integer  "user_id",            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "tags", force: true do |t|
     t.string   "name"
     t.integer  "image_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "images_count", default: 0, null: false
-    t.integer  "users_count",  default: 0, null: false
+    t.integer  "images_count",       default: 0,         null: false
+    t.integer  "users_count",        default: 0,         null: false
+    t.string   "language",           default: "english", null: false
+    t.integer  "recommended_tag_id"
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", using: :btree
@@ -233,6 +345,20 @@ ActiveRecord::Schema.define(version: 20141016181815) do
     t.boolean  "enabled"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "images_count",      default: 0, null: false
+    t.integer  "width"
+    t.integer  "height"
+  end
+
+  create_table "target_sites", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "target_sites_users", force: true do |t|
+    t.integer "target_site_id", null: false
+    t.integer "user_id",        null: false
   end
 
   create_table "target_words", force: true do |t|
@@ -269,12 +395,12 @@ ActiveRecord::Schema.define(version: 20141016181815) do
     t.string   "avatar_content_type"
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
-    t.string   "email",                            default: "", null: false
-    t.string   "encrypted_password",               default: "", null: false
+    t.string   "email",                            default: "",    null: false
+    t.string   "encrypted_password",               default: "",    null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",                    default: 0,  null: false
+    t.integer  "sign_in_count",                    default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
@@ -286,8 +412,10 @@ ActiveRecord::Schema.define(version: 20141016181815) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "language"
-    t.integer  "likes_count",                      default: 0,  null: false
+    t.integer  "likes_count",                      default: 0,     null: false
     t.string   "language_preferences"
+    t.boolean  "pagination",                       default: false
+    t.integer  "display_num",                      default: 10
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

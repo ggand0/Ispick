@@ -1,0 +1,46 @@
+<%= content_tag :div, class: "temp_information", data: { scroll: false } do %>
+<% end %>
+
+
+  <ul class="boxline">
+  <% similars.each_with_index do |image, index| %>
+    <%= image[:distance] %>
+
+    <li>
+      <%= link_to image_tag(image[:image].data.url(:thumb)), { controller: 'debug', action: 'show_debug', id: image[:image].id.to_s, remote: true, 'data-toggle' => "modal", 'data-target' => '#modal-image' } %>
+    </li>
+
+    <!--<div class="block has-gutters">
+      <div class="height"><%= image[:image].height %></div>
+
+      <%= image[:distance] %>
+      <br>
+
+      <%= render_image(image[:image]) %>
+
+      <div class="titleBox">
+        <div class="id"><%= image[:image].id %></div>
+        <%= button_group class: 'pull-right blocks' do %>
+          <%= render_clip_button(image[:image]) %>
+          <%= render_show_button(image[:image]) %>
+          <%= render_show_debug_button(image[:image]) if Rails.env.development? %>
+        <% end %>
+        <br />
+      </div>
+      <div class="title">
+          <%= image[:image].title.to_s %>
+          <div class="time-string">
+            <%= "PA: #{get_jst_string(image[:image].posted_at)}" %>
+          </div>
+        </div>
+    </div>-->
+  <% end %>
+  <div id="loader">
+    <%= image_tag asset_path('round_loader_mini.gif')%>
+  </div>
+
+  </ul>
+
+
+<%# paginate_target_images(@message, @similars) %>
+<%= paginate @similars %>

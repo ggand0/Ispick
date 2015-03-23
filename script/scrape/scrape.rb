@@ -7,18 +7,18 @@ module Scrape
   require "#{Rails.root}/script/scrape/scrape_deviant"
   require "#{Rails.root}/script/scrape/scrape_4chan"
   require "#{Rails.root}/script/scrape/scrape_tumblr"
-  require "#{Rails.root}/script/scrape/scrape_giphy"
+  #require "#{Rails.root}/script/scrape/scrape_giphy"
   require "#{Rails.root}/script/scrape/scrape_anipic"
 
   require "#{Rails.root}/script/scrape/_legacy/scrape_2ch"
   require "#{Rails.root}/script/scrape/_legacy/scrape_futaba"
   require "#{Rails.root}/script/scrape/_legacy/scrape_matome"
   require "#{Rails.root}/script/scrape/_legacy/scrape_tinami"
-  require "#{Rails.root}/script/scrape/_legacy/scrape_pixiv"
-  require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
+  require "#{Rails.root}/script/scrape/scrape_pixiv"
+  #require "#{Rails.root}/script/scrape/_legacy/scrape_twitter"
 
 
-  # 全てのTargetWordに基づき画像抽出する
+  # Scrape images based on all TargetWord records
   def self.scrape_all
     TargetWord.all.each do |target_word|
       self.scrape_keyword target_word
@@ -26,8 +26,7 @@ module Scrape
     puts 'DONE!!'
   end
 
-  # ユーザが登録している全てのTargetWordに基づき画像抽出する
-  # （全てのTargetWordレコードとは必ずしも一致しない）
+  # Scrape images based on all TargetWord records that are followed by at least a user
   def self.scrape_users
     User.all.each do |user|
       user.target_words.each do |target_word|
@@ -37,16 +36,15 @@ module Scrape
     puts 'DONE!!'
   end
 
-  # タグ登録直後の配信用
-  # @param [TargetWord] 配信対象であるTargetWordインスタンス
+  # For an immediate scraping after following a tag
+  # @param [TargetWord] A target TargetWord instance
   def self.scrape_target_word(user_id, target_word, logger)
     Scrape::Nico.new(logger).scrape_target_word(user_id, target_word)
     Scrape::Tumblr.new(logger).scrape_target_word(user_id, target_word)
     #Scrape::Twitter.new(logger).scrape_target_word(user_id, target_word)
     Scrape::Anipic.new(logger).scrape_target_word(user_id, target_word)
 
-    # 英名が存在する場合はさらに検索
-    # Englishかどうかはscrape_using_api内で判定し、にほんご
+    # Search more if an English name exists
     if target_word.person and target_word.person.name_english and not target_word.person.name_english.empty?
       query = target_word.person.name_english
       logger.debug "name_english: #{query}"
@@ -59,7 +57,7 @@ module Scrape
   end
 
 
-  # Paperclipのattachmentがnilのレコードを探し再度downloadする
+  # Search for records where Paperclip attachment is nil, and re-download it
   def self.redownload
     images = Image.where(data_file_size: nil)
     puts "number of images with nil data: #{images.count}"
@@ -69,21 +67,21 @@ module Scrape
     end
   end
 
-  # 重複したsrc_urlを持つレコードがDBにあるか調べる
+  # Check if there exists records that have duplicate src_url
   # @param [String] 確認するsource url.
   def self.is_duplicate(src_url)
     Image.where(src_url: src_url).length > 0
   end
 
-  # TargetWordから、API使用時に用いるクエリを取得する
-  # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
+  # Get a query string from a TargetWord object used for APIs
+  # @return [String] A string used for API requests(like 'Madoka Kaname')
   def self.get_query(target_word)
     return nil if target_word.nil?
     target_word.person ? target_word.person.name : target_word.name
   end
 
-  # TargetWordから、API使用時に用いるクエリを取得する
-  # @return [String] APIリクエストのパラメータとして使う文字列（'鹿目まどか'など）
+  # Get a query string from a TargetWord object used for APIs
+  # @return [String] A string used for API requests(like 'Madoka Kaname')
   def self.get_query_en(target_word, key)
     case key
       when 'english' then
@@ -123,26 +121,53 @@ module Scrape
   end
 
 
-  # タグを取得する。DBに既にある場合はそのレコードを返す
+  # Get a tag. If there's an existing record, return it.
   # @param [String]
   def self.get_tag(tag)
     t = Tag.where(name: tag)
-    t.empty? ? Tag.new(name: tag) : t.first
+
+    if t.empty?
+      # Detect non-ascii characters, and assume it's Japanese
+      ascii = Scrape.is_ascii(tag)
+      if ascii
+        lang = 'english'
+      else
+        lang = 'japanese'
+      end
+
+      # Create one newly
+      t = Tag.new(name: tag, language: lang)
+    else
+      # There's already a tag record
+      t.first
+    end
   end
 
-  # Tagインスタンスの配列を作成する
-  # @param [Array] タグを表す文字列の配列
-  # @return [Array] Tagオブジェクトの配列
+  # Create an array of Tag objects.
+  # @param [Array] An array of strings
+  # @return [Array] An array of Tag objects
   def self.get_tags(tags)
     tags.map do |tag|
-      t = Tag.where(name: tag)
-      t.empty? ? Tag.new(name: tag) : t.first
+      Scrape.get_tag(tag)
     end
   end
 
   def self.remove_4bytes(string)
     return nil if string.nil?
     string.each_char.select{ |c| c.bytes.count < 4 }.join('')
+  end
+
+  def self.is_ascii(string)
+    return nil if string.nil?
+    string.match(/\P{ASCII}/) ? false : true
+  end
+
+  def self.remove_nonascii(string)
+    return nil if string.nil?
+    if string.match(/\P{ASCII}/)
+      string = string.gsub(/\P{ASCII}/, '').to_s
+    end
+    string
   end
 
 end

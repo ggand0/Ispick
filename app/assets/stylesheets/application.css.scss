@@ -9,6 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
+ *= require jquery-ui
  *= require images
  *= require images_detail
  *= require images_debug
@@ -18,28 +19,100 @@
  *= require welcome
  *= require bootstrap-datepicker3
  *= require rails_bootstrap_forms
- *= require bootstrap-social
  *= require font-awesome
+ *= require navbar_custom
+ *= require button_custom
  *
  */
 
 @import "bootstrap-sprockets";
 @import "bootstrap";
+@import "_colors";
+
+html,
+body { // For sticky footer
+  height: 100%;
+}
+
+body:before { // For sticky footer
+  content: "";
+  height: 100%;
+  float: left;
+  width: 0;
+  margin-top: -32767px;
+}
+#wrapper { // For sticky footer
+  min-height: 100%;
+  background-color: $base-light;
+  padding-bottom: 140px;
+}
+
+// Override button color
+$color: #E4F5F5;
+$background: #5B9B9B;//#79CECE;
+$border: #5B9B9B;//#79CECE;
+.btn-info {
+  @include button-variant($color, $background, $border);
+}
 
 #footer {
-  clear:  left;
-  bottom: 0;
+  background-color: $base-pale;
+  clear: both;
+  text-align: center;
+  padding: 20px;
   width:  100%;
+  position: relative; // For sticky footer
+  margin-top: -100px;
   height: 100px;
+  ul {
+    border-left: 1px solid $white;
+    display: inline-block;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    padding: 2px 20px;
+    border-right: 1px solid $white;
+  }
 }
 
-// headerのロゴ部分
-a.logo {
+// Header's logo related styles
+.navbar-inverse {
+  background-color: #79CECE;//#3F3F3F;
+  border-color: #79CECE;//#3F3F3F;
+}
+
+.collapse-item {
+  padding-top: 10px;
+}
+
+.logo {
   float:left;
-  display:block;
-  height:40px;
-  width:160px;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 10px 20px 10px 10px;
+  height: 40px;
 }
-a.logo:hover {
-  background-color: #fff;
+
+.glyphicon-search:before {
+  color: #79CECE;
 }
+
+h1 {
+  padding: 10px 0;
+  margin: 20px 0;
+  color: $ice-soft;
+  border-bottom: 2px solid $ice-soft;
+  font-weight: 700;
+}
+
+h1.h1-description {
+  color: #FFF;
+  margin: 0px;
+}
+
+hr {
+  border-top: 3px dotted $white;
+}
+
+img { max-width: 100%; }

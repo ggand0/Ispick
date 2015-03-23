@@ -1,14 +1,15 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :tag do
-    #name '鹿目まどか'
-    sequence(:name) { |n| "鹿目まどか#{n}" }
 
-    # images(no file)を持つTagオブジェクト
-    # A Tag object with images that have no files
+  # Creates a Tag that has sequenced name
+  factory :tag do
+    sequence(:name) { |n| "鹿目まどか#{n}" } # 'Madoka Kaname' in Japanese
+
+    # Creates a Tag object which is associated with images that don't have actual image files(only attributes).
+    # The default images_count is 5.
     factory :tag_with_images do
-      ignore do
+      transient do
         images_count 5
       end
       after(:create) do |tag, evaluator|
@@ -18,10 +19,10 @@ FactoryGirl.define do
       end
     end
 
-    # image(with file)を持つTag
-    # A Tag object with images that have files
+    # Creates a Tag object which is associated with images that have actual image files.
+    # The default images_count is 1, since it takes time to save image files.
     factory :tag_with_image_file do
-      ignore do
+      transient do
         images_count 1
       end
       after(:create) do |tag, evaluator|
@@ -47,10 +48,9 @@ FactoryGirl.define do
       end
     end
 
-
-    # A Tag object which is associated with a Person record
+    # Creates a Tag object which is associated with a Person record
     factory :tag_with_person do
-      ignore do
+      transient do
         words_count 1
       end
       after(:build) do |tag, evaluator|
@@ -62,20 +62,30 @@ FactoryGirl.define do
 
 
 
-
+  # ======================================================
+  #  Factories for creating tags that have specific names
+  # ======================================================
   factory :tag_en, class: Tag do
     name 'Madoka Kaname'
   end
   factory :tag_title, class: Tag do
-    name '魔法少女まどか☆マギカ'
+    name '魔法少女まどか☆マギカ'  # Puella Magi Madoka Magica
   end
-  factory :tags, class: Tag do
-    sequence(:name) { |n| "鹿目まどか#{n}" }
 
-    after(:create) do |tag|
-      5.times do
-        tag.images << create(:image)
-      end
-    end
+
+  factory :tag_madoka, class: Tag do
+    name 'Madoka Kaname'
+  end
+  factory :tag_madoka_roman, class: Tag do
+    name 'Kaname Madoka'
+  end
+  factory :tag_sayaka, class: Tag do
+    name 'Sayaka Miki'
+  end
+  factory :tag_sayaka_roman, class: Tag do
+    name 'Miki Sayaka'
+  end
+  factory :tag_single, class: Tag do
+    name 'single'
   end
 end

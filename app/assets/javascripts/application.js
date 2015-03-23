@@ -12,8 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery-ui
 
 //= require jquery.infinitescroll.min
+//= require jquery.mousewheel.min
 //= require infinity
 //= require masonry.pkgd.min
 //= require imagesloaded.pkgd.min

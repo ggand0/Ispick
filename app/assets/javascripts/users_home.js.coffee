@@ -3,9 +3,13 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 #= require 'component'
 #= require 'scroll'
+#= require 'home'
+
 
 $(document).on 'ready page:load', ->
   logging = false
+  scroll = $('.temp_information').data('scroll')
+
   imgLoad = imagesLoaded($('.wrapper'))
   imgLoad.on( 'progress', ( instance, image ) ->
     result = image.isLoaded ? 'loaded' : 'broken'
@@ -18,22 +22,27 @@ $(document).on 'ready page:load', ->
   return if $('.wrapper').length==0
 
 
-  window.component = new Component()
 
   # Initialize buttons related to clipping
-  window.component.initButtons()
+  component = new Component()
+  component.initButtons()
 
 
-  # Initialize infinite scroll
-  window.scroll = new Scroll(logging)
-  window.scroll.infiniteScroll()
+
+  # Initiate infinite scrolling or just aligning images for pagination
+  if $('.block').length > 0
+    sc = new Scroll(logging)
+    if scroll
+      sc.infiniteScroll()
+    else
+      sc.alignImages()
+
+  component.initCollapsables(sc)
 
   # Display the calender (Datepicker)
-  window.component.initCalender()
+  component.initCalender()
 
 
   # Popovers: close popover on click wherever except popover windows
-  window.component.initPopovers()
+  component.initPopovers()
 
-#$(document).ready(ready)
-#$(document).on('page:load', ready)

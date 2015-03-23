@@ -7,72 +7,38 @@ include Scrape::Wiki::Character
 
 describe "Scrape::Wiki::Character" do
   before do
-    IO.any_instance.stub(:puts)
+    allow_any_instance_of(IO).to receive(:puts)             # Suppress console outputs
   end
 
   describe "scrape character pages, then extract character names" do
     it "returns a proper array" do
       anime_page = {
-        "魔法少女まどか☆マギカ"=>{:ja=>"http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB", :en=>"http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica"}
+        # PMMM
+        "魔法少女まどか☆マギカ"=>{
+          :ja=>"http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB",
+          :en=>"http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica"}
       }
-
-      #
-      #url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      #puts CGI.unescape(url)
-      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E%203%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
-      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
-
       puts anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page, false)
 
-      # キャラクタ名の一覧配列を取得
+      # Get character names list
       puts anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page, false)
     end
 
     it "returns an anime_character_page" do
       anime_page = {
+        # Love live!
         "ラブライブ!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}
       }
-
-      #
-      #url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      #puts CGI.unescape(url)
-      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E%203%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
-      #http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB
-
       puts anime_character_page = Scrape::Wiki::Character.get_anime_character_page(anime_page, false)
 
-      # キャラクタ名の一覧配列を取得
+      # Get character names list
       puts anime_character = Scrape::Wiki::Character.get_anime_character_name(anime_character_page, false)
 
     end
   end
 
 
-  describe "get_anime_character_page function" do
-=begin
-    it "returns a valid hash" do
-      url_ja = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
-      url_en = 'http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica'
-      url_ja0 = 'http://ja.wikipedia.org/wiki/%E3%81%95%E3%82%88%E3%81%AA%E3%82%89%E7%B5%B6%E6%9C%9B%E5%85%88%E7%94%9F'
-      url_en0 = 'http://en.wikipedia.org/wiki/Sayonara,_Zetsubou-Sensei'
-      page_hash = {
-        '魔法少女まどか☆マギカ' => { ja: url_ja, en: url_en },
-        'さよなら絶望先生' => { ja: url_ja0, en: url_en0 }
-      }
-      valid_hash = {
-        "さよなら絶望先生"=>{:ja=>"http://ja.wikipedia.org/wiki/%E3%81%95%E3%82%88%E3%81%AA%E3%82%89%E7%B5%B6%E6%9C%9B%E5%85%88%E7%94%9F%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9", :en=>"http://en.wikipedia.org/wiki/List_of_Sayonara,_Zetsubou-Sensei_characters", :title_en=>"Sayonara, Zetsubou-Sensei"},
-        "魔法少女まどか☆マギカ"=>
-          {:ja=>"http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7",
-            :en=>"http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters", :title_en=>"Puella Magi Madoka Magica"
-          }
-      }
-
-      puts result = Scrape::Wiki::Character.get_anime_character_page(page_hash)
-      expect(result).to be_a(Hash)
-      expect(result).to eq(valid_hash)
-    end
-=end
-
+  describe "get_anime_character_page method" do
     it "return a valid hash for english" do
       page_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!"}}
       valid_hash = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!", :title_ja=>nil}}
@@ -82,22 +48,19 @@ describe "Scrape::Wiki::Character" do
     end
   end
 
-  describe "get_character_page_ja function" do
+  describe "get_character_page_ja method" do
     it "returns the hash that contains characters page url if characters list page exists" do
-      # Use the url that contains the character list page link.
-      # 「登場人物」の項が概要ページに存在するurl
+      # URLs that have a link to "Characters" page
       url = 'http://ja.wikipedia.org/wiki/%E3%81%93%E3%81%B0%E3%81%A8%E3%80%82'
-      #url = 'http://ja.wikipedia.org/wiki/IS_%E3%80%88%E3%82%A4%E3%83%B3%E3%83%95%E3%82%A3%E3%83%8B%E3%83%83%E3%83%88%E3%83%BB%E3%82%B9%E3%83%88%E3%83%A9%E3%83%88%E3%82%B9%E3%80%89'
       html = Scrape::Wiki.open_html(url)
       puts result = Scrape::Wiki::Character.get_character_page_ja('こばと。', url, html)
 
-      # get_anime_character_pageで拾う仕様なので、ここではempty hashを返す
       expect(result).to eql({ title: 'こばと。',
         url: 'http://ja.wikipedia.org/wiki/%E3%81%93%E3%81%B0%E3%81%A8%E3%80%82' })
     end
 
     it "returns a valid hash with external links" do
-      # 「登場人物」の項が概要ページに存在するurl
+      # URLs that have a link to "Characters" page
       url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB'
       html = Scrape::Wiki.open_html(url)
       puts result = Scrape::Wiki::Character.get_character_page_ja('魔法少女まどか☆マギカ', url, html)
@@ -106,20 +69,19 @@ describe "Scrape::Wiki::Character" do
     end
   end
 
-  describe "get_character_page_en function" do
+  describe "get_character_page_en method" do
     it "returns a valid Hash value" do
       url = 'http://en.wikipedia.org/wiki/Puella_Magi_Madoka_Magica'
       html = Scrape::Wiki.open_html url
 
       puts result = Scrape::Wiki::Character.get_character_page_en('Puella Magi Madoka Magica', url, html)
-      #puts result = Scrape::Wiki::Character.get_character_page_en('魔法少女まどか☆マギカ', url, html)
       expect(result).to eql({ title: 'Puella Magi Madoka Magica',
         url: 'http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters'})
     end
   end
 
 
-  describe "get_anime_character_name function" do
+  describe "get_anime_character_name method" do
     it "returns a valid Hash value" do
       url_ja = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7'
       url_en = 'http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters'
@@ -132,8 +94,6 @@ describe "Scrape::Wiki::Character" do
     end
 
     it "returns a valid hash value for english" do
-      #url_ja = nil
-      #url_en = 'http://en.wikipedia.org/wiki/Love_Live!'
       wiki_url = {"Love Live!"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!"},
                   "Love Live!2"=>{:ja=>nil, :en=>"http://en.wikipedia.org/wiki/Love_Live!", :title_en=>"Love Live!2"}}
 
@@ -141,26 +101,24 @@ describe "Scrape::Wiki::Character" do
       expect(result).to be_a(Hash)
       puts result['Love Live!']
       expect(result['Love Live!'][:characters].first[:en]).to eq('Honoka Kousaka')
-
     end
   end
 
   describe "get_character_name_ja funciton" do
     it "returns a hash that contains valid character names" do
-      # 登場人物一覧ページ
+      # Characters list page
       url = 'http://ja.wikipedia.org/wiki/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%81%BE%E3%81%A9%E3%81%8B%E2%98%86%E3%83%9E%E3%82%AE%E3%82%AB%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC%E4%B8%80%E8%A6%A7'
       html = Scrape::Wiki.open_html url
 
       result = Scrape::Wiki::Character.get_character_name_ja('魔法少女まどか☆マギカ', html)
       expect(result).to be_an(Array)
-      #result.each { |n| puts n.class.name } # => Array
       result.each { |n| puts n }
     end
   end
 
   describe "get_character_name_en funciton" do
     it "returns a hash that contains valid character names" do
-      # 登場人物一覧ページ
+      # Characters list page
       url = 'http://en.wikipedia.org/wiki/List_of_Puella_Magi_Madoka_Magica_characters'
       html = Scrape::Wiki.open_html url
       characters_list = [
@@ -172,15 +130,13 @@ describe "Scrape::Wiki::Character" do
         {:name=>"キュゥべえ", :query=>"キュゥべえ", :_alias=>""}
       ]
 
-      puts result = Scrape::Wiki::Character.get_character_name_en(
-        '魔法少女まどか☆マギカ', html)
-      #result.each { |n| puts "#{n.count}, #{n}" }
+      puts result = Scrape::Wiki::Character.get_character_name_en('魔法少女まどか☆マギカ', html)
       expect(result).to be_a(Array)
       expect(result.count).to eq(75)
     end
   end
 
-  describe "match_character_name function" do
+  describe "match_character_name method" do
     it "returns a valid hash" do
       name_string = '(鹿目 まどか Kaname Madoka)'
       characters_list =[{ name: '鹿目 まどか' }, { name: '美樹 さやか' }]
@@ -196,12 +152,11 @@ describe "Scrape::Wiki::Character" do
     end
   end
 
-  describe "match_english_name function" do
+  describe "match_english_name method" do
     it "returns a valid hash" do
       name1 = "高坂 穂乃果"
       name2 = "高坂 穂乃果 Kōsaka Honoka"
       puts result = Scrape::Wiki::Character.match_english_name(name1, name2)
-      #expect(result).to eq({ name: '鹿目 まどか' })
     end
   end
 

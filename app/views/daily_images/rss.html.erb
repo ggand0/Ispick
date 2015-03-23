@@ -1,0 +1,43 @@
+<%= stylesheet_link_tag 'users' %>
+<%= stylesheet_link_tag 'images_detail' %>
+<%= render 'shared/modal_image' %>
+<%= render 'shared/modal_board' %>
+
+
+<!-- Render images and the dropdown for filtering them -->
+<div class="controlls">
+  <p style="margin-left: 20px;">
+    <%= "<i>You don't seem to follow any tags yet. Let\'s follow them at the #{link_to "Preferences page", preferences_users_path}! <br />Showing recently created images:</i>".html_safe if current_user and current_user.tags.blank? %>
+  </p>
+</div>
+
+  <!-- Render the dropdown to provide filtering and sorting functionality-->
+  <div class="dropdown">
+    <a id="dLabel" role="button" data-toggle="dropdown" class="btn btn-default" data-target="#" href="/page.html">
+        Filter/Sort <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+      <li><%= link_to 'Sort by posted_at', home_users_path(sort: true) %></li>
+      <li><%= link_to 'Sort by favorites', home_users_path(fav: true) %></li>
+      <li class="divider"></li>
+      <li class="dropdown-submenu">
+        <a tabindex="-1" href="#">Filter by source</a>
+
+        <ul class="dropdown-menu">
+          <% Image::TARGET_SITES_DISPLAY.each_with_index do |site, count| %>
+            <li><%= link_to "#{site}", home_users_path(site: Image::TARGET_SITES[count]) %></li>
+          <% end %>
+        </ul>
+      </li>
+    </ul>
+    <%= "  #{get_debug_html(@count)}".html_safe if @count %>
+  </div>
+
+
+<!--
+  Intert 20px default margin from JavaScript at here
+-->
+
+<!-- image rendering starts from here -->
+<%= render partial: 'users/home_images', locals: { images: @images, count: @count, pagination: @pagination } %>

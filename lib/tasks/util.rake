@@ -4,6 +4,14 @@ require "#{Rails.root}/script/anidb/anidb"
 require "#{Rails.root}/script/anidb/import_anidb_characters"
 
 namespace :util do
+  desc "Add a TargetSite record"
+  task :add_target_sites, :environment do
+    TargetSite.create!(name: 'pixiv')
+    TargetSite.create!(name: 'deviantart')
+    #TargetSite.create!(name: 'minitokyo')
+    #TargetSite.create!(name: '')
+  end
+
   desc "Redownload first n thumbnails"
   task :redownload_all, [:limit]=> :environment do |t, args|
     count=0
@@ -25,6 +33,8 @@ namespace :util do
       end
     end
   end
+
+  desc "Redownload the thumbnail of an Image record"
   task :redownload, [:id]=> :environment do |t, args|
     count=0
     if args[:id]
@@ -43,7 +53,8 @@ namespace :util do
       puts "#{image.id} thumb redownload failed."
     end
   end
-  desc "Refresh last 1000 thumbnails"
+
+  desc "Refresh last n thumbnails"
   task :refresh_thumbs, [:limit]=> :environment do |t, args|
     count=0
     if args[:limit]
@@ -60,8 +71,6 @@ namespace :util do
         puts e
         puts "#{image.id} thumb refresh failed."
       end
-
-      #break if count >= limit
     end
   end
 
@@ -92,7 +101,7 @@ namespace :util do
     end
   end
 
-  desc "Delete images with irrelevant words"
+  desc "Delete images with irrelevant or banned words"
   task :delete_banned, [:limit] => :environment do |t, args|
     if args[:limit]
       limit = args[:limit]
@@ -101,12 +110,55 @@ namespace :util do
     end
 
     Image.order('created_at DESC').limit(limit).each do |image|
-      if Scrape::Client.is_adult(image.tags)
+      if Scrape::Client.check_banned(image)
         image.destroy
-        puts "Deleted: #{image.id} / #{image.target_words.first.name}"
+        puts "Deleted: #{image.id}"
       end
     end
   end
+
+  desc "Delete all Tumblr images"
+  task delete_tumblr: :environment do
+    Image.destroy_all(site_name: 'tumblr')
+
+    puts "DONE!"
+  end
+
+  desc "Delete tags that aren't associated with any images"
+  task delete_tags: :environment do
+    count = 0
+    Tag.all.each do |tag|
+      if tag.images.count == 0
+        tag.destroy
+        puts "Deleted: #{tag.id}"
+        count += 1
+      end
+    end
+
+    puts "Number of tags destroyed: #{count}"
+  end
+
+  desc "Reset counter cache of tags table"
+  task reset_tag_counter: :environment do
+    count = 0
+    Tag.all.each_with_index do |tag, count|
+      Tag.reset_counters(tag.id, :images)
+      puts "#{count} / #{Tag.count}" if count % 1000 == 0
+    end
+    puts "counter cache reset has been completed!"
+  end
+
+  desc "Reset counter cache of tags table"
+  task delete_tag_counter: :environment do
+    # =================================================================
+    #  Make sure you've already run the "util:reset_tag_counter" task!
+    # =================================================================
+    count = 0
+    Tag.destroy_all(images_count: 0)
+    puts "DONE!"
+  end
+
+
 
   task :test => :environment do
     puts "debugging something..."

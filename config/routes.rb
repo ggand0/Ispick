@@ -4,9 +4,10 @@ Ispick::Application.routes.draw do
 
   # Root path
   root 'welcome#index'
-  #root 'welcome#signup', :as => 'signup_welcome'
-  #match '/' => 'welcome#index', :via => :get
+
   match '/signup' => 'welcome#signup', :as => 'signup_welcome', :via => :get
+  match '/ranking' => 'welcome#ranking', :as => 'ranking_welcome', :via => :get
+  match '/tags' => 'welcome#tags', :as => 'tags_welcome', :via => [:get,:post]
   match 'contact' => 'contact#new', :as => 'new_contact', :via => :get
   match 'contact' => 'contact#create', :as => 'create_contact', :via => :post
 
@@ -14,7 +15,15 @@ Ispick::Application.routes.draw do
   scope "/debug" do
     get "/index" => "debug#index", as: "index_debug"
     get '/home' => 'debug#home', as: "home_debug"
+    get '/search' => 'debug#search', as: "search_debug"
     get '/download' => 'debug#download_favored_images', as: "download_debug"
+    get '/download_recent' => 'debug#download_images_n', as: "download_recent"
+    get '/download_tag' => 'debug#download_images_tag', as: "download_tag"
+    get '/download_custom' => 'debug#download_images_custom', as: "download_custom"
+    get '/download_csv' => 'debug#download_csv', as: "download_csv"
+    get '/stream_csv' => 'debug#stream_csv', as: "stream_csv"
+    get '/view_csv' => 'debug#view_csv', as: "view_csv"
+    get '/download_tags' => 'debug#download_images_tags', as: "download_tags"
     get '/illust_detection' => 'debug#debug_illust_detection', as: "illust_detection_debug"
     get '/crawling' => 'debug#debug_crawling', as: "crawling_debug"
     get '/miniprofiler' => 'debug#toggle_miniprofiler', as: "miniprofiler_debug"
@@ -52,12 +61,16 @@ Ispick::Application.routes.draw do
       get 'settings'
       get 'new_avatar'
       post 'create_avatar'
+      get 'rss'
       get 'preferences'
       post 'preferences'
       get 'boards'
-      get 'search'
+      put 'update_display_settings'
+
       delete 'delete_target_word'
       delete 'delete_tag'
+      get 'recommended_tags'
+      post 'set_sites'
 
       get "/home/:year/:month/:day" => "users#home",
         constraints: { year: /[1-9][0-9]{3}/, month: /[01][0-9]/, day: /[0123][0-9]/ }
@@ -68,14 +81,21 @@ Ispick::Application.routes.draw do
     end
   end
 
+  namespace :daily_images do
+    get 'rss'
+  end
   resources :favored_images, only: [:show, :destroy]
   resources :image_boards do
     collection do
       get 'boards'
     end
   end
-  resources :images, only: [:index, :show, :destroy]
+
   resources :images do
+    collection do
+      get 'rss_aqua'
+      get 'search'
+    end
     member do
       put 'favor'
       put 'hide'
@@ -86,6 +106,7 @@ Ispick::Application.routes.draw do
   resources :target_images do
     member do
       get 'prefer'
+      get 'similar_convnet'
       get 'show_delivered'
       get 'switch'
     end
@@ -104,6 +125,8 @@ Ispick::Application.routes.draw do
     collection do
       match 'search' => 'tags#search', via: [:get, :post], as: :search
       post 'attach'
+      post 'follow_remote'
+      get 'autocomplete'
     end
     member do
       get 'images'

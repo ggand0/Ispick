@@ -1,18 +1,21 @@
-// 画像詳細画面(modal)で使用するクラス
+.modal-body {
+  word-break: break-word;
+}
+
+// Used on image detail modals
+@media only screen and (min-width: 500px) {
+  .image {
+    text-align: center;
+    align: center;
+  }
+}
+
 .image-title {
   font-size: 20pt;
-  width: 700px;//560px;
-  float: left;
-}
-.image-detail {
-  width: 500px;
   float: left;
 }
 .image-buttons {
   align: right;
-}
-.image-info {
-  align: left;
 }
 .image-share {
   text-align: right;
@@ -21,16 +24,24 @@
 .image-time {
   text-align: left;
 }
-.image-buttons {
-}
 .share-button {
   float: right;
-  width: auto;
   text-align: right;
   align: right;
 }
 
-// 画像詳細画面(html)で使用するクラス
-.detail-wrap {
-  width: 800px;
+
+
+dt {
+  clear: right;
+  width: 150px;
+  color: white;
+  background-color: #7ACECE;
+}
+dd {
+  color: #444;
+  word-break: break-word;
+}
+dt, dd {
+  padding-left: 14px;
 }

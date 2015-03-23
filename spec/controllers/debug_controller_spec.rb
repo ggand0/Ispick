@@ -15,25 +15,35 @@ describe DebugController do
     end
   end
 
-=begin
-  describe "GET download_favored_images" do
-    # see: http://stackoverflow.com/questions/4701108/rspec-send-file-testing
-    it "downloads favored delivered_images" do
+  describe "GET download_recent_images" do
+    it "downloads recent images" do
       login_user
-      controller.stub(:render).and_return nil
-      controller.should_receive(:send_file)#.and_return(nil)#{ controller.render nothing: true }
-      get :download_favored_images, {}, valid_session
+      allow(controller).to receive(:render).and_return nil
+      expect(controller).to receive(:send_file)
+      get :download_images_n, {}
+    end
+
+    it "downloads recent images that have proper filenames" do
+      login_user
+      get :download_images_n, {}
     end
   end
 
-  # An action for debug
+  describe "GET download_tag" do
+    it "downloads recent images" do
+      login_user
+      allow(controller).to receive(:render).and_return nil
+      expect(controller).to receive(:send_file)
+      get :download_images_tag, {}
+    end
+  end
+
   describe "GET debug_illust_detection" do
     it "renders valid template" do
       login_user
-      get :debug_illust_detection, {}, valid_session
-      response.should render_template('debug_illust_detection')
+      get :debug_illust_detection, {}
+      expect(response).to render_template('debug_illust_detection')
     end
   end
-=end
 
 end

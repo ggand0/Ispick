@@ -20,10 +20,10 @@ describe "Boards page" do
 
   describe "boards editing features", :js => true do
     it "unclips the image of the default board" do
-      page.find('.boxInner').hover
+      page.find('.block').hover
       expect(page).to have_content('Unclip')
       click_link 'Unclip'
-      expect(page.all('.box').count).to eq(0)
+      expect(page.all('.block').count).to eq(0)
     end
 
     it "renames the default image_board" do
@@ -31,15 +31,15 @@ describe "Boards page" do
     end
 
     it "selects another image_board" do
-      click_button 'Select a board'
+      first('.glyphicon-list').click
       click_link 'A board without images'
       expect(page).not_to have_content('MyText')
     end
 
     it "deletes an optional image_board" do
-      click_button 'Select a board'
+      first('.glyphicon-list').click
       click_link 'A board without images'
-      click_link 'Delete'
+      first('.glyphicon-remove').click
       page.driver.browser.accept_js_confirms
       expect(@user.image_boards.count).to eq(1)
     end

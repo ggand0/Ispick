@@ -15,10 +15,12 @@
     </div>
   <% end %>
 
-  <%= f.text_field :name, :required => true, :autofocus => true %>
+  <%= f.text_field :name, :required => true, :autofocus => true, inline: true %>
+  <br />
+  <br />
   <%# f.select :language_preferences, ['ja', 'en'], { label: "Choose a language:" }, { class: "selectpicker" } %>
 
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit 'Update settings' %>
   </div>
 <% end %>
