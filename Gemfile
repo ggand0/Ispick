@@ -48,16 +48,6 @@ gem 'puma'
 gem 'rb-readline', require: false                   # Necessary to launch rails console
 
 
-# API clients
-gem 'natto'
-gem 'x2ch'
-gem 'futaba', git: 'git@github.com:pentiumx/futaba.git'
-#gem 'twitter', '>= 5.8.0', git: 'git@github.com:pentiumx/twitter.git'
-gem 'tumblr_client', git: 'https://github.com/tumblr/tumblr_client.git'
-#gem 'giphy'
-gem 'tinami'
-
-
 # OAuth gems
 gem 'devise'
 gem 'omniauth'

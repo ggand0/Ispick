@@ -115,6 +115,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html {}
+      format.json {}
       format.js { render action: 'home' }
     end
   end
